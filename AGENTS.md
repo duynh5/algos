@@ -6,6 +6,56 @@ This repository teaches algorithms and data structures in Go. Keep educational
 concept implementations under `concepts/`, the active exercise under
 `workbench/`, and completed judge-ready solutions under `problems/`.
 
+## Problem Retrieval
+
+When the user asks to "retrieve" a problem from a URL, treat the authoritative
+page at that URL as the source of truth and create an unsolved practice file
+directly under `problems/`. Use `workbench/main.go.template` as the canonical
+structural skeleton, then adapt it into a standalone practice file by adding
+the `//go:build ignore` directive and file-level difficulty, source, and problem
+ID metadata used under `problems/`. Do not put the retrieved problem in
+`workbench/` and do not add the `solved_` prefix.
+
+1. Open the authoritative problem page and verify the source, problem ID,
+   title, difficulty, full statement, constraints, examples, and canonical URL.
+   If required metadata is unavailable or ambiguous, stop and ask the user
+   rather than inferring it.
+2. Name the file
+   `<difficulty>_<source>_<problem_id>_<descriptive_slug>.go`, using lowercase
+   difficulty and source names and zero-padding numeric problem IDs to at least
+   four digits.
+3. Fill in the complete prompt, source metadata, problem-specific judge-owned
+   types, strongly typed input parser, structural output formatter when needed,
+   and all official examples as executable `sampleCases`.
+4. Add useful valid coverage beyond the official examples, including minimum,
+   boundary, duplicate, adversarial, transition, and constraint-extreme cases
+   as applicable. Prefer cases that expose common incorrect assumptions while
+   keeping the practice file practical to run locally.
+5. Keep `archiveReady` set to `false`, register only
+   `currentAttemptSolution`, and leave `agentSolutions` empty. In
+   `solveCurrentAttempt`, parse the input into strongly typed arguments and
+   leave only the user's algorithm body and result construction unimplemented.
+6. Leave the `CURRENT ATTEMPT` and `AGENT SOLUTIONS` sections unsolved. Do not
+   add an algorithm, judge solution, hints, completed review analysis, or
+   concept-based solution material during retrieval. Preserve the blank review
+   analysis template for a later "review" request.
+7. Format the generated Go file and verify that its retrieval scaffolding is
+   structurally consistent with `workbench/main.go.template` plus the required
+   standalone practice-file metadata. Do not treat expected test failures from
+   the deliberately blank current attempt as a retrieval failure.
+8. When the user later asks to "review" a retrieved practice file, treat that
+   file as the single source of truth and as an implementation request. Apply
+   the Active Problem Workflow below to that file: preserve and assess the
+   user's current attempt, add three distinct agent-authored solutions, run all
+   implementations against the same cases, and complete the worked analysis
+   and complexity discussion. Substitute the retrieved file for
+   `workbench/main.go`; do not move it through the workbench.
+9. Validate a reviewed practice file with
+   `./scripts/run-problem.sh <filename>`, `./scripts/test-problems.sh`, and
+   `go test ./...`. Set `archiveReady` to `true` only when the current attempt,
+   all three agent solutions, regression coverage, and analysis are complete
+   and the required checks pass.
+
 ## Active Problem Workflow
 
 When the user asks for help with, an answer to, or a review of "the problem in
@@ -91,6 +141,13 @@ has been archived or the user explicitly says to discard it.
 ## Archiving
 
 After a problem is complete:
+
+When the user asks to archive a completed retrieved practice file that is
+already under `problems/`, verify its source metadata and `archiveReady` state,
+then rename it in place by adding the `solved_` prefix to its existing basename.
+Do not run `archive-workbench.sh` or reset the workbench for this path. After the
+rename, run `./scripts/run-problem.sh <solved-filename>`,
+`./scripts/test-problems.sh`, and `go test ./...` before reporting success.
 
 1. Assign `easy`, `medium`, or `hard` based on the required insight,
    implementation complexity, edge cases, and constraints. Record the source

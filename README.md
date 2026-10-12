@@ -18,6 +18,80 @@ implementations separate from judge-ready problem solutions.
 Concept code is written for learning and reuse. Problem algorithms stay local
 to their problem file so the selected judge function remains easy to copy.
 
+## Agent workflow requests
+
+These phrases invoke repository-specific Codex workflows. They are not shell
+commands.
+
+| Request | Result |
+| --- | --- |
+| `retrieve <problem-url>` | Verifies the authoritative page, then creates an unsolved practice file under `problems/` from `workbench/main.go.template`. It includes metadata, the prompt, typed adapters, official examples, and additional edge cases, while leaving the current attempt and agent solutions unsolved. |
+| `fill in` | Completes input cases, parsing, and output formatting for the active workbench problem without solving or replacing the current algorithm. |
+| `review the problem in the workbench` | Preserves the current attempt, adds direct, improved, and preferred solutions, runs shared regression cases, and completes the correctness and complexity analysis. |
+| `review problems/<practice-file>.go` | Applies the same three-solution review workflow directly to a retrieved practice file without moving it through the workbench. |
+| `archive the problem` | Archives a completed workbench problem with a `solved_` filename. For a completed retrieved practice file, adds the `solved_` prefix in place. Archiving requires `archiveReady = true` and successful validation. |
+
+## Command reference
+
+Run these commands from the repository root. The scripts require Bash, Go,
+`gofmt`, and `rg` (ripgrep). The module currently declares Go 1.26.3.
+
+### Daily problem workflow
+
+| Command | Purpose and behavior |
+| --- | --- |
+| `./scripts/workbench.sh` | Runs the active workbench program and then its package tests. Equivalent to `go run ./workbench` followed by `go test ./workbench`. |
+| `./scripts/run-problem.sh <filename>` | Runs one file under `problems/`. Accepts either the basename or `problems/<filename>` and requires the `[solved_]<difficulty>_<source>_<problem-id>_<slug>.go` naming format. |
+| `./scripts/test-problems.sh` | Runs every completed problem file. Files containing `archiveReady = false` are reported and skipped. |
+| `./scripts/archive-workbench.sh <easy\|medium\|hard> <problem-id> <descriptive-slug> [source]` | Validates the completed workbench, creates a standalone `solved_` file under `problems/`, adds its metadata, runs it, and appends it to `problems/README.md`. The source defaults to `leetcode`; the command refuses an incomplete workbench or an existing destination. |
+| `./scripts/reset-workbench.sh` | Restores `workbench/main.go` and `main_test.go` from their canonical templates after validating the replacement. It refuses to discard an unfinished workbench. |
+| `./scripts/reset-workbench.sh --force` | Performs the same reset while explicitly allowing unfinished workbench content to be discarded. This is destructive and should only be used intentionally. |
+
+Examples:
+
+```bash
+./scripts/workbench.sh
+./scripts/run-problem.sh easy_leetcode_0066_plus_one.go
+./scripts/archive-workbench.sh easy 1 two-sum
+./scripts/reset-workbench.sh
+```
+
+### Repository validation
+
+| Command | Purpose and behavior |
+| --- | --- |
+| `go test ./...` | Runs every Go package test that is not excluded by build constraints. Standalone problem files use `//go:build ignore`, so they are exercised by the problem scripts instead. |
+| `./scripts/test-problem-workflow.sh` | Runs the archive, reset, filename-validation, single-problem, and bulk-problem workflow tests inside a temporary repository fixture. It does not modify the active workbench. |
+
+The usual full validation sequence is:
+
+```bash
+./scripts/workbench.sh
+./scripts/test-problems.sh
+./scripts/test-problem-workflow.sh
+go test ./...
+```
+
+### Maintainer bulk import
+
+The Top Interview 150 importer is a repository maintenance command, not part of
+the normal single-problem workflow:
+
+```bash
+go run scripts/import-top-interview-150-practice.go \
+  scripts/import-top-interview-150-practice-helpers.go \
+  [-manifest <catalog.tsv>] \
+  [-metadata <metadata-directory>] \
+  [-problems <destination-directory>]
+```
+
+Defaults are `scripts/top-interview-150.tsv`,
+`/tmp/leetcode-top-interview-150`, and `problems`. The metadata directory must
+already contain the separately downloaded LeetCode GraphQL JSON responses. The
+importer requires a 150-entry catalog, verifies each response against it,
+generates unsolved practice files, and updates `problems/README.md`. It refuses
+to overwrite a non-generated practice file.
+
 ## Starting a problem
 
 All active-problem content lives in one editable file:
@@ -59,9 +133,9 @@ The default collaboration flow is:
 7. Archive the completed solution with `archive-workbench.sh`, then run the
    archived problem and the repository checks.
 
-Because this is a public repository, problem notes should contain an original
-summary and a link to the source rather than a verbatim copy of a third-party
-problem statement.
+Retrieved problem files retain source metadata and the canonical URL for
+attribution. Check the source's licensing terms before redistributing imported
+problem statements.
 
 ## Archiving and running problems
 
@@ -114,7 +188,6 @@ using the repository's shared `internal/testrunner` package.
 
 ## Validation
 
-```bash
-go test ./...
-./scripts/test-problem-workflow.sh
-```
+See the complete [command reference](#command-reference), including the
+recommended full validation sequence and the isolated workflow regression
+test.
