@@ -1,6 +1,8 @@
 //go:build ignore
 
 // Difficulty: Easy
+// Source: leetcode
+// Problem ID: 1
 
 package main
 
@@ -122,19 +124,28 @@ var sampleCases = []testrunner.Case{
 	},
 }
 
-// archiveReady is set to true only after the problem, samples, three solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady is set to true only after the problem, samples, preserved
+// current attempt, three agent solutions, analysis, and regression coverage
+// are complete and verified.
 const archiveReady = true
 
-// solutions lists every implementation that the sample runner checks. Keep the
-// current attempt registered while developing it. When Codex adds three final
-// approaches, every approach is registered here and receives the same cases.
-var solutions = []testrunner.Solution{
-	{Name: "current attempt", Run: solveCurrentAttempt},
+// Registered implementations run against the same cases.
+var currentAttemptSolution = testrunner.Solution{
+	Name: "current attempt",
+	Run:  solveCurrentAttempt,
+}
+
+var agentSolutions = []testrunner.Solution{
 	{Name: "check every pair", Run: solveByCheckingEveryPair},
 	{Name: "sort and use two pointers", Run: solveBySortingAndTwoPointers},
 	{Name: "remember complements", Run: solveByRememberingComplements},
 }
+
+var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+
+// =============================================================================
+// CURRENT ATTEMPT
+// =============================================================================
 
 // solveCurrentAttempt is the only function you need to change initially. It
 // receives the exact sample input string and returns the expected output form.
@@ -163,6 +174,10 @@ func solveCurrentAttempt(input string) string {
 
 	return ret
 }
+
+// =============================================================================
+// AGENT SOLUTIONS
+// =============================================================================
 
 // solveByCheckingEveryPair is the direct baseline. It improves the control flow
 // of the current attempt by returning as soon as the unique answer is found.

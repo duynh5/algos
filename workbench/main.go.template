@@ -11,20 +11,19 @@ import (
 ===============================================================================
 PASTE THE COMPLETE PROBLEM BELOW THIS LINE
 
-Include the source URL if available.
+Source: LeetCode
+Problem ID:
+Source URL:
 
 PASTE THE COMPLETE PROBLEM ABOVE THIS LINE
 ===============================================================================
 */
 
-// =============================================================================
-// PROBLEM-SPECIFIC TYPES AND ADAPTERS
+// Problem-specific support.
 //
-// Define judge-owned types and strongly typed parsing or formatting helpers
-// here. Name adapters after the problem, such as parseTwoSumInput. Keep sample
-// inputs in the statement's readable serialization and convert structural
-// values such as linked lists, trees, or graphs inside these helpers.
-// =============================================================================
+// Keep shared judge types and parsing or formatting helpers here. Name adapters
+// after the problem, such as parseTwoSumInput. Put setup used only by the
+// current attempt at the top of solveCurrentAttempt below.
 
 // sampleCases contains the examples that every registered solution must pass.
 // Add one entry per example. Encode arguments as a positional JSON array.
@@ -36,16 +35,32 @@ var sampleCases = []testrunner.Case{
 	// },
 }
 
-// archiveReady is set to true only after the problem, samples, three solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady is set to true only after the problem, samples, preserved
+// current attempt, three agent solutions, analysis, and regression coverage
+// are complete and verified.
 const archiveReady = false
 
-// solutions lists every implementation that the sample runner checks. Keep the
-// current attempt registered while developing it. When Codex adds three final
-// approaches, every approach is registered here and receives the same cases.
-var solutions = []testrunner.Solution{
-	{Name: "current attempt", Run: solveCurrentAttempt},
+// Registered implementations run against the same cases.
+var currentAttemptSolution = testrunner.Solution{
+	Name: "current attempt",
+	Run:  solveCurrentAttempt,
 }
+
+// agentSolutions contains three implementations authored during review: a
+// direct approach, an improved approach, and the preferred approach.
+var agentSolutions = []testrunner.Solution{}
+
+// solutions keeps the user's attempt separate while running every case against
+// it and all three agent-authored approaches.
+var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+
+// =============================================================================
+// CURRENT ATTEMPT
+//
+// Preserve this function's algorithm body during review. Add agent-authored
+// implementations in the separate section below, even when one uses the same
+// algorithmic method.
+// =============================================================================
 
 // solveCurrentAttempt is the only function you need to change initially. It
 // receives the exact sample input string and returns the expected output form.
@@ -57,6 +72,13 @@ func solveCurrentAttempt(input string) string {
 	// Parse input, implement your algorithm, and return the formatted answer.
 	return ""
 }
+
+// =============================================================================
+// AGENT SOLUTIONS
+//
+// Add the direct, improved, and preferred implementations here during review.
+// Keep parsing helpers and judge-owned types in the compact support block above.
+// =============================================================================
 
 /*
 ===============================================================================

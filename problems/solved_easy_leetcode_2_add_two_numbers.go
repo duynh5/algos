@@ -1,6 +1,8 @@
 //go:build ignore
 
 // Difficulty: Easy
+// Source: leetcode
+// Problem ID: 2
 
 package main
 
@@ -54,8 +56,7 @@ PASTE THE COMPLETE PROBLEM ABOVE THIS LINE
 ===============================================================================
 */
 
-// =============================================================================
-// PROBLEM-SPECIFIC TYPES AND ADAPTERS
+// Problem-specific support.
 
 // ListNode is a node in a singly linked list.
 type ListNode struct {
@@ -104,8 +105,6 @@ func formatAddTwoNumbersOutput(head *ListNode) string {
 	}
 	return string(encoded)
 }
-
-// =============================================================================
 
 // sampleCases contains the examples that every registered solution must pass.
 // Each input is a positional JSON array containing the statement's serialized
@@ -168,18 +167,28 @@ var sampleCases = []testrunner.Case{
 	},
 }
 
-// archiveReady is set to true only after the problem, samples, three solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady is set to true only after the problem, samples, preserved
+// current attempt, three agent solutions, analysis, and regression coverage
+// are complete and verified.
 const archiveReady = true
 
-// solutions lists every implementation that the sample runner checks. Keep the
-// current attempt registered while developing it. When Codex adds three final
-// approaches, every approach is registered here and receives the same cases.
-var solutions = []testrunner.Solution{
-	{Name: "direct: arbitrary-precision conversion", Run: solveCurrentAttempt},
+// Registered implementations run against the same cases.
+var currentAttemptSolution = testrunner.Solution{
+	Name: "current attempt",
+	Run:  solveCurrentAttempt,
+}
+
+var agentSolutions = []testrunner.Solution{
+	{Name: "direct: arbitrary-precision conversion", Run: solveViaArbitraryPrecision},
 	{Name: "improved: recursive carry", Run: solveRecursiveCarry},
 	{Name: "preferred: iterative carry", Run: solveIterativeCarry},
 }
+
+var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+
+// =============================================================================
+// CURRENT ATTEMPT
+// =============================================================================
 
 // solveCurrentAttempt is the only function you need to change initially. It
 // receives the exact sample input string and returns the expected output form.
@@ -221,6 +230,15 @@ func addTwoNumbersViaBigInt(l1, l2 *ListNode) *ListNode {
 	}
 
 	return dummy.Next
+}
+
+// =============================================================================
+// AGENT SOLUTIONS
+// =============================================================================
+
+func solveViaArbitraryPrecision(input string) string {
+	l1, l2 := parseAddTwoNumbersInput(input)
+	return formatAddTwoNumbersOutput(addTwoNumbersViaBigInt(l1, l2))
 }
 
 func solveRecursiveCarry(input string) string {

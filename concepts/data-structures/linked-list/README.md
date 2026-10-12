@@ -44,4 +44,4 @@ traversal additionally consumes O(n) call-stack space.
 
 ## Related problems
 
-- [Add Two Numbers (Easy)](../../../problems/easy_add_two_numbers.go)
+- [Add Two Numbers (Easy)](../../../problems/easy_leetcode_2_add_two_numbers.go)

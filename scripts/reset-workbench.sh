@@ -28,11 +28,16 @@ script_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 default_root=$(cd "$script_directory/.." && pwd)
 repository_root=${ALGOS_REPO_ROOT:-$default_root}
 template_file="$repository_root/workbench/main.go.template"
+template_test_file="$repository_root/workbench/main_test.go.template"
 workbench_file="$repository_root/workbench/main.go"
+workbench_test_file="$repository_root/workbench/main_test.go"
 
 [[ -f $template_file ]] || fail "$template_file was not found"
+[[ -f $template_test_file ]] || fail "$template_test_file was not found"
 
-if [[ -f $workbench_file ]] && cmp -s "$template_file" "$workbench_file"; then
+if [[ -f $workbench_file ]] && [[ -f $workbench_test_file ]] && \
+  cmp -s "$template_file" "$workbench_file" && \
+  cmp -s "$template_test_file" "$workbench_test_file"; then
   echo "workbench is already reset"
   exit 0
 fi
@@ -43,40 +48,23 @@ fi
 
 temporary_directory=$(mktemp -d "$repository_root/.reset-workbench.XXXXXX")
 temporary_file="$temporary_directory/main.go"
-temporary_test_files=()
+temporary_test_file="$temporary_directory/main_test.go"
 cleanup() {
-  if [[ ${#temporary_test_files[@]} -gt 0 ]]; then
-    rm -f "${temporary_test_files[@]}"
-  fi
-  rm -f "$temporary_file"
+	rm -f "$temporary_file" "$temporary_test_file"
   rmdir "$temporary_directory" 2>/dev/null || true
 }
 trap cleanup EXIT
 
 cp "$template_file" "$temporary_file"
-gofmt -w "$temporary_file"
+cp "$template_test_file" "$temporary_test_file"
+gofmt -w "$temporary_file" "$temporary_test_file"
 (cd "$repository_root" && go run "$temporary_file")
 
 if [[ -f "$repository_root/go.mod" ]]; then
-  shopt -s nullglob
-  workbench_test_files=("$repository_root"/workbench/*_test.go)
-  shopt -u nullglob
-
-  for test_file in "${workbench_test_files[@]}"; do
-    temporary_test_file="$temporary_directory/$(basename "$test_file")"
-    cp "$test_file" "$temporary_test_file"
-    temporary_test_files+=("$temporary_test_file")
-  done
-
-  if [[ ${#temporary_test_files[@]} -gt 0 ]]; then
-    (cd "$repository_root" && go test "$temporary_file" "${temporary_test_files[@]}")
-  fi
+	(cd "$repository_root" && go test "$temporary_file" "$temporary_test_file")
 fi
 
-if [[ ${#temporary_test_files[@]} -gt 0 ]]; then
-  rm -f "${temporary_test_files[@]}"
-  temporary_test_files=()
-fi
 mv "$temporary_file" "$workbench_file"
+mv "$temporary_test_file" "$workbench_test_file"
 
 echo "reset $workbench_file"

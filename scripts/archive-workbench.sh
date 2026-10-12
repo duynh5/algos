@@ -3,7 +3,7 @@
 set -euo pipefail
 
 usage() {
-  echo "usage: $0 <easy|medium|hard> <descriptive-slug>" >&2
+  echo "usage: $0 <easy|medium|hard> <problem-id> <descriptive-slug> [source]" >&2
 }
 
 fail() {
@@ -11,13 +11,15 @@ fail() {
   exit 1
 }
 
-if [[ $# -ne 2 ]]; then
+if [[ $# -lt 3 || $# -gt 4 ]]; then
   usage
   exit 2
 fi
 
 difficulty=$1
-slug=$2
+problem_id=$2
+slug=$3
+source_name=${4:-leetcode}
 
 case $difficulty in
   easy) difficulty_label=Easy ;;
@@ -26,6 +28,8 @@ case $difficulty in
   *) fail "difficulty must be easy, medium, or hard" ;;
 esac
 
+[[ $source_name =~ ^[a-z0-9]+$ ]] || fail "source must contain lowercase letters and digits"
+[[ $problem_id =~ ^[a-z0-9]+$ ]] || fail "problem ID must contain lowercase letters and digits"
 [[ $slug =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || fail "slug must contain lowercase letters, digits, and single hyphen separators"
 
 script_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -33,13 +37,15 @@ default_root=$(cd "$script_directory/.." && pwd)
 repository_root=${ALGOS_REPO_ROOT:-$default_root}
 source_file="$repository_root/workbench/main.go"
 problem_root="$repository_root/problems"
-filename="${difficulty}_${slug//-/_}.go"
+filename="solved_${difficulty}_${source_name}_${problem_id}_${slug//-/_}.go"
 destination="$problem_root/$filename"
 
 [[ -f $source_file ]] || fail "$source_file was not found"
 [[ -f "$problem_root/README.md" ]] || fail "$problem_root/README.md was not found"
 [[ ! -e $destination ]] || fail "$destination already exists"
 rg -q '^const archiveReady = true$' "$source_file" || fail "workbench is not marked ready to archive"
+
+(cd "$repository_root" && go test ./workbench)
 
 temporary_directory=$(mktemp -d "$repository_root/.archive-workbench.XXXXXX")
 temporary_file="$temporary_directory/$filename"
@@ -51,7 +57,9 @@ trap cleanup EXIT
 
 {
   printf '%s\n\n' '//go:build ignore'
-  printf '// Difficulty: %s\n\n' "$difficulty_label"
+  printf '// Difficulty: %s\n' "$difficulty_label"
+  printf '// Source: %s\n' "$source_name"
+  printf '// Problem ID: %s\n\n' "$problem_id"
   sed -n '1,$p' "$source_file"
 } > "$temporary_file"
 

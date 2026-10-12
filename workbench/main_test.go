@@ -7,13 +7,19 @@ import (
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
 
-func TestArchiveReadyWorkbenchHasThreeApproaches(t *testing.T) {
+func TestArchiveReadyWorkbenchHasCurrentAttemptAndThreeAgentSolutions(t *testing.T) {
 	if !archiveReady {
 		t.Skip("workbench is not ready to archive")
 	}
 
-	if got, want := len(solutions), 3; got != want {
+	if got, want := len(agentSolutions), 3; got != want {
+		t.Fatalf("len(agentSolutions) = %d, want %d", got, want)
+	}
+	if got, want := len(solutions), 4; got != want {
 		t.Fatalf("len(solutions) = %d, want %d", got, want)
+	}
+	if solutions[0].Name != "current attempt" {
+		t.Fatalf("solutions[0].Name = %q, want current attempt", solutions[0].Name)
 	}
 
 	seen := make(map[string]struct{}, len(solutions))

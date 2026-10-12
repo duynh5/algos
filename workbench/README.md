@@ -8,8 +8,8 @@ sample execution lives in [`internal/testrunner`](../internal/testrunner/).
 ## Quick start
 
 1. Paste the problem into the `PROBLEM` block comment in `main.go`.
-2. Define any judge-owned types and problem-specific input/output adapters in
-   the section immediately below the statement.
+2. Define shared judge-owned types and problem-specific input/output adapters
+   in the compact support block immediately below the statement.
 3. Add every supplied example to the `sampleCases` slice.
 4. Implement `solveCurrentAttempt` using the typed adapter values.
 5. Run `./scripts/workbench.sh` from the repository root.
@@ -22,9 +22,9 @@ your algorithm begins with strongly typed arguments. If structural output needs
 conversion, Codex also wires the matching formatter without replacing your
 algorithm body.
 
-The agent sets `archiveReady` to `true` only after the completed problem and all
-three solutions pass their checks. The archive script refuses incomplete
-workbench content.
+The agent sets `archiveReady` to `true` only after the completed problem, the
+preserved current attempt, and all three agent-authored solutions pass their
+checks. The archive script refuses incomplete workbench content.
 
 The universal workbench function accepts raw sample input and returns raw
 output. For a function-style judge such as LeetCode, encode the arguments in
@@ -59,14 +59,19 @@ form. Handle decoding and formatting errors at these adapter boundaries.
 If copied problem text contains the uncommon sequence `*/`, change it to `* /`
 so it does not close the Go block comment early.
 
-Codex will preserve and review the attempt, connect it to relevant material in
-[`concepts/`](../concepts/), register three distinct solutions, and apply the
-same sample and regression cases to all three. Detailed correctness and
-complexity notes stay in the analysis block in `main.go`.
+Codex will preserve and review the attempt without using it as one of its three
+solutions, connect it to relevant material in [`concepts/`](../concepts/),
+register three distinct agent-authored solutions, and apply the same sample and
+regression cases to all four implementations. Full-width banners are reserved
+for the current attempt and agent solutions; adapters, registration, and other
+supporting code use compact labels. Detailed correctness and complexity notes
+stay in the analysis block in `main.go`.
 
 Once verified, the complete problem is copied to its permanent location under
 [`problems/`](../problems/) with
-`./scripts/archive-workbench.sh <easy|medium|hard> <descriptive-slug>`. Do not
+`./scripts/archive-workbench.sh <easy|medium|hard> <problem-id> <descriptive-slug> [source]`.
+Completed archives receive a `solved_` filename prefix. The source defaults to
+`leetcode`; provide the optional final argument only for another source. Do not
 overwrite an unarchived workbench problem.
 
 After verifying the archived file, restore the canonical blank template with:

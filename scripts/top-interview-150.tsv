@@ -1,0 +1,152 @@
+# Official source: https://leetcode.com/studyplan/top-interview-150/
+# id	difficulty	slug	title
+88	easy	merge-sorted-array	Merge Sorted Array
+27	easy	remove-element	Remove Element
+26	easy	remove-duplicates-from-sorted-array	Remove Duplicates from Sorted Array
+80	medium	remove-duplicates-from-sorted-array-ii	Remove Duplicates from Sorted Array II
+169	easy	majority-element	Majority Element
+189	medium	rotate-array	Rotate Array
+121	easy	best-time-to-buy-and-sell-stock	Best Time to Buy and Sell Stock
+122	medium	best-time-to-buy-and-sell-stock-ii	Best Time to Buy and Sell Stock II
+55	medium	jump-game	Jump Game
+45	medium	jump-game-ii	Jump Game II
+274	medium	h-index	H-Index
+380	medium	insert-delete-getrandom-o1	Insert Delete GetRandom O(1)
+238	medium	product-of-array-except-self	Product of Array Except Self
+134	medium	gas-station	Gas Station
+135	hard	candy	Candy
+42	hard	trapping-rain-water	Trapping Rain Water
+13	easy	roman-to-integer	Roman to Integer
+12	medium	integer-to-roman	Integer to Roman
+58	easy	length-of-last-word	Length of Last Word
+14	easy	longest-common-prefix	Longest Common Prefix
+151	medium	reverse-words-in-a-string	Reverse Words in a String
+6	medium	zigzag-conversion	Zigzag Conversion
+28	easy	find-the-index-of-the-first-occurrence-in-a-string	Find the Index of the First Occurrence in a String
+68	hard	text-justification	Text Justification
+125	easy	valid-palindrome	Valid Palindrome
+392	easy	is-subsequence	Is Subsequence
+167	medium	two-sum-ii-input-array-is-sorted	Two Sum II - Input Array Is Sorted
+11	medium	container-with-most-water	Container With Most Water
+15	medium	3sum	3Sum
+209	medium	minimum-size-subarray-sum	Minimum Size Subarray Sum
+3	medium	longest-substring-without-repeating-characters	Longest Substring Without Repeating Characters
+30	hard	substring-with-concatenation-of-all-words	Substring with Concatenation of All Words
+76	hard	minimum-window-substring	Minimum Window Substring
+36	medium	valid-sudoku	Valid Sudoku
+54	medium	spiral-matrix	Spiral Matrix
+48	medium	rotate-image	Rotate Image
+73	medium	set-matrix-zeroes	Set Matrix Zeroes
+289	medium	game-of-life	Game of Life
+383	easy	ransom-note	Ransom Note
+205	easy	isomorphic-strings	Isomorphic Strings
+290	easy	word-pattern	Word Pattern
+242	easy	valid-anagram	Valid Anagram
+49	medium	group-anagrams	Group Anagrams
+1	easy	two-sum	Two Sum
+202	easy	happy-number	Happy Number
+219	easy	contains-duplicate-ii	Contains Duplicate II
+128	medium	longest-consecutive-sequence	Longest Consecutive Sequence
+228	easy	summary-ranges	Summary Ranges
+56	medium	merge-intervals	Merge Intervals
+57	medium	insert-interval	Insert Interval
+452	medium	minimum-number-of-arrows-to-burst-balloons	Minimum Number of Arrows to Burst Balloons
+20	easy	valid-parentheses	Valid Parentheses
+71	medium	simplify-path	Simplify Path
+155	medium	min-stack	Min Stack
+150	medium	evaluate-reverse-polish-notation	Evaluate Reverse Polish Notation
+224	hard	basic-calculator	Basic Calculator
+141	easy	linked-list-cycle	Linked List Cycle
+2	medium	add-two-numbers	Add Two Numbers
+21	easy	merge-two-sorted-lists	Merge Two Sorted Lists
+138	medium	copy-list-with-random-pointer	Copy List with Random Pointer
+92	medium	reverse-linked-list-ii	Reverse Linked List II
+25	hard	reverse-nodes-in-k-group	Reverse Nodes in k-Group
+19	medium	remove-nth-node-from-end-of-list	Remove Nth Node From End of List
+82	medium	remove-duplicates-from-sorted-list-ii	Remove Duplicates from Sorted List II
+61	medium	rotate-list	Rotate List
+86	medium	partition-list	Partition List
+146	medium	lru-cache	LRU Cache
+104	easy	maximum-depth-of-binary-tree	Maximum Depth of Binary Tree
+100	easy	same-tree	Same Tree
+226	easy	invert-binary-tree	Invert Binary Tree
+101	easy	symmetric-tree	Symmetric Tree
+105	medium	construct-binary-tree-from-preorder-and-inorder-traversal	Construct Binary Tree from Preorder and Inorder Traversal
+106	medium	construct-binary-tree-from-inorder-and-postorder-traversal	Construct Binary Tree from Inorder and Postorder Traversal
+117	medium	populating-next-right-pointers-in-each-node-ii	Populating Next Right Pointers in Each Node II
+114	medium	flatten-binary-tree-to-linked-list	Flatten Binary Tree to Linked List
+112	easy	path-sum	Path Sum
+129	medium	sum-root-to-leaf-numbers	Sum Root to Leaf Numbers
+124	hard	binary-tree-maximum-path-sum	Binary Tree Maximum Path Sum
+173	medium	binary-search-tree-iterator	Binary Search Tree Iterator
+222	medium	count-complete-tree-nodes	Count Complete Tree Nodes
+236	medium	lowest-common-ancestor-of-a-binary-tree	Lowest Common Ancestor of a Binary Tree
+199	medium	binary-tree-right-side-view	Binary Tree Right Side View
+637	easy	average-of-levels-in-binary-tree	Average of Levels in Binary Tree
+102	medium	binary-tree-level-order-traversal	Binary Tree Level Order Traversal
+103	medium	binary-tree-zigzag-level-order-traversal	Binary Tree Zigzag Level Order Traversal
+530	easy	minimum-absolute-difference-in-bst	Minimum Absolute Difference in BST
+230	medium	kth-smallest-element-in-a-bst	Kth Smallest Element in a BST
+98	medium	validate-binary-search-tree	Validate Binary Search Tree
+200	medium	number-of-islands	Number of Islands
+130	medium	surrounded-regions	Surrounded Regions
+133	medium	clone-graph	Clone Graph
+399	medium	evaluate-division	Evaluate Division
+207	medium	course-schedule	Course Schedule
+210	medium	course-schedule-ii	Course Schedule II
+909	medium	snakes-and-ladders	Snakes and Ladders
+433	medium	minimum-genetic-mutation	Minimum Genetic Mutation
+127	hard	word-ladder	Word Ladder
+208	medium	implement-trie-prefix-tree	Implement Trie (Prefix Tree)
+211	medium	design-add-and-search-words-data-structure	Design Add and Search Words Data Structure
+212	hard	word-search-ii	Word Search II
+17	medium	letter-combinations-of-a-phone-number	Letter Combinations of a Phone Number
+77	medium	combinations	Combinations
+46	medium	permutations	Permutations
+39	medium	combination-sum	Combination Sum
+52	hard	n-queens-ii	N-Queens II
+22	medium	generate-parentheses	Generate Parentheses
+79	medium	word-search	Word Search
+108	easy	convert-sorted-array-to-binary-search-tree	Convert Sorted Array to Binary Search Tree
+148	medium	sort-list	Sort List
+427	medium	construct-quad-tree	Construct Quad Tree
+23	hard	merge-k-sorted-lists	Merge k Sorted Lists
+53	medium	maximum-subarray	Maximum Subarray
+918	medium	maximum-sum-circular-subarray	Maximum Sum Circular Subarray
+35	easy	search-insert-position	Search Insert Position
+74	medium	search-a-2d-matrix	Search a 2D Matrix
+162	medium	find-peak-element	Find Peak Element
+33	medium	search-in-rotated-sorted-array	Search in Rotated Sorted Array
+34	medium	find-first-and-last-position-of-element-in-sorted-array	Find First and Last Position of Element in Sorted Array
+153	medium	find-minimum-in-rotated-sorted-array	Find Minimum in Rotated Sorted Array
+4	hard	median-of-two-sorted-arrays	Median of Two Sorted Arrays
+215	medium	kth-largest-element-in-an-array	Kth Largest Element in an Array
+502	hard	ipo	IPO
+373	medium	find-k-pairs-with-smallest-sums	Find K Pairs with Smallest Sums
+295	hard	find-median-from-data-stream	Find Median from Data Stream
+67	easy	add-binary	Add Binary
+190	easy	reverse-bits	Reverse Bits
+191	easy	number-of-1-bits	Number of 1 Bits
+136	easy	single-number	Single Number
+137	medium	single-number-ii	Single Number II
+201	medium	bitwise-and-of-numbers-range	Bitwise AND of Numbers Range
+9	easy	palindrome-number	Palindrome Number
+66	easy	plus-one	Plus One
+172	medium	factorial-trailing-zeroes	Factorial Trailing Zeroes
+69	easy	sqrtx	Sqrt(x)
+50	medium	powx-n	Pow(x, n)
+149	hard	max-points-on-a-line	Max Points on a Line
+70	easy	climbing-stairs	Climbing Stairs
+198	medium	house-robber	House Robber
+139	medium	word-break	Word Break
+322	medium	coin-change	Coin Change
+300	medium	longest-increasing-subsequence	Longest Increasing Subsequence
+120	medium	triangle	Triangle
+64	medium	minimum-path-sum	Minimum Path Sum
+63	medium	unique-paths-ii	Unique Paths II
+5	medium	longest-palindromic-substring	Longest Palindromic Substring
+97	medium	interleaving-string	Interleaving String
+72	medium	edit-distance	Edit Distance
+123	hard	best-time-to-buy-and-sell-stock-iii	Best Time to Buy and Sell Stock III
+188	hard	best-time-to-buy-and-sell-stock-iv	Best Time to Buy and Sell Stock IV
+221	medium	maximal-square	Maximal Square

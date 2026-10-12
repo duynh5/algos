@@ -3,7 +3,7 @@
 set -euo pipefail
 
 usage() {
-  echo "usage: $0 <difficulty_problem_name.go>" >&2
+  echo "usage: $0 <[solved_]difficulty_source_problem_id_name.go>" >&2
 }
 
 fail() {
@@ -23,7 +23,7 @@ case $requested_file in
   *) filename=$requested_file ;;
 esac
 
-[[ $filename =~ ^(easy|medium|hard)_[a-z0-9]+(_[a-z0-9]+)*\.go$ ]] || fail "filename must match <easy|medium|hard>_<descriptive_slug>.go"
+[[ $filename =~ ^(solved_)?(easy|medium|hard)_[a-z0-9]+_[a-z0-9]+_[a-z0-9]+(_[a-z0-9]+)*\.go$ ]] || fail "filename must match [solved_]<difficulty>_<source>_<problem_id>_<descriptive_slug>.go"
 
 script_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 default_root=$(cd "$script_directory/.." && pwd)
