@@ -23,7 +23,7 @@ case $requested_file in
   *) filename=$requested_file ;;
 esac
 
-[[ $filename =~ ^(solved_)?(easy|medium|hard)_[a-z0-9]+_[a-z0-9]+_[a-z0-9]+(_[a-z0-9]+)*\.go$ ]] || fail "filename must match [solved_]<difficulty>_<source>_<problem_id>_<descriptive_slug>.go"
+[[ $filename =~ ^(solved_)?(easy|medium|hard)_[a-z0-9]+_([0-9]{4,}|[a-z0-9]*[a-z][a-z0-9]*)_[a-z0-9]+(_[a-z0-9]+)*\.go$ ]] || fail "filename must match [solved_]<difficulty>_<source>_<problem_id>_<descriptive_slug>.go with a zero-padded numeric ID"
 
 script_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 default_root=$(cd "$script_directory/.." && pwd)

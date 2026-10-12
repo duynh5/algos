@@ -74,23 +74,27 @@ mv "$temporary_root/main_test.go.template.before-failed-reset" "$temporary_root/
 
 ALGOS_REPO_ROOT=$temporary_root "$script_directory/archive-workbench.sh" easy 1 two-sum
 
-archived_file="$temporary_root/problems/solved_easy_leetcode_1_two_sum.go"
+archived_file="$temporary_root/problems/solved_easy_leetcode_0001_two_sum.go"
 test -f "$archived_file"
 test "$(sed -n '1p' "$archived_file")" = "//go:build ignore"
 rg -q '^// Difficulty: Easy$' "$archived_file"
 rg -q '^// Source: leetcode$' "$archived_file"
 rg -q '^// Problem ID: 1$' "$archived_file"
-rg -q 'solved_easy_leetcode_1_two_sum.go' "$temporary_root/problems/README.md"
+rg -q 'solved_easy_leetcode_0001_two_sum.go' "$temporary_root/problems/README.md"
 
-ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" solved_easy_leetcode_1_two_sum.go
-ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" problems/solved_easy_leetcode_1_two_sum.go
+ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" solved_easy_leetcode_0001_two_sum.go
+ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" problems/solved_easy_leetcode_0001_two_sum.go
+if ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" solved_easy_leetcode_1_two_sum.go >/dev/null 2>&1; then
+	echo "error: unpadded numeric problem ID unexpectedly succeeded" >&2
+	exit 1
+fi
 if ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" easy_two_sum.go >/dev/null 2>&1; then
   echo "error: legacy archive filename unexpectedly succeeded" >&2
   exit 1
 fi
 ALGOS_REPO_ROOT=$temporary_root "$script_directory/test-problems.sh"
 
-if ALGOS_REPO_ROOT=$temporary_root "$script_directory/archive-workbench.sh" easy 1 two-sum >/dev/null 2>&1; then
+if ALGOS_REPO_ROOT=$temporary_root "$script_directory/archive-workbench.sh" easy 0001 two-sum >/dev/null 2>&1; then
   echo "error: duplicate archive unexpectedly succeeded" >&2
   exit 1
 fi

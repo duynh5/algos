@@ -72,7 +72,9 @@ problem file:
 ./scripts/archive-workbench.sh easy 1 two-sum
 ```
 
-This creates `problems/solved_easy_leetcode_1_two_sum.go`. The `solved_` prefix
+This creates `problems/solved_easy_leetcode_0001_two_sum.go`. Numeric problem
+IDs use at least four digits so filenames sort numerically within their existing
+status, difficulty, and source groups. The `solved_` prefix
 marks archives that preserve your attempt and the completed agent review.
 LeetCode is the default
 source; pass a fourth argument only when using another source. The source URL
@@ -91,7 +93,7 @@ bulk runner skips practice archives until a later review fills the solution and
 analysis sections and marks the archive ready:
 
 ```bash
-./scripts/run-problem.sh solved_easy_leetcode_1_two_sum.go
+./scripts/run-problem.sh solved_easy_leetcode_0001_two_sum.go
 ./scripts/test-problems.sh
 ```
 

@@ -71,8 +71,9 @@ Once verified, the complete problem is copied to its permanent location under
 [`problems/`](../problems/) with
 `./scripts/archive-workbench.sh <easy|medium|hard> <problem-id> <descriptive-slug> [source]`.
 Completed archives receive a `solved_` filename prefix. The source defaults to
-`leetcode`; provide the optional final argument only for another source. Do not
-overwrite an unarchived workbench problem.
+`leetcode`, and numeric problem IDs are zero-padded to at least four digits in
+the filename. Provide the optional final argument only for another source. Do
+not overwrite an unarchived workbench problem.
 
 After verifying the archived file, restore the canonical blank template with:
 

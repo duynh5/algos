@@ -177,7 +177,11 @@ func readQuestion(directory string, entry catalogEntry) (question, metadata, err
 }
 
 func destinationFilename(directory string, entry catalogEntry) (string, error) {
-	base := fmt.Sprintf("%s_leetcode_%s_%s.go", entry.Difficulty, entry.ID, strings.ReplaceAll(entry.Slug, "-", "_"))
+	problemID, err := strconv.Atoi(entry.ID)
+	if err != nil {
+		return "", fmt.Errorf("problem ID %q is not numeric: %w", entry.ID, err)
+	}
+	base := fmt.Sprintf("%s_leetcode_%04d_%s.go", entry.Difficulty, problemID, strings.ReplaceAll(entry.Slug, "-", "_"))
 	practice := strings.TrimSuffix(base, ".go") + "_practice.go"
 	practicePath := filepath.Join(directory, practice)
 	if _, err := os.Stat(practicePath); err == nil {

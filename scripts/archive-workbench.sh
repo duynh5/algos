@@ -32,12 +32,18 @@ esac
 [[ $problem_id =~ ^[a-z0-9]+$ ]] || fail "problem ID must contain lowercase letters and digits"
 [[ $slug =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || fail "slug must contain lowercase letters, digits, and single hyphen separators"
 
+filename_problem_id=$problem_id
+if [[ $problem_id =~ ^[0-9]+$ ]]; then
+  problem_id_number=$((10#$problem_id))
+  printf -v filename_problem_id '%04d' "$problem_id_number"
+fi
+
 script_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 default_root=$(cd "$script_directory/.." && pwd)
 repository_root=${ALGOS_REPO_ROOT:-$default_root}
 source_file="$repository_root/workbench/main.go"
 problem_root="$repository_root/problems"
-filename="solved_${difficulty}_${source_name}_${problem_id}_${slug//-/_}.go"
+filename="solved_${difficulty}_${source_name}_${filename_problem_id}_${slug//-/_}.go"
 destination="$problem_root/$filename"
 
 [[ -f $source_file ]] || fail "$source_file was not found"

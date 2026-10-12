@@ -109,14 +109,15 @@ After a problem is complete:
 5. Reset the active file with `./scripts/reset-workbench.sh` only after the
    archive and checks succeed.
 
-Use flat filenames such as `solved_easy_leetcode_1_two_sum.go`; do not group by
+Use flat filenames such as `solved_easy_leetcode_0001_two_sum.go`; do not group by
 platform or create per-problem directories. Completed filenames must follow
 `solved_<difficulty>_<source>_<problem_id>_<descriptive_slug>.go`; blank
-practice archives omit the `solved_` prefix. Each completed archive contains
-all problem-specific material: its statement, samples, preserved current
-attempt, three agent-authored solutions, and analysis. It imports only the
-shared `internal/testrunner` infrastructure; reference concept pages in
-comments rather than importing their code.
+practice archives omit the `solved_` prefix. Zero-pad numeric problem IDs to at
+least four digits in filenames while keeping canonical IDs unpadded inside the
+file. Each completed archive contains all problem-specific material: its
+statement, samples, preserved current attempt, three agent-authored solutions,
+and analysis. It imports only the shared `internal/testrunner` infrastructure;
+reference concept pages in comments rather than importing their code.
 
 Never use `reset-workbench.sh --force` unless the user explicitly authorizes
 discarding the unfinished workbench content.
