@@ -101,19 +101,34 @@ func parseIsomorphicStringsInput(input string) (string, string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["egg","add"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["foo","bar"]`,
-		Want: `false`,
+		Want:  `false`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["paper","title"]`,
-		Want: `true`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Single matching character",
+		Input: `["a","a"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Two source characters map to one target",
+		Input: `["ab","aa"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Repeated pattern mismatch",
+		Input: `["foo","bar"]`,
+		Want:  `false`,
 	},
 }
 

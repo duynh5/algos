@@ -59,7 +59,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseContainerWithMostWaterInput(input string) ([]int) {
+func parseContainerWithMostWaterInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse container-with-most-water input: %w", err))
@@ -79,14 +79,29 @@ func parseContainerWithMostWaterInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,8,6,2,5,4,8,3,7]]`,
-		Want: `49`,
+		Want:  `49`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,1]]`,
-		Want: `1`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Minimum two lines",
+		Input: `[[1,1]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Zero-height lines",
+		Input: `[[0,0]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Narrower middle does not help",
+		Input: `[[1,2,1]]`,
+		Want:  `2`,
 	},
 }
 

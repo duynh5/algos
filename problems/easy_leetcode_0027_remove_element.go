@@ -107,14 +107,29 @@ func parseRemoveElementInput(input string) ([]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[3,2,2,3],3]`,
-		Want: `2, nums = [2,2,_,_]`,
+		Want:  `2, nums = [2,2,_,_]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[0,1,2,2,3,0,4,2],2]`,
-		Want: `5, nums = [0,1,4,0,3,_,_,_]`,
+		Want:  `5, nums = [0,1,4,0,3,_,_,_]`,
+	},
+	{
+		Name:  "Additional: Empty array",
+		Input: `[[],0]`,
+		Want:  `0, nums = []`,
+	},
+	{
+		Name:  "Additional: Every value removed",
+		Input: `[[1,1],1]`,
+		Want:  `0, nums = [_,_]`,
+	},
+	{
+		Name:  "Additional: No value removed",
+		Input: `[[1,2],3]`,
+		Want:  `2, nums = [1,2]`,
 	},
 }
 

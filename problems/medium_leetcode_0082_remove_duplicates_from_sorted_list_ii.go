@@ -57,11 +57,11 @@ Constraints:
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
-func parseRemoveDuplicatesFromSortedListIiInput(input string) (*ListNode) {
+func parseRemoveDuplicatesFromSortedListIiInput(input string) *ListNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse remove-duplicates-from-sorted-list-ii input: %w", err))
@@ -77,9 +77,16 @@ func parseRemoveDuplicatesFromSortedListIiInput(input string) (*ListNode) {
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
@@ -87,14 +94,29 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,3,4,4,5]]`,
-		Want: `[1,2,5]`,
+		Want:  `[1,2,5]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,1,1,2,3]]`,
-		Want: `[2,3]`,
+		Want:  `[2,3]`,
+	},
+	{
+		Name:  "Additional: Empty list",
+		Input: `[[]]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Every node duplicated",
+		Input: `[[1,1]]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Duplicate suffix",
+		Input: `[[1,2,3,3]]`,
+		Want:  `[1,2]`,
 	},
 }
 

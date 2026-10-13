@@ -81,7 +81,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseRomanToIntegerInput(input string) (string) {
+func parseRomanToIntegerInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse roman-to-integer input: %w", err))
@@ -101,19 +101,34 @@ func parseRomanToIntegerInput(input string) (string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["III"]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["LVIII"]`,
-		Want: `58`,
+		Want:  `58`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["MCMXCIV"]`,
-		Want: `1994`,
+		Want:  `1994`,
+	},
+	{
+		Name:  "Additional: Minimum numeral",
+		Input: `["I"]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: All subtractive pairs",
+		Input: `["CDXLIV"]`,
+		Want:  `444`,
+	},
+	{
+		Name:  "Additional: Maximum numeral",
+		Input: `["MMMCMXCIX"]`,
+		Want:  `3999`,
 	},
 }
 

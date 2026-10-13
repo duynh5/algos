@@ -54,7 +54,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseSingleNumberIiInput(input string) ([]int) {
+func parseSingleNumberIiInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse single-number-ii input: %w", err))
@@ -74,14 +74,29 @@ func parseSingleNumberIiInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[2,2,3,2]]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[0,1,0,1,0,1,99]]`,
-		Want: `99`,
+		Want:  `99`,
+	},
+	{
+		Name:  "Additional: Single value",
+		Input: `[[5]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Negative unique value",
+		Input: `[[-2,-2,-2,-7]]`,
+		Want:  `-7`,
+	},
+	{
+		Name:  "Additional: Unique zero",
+		Input: `[[6,6,6,0]]`,
+		Want:  `0`,
 	},
 }
 

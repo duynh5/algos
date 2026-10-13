@@ -57,7 +57,7 @@ Follow up: Could you do it in one pass?
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
@@ -87,9 +87,16 @@ func parseReverseLinkedListIiInput(input string) (*ListNode, int, int) {
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
@@ -97,14 +104,24 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,4,5],2,4]`,
-		Want: `[1,4,3,2,5]`,
+		Want:  `[1,4,3,2,5]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[5],1,1]`,
-		Want: `[5]`,
+		Want:  `[5]`,
+	},
+	{
+		Name:  "Additional: Reverse the whole list",
+		Input: `[[1,2,3,4],1,4]`,
+		Want:  `[4,3,2,1]`,
+	},
+	{
+		Name:  "Additional: One-position range",
+		Input: `[[1,2,3],2,2]`,
+		Want:  `[1,2,3]`,
 	},
 }
 

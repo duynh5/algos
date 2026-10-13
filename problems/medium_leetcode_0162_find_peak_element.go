@@ -60,7 +60,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseFindPeakElementInput(input string) ([]int) {
+func parseFindPeakElementInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse find-peak-element input: %w", err))
@@ -80,14 +80,29 @@ func parseFindPeakElementInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,1]]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,2,1,3,5,6,4]]`,
-		Want: `5`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Single value",
+		Input: `[[5]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Strictly decreasing",
+		Input: `[[5,4,3,2]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Strictly increasing",
+		Input: `[[1,2,3,4]]`,
+		Want:  `3`,
 	},
 }
 

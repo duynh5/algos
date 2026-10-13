@@ -65,7 +65,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parse3sumInput(input string) ([]int) {
+func parse3sumInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse 3sum input: %w", err))
@@ -85,19 +85,34 @@ func parse3sumInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[-1,0,1,2,-1,-4]]`,
-		Want: `[[-1,-1,2],[-1,0,1]]`,
+		Want:  `[[-1,-1,2],[-1,0,1]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[0,1,1]]`,
-		Want: `[]`,
+		Want:  `[]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[0,0,0]]`,
-		Want: `[[0,0,0]]`,
+		Want:  `[[0,0,0]]`,
+	},
+	{
+		Name:  "Additional: Extra duplicate zeros",
+		Input: `[[0,0,0,0]]`,
+		Want:  `[[0,0,0]]`,
+	},
+	{
+		Name:  "Additional: Duplicate value supplies a triplet",
+		Input: `[[-2,0,1,1,2]]`,
+		Want:  `[[-2,0,2],[-2,1,1]]`,
+	},
+	{
+		Name:  "Additional: No zero-sum triplet",
+		Input: `[[1,2,3,4]]`,
+		Want:  `[]`,
 	},
 }
 

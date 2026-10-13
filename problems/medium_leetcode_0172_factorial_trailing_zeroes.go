@@ -59,7 +59,7 @@ Follow up: Could you write a solution that works in logarithmic time complexity?
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseFactorialTrailingZeroesInput(input string) (int) {
+func parseFactorialTrailingZeroesInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse factorial-trailing-zeroes input: %w", err))
@@ -79,19 +79,34 @@ func parseFactorialTrailingZeroesInput(input string) (int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[3]`,
-		Want: `0`,
+		Want:  `0`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[5]`,
-		Want: `1`,
+		Want:  `1`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[0]`,
-		Want: `0`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: First trailing zero",
+		Input: `[5]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Multiple factors of five",
+		Input: `[25]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Constraint maximum",
+		Input: `[10000]`,
+		Want:  `2499`,
 	},
 }
 

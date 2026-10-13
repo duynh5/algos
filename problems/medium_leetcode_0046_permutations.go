@@ -57,7 +57,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parsePermutationsInput(input string) ([]int) {
+func parsePermutationsInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse permutations input: %w", err))
@@ -77,19 +77,24 @@ func parsePermutationsInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3]]`,
-		Want: `[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]`,
+		Want:  `[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[0,1]]`,
-		Want: `[[0,1],[1,0]]`,
+		Want:  `[[0,1],[1,0]]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[1]]`,
-		Want: `[[1]]`,
+		Want:  `[[1]]`,
+	},
+	{
+		Name:  "Additional: Two signed values",
+		Input: `[[-1,0]]`,
+		Want:  `[[-1,0],[0,-1]]`,
 	},
 }
 

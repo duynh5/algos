@@ -97,19 +97,34 @@ func parseTwoSumIiInputArrayIsSortedInput(input string) ([]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[2,7,11,15],9]`,
-		Want: `[1,2]`,
+		Want:  `[1,2]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[2,3,4],6]`,
-		Want: `[1,3]`,
+		Want:  `[1,3]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[-1,0],-1]`,
-		Want: `[1,2]`,
+		Want:  `[1,2]`,
+	},
+	{
+		Name:  "Additional: Minimum pair",
+		Input: `[[1,2],3]`,
+		Want:  `[1,2]`,
+	},
+	{
+		Name:  "Additional: Duplicate values",
+		Input: `[[3,3],6]`,
+		Want:  `[1,2]`,
+	},
+	{
+		Name:  "Additional: Negative and positive",
+		Input: `[[-5,-1,4,8],3]`,
+		Want:  `[2,3]`,
 	},
 }
 

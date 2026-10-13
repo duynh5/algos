@@ -28,11 +28,11 @@ PASTE THE COMPLETE PROBLEM ABOVE THIS LINE
 // sampleCases contains the examples that every registered solution must pass.
 // Add one entry per example. Encode arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
-	// {
-	// 	Name:  "Example 1",
-	// 	Input: `[[1,2,3],0]`,
-	// 	Want:  `[]`,
-	// },
+	{
+		Name:  "Example 1",
+		Input: `[[1,2,3],0]`,
+		Want:  `[]`,
+	},
 }
 
 // archiveReady is set to true only after the problem, samples, preserved
@@ -70,6 +70,16 @@ var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolut
 // whitespace remains significant.
 func solveCurrentAttempt(input string) string {
 	// Parse input, implement your algorithm, and return the formatted answer.
+	array := make([]int, 0, 2)
+	array = append(array, 5)
+	fmt.Println(len(array), cap(array))
+	array = append(array, 10)
+	fmt.Println(len(array), cap(array))
+	array = append(array, 25)
+	fmt.Println(len(array), cap(array))
+	for _, val := range array {
+		fmt.Println(val)
+	}
 	return ""
 }
 

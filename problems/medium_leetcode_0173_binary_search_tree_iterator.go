@@ -104,9 +104,19 @@ func parseBinarySearchTreeIteratorInput(input string) ([]string, [][]json.RawMes
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["BSTIterator","next","next","hasNext","next","hasNext","next","hasNext","next","hasNext"],[[[7,3,15,null,null,9,20]],[],[],[],[],[],[],[],[],[]]]`,
-		Want: `[null, 3, 7, true, 9, true, 15, true, 20, false]`,
+		Want:  `[null, 3, 7, true, 9, true, 15, true, 20, false]`,
+	},
+	{
+		Name:  "Additional: Single-node iterator",
+		Input: `[["BSTIterator","hasNext","next","hasNext"],[[[5]],[],[],[]]]`,
+		Want:  `[null,true,5,false]`,
+	},
+	{
+		Name:  "Additional: Right-skewed iterator",
+		Input: `[["BSTIterator","next","next","next","hasNext"],[[[1,null,2,null,3]],[],[],[],[]]]`,
+		Want:  `[null,1,2,3,false]`,
 	},
 }
 

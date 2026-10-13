@@ -54,7 +54,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseSqrtxInput(input string) (int) {
+func parseSqrtxInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse sqrtx input: %w", err))
@@ -74,14 +74,29 @@ func parseSqrtxInput(input string) (int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[4]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[8]`,
-		Want: `2`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Zero",
+		Input: `[0]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: One",
+		Input: `[1]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Maximum input",
+		Input: `[2147483647]`,
+		Want:  `46340`,
 	},
 }
 

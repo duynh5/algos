@@ -92,14 +92,29 @@ func parseMinimumGeneticMutationInput(input string) (string, string, []string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["AACCGGTT","AACCGGTA",["AACCGGTA"]]`,
-		Want: `1`,
+		Want:  `1`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["AACCGGTT","AAACGGTA",["AACCGGTA","AACCGCTA","AAACGGTA"]]`,
-		Want: `2`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: No mutation needed",
+		Input: `["AACCGGTT","AACCGGTT",[]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: End gene absent",
+		Input: `["AACCGGTT","AACCGGTA",[]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: One mutation",
+		Input: `["AACCGGTT","AACCGGTA",["AACCGGTA"]]`,
+		Want:  `1`,
 	},
 }
 

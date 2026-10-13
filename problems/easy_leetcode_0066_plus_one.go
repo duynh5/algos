@@ -68,7 +68,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parsePlusOneInput(input string) ([]int) {
+func parsePlusOneInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse plus-one input: %w", err))
@@ -88,19 +88,34 @@ func parsePlusOneInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3]]`,
-		Want: `[1,2,4]`,
+		Want:  `[1,2,4]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[4,3,2,1]]`,
-		Want: `[4,3,2,2]`,
+		Want:  `[4,3,2,2]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[9]]`,
-		Want: `[1,0]`,
+		Want:  `[1,0]`,
+	},
+	{
+		Name:  "Additional: Single non-nine digit",
+		Input: `[[1]]`,
+		Want:  `[2]`,
+	},
+	{
+		Name:  "Additional: Carry through every digit",
+		Input: `[[9,9,9]]`,
+		Want:  `[1,0,0,0]`,
+	},
+	{
+		Name:  "Additional: Carry stops in the middle",
+		Input: `[[1,9,9]]`,
+		Want:  `[2,0,0]`,
 	},
 }
 

@@ -91,7 +91,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseConstructQuadTreeInput(input string) ([][]int) {
+func parseConstructQuadTreeInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse construct-quad-tree input: %w", err))
@@ -111,14 +111,29 @@ func parseConstructQuadTreeInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[0,1],[1,0]]]`,
-		Want: `[[0,1],[1,0],[1,1],[1,1],[1,0]]`,
+		Want:  `[[0,1],[1,0],[1,1],[1,1],[1,0]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0]]]`,
-		Want: `[[0,1],[1,1],[0,1],[1,1],[1,0],null,null,null,null,[1,0],[1,0],[1,1],[1,1]]`,
+		Want:  `[[0,1],[1,1],[0,1],[1,1],[1,0],null,null,null,null,[1,0],[1,0],[1,1],[1,1]]`,
+	},
+	{
+		Name:  "Additional: Single zero cell",
+		Input: `[[[0]]]`,
+		Want:  `[[1,0]]`,
+	},
+	{
+		Name:  "Additional: Single one cell",
+		Input: `[[[1]]]`,
+		Want:  `[[1,1]]`,
+	},
+	{
+		Name:  "Additional: Uniform larger grid collapses",
+		Input: `[[[1,1],[1,1]]]`,
+		Want:  `[[1,1]]`,
 	},
 }
 

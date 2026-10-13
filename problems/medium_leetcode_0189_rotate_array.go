@@ -90,14 +90,29 @@ func parseRotateArrayInput(input string) ([]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,4,5,6,7],3]`,
-		Want: `[5,6,7,1,2,3,4]`,
+		Want:  `[5,6,7,1,2,3,4]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[-1,-100,3,99],2]`,
-		Want: `[3,99,-1,-100]`,
+		Want:  `[3,99,-1,-100]`,
+	},
+	{
+		Name:  "Additional: Zero rotations",
+		Input: `[[1,2,3],0]`,
+		Want:  `[1,2,3]`,
+	},
+	{
+		Name:  "Additional: Rotations exceed length",
+		Input: `[[1,2,3],4]`,
+		Want:  `[3,1,2]`,
+	},
+	{
+		Name:  "Additional: Single value",
+		Input: `[[7],100000]`,
+		Want:  `[7]`,
 	},
 }
 

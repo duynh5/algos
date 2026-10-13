@@ -79,14 +79,29 @@ func parseValidAnagramInput(input string) (string, string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["anagram","nagaram"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["rat","car"]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Single matching character",
+		Input: `["a","a"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Different lengths",
+		Input: `["a","ab"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Same counts in different order",
+		Input: `["aabb","baba"]`,
+		Want:  `true`,
 	},
 }
 

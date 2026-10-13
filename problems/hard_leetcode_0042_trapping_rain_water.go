@@ -53,7 +53,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseTrappingRainWaterInput(input string) ([]int) {
+func parseTrappingRainWaterInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse trapping-rain-water input: %w", err))
@@ -73,14 +73,29 @@ func parseTrappingRainWaterInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[0,1,0,2,1,0,1,3,2,1,2,1]]`,
-		Want: `6`,
+		Want:  `6`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[4,2,0,3,2,5]]`,
-		Want: `9`,
+		Want:  `9`,
+	},
+	{
+		Name:  "Additional: Minimum length",
+		Input: `[[5]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Monotone heights",
+		Input: `[[1,2,3,4]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Deep simple basin",
+		Input: `[[5,0,5]]`,
+		Want:  `5`,
 	},
 }
 

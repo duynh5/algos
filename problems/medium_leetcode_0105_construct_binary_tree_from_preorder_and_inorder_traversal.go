@@ -85,14 +85,24 @@ func parseConstructBinaryTreeFromPreorderAndInorderTraversalInput(input string) 
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[3,9,20,15,7],[9,3,15,20,7]]`,
-		Want: `[3,9,20,null,null,15,7]`,
+		Want:  `[3,9,20,null,null,15,7]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[-1],[-1]]`,
-		Want: `[-1]`,
+		Want:  `[-1]`,
+	},
+	{
+		Name:  "Additional: Right-skewed tree",
+		Input: `[[1,2,3],[1,2,3]]`,
+		Want:  `[1,null,2,null,3]`,
+	},
+	{
+		Name:  "Additional: Left-skewed tree",
+		Input: `[[3,2,1],[1,2,3]]`,
+		Want:  `[3,2,null,1]`,
 	},
 }
 

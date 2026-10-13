@@ -108,14 +108,29 @@ func parseIpoInput(input string) (int, int, []int, []int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[2,0,[1,2,3],[0,1,1]]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[3,0,[1,2,3],[0,1,2]]`,
-		Want: `6`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Nothing is initially affordable",
+		Input: `[3,0,[1,2],[1,2]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Fewer projects than allowed rounds",
+		Input: `[5,1,[2],[0]]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Additional: Capital unlock chain",
+		Input: `[3,0,[1,2,3],[0,1,3]]`,
+		Want:  `6`,
 	},
 }
 

@@ -98,9 +98,19 @@ func parseInsertDeleteGetrandomO1Input(input string) ([]string, [][]json.RawMess
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["RandomizedSet","insert","remove","insert","getRandom","remove","insert","getRandom"],[[],[1],[2],[2],[],[1],[2],[]]]`,
-		Want: `[null, true, false, true, 2, true, false, 2]`,
+		Want:  `[null, true, false, true, 2, true, false, 2]`,
+	},
+	{
+		Name:  "Additional: Duplicate insert and missing removal",
+		Input: `[["RandomizedSet","insert","insert","remove"],[[],[1],[1],[2]]]`,
+		Want:  `[null,true,false,false]`,
+	},
+	{
+		Name:  "Additional: Single deterministic random value",
+		Input: `[["RandomizedSet","insert","getRandom","remove"],[[],[-1],[],[-1]]]`,
+		Want:  `[null,true,-1,true]`,
 	},
 }
 

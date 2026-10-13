@@ -114,7 +114,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseSimplifyPathInput(input string) (string) {
+func parseSimplifyPathInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse simplify-path input: %w", err))
@@ -134,29 +134,39 @@ func parseSimplifyPathInput(input string) (string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["/home/"]`,
-		Want: `"/home"`,
+		Want:  `"/home"`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["/home//foo/"]`,
-		Want: `"/home/foo"`,
+		Want:  `"/home/foo"`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["/home/user/Documents/../Pictures"]`,
-		Want: `"/home/user/Pictures"`,
+		Want:  `"/home/user/Pictures"`,
 	},
 	{
-		Name: "Official example 4",
+		Name:  "Official example 4",
 		Input: `["/../"]`,
-		Want: `"/"`,
+		Want:  `"/"`,
 	},
 	{
-		Name: "Official example 5",
+		Name:  "Official example 5",
 		Input: `["/.../a/../b/c/../d/./"]`,
-		Want: `"/.../b/d"`,
+		Want:  `"/.../b/d"`,
+	},
+	{
+		Name:  "Additional: Parent traversal above root",
+		Input: `["/a/../../b"]`,
+		Want:  `"/b"`,
+	},
+	{
+		Name:  "Additional: Dots inside a name are literal",
+		Input: `["/.hidden/.."]`,
+		Want:  `"/"`,
 	},
 }
 

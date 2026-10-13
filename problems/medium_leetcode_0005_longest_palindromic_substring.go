@@ -51,7 +51,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseLongestPalindromicSubstringInput(input string) (string) {
+func parseLongestPalindromicSubstringInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse longest-palindromic-substring input: %w", err))
@@ -71,14 +71,29 @@ func parseLongestPalindromicSubstringInput(input string) (string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["babad"]`,
-		Want: `"bab"`,
+		Want:  `"bab"`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["cbbd"]`,
-		Want: `"bb"`,
+		Want:  `"bb"`,
+	},
+	{
+		Name:  "Additional: Minimum length",
+		Input: `["a"]`,
+		Want:  `"a"`,
+	},
+	{
+		Name:  "Additional: Entire string is a palindrome",
+		Input: `["aaaa"]`,
+		Want:  `"aaaa"`,
+	},
+	{
+		Name:  "Additional: Long interior palindrome",
+		Input: `["forgeeksskeegfor"]`,
+		Want:  `"geeksskeeg"`,
 	},
 }
 

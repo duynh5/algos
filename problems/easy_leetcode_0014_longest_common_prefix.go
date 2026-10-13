@@ -55,7 +55,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseLongestCommonPrefixInput(input string) ([]string) {
+func parseLongestCommonPrefixInput(input string) []string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse longest-common-prefix input: %w", err))
@@ -75,14 +75,29 @@ func parseLongestCommonPrefixInput(input string) ([]string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["flower","flow","flight"]]`,
-		Want: `"fl"`,
+		Want:  `"fl"`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[["dog","racecar","car"]]`,
-		Want: `""`,
+		Want:  `""`,
+	},
+	{
+		Name:  "Additional: Single string",
+		Input: `[["alone"]]`,
+		Want:  `"alone"`,
+	},
+	{
+		Name:  "Additional: Empty member",
+		Input: `[["","abc"]]`,
+		Want:  `""`,
+	},
+	{
+		Name:  "Additional: Prefix ends inside words",
+		Input: `[["interstellar","internet","internal"]]`,
+		Want:  `"inter"`,
 	},
 }
 

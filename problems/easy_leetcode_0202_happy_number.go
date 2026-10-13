@@ -63,7 +63,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseHappyNumberInput(input string) (int) {
+func parseHappyNumberInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse happy-number input: %w", err))
@@ -83,14 +83,29 @@ func parseHappyNumberInput(input string) (int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[19]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[2]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: One is already happy",
+		Input: `[1]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Small unhappy cycle",
+		Input: `[2]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Happy after several steps",
+		Input: `[7]`,
+		Want:  `true`,
 	},
 }
 

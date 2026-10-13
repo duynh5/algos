@@ -58,7 +58,7 @@ Follow up: Can you come up with an algorithm that runs in O(n log(n)) time compl
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseLongestIncreasingSubsequenceInput(input string) ([]int) {
+func parseLongestIncreasingSubsequenceInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse longest-increasing-subsequence input: %w", err))
@@ -78,19 +78,34 @@ func parseLongestIncreasingSubsequenceInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[10,9,2,5,3,7,101,18]]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[0,1,0,3,2,3]]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[7,7,7,7,7,7,7]]`,
-		Want: `1`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Single value",
+		Input: `[[5]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Strictly decreasing",
+		Input: `[[5,4,3,2,1]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Duplicates do not increase length",
+		Input: `[[2,2,2]]`,
+		Want:  `1`,
 	},
 }
 

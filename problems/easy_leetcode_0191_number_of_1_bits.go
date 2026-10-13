@@ -70,7 +70,7 @@ Follow up: If this function is called many times, how would you optimize it?
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseNumberOf1BitsInput(input string) (int) {
+func parseNumberOf1BitsInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse number-of-1-bits input: %w", err))
@@ -90,19 +90,34 @@ func parseNumberOf1BitsInput(input string) (int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[11]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[128]`,
-		Want: `1`,
+		Want:  `1`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[2147483645]`,
-		Want: `30`,
+		Want:  `30`,
+	},
+	{
+		Name:  "Additional: One set bit",
+		Input: `[1]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: All 31 allowed bits set",
+		Input: `[2147483647]`,
+		Want:  `31`,
+	},
+	{
+		Name:  "Additional: Alternating bits",
+		Input: `[1431655765]`,
+		Want:  `16`,
 	},
 }
 

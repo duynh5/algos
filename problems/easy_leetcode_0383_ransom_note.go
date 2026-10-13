@@ -82,19 +82,34 @@ func parseRansomNoteInput(input string) (string, string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["a","b"]`,
-		Want: `false`,
+		Want:  `false`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["aa","ab"]`,
-		Want: `false`,
+		Want:  `false`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["aa","aab"]`,
-		Want: `true`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Single available letter",
+		Input: `["a","a"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Repeated letter shortage",
+		Input: `["aa","ab"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Magazine may contain extras",
+		Input: `["abc","cbad"]`,
+		Want:  `true`,
 	},
 }
 

@@ -106,19 +106,34 @@ func parseInterleavingStringInput(input string) (string, string, string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["aabcc","dbbca","aadbbcbcac"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["aabcc","dbbca","aadbbbaccc"]`,
-		Want: `false`,
+		Want:  `false`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["","",""]`,
-		Want: `true`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Length mismatch",
+		Input: `["a","b","a"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Only first source populated",
+		Input: `["abc","","abc"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Repeated letters require valid order",
+		Input: `["aa","ab","aaba"]`,
+		Want:  `true`,
 	},
 }
 

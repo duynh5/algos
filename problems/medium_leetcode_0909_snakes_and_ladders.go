@@ -79,7 +79,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseSnakesAndLaddersInput(input string) ([][]int) {
+func parseSnakesAndLaddersInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse snakes-and-ladders input: %w", err))
@@ -99,14 +99,24 @@ func parseSnakesAndLaddersInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,35,-1,-1,13,-1],[-1,-1,-1,-1,-1,-1],[-1,15,-1,-1,-1,-1]]]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[-1,-1],[-1,3]]]`,
-		Want: `1`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Empty two-by-two board",
+		Input: `[[[-1,-1],[-1,-1]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Empty three-by-three board",
+		Input: `[[[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]]]`,
+		Want:  `2`,
 	},
 }
 

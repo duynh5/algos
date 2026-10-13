@@ -58,7 +58,7 @@ Follow up: Can you solve the problem in O(1) extra space complexity? (The output
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseProductOfArrayExceptSelfInput(input string) ([]int) {
+func parseProductOfArrayExceptSelfInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse product-of-array-except-self input: %w", err))
@@ -78,14 +78,29 @@ func parseProductOfArrayExceptSelfInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,4]]`,
-		Want: `[24,12,8,6]`,
+		Want:  `[24,12,8,6]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[-1,1,0,-3,3]]`,
-		Want: `[0,0,9,0,0]`,
+		Want:  `[0,0,9,0,0]`,
+	},
+	{
+		Name:  "Additional: Minimum length",
+		Input: `[[1,2]]`,
+		Want:  `[2,1]`,
+	},
+	{
+		Name:  "Additional: One zero",
+		Input: `[[1,0,3]]`,
+		Want:  `[0,3,0]`,
+	},
+	{
+		Name:  "Additional: Two zeros",
+		Input: `[[0,1,2,0]]`,
+		Want:  `[0,0,0,0]`,
 	},
 }
 

@@ -92,19 +92,34 @@ func parseSearchInRotatedSortedArrayInput(input string) ([]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[4,5,6,7,0,1,2],0]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[4,5,6,7,0,1,2],3]`,
-		Want: `-1`,
+		Want:  `-1`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[1],0]`,
-		Want: `-1`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Single value found",
+		Input: `[[1],1]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Single value absent",
+		Input: `[[1],0]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Unrotated array",
+		Input: `[[1,2,3,4],3]`,
+		Want:  `2`,
 	},
 }
 

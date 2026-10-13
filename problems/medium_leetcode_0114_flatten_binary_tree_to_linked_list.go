@@ -62,11 +62,11 @@ Follow up: Can you flatten the tree in-place (with O(1) extra space)?
 // This intentionally unsolved practice archive follows the workbench template.
 
 type TreeNode struct {
-	Val int
+	Val               int
 	Left, Right, Next *TreeNode
 }
 
-func parseFlattenBinaryTreeToLinkedListInput(input string) (*TreeNode) {
+func parseFlattenBinaryTreeToLinkedListInput(input string) *TreeNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse flatten-binary-tree-to-linked-list input: %w", err))
@@ -83,13 +83,30 @@ func parseFlattenBinaryTreeToLinkedListInput(input string) (*TreeNode) {
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 { return nil, err }
-	if values[0] == nil { return nil, nil }
-	root := &TreeNode{Val: *values[0]}; queue := []*TreeNode{root}; next := 1
+	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+		return nil, err
+	}
+	if values[0] == nil {
+		return nil, nil
+	}
+	root := &TreeNode{Val: *values[0]}
+	queue := []*TreeNode{root}
+	next := 1
 	for len(queue) > 0 && next < len(values) {
-		node := queue[0]; queue = queue[1:]
-		if values[next] != nil { node.Left = &TreeNode{Val: *values[next]}; queue = append(queue, node.Left) }; next++
-		if next < len(values) { if values[next] != nil { node.Right = &TreeNode{Val: *values[next]}; queue = append(queue, node.Right) }; next++ }
+		node := queue[0]
+		queue = queue[1:]
+		if values[next] != nil {
+			node.Left = &TreeNode{Val: *values[next]}
+			queue = append(queue, node.Left)
+		}
+		next++
+		if next < len(values) {
+			if values[next] != nil {
+				node.Right = &TreeNode{Val: *values[next]}
+				queue = append(queue, node.Right)
+			}
+			next++
+		}
 	}
 	return root, nil
 }
@@ -98,19 +115,29 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,5,3,4,null,6]]`,
-		Want: `[1,null,2,null,3,null,4,null,5,null,6]`,
+		Want:  `[1,null,2,null,3,null,4,null,5,null,6]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[]]`,
-		Want: `[]`,
+		Want:  `[]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[0]]`,
-		Want: `[0]`,
+		Want:  `[0]`,
+	},
+	{
+		Name:  "Additional: Only left children",
+		Input: `[[1,2,null,3]]`,
+		Want:  `[1,null,2,null,3]`,
+	},
+	{
+		Name:  "Additional: Only right children",
+		Input: `[[1,null,2,null,3]]`,
+		Want:  `[1,null,2,null,3]`,
 	},
 }
 

@@ -97,9 +97,19 @@ func parseImplementTriePrefixTreeInput(input string) ([]string, [][]json.RawMess
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["Trie","insert","search","search","startsWith","insert","search"],[[],["apple"],["apple"],["app"],["app"],["app"],["app"]]]`,
-		Want: `[null, null, true, false, true, null, true]`,
+		Want:  `[null, null, true, false, true, null, true]`,
+	},
+	{
+		Name:  "Additional: Prefix is not automatically a word",
+		Input: `[["Trie","insert","search","startsWith"],[[],["abc"],["ab"],["ab"]]]`,
+		Want:  `[null,null,false,true]`,
+	},
+	{
+		Name:  "Additional: Duplicate insertion",
+		Input: `[["Trie","insert","insert","search"],[[],["a"],["a"],["a"]]]`,
+		Want:  `[null,null,null,true]`,
 	},
 }
 

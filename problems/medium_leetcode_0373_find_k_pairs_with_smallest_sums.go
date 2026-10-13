@@ -92,14 +92,24 @@ func parseFindKPairsWithSmallestSumsInput(input string) ([]int, []int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,7,11],[2,4,6],3]`,
-		Want: `[[1,2],[1,4],[1,6]]`,
+		Want:  `[[1,2],[1,4],[1,6]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,1,2],[1,2,3],2]`,
-		Want: `[[1,1],[1,1]]`,
+		Want:  `[[1,1],[1,1]]`,
+	},
+	{
+		Name:  "Additional: One possible pair",
+		Input: `[[1],[2],1]`,
+		Want:  `[[1,2]]`,
+	},
+	{
+		Name:  "Additional: Negative pair sums",
+		Input: `[[-2,-1],[1,2],1]`,
+		Want:  `[[-2,1]]`,
 	},
 }
 

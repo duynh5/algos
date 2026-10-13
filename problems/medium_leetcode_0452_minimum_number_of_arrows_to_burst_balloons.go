@@ -68,7 +68,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseMinimumNumberOfArrowsToBurstBalloonsInput(input string) ([][]int) {
+func parseMinimumNumberOfArrowsToBurstBalloonsInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse minimum-number-of-arrows-to-burst-balloons input: %w", err))
@@ -88,19 +88,34 @@ func parseMinimumNumberOfArrowsToBurstBalloonsInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[10,16],[2,8],[1,6],[7,12]]]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,2],[3,4],[5,6],[7,8]]]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[[1,2],[2,3],[3,4],[4,5]]]`,
-		Want: `2`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Single balloon",
+		Input: `[[[1,2]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Touching endpoints share an arrow",
+		Input: `[[[1,2],[2,3]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Separated balloons",
+		Input: `[[[-2147483648,-1],[0,2147483647]]]`,
+		Want:  `2`,
 	},
 }
 

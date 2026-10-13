@@ -91,19 +91,34 @@ func parseWordBreakInput(input string) (string, []string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["leetcode",["leet","code"]]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["applepenapple",["apple","pen"]]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["catsandog",["cats","dog","sand","and","cat"]]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Single exact word",
+		Input: `["a",["a"]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Long prefix cannot consume final character",
+		Input: `["aaaaab",["a","aa"]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Reuse dictionary words",
+		Input: `["aaaa",["a","aa"]]`,
+		Want:  `true`,
 	},
 }
 

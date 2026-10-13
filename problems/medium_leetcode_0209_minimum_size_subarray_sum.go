@@ -85,19 +85,34 @@ func parseMinimumSizeSubarraySumInput(input string) (int, []int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[7,[2,3,1,2,4,3]]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[4,[1,4,4]]`,
-		Want: `1`,
+		Want:  `1`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[11,[1,1,1,1,1,1,1,1]]`,
-		Want: `0`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Target unreachable",
+		Input: `[100,[1,2,3]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Single exact element",
+		Input: `[5,[5]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Window must shrink repeatedly",
+		Input: `[8,[1,2,3,4,5]]`,
+		Want:  `2`,
 	},
 }
 

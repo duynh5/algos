@@ -62,11 +62,11 @@ Constraints:
 // This intentionally unsolved practice archive follows the workbench template.
 
 type TreeNode struct {
-	Val int
+	Val               int
 	Left, Right, Next *TreeNode
 }
 
-func parseCountCompleteTreeNodesInput(input string) (*TreeNode) {
+func parseCountCompleteTreeNodesInput(input string) *TreeNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse count-complete-tree-nodes input: %w", err))
@@ -83,13 +83,30 @@ func parseCountCompleteTreeNodesInput(input string) (*TreeNode) {
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 { return nil, err }
-	if values[0] == nil { return nil, nil }
-	root := &TreeNode{Val: *values[0]}; queue := []*TreeNode{root}; next := 1
+	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+		return nil, err
+	}
+	if values[0] == nil {
+		return nil, nil
+	}
+	root := &TreeNode{Val: *values[0]}
+	queue := []*TreeNode{root}
+	next := 1
 	for len(queue) > 0 && next < len(values) {
-		node := queue[0]; queue = queue[1:]
-		if values[next] != nil { node.Left = &TreeNode{Val: *values[next]}; queue = append(queue, node.Left) }; next++
-		if next < len(values) { if values[next] != nil { node.Right = &TreeNode{Val: *values[next]}; queue = append(queue, node.Right) }; next++ }
+		node := queue[0]
+		queue = queue[1:]
+		if values[next] != nil {
+			node.Left = &TreeNode{Val: *values[next]}
+			queue = append(queue, node.Left)
+		}
+		next++
+		if next < len(values) {
+			if values[next] != nil {
+				node.Right = &TreeNode{Val: *values[next]}
+				queue = append(queue, node.Right)
+			}
+			next++
+		}
 	}
 	return root, nil
 }
@@ -98,19 +115,29 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,4,5,6]]`,
-		Want: `6`,
+		Want:  `6`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[]]`,
-		Want: `0`,
+		Want:  `0`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[1]]`,
-		Want: `1`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Perfect three-level tree",
+		Input: `[[1,2,3,4,5,6,7]]`,
+		Want:  `7`,
+	},
+	{
+		Name:  "Additional: Incomplete final level",
+		Input: `[[1,2,3,4]]`,
+		Want:  `4`,
 	},
 }
 

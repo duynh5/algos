@@ -98,14 +98,29 @@ func parseGasStationInput(input string) ([]int, []int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,4,5],[3,4,5,1,2]]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[2,3,4],[3,4,3]]`,
-		Want: `-1`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Single feasible station",
+		Input: `[[1],[1]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Single infeasible station",
+		Input: `[[1],[2]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Start must wrap around",
+		Input: `[[1,2,3],[2,2,1]]`,
+		Want:  `1`,
 	},
 }
 

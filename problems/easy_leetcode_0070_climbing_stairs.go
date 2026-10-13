@@ -57,7 +57,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseClimbingStairsInput(input string) (int) {
+func parseClimbingStairsInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse climbing-stairs input: %w", err))
@@ -77,14 +77,29 @@ func parseClimbingStairsInput(input string) (int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[2]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[3]`,
-		Want: `3`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Additional: Minimum staircase",
+		Input: `[1]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Small transition",
+		Input: `[4]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Constraint maximum",
+		Input: `[45]`,
+		Want:  `1836311903`,
 	},
 }
 

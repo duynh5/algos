@@ -93,14 +93,29 @@ func parseEditDistanceInput(input string) (string, string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["horse","ros"]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["intention","execution"]`,
-		Want: `5`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Both words empty",
+		Input: `["",""]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Delete every character",
+		Input: `["abc",""]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Additional: Identical words",
+		Input: `["algorithm","algorithm"]`,
+		Want:  `0`,
 	},
 }
 

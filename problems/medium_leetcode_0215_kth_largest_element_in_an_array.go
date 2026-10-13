@@ -79,14 +79,29 @@ func parseKthLargestElementInAnArrayInput(input string) ([]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[3,2,1,5,6,4],2]`,
-		Want: `5`,
+		Want:  `5`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[3,2,3,1,2,4,5,5,6],4]`,
-		Want: `4`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Single value",
+		Input: `[[7],1]`,
+		Want:  `7`,
+	},
+	{
+		Name:  "Additional: Duplicate values",
+		Input: `[[2,2,1],2]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Smallest via maximum k",
+		Input: `[[3,1,2],3]`,
+		Want:  `1`,
 	},
 }
 

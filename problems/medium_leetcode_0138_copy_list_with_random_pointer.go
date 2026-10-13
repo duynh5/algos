@@ -72,11 +72,11 @@ Constraints:
 // This intentionally unsolved practice archive follows the workbench template.
 
 type randomListEntry struct {
-	Value int
+	Value       int
 	RandomIndex *int
 }
 
-func parseCopyListWithRandomPointerInput(input string) ([]randomListEntry) {
+func parseCopyListWithRandomPointerInput(input string) []randomListEntry {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse copy-list-with-random-pointer input: %w", err))
@@ -92,8 +92,17 @@ func parseCopyListWithRandomPointerInput(input string) ([]randomListEntry) {
 }
 
 func decodeRandomList(raw json.RawMessage) ([]randomListEntry, error) {
-	var pairs [][]*int; if err := json.Unmarshal(raw, &pairs); err != nil { return nil, err }
-	result := make([]randomListEntry, len(pairs)); for index, pair := range pairs { if len(pair) != 2 || pair[0] == nil { return nil, fmt.Errorf("entry %d must contain [value, randomIndex]", index) }; result[index] = randomListEntry{Value: *pair[0], RandomIndex: pair[1]} }
+	var pairs [][]*int
+	if err := json.Unmarshal(raw, &pairs); err != nil {
+		return nil, err
+	}
+	result := make([]randomListEntry, len(pairs))
+	for index, pair := range pairs {
+		if len(pair) != 2 || pair[0] == nil {
+			return nil, fmt.Errorf("entry %d must contain [value, randomIndex]", index)
+		}
+		result[index] = randomListEntry{Value: *pair[0], RandomIndex: pair[1]}
+	}
 	return result, nil
 }
 
@@ -101,19 +110,29 @@ func decodeRandomList(raw json.RawMessage) ([]randomListEntry, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[7,null],[13,0],[11,4],[10,2],[1,0]]]`,
-		Want: `[[7,null],[13,0],[11,4],[10,2],[1,0]]`,
+		Want:  `[[7,null],[13,0],[11,4],[10,2],[1,0]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,1],[2,1]]]`,
-		Want: `[[1,1],[2,1]]`,
+		Want:  `[[1,1],[2,1]]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[[3,null],[3,0],[3,null]]]`,
-		Want: `[[3,null],[3,0],[3,null]]`,
+		Want:  `[[3,null],[3,0],[3,null]]`,
+	},
+	{
+		Name:  "Additional: Single self-reference",
+		Input: `[[[1,0]]]`,
+		Want:  `[[1,0]]`,
+	},
+	{
+		Name:  "Additional: Single null reference",
+		Input: `[[[-1,null]]]`,
+		Want:  `[[-1,null]]`,
 	},
 }
 

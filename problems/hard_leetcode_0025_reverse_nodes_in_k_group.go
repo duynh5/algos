@@ -59,7 +59,7 @@ Follow-up: Can you solve the problem in O(1) extra memory space?
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
@@ -84,9 +84,16 @@ func parseReverseNodesInKGroupInput(input string) (*ListNode, int) {
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
@@ -94,14 +101,29 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,4,5],2]`,
-		Want: `[2,1,4,3,5]`,
+		Want:  `[2,1,4,3,5]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,2,3,4,5],3]`,
-		Want: `[3,2,1,4,5]`,
+		Want:  `[3,2,1,4,5]`,
+	},
+	{
+		Name:  "Additional: Group size one",
+		Input: `[[1,2,3],1]`,
+		Want:  `[1,2,3]`,
+	},
+	{
+		Name:  "Additional: One full group",
+		Input: `[[1,2,3],3]`,
+		Want:  `[3,2,1]`,
+	},
+	{
+		Name:  "Additional: Incomplete suffix remains",
+		Input: `[[1,2,3,4,5],3]`,
+		Want:  `[3,2,1,4,5]`,
 	},
 }
 

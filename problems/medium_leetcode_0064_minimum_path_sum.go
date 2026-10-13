@@ -57,7 +57,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseMinimumPathSumInput(input string) ([][]int) {
+func parseMinimumPathSumInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse minimum-path-sum input: %w", err))
@@ -77,14 +77,29 @@ func parseMinimumPathSumInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[1,3,1],[1,5,1],[4,2,1]]]`,
-		Want: `7`,
+		Want:  `7`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,2,3],[4,5,6]]]`,
-		Want: `12`,
+		Want:  `12`,
+	},
+	{
+		Name:  "Additional: One cell",
+		Input: `[[[5]]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Single row",
+		Input: `[[[1,2,3]]]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Zeros around an expensive cell",
+		Input: `[[[0,9],[0,0]]]`,
+		Want:  `0`,
 	},
 }
 

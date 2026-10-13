@@ -87,19 +87,34 @@ func parsePowxNInput(input string) (float64, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[2.00000,10]`,
-		Want: `1024.00000`,
+		Want:  `1024.00000`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[2.10000,3]`,
-		Want: `9.26100`,
+		Want:  `9.26100`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[2.00000,-2]`,
-		Want: `0.25000`,
+		Want:  `0.25000`,
+	},
+	{
+		Name:  "Additional: Zero exponent",
+		Input: `[2.0,0]`,
+		Want:  `1.00000`,
+	},
+	{
+		Name:  "Additional: Identity base at minimum exponent",
+		Input: `[1.0,-2147483648]`,
+		Want:  `1.00000`,
+	},
+	{
+		Name:  "Additional: Negative base",
+		Input: `[-2.0,3]`,
+		Want:  `-8.00000`,
 	},
 }
 

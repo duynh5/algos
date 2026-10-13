@@ -83,7 +83,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseValidSudokuInput(input string) ([][]byte) {
+func parseValidSudokuInput(input string) [][]byte {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse valid-sudoku input: %w", err))
@@ -99,8 +99,20 @@ func parseValidSudokuInput(input string) ([][]byte) {
 }
 
 func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
-	var rows [][]string; if err := json.Unmarshal(raw, &rows); err != nil { return nil, err }
-	result := make([][]byte, len(rows)); for row := range rows { result[row] = make([]byte, len(rows[row])); for column, value := range rows[row] { if len(value) != 1 { return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column) }; result[row][column] = value[0] } }
+	var rows [][]string
+	if err := json.Unmarshal(raw, &rows); err != nil {
+		return nil, err
+	}
+	result := make([][]byte, len(rows))
+	for row := range rows {
+		result[row] = make([]byte, len(rows[row]))
+		for column, value := range rows[row] {
+			if len(value) != 1 {
+				return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column)
+			}
+			result[row][column] = value[0]
+		}
+	}
 	return result, nil
 }
 
@@ -108,14 +120,24 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[["8","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Empty board",
+		Input: `[[[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."]]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Duplicate confined to a sub-box",
+		Input: `[[["1",".",".",".",".",".",".",".","."],[".","1",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."]]]`,
+		Want:  `false`,
 	},
 }
 

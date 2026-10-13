@@ -68,7 +68,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseGroupAnagramsInput(input string) ([]string) {
+func parseGroupAnagramsInput(input string) []string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse group-anagrams input: %w", err))
@@ -88,19 +88,29 @@ func parseGroupAnagramsInput(input string) ([]string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["eat","tea","tan","ate","nat","bat"]]`,
-		Want: `[["bat"],["nat","tan"],["ate","eat","tea"]]`,
+		Want:  `[["bat"],["nat","tan"],["ate","eat","tea"]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[""]]`,
-		Want: `[[""]]`,
+		Want:  `[[""]]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[["a"]]`,
-		Want: `[["a"]]`,
+		Want:  `[["a"]]`,
+	},
+	{
+		Name:  "Additional: Duplicate empty strings",
+		Input: `[["",""]]`,
+		Want:  `[["",""]]`,
+	},
+	{
+		Name:  "Additional: Single anagram group",
+		Input: `[["ab","ba"]]`,
+		Want:  `[["ab","ba"]]`,
 	},
 }
 

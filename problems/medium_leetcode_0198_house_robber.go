@@ -56,7 +56,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseHouseRobberInput(input string) ([]int) {
+func parseHouseRobberInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse house-robber input: %w", err))
@@ -76,14 +76,29 @@ func parseHouseRobberInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,1]]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[2,7,9,3,1]]`,
-		Want: `12`,
+		Want:  `12`,
+	},
+	{
+		Name:  "Additional: Single house",
+		Input: `[[5]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: All zero values",
+		Input: `[[0,0,0]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Skip two adjacent large houses",
+		Input: `[[5,10,10,5]]`,
+		Want:  `15`,
 	},
 }
 

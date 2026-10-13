@@ -60,7 +60,7 @@ Follow up: If you have figured out the O(n) solution, try coding another solutio
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseMaximumSubarrayInput(input string) ([]int) {
+func parseMaximumSubarrayInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse maximum-subarray input: %w", err))
@@ -80,19 +80,34 @@ func parseMaximumSubarrayInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[-2,1,-3,4,-1,2,1,-5,4]]`,
-		Want: `6`,
+		Want:  `6`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1]]`,
-		Want: `1`,
+		Want:  `1`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[5,4,-1,7,8]]`,
-		Want: `23`,
+		Want:  `23`,
+	},
+	{
+		Name:  "Additional: All negative",
+		Input: `[[-2,-1]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Single zero",
+		Input: `[[0]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Best range ends before array",
+		Input: `[[4,-1,2,-10,3]]`,
+		Want:  `5`,
 	},
 }
 

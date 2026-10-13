@@ -54,7 +54,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseConvertSortedArrayToBinarySearchTreeInput(input string) ([]int) {
+func parseConvertSortedArrayToBinarySearchTreeInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse convert-sorted-array-to-binary-search-tree input: %w", err))
@@ -74,14 +74,24 @@ func parseConvertSortedArrayToBinarySearchTreeInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[-10,-3,0,5,9]]`,
-		Want: `[0,-3,9,-10,null,5]`,
+		Want:  `[0,-3,9,-10,null,5]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,3]]`,
-		Want: `[3,1]`,
+		Want:  `[3,1]`,
+	},
+	{
+		Name:  "Additional: Single value",
+		Input: `[[0]]`,
+		Want:  `[0]`,
+	},
+	{
+		Name:  "Additional: Three values have a unique balanced shape",
+		Input: `[[-1,0,1]]`,
+		Want:  `[0,-1,1]`,
 	},
 }
 

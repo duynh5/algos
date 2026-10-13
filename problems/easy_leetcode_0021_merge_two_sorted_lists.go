@@ -62,7 +62,7 @@ Constraints:
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
@@ -86,9 +86,16 @@ func parseMergeTwoSortedListsInput(input string) (*ListNode, *ListNode) {
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
@@ -96,19 +103,29 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,4],[1,3,4]]`,
-		Want: `[1,1,2,3,4,4]`,
+		Want:  `[1,1,2,3,4,4]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[],[]]`,
-		Want: `[]`,
+		Want:  `[]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[],[0]]`,
-		Want: `[0]`,
+		Want:  `[0]`,
+	},
+	{
+		Name:  "Additional: Duplicate and negative values",
+		Input: `[[-3,-1,2],[-3,0,2]]`,
+		Want:  `[-3,-3,-1,0,2,2]`,
+	},
+	{
+		Name:  "Additional: Only right list populated",
+		Input: `[[],[-100,100]]`,
+		Want:  `[-100,100]`,
 	},
 }
 

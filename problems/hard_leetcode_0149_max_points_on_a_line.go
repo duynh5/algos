@@ -54,7 +54,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseMaxPointsOnALineInput(input string) ([][]int) {
+func parseMaxPointsOnALineInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse max-points-on-a-line input: %w", err))
@@ -74,14 +74,29 @@ func parseMaxPointsOnALineInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[1,1],[2,2],[3,3]]]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]]]`,
-		Want: `4`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Single point",
+		Input: `[[[0,0]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Vertical line",
+		Input: `[[[2,1],[2,3],[2,-1]]]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Additional: One outlier",
+		Input: `[[[0,0],[1,1],[2,2],[2,3]]]`,
+		Want:  `3`,
 	},
 }
 

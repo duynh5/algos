@@ -97,19 +97,34 @@ func parseZigzagConversionInput(input string) (string, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["PAYPALISHIRING",3]`,
-		Want: `"PAHNAPLSIIGYIR"`,
+		Want:  `"PAHNAPLSIIGYIR"`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["PAYPALISHIRING",4]`,
-		Want: `"PINALSIGYAHRPI"`,
+		Want:  `"PINALSIGYAHRPI"`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["A",1]`,
-		Want: `"A"`,
+		Want:  `"A"`,
+	},
+	{
+		Name:  "Additional: Single row",
+		Input: `["AB",1]`,
+		Want:  `"AB"`,
+	},
+	{
+		Name:  "Additional: More rows than characters",
+		Input: `["A",1000]`,
+		Want:  `"A"`,
+	},
+	{
+		Name:  "Additional: Two rows",
+		Input: `["ABCDE",2]`,
+		Want:  `"ACEBD"`,
 	},
 }
 

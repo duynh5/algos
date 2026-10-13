@@ -64,7 +64,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseMaximumSumCircularSubarrayInput(input string) ([]int) {
+func parseMaximumSumCircularSubarrayInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse maximum-sum-circular-subarray input: %w", err))
@@ -84,19 +84,34 @@ func parseMaximumSumCircularSubarrayInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,-2,3,-2]]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[5,-3,5]]`,
-		Want: `10`,
+		Want:  `10`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[-3,-2,-3]]`,
-		Want: `-2`,
+		Want:  `-2`,
+	},
+	{
+		Name:  "Additional: Single negative value",
+		Input: `[[-5]]`,
+		Want:  `-5`,
+	},
+	{
+		Name:  "Additional: All negative",
+		Input: `[[-3,-2,-3]]`,
+		Want:  `-2`,
+	},
+	{
+		Name:  "Additional: Best subarray wraps",
+		Input: `[[5,-3,5]]`,
+		Want:  `10`,
 	},
 }
 

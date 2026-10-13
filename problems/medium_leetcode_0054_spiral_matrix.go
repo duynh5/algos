@@ -54,7 +54,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseSpiralMatrixInput(input string) ([][]int) {
+func parseSpiralMatrixInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse spiral-matrix input: %w", err))
@@ -74,14 +74,29 @@ func parseSpiralMatrixInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[1,2,3],[4,5,6],[7,8,9]]]`,
-		Want: `[1,2,3,6,9,8,7,4,5]`,
+		Want:  `[1,2,3,6,9,8,7,4,5]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,2,3,4],[5,6,7,8],[9,10,11,12]]]`,
-		Want: `[1,2,3,4,8,12,11,10,9,5,6,7]`,
+		Want:  `[1,2,3,4,8,12,11,10,9,5,6,7]`,
+	},
+	{
+		Name:  "Additional: One cell",
+		Input: `[[[1]]]`,
+		Want:  `[1]`,
+	},
+	{
+		Name:  "Additional: Single row",
+		Input: `[[[1,2,3]]]`,
+		Want:  `[1,2,3]`,
+	},
+	{
+		Name:  "Additional: Single column",
+		Input: `[[[1],[2],[3]]]`,
+		Want:  `[1,2,3]`,
 	},
 }
 

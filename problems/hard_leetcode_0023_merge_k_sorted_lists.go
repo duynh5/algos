@@ -74,11 +74,11 @@ Constraints:
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
-func parseMergeKSortedListsInput(input string) ([]*ListNode) {
+func parseMergeKSortedListsInput(input string) []*ListNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse merge-k-sorted-lists input: %w", err))
@@ -94,15 +94,32 @@ func parseMergeKSortedListsInput(input string) ([]*ListNode) {
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
 func decodeListNodes(raw json.RawMessage) ([]*ListNode, error) {
-	var lists []json.RawMessage; if err := json.Unmarshal(raw, &lists); err != nil { return nil, err }
-	result := make([]*ListNode, len(lists)); for index := range lists { head, err := decodeListNode(lists[index]); if err != nil { return nil, err }; result[index] = head }
+	var lists []json.RawMessage
+	if err := json.Unmarshal(raw, &lists); err != nil {
+		return nil, err
+	}
+	result := make([]*ListNode, len(lists))
+	for index := range lists {
+		head, err := decodeListNode(lists[index])
+		if err != nil {
+			return nil, err
+		}
+		result[index] = head
+	}
 	return result, nil
 }
 
@@ -110,19 +127,29 @@ func decodeListNodes(raw json.RawMessage) ([]*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[1,4,5],[1,3,4],[2,6]]]`,
-		Want: `[1,1,2,3,4,4,5,6]`,
+		Want:  `[1,1,2,3,4,4,5,6]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[]]`,
-		Want: `[]`,
+		Want:  `[]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[[]]]`,
-		Want: `[]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Single populated list",
+		Input: `[[[-2,0,2]]]`,
+		Want:  `[-2,0,2]`,
+	},
+	{
+		Name:  "Additional: Empty lists mixed with values",
+		Input: `[[[],[1],[],[0,2]]]`,
+		Want:  `[0,1,2]`,
 	},
 }
 

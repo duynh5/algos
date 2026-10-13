@@ -67,7 +67,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseBasicCalculatorInput(input string) (string) {
+func parseBasicCalculatorInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse basic-calculator input: %w", err))
@@ -87,19 +87,34 @@ func parseBasicCalculatorInput(input string) (string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["1 + 1"]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[" 2-1 + 2 "]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["(1+(4+5+2)-3)+(6+8)"]`,
-		Want: `23`,
+		Want:  `23`,
+	},
+	{
+		Name:  "Additional: Unary negative",
+		Input: `["-1"]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Negated parenthesized expression",
+		Input: `["-(2+3)+10"]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Nested subtraction",
+		Input: `["1-(2-(3-4))"]`,
+		Want:  `-2`,
 	},
 }
 

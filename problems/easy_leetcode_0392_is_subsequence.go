@@ -81,14 +81,29 @@ func parseIsSubsequenceInput(input string) (string, string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["abc","ahbgdc"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["axc","ahbgdc"]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Both strings empty",
+		Input: `["",""]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Empty subsequence",
+		Input: `["","abc"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Nonempty cannot fit in empty",
+		Input: `["a",""]`,
+		Want:  `false`,
 	},
 }
 

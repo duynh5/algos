@@ -100,9 +100,19 @@ func parseDesignAddAndSearchWordsDataStructureInput(input string) ([]string, [][
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["WordDictionary","addWord","addWord","addWord","search","search","search","search"],[[],["bad"],["dad"],["mad"],["pad"],["bad"],[".ad"],["b.."]]]`,
-		Want: `[null,null,null,null,false,true,true,true]`,
+		Want:  `[null,null,null,null,false,true,true,true]`,
+	},
+	{
+		Name:  "Additional: Length must match",
+		Input: `[["WordDictionary","addWord","search","search"],[[],["a"],["."],[".."]]]`,
+		Want:  `[null,null,true,false]`,
+	},
+	{
+		Name:  "Additional: Wildcard in the middle",
+		Input: `[["WordDictionary","addWord","search","search"],[[],["cat"],["c.t"],["..t"]]]`,
+		Want:  `[null,null,true,true]`,
 	},
 }
 

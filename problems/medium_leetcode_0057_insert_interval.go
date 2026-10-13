@@ -92,14 +92,29 @@ func parseInsertIntervalInput(input string) ([][]int, []int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[1,3],[6,9]],[2,5]]`,
-		Want: `[[1,5],[6,9]]`,
+		Want:  `[[1,5],[6,9]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,2],[3,5],[6,7],[8,10],[12,16]],[4,8]]`,
-		Want: `[[1,2],[3,10],[12,16]]`,
+		Want:  `[[1,2],[3,10],[12,16]]`,
+	},
+	{
+		Name:  "Additional: Insert into empty list",
+		Input: `[[],[2,5]]`,
+		Want:  `[[2,5]]`,
+	},
+	{
+		Name:  "Additional: Insert before all intervals",
+		Input: `[[[3,5],[7,9]],[0,1]]`,
+		Want:  `[[0,1],[3,5],[7,9]]`,
+	},
+	{
+		Name:  "Additional: New interval contains all",
+		Input: `[[[2,3],[5,7]],[1,8]]`,
+		Want:  `[[1,8]]`,
 	},
 }
 

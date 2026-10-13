@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -58,7 +60,7 @@ Follow up: Could you solve it without converting the integer to a string?
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parsePalindromeNumberInput(input string) (int) {
+func parsePalindromeNumberInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse palindrome-number input: %w", err))
@@ -78,19 +80,34 @@ func parsePalindromeNumberInput(input string) (int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[121]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[-121]`,
-		Want: `false`,
+		Want:  `false`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[10]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Zero",
+		Input: `[0]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Two equal digits",
+		Input: `[11]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Large odd-length palindrome",
+		Input: `[2147447412]`,
+		Want:  `true`,
 	},
 }
 
@@ -118,10 +135,37 @@ var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolut
 
 func solveCurrentAttempt(input string) string {
 	x := parsePalindromeNumberInput(input)
-	_ = x
+	is_palindrome := false
+	x_as_string := strconv.Itoa(x)
+	p_stack := make([]string, 0)
+	is_candidate := false
+
+	if x < 0 || len(x_as_string) <= 2 {
+		return strconv.FormatBool(is_palindrome)
+	}
+
+	for i, val := range strings.Split(x_as_string, "") {
+		if is_candidate == false && i > 1 && val == p_stack[len(p_stack)-2] {
+			is_candidate = true
+			p_stack = p_stack[:len(p_stack)-2]
+		} else if is_candidate == true {
+			if val == p_stack[len(p_stack)-1] {
+				p_stack = p_stack[:len(p_stack)-1]
+			} else {
+				is_palindrome = false
+				break
+			}
+		} else {
+			p_stack = append(p_stack, val)
+		}
+	}
+
+	if len(p_stack) == 0 {
+		is_palindrome = true
+	}
 
 	// Implement your algorithm with the typed values above.
-	return ""
+	return strconv.FormatBool(is_palindrome)
 }
 
 // =============================================================================

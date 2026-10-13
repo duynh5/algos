@@ -48,7 +48,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseGenerateParenthesesInput(input string) (int) {
+func parseGenerateParenthesesInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse generate-parentheses input: %w", err))
@@ -68,14 +68,24 @@ func parseGenerateParenthesesInput(input string) (int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[3]`,
-		Want: `["((()))","(()())","(())()","()(())","()()()"]`,
+		Want:  `["((()))","(()())","(())()","()(())","()()()"]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[1]`,
-		Want: `["()"]`,
+		Want:  `["()"]`,
+	},
+	{
+		Name:  "Additional: Minimum pair",
+		Input: `[1]`,
+		Want:  `["()"]`,
+	},
+	{
+		Name:  "Additional: Two pairs",
+		Input: `[2]`,
+		Want:  `["(())","()()"]`,
 	},
 }
 

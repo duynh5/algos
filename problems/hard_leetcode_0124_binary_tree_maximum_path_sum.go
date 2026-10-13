@@ -57,11 +57,11 @@ Constraints:
 // This intentionally unsolved practice archive follows the workbench template.
 
 type TreeNode struct {
-	Val int
+	Val               int
 	Left, Right, Next *TreeNode
 }
 
-func parseBinaryTreeMaximumPathSumInput(input string) (*TreeNode) {
+func parseBinaryTreeMaximumPathSumInput(input string) *TreeNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse binary-tree-maximum-path-sum input: %w", err))
@@ -78,13 +78,30 @@ func parseBinaryTreeMaximumPathSumInput(input string) (*TreeNode) {
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 { return nil, err }
-	if values[0] == nil { return nil, nil }
-	root := &TreeNode{Val: *values[0]}; queue := []*TreeNode{root}; next := 1
+	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+		return nil, err
+	}
+	if values[0] == nil {
+		return nil, nil
+	}
+	root := &TreeNode{Val: *values[0]}
+	queue := []*TreeNode{root}
+	next := 1
 	for len(queue) > 0 && next < len(values) {
-		node := queue[0]; queue = queue[1:]
-		if values[next] != nil { node.Left = &TreeNode{Val: *values[next]}; queue = append(queue, node.Left) }; next++
-		if next < len(values) { if values[next] != nil { node.Right = &TreeNode{Val: *values[next]}; queue = append(queue, node.Right) }; next++ }
+		node := queue[0]
+		queue = queue[1:]
+		if values[next] != nil {
+			node.Left = &TreeNode{Val: *values[next]}
+			queue = append(queue, node.Left)
+		}
+		next++
+		if next < len(values) {
+			if values[next] != nil {
+				node.Right = &TreeNode{Val: *values[next]}
+				queue = append(queue, node.Right)
+			}
+			next++
+		}
 	}
 	return root, nil
 }
@@ -93,14 +110,29 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3]]`,
-		Want: `6`,
+		Want:  `6`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[-10,9,20,null,null,15,7]]`,
-		Want: `42`,
+		Want:  `42`,
+	},
+	{
+		Name:  "Additional: Single negative node",
+		Input: `[[-3]]`,
+		Want:  `-3`,
+	},
+	{
+		Name:  "Additional: All-negative tree",
+		Input: `[[-1,-2,-3]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Best path crosses root",
+		Input: `[[1,2,3]]`,
+		Want:  `6`,
 	},
 }
 

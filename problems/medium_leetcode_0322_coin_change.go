@@ -87,19 +87,34 @@ func parseCoinChangeInput(input string) ([]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,5],11]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[2],3]`,
-		Want: `-1`,
+		Want:  `-1`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[1],0]`,
-		Want: `0`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Zero amount",
+		Input: `[[2,3],0]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Unreachable amount",
+		Input: `[[2],3]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Greedy choice is suboptimal",
+		Input: `[[1,3,4],6]`,
+		Want:  `2`,
 	},
 }
 

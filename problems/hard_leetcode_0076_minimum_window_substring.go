@@ -92,19 +92,34 @@ func parseMinimumWindowSubstringInput(input string) (string, string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["ADOBECODEBANC","ABC"]`,
-		Want: `"BANC"`,
+		Want:  `"BANC"`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["a","a"]`,
-		Want: `"a"`,
+		Want:  `"a"`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["a","aa"]`,
-		Want: `""`,
+		Want:  `""`,
+	},
+	{
+		Name:  "Additional: Exact one-character window",
+		Input: `["a","a"]`,
+		Want:  `"a"`,
+	},
+	{
+		Name:  "Additional: Required character absent",
+		Input: `["a","b"]`,
+		Want:  `""`,
+	},
+	{
+		Name:  "Additional: Duplicate requirement",
+		Input: `["aaab","aab"]`,
+		Want:  `"aab"`,
 	},
 }
 

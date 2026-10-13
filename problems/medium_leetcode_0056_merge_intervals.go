@@ -60,7 +60,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseMergeIntervalsInput(input string) ([][]int) {
+func parseMergeIntervalsInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse merge-intervals input: %w", err))
@@ -80,19 +80,34 @@ func parseMergeIntervalsInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[1,3],[2,6],[8,10],[15,18]]]`,
-		Want: `[[1,6],[8,10],[15,18]]`,
+		Want:  `[[1,6],[8,10],[15,18]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,4],[4,5]]]`,
-		Want: `[[1,5]]`,
+		Want:  `[[1,5]]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[[4,7],[1,4]]]`,
-		Want: `[[1,7]]`,
+		Want:  `[[1,7]]`,
+	},
+	{
+		Name:  "Additional: Single point interval",
+		Input: `[[[1,1]]]`,
+		Want:  `[[1,1]]`,
+	},
+	{
+		Name:  "Additional: Nested intervals",
+		Input: `[[[1,10],[2,3],[4,8]]]`,
+		Want:  `[[1,10]]`,
+	},
+	{
+		Name:  "Additional: Touching endpoints merge",
+		Input: `[[[1,2],[2,3]]]`,
+		Want:  `[[1,3]]`,
 	},
 }
 

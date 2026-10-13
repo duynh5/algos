@@ -55,7 +55,7 @@ Constraints:
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
@@ -80,9 +80,16 @@ func parsePartitionListInput(input string) (*ListNode, int) {
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
@@ -90,14 +97,29 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,4,3,2,5,2],3]`,
-		Want: `[1,2,2,4,3,5]`,
+		Want:  `[1,2,2,4,3,5]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[2,1],2]`,
-		Want: `[1,2]`,
+		Want:  `[1,2]`,
+	},
+	{
+		Name:  "Additional: Empty list",
+		Input: `[[],0]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: All nodes below partition",
+		Input: `[[1,2,1],3]`,
+		Want:  `[1,2,1]`,
+	},
+	{
+		Name:  "Additional: Values equal to pivot stay right",
+		Input: `[[2,1,2],2]`,
+		Want:  `[1,2,2]`,
 	},
 }
 

@@ -52,7 +52,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseLetterCombinationsOfAPhoneNumberInput(input string) (string) {
+func parseLetterCombinationsOfAPhoneNumberInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse letter-combinations-of-a-phone-number input: %w", err))
@@ -72,14 +72,24 @@ func parseLetterCombinationsOfAPhoneNumberInput(input string) (string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["23"]`,
-		Want: `["ad","ae","af","bd","be","bf","cd","ce","cf"]`,
+		Want:  `["ad","ae","af","bd","be","bf","cd","ce","cf"]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["2"]`,
-		Want: `["a","b","c"]`,
+		Want:  `["a","b","c"]`,
+	},
+	{
+		Name:  "Additional: Four-letter digit",
+		Input: `["9"]`,
+		Want:  `["w","x","y","z"]`,
+	},
+	{
+		Name:  "Additional: Two four-letter digits",
+		Input: `["79"]`,
+		Want:  `["pw","px","py","pz","qw","qx","qy","qz","rw","rx","ry","rz","sw","sx","sy","sz"]`,
 	},
 }
 

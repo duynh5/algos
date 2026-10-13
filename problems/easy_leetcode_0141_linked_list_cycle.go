@@ -67,7 +67,7 @@ Follow up: Can you solve it using O(1) (i.e. constant) memory?
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
@@ -90,17 +90,28 @@ func parseLinkedListCycleInput(input string) (*ListNode, int) {
 	}
 	if pos >= 0 {
 		tail, target := head, head
-		for index := 0; index < pos; index++ { target = target.Next }
-		for tail.Next != nil { tail = tail.Next }
+		for index := 0; index < pos; index++ {
+			target = target.Next
+		}
+		for tail.Next != nil {
+			tail = tail.Next
+		}
 		tail.Next = target
 	}
 	return head, pos
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
@@ -108,19 +119,34 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[3,2,0,-4],1]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,2],0]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[1],-1]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Single-node self-cycle",
+		Input: `[[1],0]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Cycle returns to head",
+		Input: `[[1,2,3],0]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Long acyclic list",
+		Input: `[[1,2,3,4],-1]`,
+		Want:  `false`,
 	},
 }
 

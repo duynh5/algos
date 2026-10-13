@@ -86,8 +86,20 @@ func parseWordSearchInput(input string) ([][]byte, string) {
 }
 
 func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
-	var rows [][]string; if err := json.Unmarshal(raw, &rows); err != nil { return nil, err }
-	result := make([][]byte, len(rows)); for row := range rows { result[row] = make([]byte, len(rows[row])); for column, value := range rows[row] { if len(value) != 1 { return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column) }; result[row][column] = value[0] } }
+	var rows [][]string
+	if err := json.Unmarshal(raw, &rows); err != nil {
+		return nil, err
+	}
+	result := make([][]byte, len(rows))
+	for row := range rows {
+		result[row] = make([]byte, len(rows[row]))
+		for column, value := range rows[row] {
+			if len(value) != 1 {
+				return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column)
+			}
+			result[row][column] = value[0]
+		}
+	}
 	return result, nil
 }
 
@@ -95,19 +107,34 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]],"ABCCED"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]],"SEE"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]],"ABCB"]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: One cell found",
+		Input: `[[["A"]],"A"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: One cell absent",
+		Input: `[[["A"]],"B"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: A cell cannot be reused",
+		Input: `[[["A","A"]],"AAA"]`,
+		Want:  `false`,
 	},
 }
 

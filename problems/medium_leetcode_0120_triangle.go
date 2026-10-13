@@ -64,7 +64,7 @@ Follow up: Could you do this using only O(n) extra space, where n is the total n
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseTriangleInput(input string) ([][]int) {
+func parseTriangleInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse triangle input: %w", err))
@@ -84,14 +84,24 @@ func parseTriangleInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[2],[3,4],[6,5,7],[4,1,8,3]]]`,
-		Want: `11`,
+		Want:  `11`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[-10]]]`,
-		Want: `-10`,
+		Want:  `-10`,
+	},
+	{
+		Name:  "Additional: Single negative value",
+		Input: `[[[-10]]]`,
+		Want:  `-10`,
+	},
+	{
+		Name:  "Additional: Negative interior choice",
+		Input: `[[[2],[-3,4],[6,-5,7]]]`,
+		Want:  `-6`,
 	},
 }
 

@@ -111,19 +111,34 @@ func parseSubstringWithConcatenationOfAllWordsInput(input string) (string, []str
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["barfoothefoobarman",["foo","bar"]]`,
-		Want: `[0,9]`,
+		Want:  `[0,9]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["wordgoodgoodgoodbestword",["word","good","best","word"]]`,
-		Want: `[]`,
+		Want:  `[]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["barfoofoobarthefoobarman",["bar","foo","the"]]`,
-		Want: `[6,9,12]`,
+		Want:  `[6,9,12]`,
+	},
+	{
+		Name:  "Additional: Repeated required word",
+		Input: `["wordgoodgoodgoodbestword",["word","good","best","good"]]`,
+		Want:  `[8]`,
+	},
+	{
+		Name:  "Additional: Overlapping starts",
+		Input: `["aaaaaa",["aa","aa"]]`,
+		Want:  `[0,1,2]`,
+	},
+	{
+		Name:  "Additional: Combined words longer than source",
+		Input: `["a",["a","a"]]`,
+		Want:  `[]`,
 	},
 }
 

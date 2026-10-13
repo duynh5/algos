@@ -103,9 +103,19 @@ func parseMinStackInput(input string) ([]string, [][]json.RawMessage) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["MinStack","push","push","push","getMin","pop","top","getMin"],[[],[-2],[0],[-3],[],[],[],[]]]`,
-		Want: `[null,null,null,null,-3,null,0,-2]`,
+		Want:  `[null,null,null,null,-3,null,0,-2]`,
+	},
+	{
+		Name:  "Additional: Duplicate minimum survives pop",
+		Input: `[["MinStack","push","push","getMin","pop","getMin"],[[],[1],[1],[],[],[]]]`,
+		Want:  `[null,null,null,1,null,1]`,
+	},
+	{
+		Name:  "Additional: Integer boundaries",
+		Input: `[["MinStack","push","push","getMin","top"],[[],[2147483647],[-2147483648],[],[]]]`,
+		Want:  `[null,null,null,-2147483648,-2147483648]`,
 	},
 }
 

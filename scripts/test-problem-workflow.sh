@@ -84,6 +84,43 @@ rg -q 'solved_easy_leetcode_0001_two_sum.go' "$temporary_root/problems/README.md
 
 ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" solved_easy_leetcode_0001_two_sum.go
 ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" problems/solved_easy_leetcode_0001_two_sum.go
+
+git -C "$temporary_root" init --quiet
+git -C "$temporary_root" config user.email "workflow-test@example.com"
+git -C "$temporary_root" config user.name "Problem Workflow Test"
+git -C "$temporary_root" add problems
+git -C "$temporary_root" commit --quiet -m "create problem runner fixture"
+
+if no_active_output=$(ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" 2>&1); then
+  echo "error: problem auto-detection without an active file unexpectedly succeeded" >&2
+  exit 1
+fi
+if [[ $no_active_output != *"error: no modified or untracked problem file found"* ]]; then
+  echo "error: problem auto-detection returned an unexpected no-file error:" >&2
+  echo "$no_active_output" >&2
+  exit 1
+fi
+
+second_problem="$temporary_root/problems/easy_leetcode_0002_add_two_numbers.go"
+cp "$archived_file" "$second_problem"
+ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh"
+rm "$second_problem"
+
+printf '\n' >> "$archived_file"
+ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh"
+
+cp "$archived_file" "$second_problem"
+if ambiguous_output=$(ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" 2>&1); then
+  echo "error: ambiguous problem auto-detection unexpectedly succeeded" >&2
+  exit 1
+fi
+if [[ $ambiguous_output != *"error: multiple modified or untracked problem files found"* ]]; then
+  echo "error: problem auto-detection returned an unexpected ambiguity error:" >&2
+  echo "$ambiguous_output" >&2
+  exit 1
+fi
+rm "$second_problem"
+
 if ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" solved_easy_leetcode_1_two_sum.go >/dev/null 2>&1; then
 	echo "error: unpadded numeric problem ID unexpectedly succeeded" >&2
 	exit 1

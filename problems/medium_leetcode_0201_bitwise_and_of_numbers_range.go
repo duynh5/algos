@@ -78,19 +78,34 @@ func parseBitwiseAndOfNumbersRangeInput(input string) (int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[5,7]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[0,0]`,
-		Want: `0`,
+		Want:  `0`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[1,2147483647]`,
-		Want: `0`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Equal endpoints",
+		Input: `[7,7]`,
+		Want:  `7`,
+	},
+	{
+		Name:  "Additional: Range crosses a power of two",
+		Input: `[7,8]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Maximum endpoint range",
+		Input: `[2147483646,2147483647]`,
+		Want:  `2147483646`,
 	},
 }
 

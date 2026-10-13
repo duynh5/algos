@@ -62,7 +62,7 @@ Follow up: Could you do this in one pass?
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
@@ -87,9 +87,16 @@ func parseRemoveNthNodeFromEndOfListInput(input string) (*ListNode, int) {
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
@@ -97,19 +104,34 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,4,5],2]`,
-		Want: `[1,2,3,5]`,
+		Want:  `[1,2,3,5]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1],1]`,
-		Want: `[]`,
+		Want:  `[]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[1,2],1]`,
-		Want: `[1]`,
+		Want:  `[1]`,
+	},
+	{
+		Name:  "Additional: Remove head",
+		Input: `[[1,2],2]`,
+		Want:  `[2]`,
+	},
+	{
+		Name:  "Additional: Remove tail",
+		Input: `[[1,2],1]`,
+		Want:  `[1]`,
+	},
+	{
+		Name:  "Additional: Remove middle of even list",
+		Input: `[[1,2,3,4],2]`,
+		Want:  `[1,2,4]`,
 	},
 }
 

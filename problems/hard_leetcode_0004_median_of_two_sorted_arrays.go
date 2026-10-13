@@ -87,14 +87,29 @@ func parseMedianOfTwoSortedArraysInput(input string) ([]int, []int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,3],[2]]`,
-		Want: `2.00000`,
+		Want:  `2.00000`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,2],[3,4]]`,
-		Want: `2.50000`,
+		Want:  `2.50000`,
+	},
+	{
+		Name:  "Additional: One array empty",
+		Input: `[[],[1]]`,
+		Want:  `1.00000`,
+	},
+	{
+		Name:  "Additional: Even combined length",
+		Input: `[[1,2],[3,4]]`,
+		Want:  `2.50000`,
+	},
+	{
+		Name:  "Additional: Negative values",
+		Input: `[[-5,-3],[-4,-2]]`,
+		Want:  `-3.50000`,
 	},
 }
 

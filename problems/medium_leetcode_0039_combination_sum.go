@@ -92,19 +92,34 @@ func parseCombinationSumInput(input string) ([]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[2,3,6,7],7]`,
-		Want: `[[2,2,3],[7]]`,
+		Want:  `[[2,2,3],[7]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[2,3,5],8]`,
-		Want: `[[2,2,2,2],[2,3,3],[3,5]]`,
+		Want:  `[[2,2,2,2],[2,3,3],[3,5]]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[2],1]`,
-		Want: `[]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Target below every candidate",
+		Input: `[[2],1]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: One repeated candidate",
+		Input: `[[2],4]`,
+		Want:  `[[2,2]]`,
+	},
+	{
+		Name:  "Additional: Exact candidate",
+		Input: `[[3,5],5]`,
+		Want:  `[[5]]`,
 	},
 }
 

@@ -58,7 +58,7 @@ Follow-up: Could you solve the problem in linear time and in O(1) space?
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseMajorityElementInput(input string) ([]int) {
+func parseMajorityElementInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse majority-element input: %w", err))
@@ -78,14 +78,29 @@ func parseMajorityElementInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[3,2,3]]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[2,2,1,1,1,2,2]]`,
-		Want: `2`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Single value",
+		Input: `[[1]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Negative majority",
+		Input: `[[-1,-1,2]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Majority is not the first value",
+		Input: `[[2,1,1]]`,
+		Want:  `1`,
 	},
 }
 

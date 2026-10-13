@@ -58,7 +58,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseLongestConsecutiveSequenceInput(input string) ([]int) {
+func parseLongestConsecutiveSequenceInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse longest-consecutive-sequence input: %w", err))
@@ -78,19 +78,34 @@ func parseLongestConsecutiveSequenceInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[100,4,200,1,3,2]]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[0,3,7,2,5,8,4,6,0,1]]`,
-		Want: `9`,
+		Want:  `9`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[1,0,1,2]]`,
-		Want: `3`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Additional: Empty array",
+		Input: `[[]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Duplicates do not extend a run",
+		Input: `[[1,2,0,1]]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Additional: Negative run",
+		Input: `[[-2,-1,0,2]]`,
+		Want:  `3`,
 	},
 }
 

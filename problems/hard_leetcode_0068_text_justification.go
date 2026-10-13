@@ -120,7 +120,7 @@ func parseTextJustificationInput(input string) ([]string, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["This","is","an","example","of","text","justification."],16]`,
 		Want: `[
 "This is an",
@@ -129,7 +129,7 @@ var sampleCases = []testrunner.Case{
 ]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[["What","must","be","acknowledgment","shall","be"],16]`,
 		Want: `[
 "What must be",
@@ -138,7 +138,7 @@ var sampleCases = []testrunner.Case{
 ]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[["Science","is","what","we","understand","well","enough","to","explain","to","a","computer.","Art","is","everything","else","we","do"],20]`,
 		Want: `[
 "Science is what we",
@@ -148,6 +148,21 @@ var sampleCases = []testrunner.Case{
 "everything else we",
 "do "
 ]`,
+	},
+	{
+		Name:  "Additional: Single word is padded",
+		Input: `[["cat"],5]`,
+		Want:  `["cat  "]`,
+	},
+	{
+		Name:  "Additional: Words exactly fill a line",
+		Input: `[["ab","cd"],5]`,
+		Want:  `["ab cd"]`,
+	},
+	{
+		Name:  "Additional: Last line uses single spacing",
+		Input: `[["a","b","c"],4]`,
+		Want:  `["a b ","c   "]`,
 	},
 }
 

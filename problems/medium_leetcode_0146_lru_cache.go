@@ -102,9 +102,19 @@ func parseLruCacheInput(input string) ([]string, [][]json.RawMessage) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["LRUCache","put","put","get","put","get","put","get","get","get"],[[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]]`,
-		Want: `[null, null, null, 1, null, -1, null, -1, 3, 4]`,
+		Want:  `[null, null, null, 1, null, -1, null, -1, 3, 4]`,
+	},
+	{
+		Name:  "Additional: Capacity one evicts immediately",
+		Input: `[["LRUCache","put","put","get","get"],[[1],[1,1],[2,2],[1],[2]]]`,
+		Want:  `[null,null,null,-1,2]`,
+	},
+	{
+		Name:  "Additional: Updating a key refreshes it",
+		Input: `[["LRUCache","put","put","put","put","get","get","get"],[[2],[1,1],[2,2],[1,9],[3,3],[2],[1],[3]]]`,
+		Want:  `[null,null,null,null,null,-1,9,3]`,
 	},
 }
 

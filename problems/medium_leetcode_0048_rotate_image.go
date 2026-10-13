@@ -54,7 +54,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseRotateImageInput(input string) ([][]int) {
+func parseRotateImageInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse rotate-image input: %w", err))
@@ -74,14 +74,24 @@ func parseRotateImageInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[1,2,3],[4,5,6],[7,8,9]]]`,
-		Want: `[[7,4,1],[8,5,2],[9,6,3]]`,
+		Want:  `[[7,4,1],[8,5,2],[9,6,3]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]]`,
-		Want: `[[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]`,
+		Want:  `[[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]`,
+	},
+	{
+		Name:  "Additional: One cell",
+		Input: `[[[1]]]`,
+		Want:  `[[1]]`,
+	},
+	{
+		Name:  "Additional: Two by two",
+		Input: `[[[1,2],[3,4]]]`,
+		Want:  `[[3,1],[4,2]]`,
 	},
 }
 

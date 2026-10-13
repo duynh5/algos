@@ -76,7 +76,7 @@ Follow up: If this function is called many times, how would you optimize it?
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseReverseBitsInput(input string) (int) {
+func parseReverseBitsInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse reverse-bits input: %w", err))
@@ -96,14 +96,29 @@ func parseReverseBitsInput(input string) (int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[43261596]`,
-		Want: `964176192`,
+		Want:  `964176192`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[2147483644]`,
-		Want: `1073741822`,
+		Want:  `1073741822`,
+	},
+	{
+		Name:  "Additional: Zero",
+		Input: `[0]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Single set bit",
+		Input: `[2]`,
+		Want:  `1073741824`,
+	},
+	{
+		Name:  "Additional: Highest allowed even value",
+		Input: `[2147483646]`,
+		Want:  `2147483646`,
 	},
 }
 

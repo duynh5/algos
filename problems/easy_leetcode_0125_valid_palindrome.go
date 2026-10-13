@@ -61,7 +61,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseValidPalindromeInput(input string) (string) {
+func parseValidPalindromeInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse valid-palindrome input: %w", err))
@@ -81,19 +81,34 @@ func parseValidPalindromeInput(input string) (string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["A man, a plan, a canal: Panama"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["race a car"]`,
-		Want: `false`,
+		Want:  `false`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[" "]`,
-		Want: `true`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: No alphanumeric characters",
+		Input: `[".,"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Case and punctuation ignored",
+		Input: `["A-b-a"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Digit mismatch",
+		Input: `["0P"]`,
+		Want:  `false`,
 	},
 }
 

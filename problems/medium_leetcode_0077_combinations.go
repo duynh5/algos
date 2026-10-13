@@ -80,14 +80,24 @@ func parseCombinationsInput(input string) (int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[4,2]`,
-		Want: `[[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]`,
+		Want:  `[[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[1,1]`,
-		Want: `[[1]]`,
+		Want:  `[[1]]`,
+	},
+	{
+		Name:  "Additional: Choose every value",
+		Input: `[4,4]`,
+		Want:  `[[1,2,3,4]]`,
+	},
+	{
+		Name:  "Additional: Pairs from three values",
+		Input: `[3,2]`,
+		Want:  `[[1,2],[1,3],[2,3]]`,
 	},
 }
 

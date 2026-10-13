@@ -83,14 +83,29 @@ func parseBestTimeToBuyAndSellStockIvInput(input string) (int, []int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[2,[2,4,1]]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[2,[3,2,6,5,0,3]]`,
-		Want: `7`,
+		Want:  `7`,
+	},
+	{
+		Name:  "Additional: Single price",
+		Input: `[1,[5]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Large transaction budget",
+		Input: `[10,[1,3,2,5]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Descending prices",
+		Input: `[3,[5,4,3,2]]`,
+		Want:  `0`,
 	},
 }
 

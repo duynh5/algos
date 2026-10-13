@@ -77,14 +77,29 @@ func parseAddBinaryInput(input string) (string, string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["11","1"]`,
-		Want: `"100"`,
+		Want:  `"100"`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["1010","1011"]`,
-		Want: `"10101"`,
+		Want:  `"10101"`,
+	},
+	{
+		Name:  "Additional: Both operands zero",
+		Input: `["0","0"]`,
+		Want:  `"0"`,
+	},
+	{
+		Name:  "Additional: Carry extends the result",
+		Input: `["1111","1"]`,
+		Want:  `"10000"`,
+	},
+	{
+		Name:  "Additional: Different operand lengths",
+		Input: `["1","1010"]`,
+		Want:  `"1011"`,
 	},
 }
 

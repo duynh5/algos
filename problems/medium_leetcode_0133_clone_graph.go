@@ -85,7 +85,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseCloneGraphInput(input string) ([][]int) {
+func parseCloneGraphInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse clone-graph input: %w", err))
@@ -105,19 +105,29 @@ func parseCloneGraphInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[2,4],[1,3],[2,4],[1,3]]]`,
-		Want: `[[2,4],[1,3],[2,4],[1,3]]`,
+		Want:  `[[2,4],[1,3],[2,4],[1,3]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[]]]`,
-		Want: `[[]]`,
+		Want:  `[[]]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[]]`,
-		Want: `[]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Two connected nodes",
+		Input: `[[[2],[1]]]`,
+		Want:  `[[2],[1]]`,
+	},
+	{
+		Name:  "Additional: Three-node chain",
+		Input: `[[[2],[1,3],[2]]]`,
+		Want:  `[[2],[1,3],[2]]`,
 	},
 }
 

@@ -87,14 +87,29 @@ func parseSearchA2dMatrixInput(input string) ([][]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[1,3,5,7],[10,11,16,20],[23,30,34,60]],3]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,3,5,7],[10,11,16,20],[23,30,34,60]],13]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: One cell found",
+		Input: `[[[1]],1]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Target below matrix",
+		Input: `[[[1]],0]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Target between rows",
+		Input: `[[[1,3],[5,7]],4]`,
+		Want:  `false`,
 	},
 }
 

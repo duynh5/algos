@@ -54,7 +54,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseJumpGameInput(input string) ([]int) {
+func parseJumpGameInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse jump-game input: %w", err))
@@ -74,14 +74,29 @@ func parseJumpGameInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[2,3,1,1,4]]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[3,2,1,0,4]]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Single zero",
+		Input: `[[0]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Blocked immediately",
+		Input: `[[0,1]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Exact final jump",
+		Input: `[[2,0,0]]`,
+		Want:  `true`,
 	},
 }
 

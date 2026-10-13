@@ -65,7 +65,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseBestTimeToBuyAndSellStockIiInput(input string) ([]int) {
+func parseBestTimeToBuyAndSellStockIiInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse best-time-to-buy-and-sell-stock-ii input: %w", err))
@@ -85,19 +85,34 @@ func parseBestTimeToBuyAndSellStockIiInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[7,1,5,3,6,4]]`,
-		Want: `7`,
+		Want:  `7`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,2,3,4,5]]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[7,6,4,3,1]]`,
-		Want: `0`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Single price",
+		Input: `[[5]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Flat market",
+		Input: `[[3,3,3]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Several short gains",
+		Input: `[[1,3,2,5]]`,
+		Want:  `5`,
 	},
 }
 

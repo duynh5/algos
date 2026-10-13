@@ -64,7 +64,7 @@ Follow up:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseSetMatrixZeroesInput(input string) ([][]int) {
+func parseSetMatrixZeroesInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse set-matrix-zeroes input: %w", err))
@@ -84,14 +84,29 @@ func parseSetMatrixZeroesInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[1,1,1],[1,0,1],[1,1,1]]]`,
-		Want: `[[1,0,1],[0,0,0],[1,0,1]]`,
+		Want:  `[[1,0,1],[0,0,0],[1,0,1]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[0,1,2,0],[3,4,5,2],[1,3,1,5]]]`,
-		Want: `[[0,0,0,0],[0,4,5,0],[0,3,1,0]]`,
+		Want:  `[[0,0,0,0],[0,4,5,0],[0,3,1,0]]`,
+	},
+	{
+		Name:  "Additional: One zero cell",
+		Input: `[[[0]]]`,
+		Want:  `[[0]]`,
+	},
+	{
+		Name:  "Additional: No zero cells",
+		Input: `[[[1,2],[3,4]]]`,
+		Want:  `[[1,2],[3,4]]`,
+	},
+	{
+		Name:  "Additional: Zero in first row and column",
+		Input: `[[[0,2],[3,4]]]`,
+		Want:  `[[0,0],[0,4]]`,
 	},
 }
 

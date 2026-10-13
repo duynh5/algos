@@ -80,7 +80,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseEvaluateReversePolishNotationInput(input string) ([]string) {
+func parseEvaluateReversePolishNotationInput(input string) []string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse evaluate-reverse-polish-notation input: %w", err))
@@ -100,19 +100,34 @@ func parseEvaluateReversePolishNotationInput(input string) ([]string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["2","1","+","3","*"]]`,
-		Want: `9`,
+		Want:  `9`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[["4","13","5","/","+"]]`,
-		Want: `6`,
+		Want:  `6`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[["10","6","9","3","+","-11","*","/","*","17","+","5","+"]]`,
-		Want: `22`,
+		Want:  `22`,
+	},
+	{
+		Name:  "Additional: Single addition",
+		Input: `[["3","4","+"]]`,
+		Want:  `7`,
+	},
+	{
+		Name:  "Additional: Division truncates toward zero",
+		Input: `[["7","-3","/"]]`,
+		Want:  `-2`,
+	},
+	{
+		Name:  "Additional: Negative intermediate result",
+		Input: `[["2","5","-"]]`,
+		Want:  `-3`,
 	},
 }
 

@@ -78,7 +78,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseValidParenthesesInput(input string) (string) {
+func parseValidParenthesesInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse valid-parentheses input: %w", err))
@@ -98,29 +98,44 @@ func parseValidParenthesesInput(input string) (string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["()"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["()[]{}"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["(]"]`,
-		Want: `false`,
+		Want:  `false`,
 	},
 	{
-		Name: "Official example 4",
+		Name:  "Official example 4",
 		Input: `["([])"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 5",
+		Name:  "Official example 5",
 		Input: `["([)]"]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Minimum unmatched opener",
+		Input: `["("]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Deep mixed nesting",
+		Input: `["{[()]}"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Correct counts but crossed order",
+		Input: `["([)]"]`,
+		Want:  `false`,
 	},
 }
 

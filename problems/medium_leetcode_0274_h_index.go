@@ -56,7 +56,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseHIndexInput(input string) ([]int) {
+func parseHIndexInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse h-index input: %w", err))
@@ -76,14 +76,29 @@ func parseHIndexInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[3,0,6,1,5]]`,
-		Want: `3`,
+		Want:  `3`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,3,1]]`,
-		Want: `1`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: No cited papers",
+		Input: `[[0]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: One cited paper",
+		Input: `[[1]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Duplicates at the threshold",
+		Input: `[[3,3,3,3]]`,
+		Want:  `3`,
 	},
 }
 

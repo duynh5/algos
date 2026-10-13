@@ -68,7 +68,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseSurroundedRegionsInput(input string) ([][]byte) {
+func parseSurroundedRegionsInput(input string) [][]byte {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse surrounded-regions input: %w", err))
@@ -84,8 +84,20 @@ func parseSurroundedRegionsInput(input string) ([][]byte) {
 }
 
 func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
-	var rows [][]string; if err := json.Unmarshal(raw, &rows); err != nil { return nil, err }
-	result := make([][]byte, len(rows)); for row := range rows { result[row] = make([]byte, len(rows[row])); for column, value := range rows[row] { if len(value) != 1 { return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column) }; result[row][column] = value[0] } }
+	var rows [][]string
+	if err := json.Unmarshal(raw, &rows); err != nil {
+		return nil, err
+	}
+	result := make([][]byte, len(rows))
+	for row := range rows {
+		result[row] = make([]byte, len(rows[row]))
+		for column, value := range rows[row] {
+			if len(value) != 1 {
+				return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column)
+			}
+			result[row][column] = value[0]
+		}
+	}
 	return result, nil
 }
 
@@ -93,14 +105,29 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]]`,
-		Want: `[["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]`,
+		Want:  `[["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[["X"]]]`,
-		Want: `[["X"]]`,
+		Want:  `[["X"]]`,
+	},
+	{
+		Name:  "Additional: Single border cell remains",
+		Input: `[[["O"]]]`,
+		Want:  `[["O"]]`,
+	},
+	{
+		Name:  "Additional: Interior region flips",
+		Input: `[[["X","X","X"],["X","O","X"],["X","X","X"]]]`,
+		Want:  `[["X","X","X"],["X","X","X"],["X","X","X"]]`,
+	},
+	{
+		Name:  "Additional: Border-connected chain remains",
+		Input: `[[["X","O","X"],["X","O","X"],["X","X","X"]]]`,
+		Want:  `[["X","O","X"],["X","O","X"],["X","X","X"]]`,
 	},
 }
 

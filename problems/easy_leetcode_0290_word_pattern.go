@@ -107,19 +107,34 @@ func parseWordPatternInput(input string) (string, string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["abba","dog cat cat dog"]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["abba","dog cat cat fish"]`,
-		Want: `false`,
+		Want:  `false`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["aaaa","dog cat cat dog"]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Single mapping",
+		Input: `["a","dog"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Word count mismatch",
+		Input: `["a","dog dog"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Two pattern letters map to one word",
+		Input: `["ab","dog dog"]`,
+		Want:  `false`,
 	},
 }
 

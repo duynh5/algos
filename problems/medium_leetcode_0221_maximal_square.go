@@ -59,7 +59,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseMaximalSquareInput(input string) ([][]byte) {
+func parseMaximalSquareInput(input string) [][]byte {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse maximal-square input: %w", err))
@@ -75,8 +75,20 @@ func parseMaximalSquareInput(input string) ([][]byte) {
 }
 
 func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
-	var rows [][]string; if err := json.Unmarshal(raw, &rows); err != nil { return nil, err }
-	result := make([][]byte, len(rows)); for row := range rows { result[row] = make([]byte, len(rows[row])); for column, value := range rows[row] { if len(value) != 1 { return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column) }; result[row][column] = value[0] } }
+	var rows [][]string
+	if err := json.Unmarshal(raw, &rows); err != nil {
+		return nil, err
+	}
+	result := make([][]byte, len(rows))
+	for row := range rows {
+		result[row] = make([]byte, len(rows[row]))
+		for column, value := range rows[row] {
+			if len(value) != 1 {
+				return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column)
+			}
+			result[row][column] = value[0]
+		}
+	}
 	return result, nil
 }
 
@@ -84,19 +96,34 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[["0","1"],["1","0"]]]`,
-		Want: `1`,
+		Want:  `1`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[["0"]]]`,
-		Want: `0`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: One live cell",
+		Input: `[[["1"]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Two-by-two square",
+		Input: `[[["1","1"],["1","1"]]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Only a rectangle of width one",
+		Input: `[[["1","0"],["1","0"]]]`,
+		Want:  `1`,
 	},
 }
 

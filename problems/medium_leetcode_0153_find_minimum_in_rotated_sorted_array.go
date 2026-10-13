@@ -74,7 +74,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseFindMinimumInRotatedSortedArrayInput(input string) ([]int) {
+func parseFindMinimumInRotatedSortedArrayInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse find-minimum-in-rotated-sorted-array input: %w", err))
@@ -94,19 +94,34 @@ func parseFindMinimumInRotatedSortedArrayInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[3,4,5,1,2]]`,
-		Want: `1`,
+		Want:  `1`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[4,5,6,7,0,1,2]]`,
-		Want: `0`,
+		Want:  `0`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[11,13,15,17]]`,
-		Want: `11`,
+		Want:  `11`,
+	},
+	{
+		Name:  "Additional: Single value",
+		Input: `[[7]]`,
+		Want:  `7`,
+	},
+	{
+		Name:  "Additional: Two values rotated",
+		Input: `[[2,1]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Minimum after the midpoint",
+		Input: `[[4,5,6,1,2,3]]`,
+		Want:  `1`,
 	},
 }
 

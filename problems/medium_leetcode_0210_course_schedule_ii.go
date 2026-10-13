@@ -95,19 +95,29 @@ func parseCourseScheduleIiInput(input string) (int, [][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[2,[[1,0]]]`,
-		Want: `[0,1]`,
+		Want:  `[0,1]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[4,[[1,0],[2,0],[3,1],[3,2]]]`,
-		Want: `[0,2,1,3]`,
+		Want:  `[0,2,1,3]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[1,[]]`,
-		Want: `[0]`,
+		Want:  `[0]`,
+	},
+	{
+		Name:  "Additional: One course",
+		Input: `[1,[]]`,
+		Want:  `[0]`,
+	},
+	{
+		Name:  "Additional: Cycle has no ordering",
+		Input: `[2,[[0,1],[1,0]]]`,
+		Want:  `[]`,
 	},
 }
 

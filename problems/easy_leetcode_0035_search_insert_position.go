@@ -86,19 +86,34 @@ func parseSearchInsertPositionInput(input string) ([]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,3,5,6],5]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,3,5,6],2]`,
-		Want: `1`,
+		Want:  `1`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[1,3,5,6],7]`,
-		Want: `4`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Single value found",
+		Input: `[[1],1]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Insert before first",
+		Input: `[[1],0]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Insert between negatives",
+		Input: `[[-5,-3,-1],-2]`,
+		Want:  `2`,
 	},
 }
 

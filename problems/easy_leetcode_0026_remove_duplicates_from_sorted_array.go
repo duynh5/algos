@@ -76,7 +76,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseRemoveDuplicatesFromSortedArrayInput(input string) ([]int) {
+func parseRemoveDuplicatesFromSortedArrayInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse remove-duplicates-from-sorted-array input: %w", err))
@@ -96,14 +96,29 @@ func parseRemoveDuplicatesFromSortedArrayInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,1,2]]`,
-		Want: `2, nums = [1,2,_]`,
+		Want:  `2, nums = [1,2,_]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[0,0,1,1,1,2,2,3,3,4]]`,
-		Want: `5, nums = [0,1,2,3,4,_,_,_,_,_]`,
+		Want:  `5, nums = [0,1,2,3,4,_,_,_,_,_]`,
+	},
+	{
+		Name:  "Additional: Minimum array",
+		Input: `[[1]]`,
+		Want:  `1, nums = [1]`,
+	},
+	{
+		Name:  "Additional: All values duplicated",
+		Input: `[[2,2,2]]`,
+		Want:  `1, nums = [2,_,_]`,
+	},
+	{
+		Name:  "Additional: No duplicates",
+		Input: `[[-1,0,1]]`,
+		Want:  `3, nums = [-1,0,1]`,
 	},
 }
 

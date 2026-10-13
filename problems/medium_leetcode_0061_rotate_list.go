@@ -53,7 +53,7 @@ Constraints:
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
@@ -78,9 +78,16 @@ func parseRotateListInput(input string) (*ListNode, int) {
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
@@ -88,14 +95,29 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,4,5],2]`,
-		Want: `[4,5,1,2,3]`,
+		Want:  `[4,5,1,2,3]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[0,1,2],4]`,
-		Want: `[2,0,1]`,
+		Want:  `[2,0,1]`,
+	},
+	{
+		Name:  "Additional: Empty list",
+		Input: `[[],5]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Zero rotations",
+		Input: `[[1,2,3],0]`,
+		Want:  `[1,2,3]`,
+	},
+	{
+		Name:  "Additional: Rotations are a length multiple",
+		Input: `[[1,2,3],6]`,
+		Want:  `[1,2,3]`,
 	},
 }
 

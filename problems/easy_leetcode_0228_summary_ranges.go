@@ -73,7 +73,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseSummaryRangesInput(input string) ([]int) {
+func parseSummaryRangesInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse summary-ranges input: %w", err))
@@ -93,14 +93,29 @@ func parseSummaryRangesInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[0,1,2,4,5,7]]`,
-		Want: `["0->2","4->5","7"]`,
+		Want:  `["0->2","4->5","7"]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[0,2,3,4,6,8,9]]`,
-		Want: `["0","2->4","6","8->9"]`,
+		Want:  `["0","2->4","6","8->9"]`,
+	},
+	{
+		Name:  "Additional: Empty array",
+		Input: `[[]]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Single value",
+		Input: `[[0]]`,
+		Want:  `["0"]`,
+	},
+	{
+		Name:  "Additional: Negative-to-positive range",
+		Input: `[[-1,0,1,3]]`,
+		Want:  `["-1->1","3"]`,
 	},
 }
 

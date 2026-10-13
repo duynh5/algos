@@ -104,9 +104,19 @@ func parseFindMedianFromDataStreamInput(input string) ([]string, [][]json.RawMes
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"],[[],[1],[2],[],[3],[]]]`,
-		Want: `[null, null, null, 1.5, null, 2.0]`,
+		Want:  `[null, null, null, 1.5, null, 2.0]`,
+	},
+	{
+		Name:  "Additional: Single stream value",
+		Input: `[["MedianFinder","addNum","findMedian"],[[],[5],[]]]`,
+		Want:  `[null,null,5.0]`,
+	},
+	{
+		Name:  "Additional: Negative even-sized stream",
+		Input: `[["MedianFinder","addNum","addNum","findMedian"],[[],[-5],[-1],[]]]`,
+		Want:  `[null,null,null,-3.0]`,
 	},
 }
 

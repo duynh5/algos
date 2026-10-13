@@ -64,7 +64,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseUniquePathsIiInput(input string) ([][]int) {
+func parseUniquePathsIiInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse unique-paths-ii input: %w", err))
@@ -84,14 +84,29 @@ func parseUniquePathsIiInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[0,0,0],[0,1,0],[0,0,0]]]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[0,1],[0,0]]]`,
-		Want: `1`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Open one-cell grid",
+		Input: `[[[0]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Blocked one-cell grid",
+		Input: `[[[1]]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Blocked destination",
+		Input: `[[[0,0],[0,1]]]`,
+		Want:  `0`,
 	},
 }
 

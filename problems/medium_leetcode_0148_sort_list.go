@@ -58,11 +58,11 @@ Follow up: Can you sort the linked list in O(n logn) time and O(1) memory (i.e. 
 // This intentionally unsolved practice archive follows the workbench template.
 
 type ListNode struct {
-	Val int
+	Val  int
 	Next *ListNode
 }
 
-func parseSortListInput(input string) (*ListNode) {
+func parseSortListInput(input string) *ListNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse sort-list input: %w", err))
@@ -78,9 +78,16 @@ func parseSortListInput(input string) (*ListNode) {
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
-	var values []int; if err := json.Unmarshal(raw, &values); err != nil { return nil, err }
-	dummy := &ListNode{}; tail := dummy
-	for _, value := range values { tail.Next = &ListNode{Val: value}; tail = tail.Next }
+	var values []int
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return nil, err
+	}
+	dummy := &ListNode{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &ListNode{Val: value}
+		tail = tail.Next
+	}
 	return dummy.Next, nil
 }
 
@@ -88,19 +95,29 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[4,2,1,3]]`,
-		Want: `[1,2,3,4]`,
+		Want:  `[1,2,3,4]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[-1,5,3,4,0]]`,
-		Want: `[-1,0,3,4,5]`,
+		Want:  `[-1,0,3,4,5]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[]]`,
-		Want: `[]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Single node",
+		Input: `[[1]]`,
+		Want:  `[1]`,
+	},
+	{
+		Name:  "Additional: Duplicates and negatives",
+		Input: `[[3,-1,3,0]]`,
+		Want:  `[-1,0,3,3]`,
 	},
 }
 

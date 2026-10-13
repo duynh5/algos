@@ -82,19 +82,34 @@ func parseContainsDuplicateIiInput(input string) ([]int, int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,2,3,1],3]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,0,1,1],1]`,
-		Want: `true`,
+		Want:  `true`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[1,2,3,1,2,3],2]`,
-		Want: `false`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Single value and zero distance",
+		Input: `[[1],0]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Duplicate exists but k is zero",
+		Input: `[[1,1],0]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Duplicate exactly k apart",
+		Input: `[[1,2,1],2]`,
+		Want:  `true`,
 	},
 }
 

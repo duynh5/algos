@@ -112,19 +112,29 @@ func parseEvaluateDivisionInput(input string) ([][]string, []float64, [][]string
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[["a","b"],["b","c"]],[2.0,3.0],[["a","c"],["b","a"],["a","e"],["a","a"],["x","x"]]]`,
-		Want: `[6.00000,0.50000,-1.00000,1.00000,-1.00000]`,
+		Want:  `[6.00000,0.50000,-1.00000,1.00000,-1.00000]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[["a","b"],["b","c"],["bc","cd"]],[1.5,2.5,5.0],[["a","c"],["c","b"],["bc","cd"],["cd","bc"]]]`,
-		Want: `[3.75000,0.40000,5.00000,0.20000]`,
+		Want:  `[3.75000,0.40000,5.00000,0.20000]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[["a","b"]],[0.5],[["a","b"],["b","a"],["a","c"],["x","y"]]]`,
-		Want: `[0.50000,2.00000,-1.00000,-1.00000]`,
+		Want:  `[0.50000,2.00000,-1.00000,-1.00000]`,
+	},
+	{
+		Name:  "Additional: Known identity and unknown identity",
+		Input: `[[["a","b"]],[2.0],[["a","a"],["b","b"],["x","x"]]]`,
+		Want:  `[1.00000,1.00000,-1.00000]`,
+	},
+	{
+		Name:  "Additional: Direct reciprocal",
+		Input: `[[["x","y"]],[4.0],[["y","x"]]]`,
+		Want:  `[0.25000]`,
 	},
 }
 

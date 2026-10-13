@@ -88,19 +88,34 @@ func parseFindFirstAndLastPositionOfElementInSortedArrayInput(input string) ([]i
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[5,7,7,8,8,10],8]`,
-		Want: `[3,4]`,
+		Want:  `[3,4]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[5,7,7,8,8,10],6]`,
-		Want: `[-1,-1]`,
+		Want:  `[-1,-1]`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `[[],0]`,
-		Want: `[-1,-1]`,
+		Want:  `[-1,-1]`,
+	},
+	{
+		Name:  "Additional: Single matching value",
+		Input: `[[1],1]`,
+		Want:  `[0,0]`,
+	},
+	{
+		Name:  "Additional: All values match",
+		Input: `[[2,2,2],2]`,
+		Want:  `[0,2]`,
+	},
+	{
+		Name:  "Additional: Target between values",
+		Input: `[[1,3],2]`,
+		Want:  `[-1,-1]`,
 	},
 }
 

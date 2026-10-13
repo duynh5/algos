@@ -67,7 +67,7 @@ Follow-up: If the string data type is mutable in your language, can you solve it
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseReverseWordsInAStringInput(input string) (string) {
+func parseReverseWordsInAStringInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse reverse-words-in-a-string input: %w", err))
@@ -87,19 +87,29 @@ func parseReverseWordsInAStringInput(input string) (string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["the sky is blue"]`,
-		Want: `"blue is sky the"`,
+		Want:  `"blue is sky the"`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["  hello world  "]`,
-		Want: `"world hello"`,
+		Want:  `"world hello"`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["a good   example"]`,
-		Want: `"example good a"`,
+		Want:  `"example good a"`,
+	},
+	{
+		Name:  "Additional: Single word with padding",
+		Input: `["   hello   "]`,
+		Want:  `"hello"`,
+	},
+	{
+		Name:  "Additional: Mixed internal spacing",
+		Input: `["a   good   example"]`,
+		Want:  `"example good a"`,
 	},
 }
 

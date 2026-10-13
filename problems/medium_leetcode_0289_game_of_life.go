@@ -76,7 +76,7 @@ Follow up:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseGameOfLifeInput(input string) ([][]int) {
+func parseGameOfLifeInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse game-of-life input: %w", err))
@@ -96,14 +96,29 @@ func parseGameOfLifeInput(input string) ([][]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[[0,1,0],[0,0,1],[1,1,1],[0,0,0]]]`,
-		Want: `[[0,0,0],[1,0,1],[0,1,1],[0,1,0]]`,
+		Want:  `[[0,0,0],[1,0,1],[0,1,1],[0,1,0]]`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[[1,1],[1,0]]]`,
-		Want: `[[1,1],[1,1]]`,
+		Want:  `[[1,1],[1,1]]`,
+	},
+	{
+		Name:  "Additional: Single live cell dies",
+		Input: `[[[1]]]`,
+		Want:  `[[0]]`,
+	},
+	{
+		Name:  "Additional: Stable block",
+		Input: `[[[1,1],[1,1]]]`,
+		Want:  `[[1,1],[1,1]]`,
+	},
+	{
+		Name:  "Additional: Blinker transition",
+		Input: `[[[0,1,0],[0,1,0],[0,1,0]]]`,
+		Want:  `[[0,0,0],[1,1,1],[0,0,0]]`,
 	},
 }
 

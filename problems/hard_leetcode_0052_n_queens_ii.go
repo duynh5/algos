@@ -51,7 +51,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseNQueensIiInput(input string) (int) {
+func parseNQueensIiInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse n-queens-ii input: %w", err))
@@ -71,14 +71,29 @@ func parseNQueensIiInput(input string) (int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[4]`,
-		Want: `2`,
+		Want:  `2`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[1]`,
-		Want: `1`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: No solution for two queens",
+		Input: `[2]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: No solution for three queens",
+		Input: `[3]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Constraint maximum",
+		Input: `[9]`,
+		Want:  `352`,
 	},
 }
 

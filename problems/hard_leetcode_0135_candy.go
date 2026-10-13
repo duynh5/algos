@@ -63,7 +63,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseCandyInput(input string) ([]int) {
+func parseCandyInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse candy input: %w", err))
@@ -83,14 +83,29 @@ func parseCandyInput(input string) ([]int) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `[[1,0,2]]`,
-		Want: `5`,
+		Want:  `5`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `[[1,2,2]]`,
-		Want: `4`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Single child",
+		Input: `[[0]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Equal ratings need no extra candy",
+		Input: `[[1,1]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Valley needs both directional passes",
+		Input: `[[2,1,2]]`,
+		Want:  `5`,
 	},
 }
 

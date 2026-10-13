@@ -62,7 +62,7 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseLengthOfLastWordInput(input string) (string) {
+func parseLengthOfLastWordInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse length-of-last-word input: %w", err))
@@ -82,19 +82,34 @@ func parseLengthOfLastWordInput(input string) (string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["Hello World"]`,
-		Want: `5`,
+		Want:  `5`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["   fly me   to   the moon  "]`,
-		Want: `4`,
+		Want:  `4`,
 	},
 	{
-		Name: "Official example 3",
+		Name:  "Official example 3",
 		Input: `["luffy is still joyboy"]`,
-		Want: `6`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Single letter",
+		Input: `["a"]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Trailing spaces",
+		Input: `["word   "]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: One-letter final word",
+		Input: `["long phrase x"]`,
+		Want:  `1`,
 	},
 }
 

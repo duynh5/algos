@@ -100,14 +100,29 @@ func parseWordLadderInput(input string) (string, string, []string) {
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["hit","cog",["hot","dot","dog","lot","log","cog"]]`,
-		Want: `5`,
+		Want:  `5`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["hit","cog",["hot","dot","dog","lot","log"]]`,
-		Want: `0`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Direct transformation",
+		Input: `["hit","hot",["hot"]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: End word absent",
+		Input: `["hit","hot",["dot"]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Shortest path among distractions",
+		Input: `["a","c",["a","b","c"]]`,
+		Want:  `2`,
 	},
 }
 

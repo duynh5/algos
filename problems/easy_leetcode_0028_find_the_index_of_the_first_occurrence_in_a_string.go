@@ -78,14 +78,29 @@ func parseFindTheIndexOfTheFirstOccurrenceInAStringInput(input string) (string, 
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
-		Name: "Official example 1",
+		Name:  "Official example 1",
 		Input: `["sadbutsad","sad"]`,
-		Want: `0`,
+		Want:  `0`,
 	},
 	{
-		Name: "Official example 2",
+		Name:  "Official example 2",
 		Input: `["leetcode","leeto"]`,
-		Want: `-1`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Exact one-character match",
+		Input: `["a","a"]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Match at final position",
+		Input: `["abc","c"]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Needle longer than haystack",
+		Input: `["a","aa"]`,
+		Want:  `-1`,
 	},
 }
 
