@@ -45,3 +45,4 @@ traversal additionally consumes O(n) call-stack space.
 ## Related problems
 
 - [Add Two Numbers (Easy)](../../../problems/solved_easy_leetcode_0002_add_two_numbers.go)
+- [Merge Two Sorted Lists (Easy)](../../../problems/solved_easy_leetcode_0021_merge_two_sorted_lists.go)
