@@ -53,6 +53,7 @@ Every concept page should explain:
 
 ## Problem-solving patterns
 
+- [Common-prefix scans](patterns/common-prefix-scan/)
 - [Directional scans](patterns/directional-scan/)
 - [Two pointers](patterns/two-pointers/)
 - Sliding window

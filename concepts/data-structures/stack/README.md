@@ -30,4 +30,4 @@ of pointers does not retain an otherwise unreachable value.
 
 ## Related problems
 
-No solved problems are linked yet.
+- [Valid Parentheses](../../../problems/solved_easy_leetcode_0020_valid_parentheses.go)
