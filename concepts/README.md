@@ -53,6 +53,7 @@ Every concept page should explain:
 
 ## Problem-solving patterns
 
+- [Directional scans](patterns/directional-scan/)
 - [Two pointers](patterns/two-pointers/)
 - Sliding window
 - Prefix sums and difference arrays

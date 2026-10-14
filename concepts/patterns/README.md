@@ -5,6 +5,7 @@ class of problems into a repeatable approach.
 
 Available:
 
+- [Directional scans](directional-scan/)
 - [Two pointers](two-pointers/)
 
 See the complete [concept curriculum](../).
