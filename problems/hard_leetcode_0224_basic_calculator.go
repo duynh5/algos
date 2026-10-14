@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -83,6 +84,32 @@ func parseBasicCalculatorInput(input string) string {
 	return s
 }
 
+func makeMaximumFlatBasicCalculatorCase() testrunner.Case {
+	expression := strings.Repeat("1+", 149999) + "1"
+	input, err := json.Marshal([]string{expression})
+	if err != nil {
+		panic(fmt.Errorf("build basic-calculator input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum-length flat expression",
+		Input: string(input),
+		Want:  `150000`,
+	}
+}
+
+func makeMaximumNestedBasicCalculatorCase() testrunner.Case {
+	expression := strings.Repeat("(", 149999) + "1" + strings.Repeat(")", 149999)
+	input, err := json.Marshal([]string{expression})
+	if err != nil {
+		panic(fmt.Errorf("build nested basic-calculator input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum-length nested expression",
+		Input: string(input),
+		Want:  `1`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -116,6 +143,28 @@ var sampleCases = []testrunner.Case{
 		Input: `["1-(2-(3-4))"]`,
 		Want:  `-2`,
 	},
+	{
+		Name:  "Additional: Unary negative inside parentheses",
+		Input: `["1-(-2)"]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Additional: Repeated unary negation across groups",
+		Input: `["-(-(-1))"]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Signed 32-bit boundary",
+		Input: `["2147483647"]`,
+		Want:  `2147483647`,
+	},
+	{
+		Name:  "Additional: Spaces around every token",
+		Input: `[" ( 10 - ( 2 + 3 ) ) + 4 "]`,
+		Want:  `9`,
+	},
+	makeMaximumFlatBasicCalculatorCase(),
+	makeMaximumNestedBasicCalculatorCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -83,6 +83,10 @@ func parsePowxNInput(input string) (float64, int) {
 	return x, n
 }
 
+func formatPowxNOutput(value float64) string {
+	return fmt.Sprintf("%.5f", value)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -115,6 +119,46 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: Negative base",
 		Input: `[-2.0,3]`,
 		Want:  `-8.00000`,
+	},
+	{
+		Name:  "Minimum: Zero base with positive exponent",
+		Input: `[0.0,1]`,
+		Want:  `0.00000`,
+	},
+	{
+		Name:  "Additional: Negative base with even exponent",
+		Input: `[-2.0,4]`,
+		Want:  `16.00000`,
+	},
+	{
+		Name:  "Additional: Fractional base with positive exponent",
+		Input: `[0.5,3]`,
+		Want:  `0.12500`,
+	},
+	{
+		Name:  "Additional: Fractional base with negative exponent",
+		Input: `[0.5,-2]`,
+		Want:  `4.00000`,
+	},
+	{
+		Name:  "Boundary: Negative one at maximum exponent",
+		Input: `[-1.0,2147483647]`,
+		Want:  `-1.00000`,
+	},
+	{
+		Name:  "Boundary: Negative one at minimum exponent",
+		Input: `[-1.0,-2147483648]`,
+		Want:  `1.00000`,
+	},
+	{
+		Name:  "Boundary: Zero base at maximum exponent",
+		Input: `[0.0,2147483647]`,
+		Want:  `0.00000`,
+	},
+	{
+		Name:  "Boundary: Large valid result near output limit",
+		Input: `[99.0,2]`,
+		Want:  `9801.00000`,
 	},
 }
 

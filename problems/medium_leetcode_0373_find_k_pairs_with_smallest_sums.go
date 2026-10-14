@@ -88,6 +88,21 @@ func parseFindKPairsWithSmallestSumsInput(input string) ([]int, []int, int) {
 	return nums1, nums2, k
 }
 
+func maximumFindKPairsWithSmallestSumsCase() testrunner.Case {
+	nums1 := make([]int, 100000)
+	nums2 := make([]int, 100000)
+	want := make([][2]int, 10000)
+	input, err := json.Marshal([]any{nums1, nums2, 10000})
+	if err != nil {
+		panic(fmt.Errorf("build maximum k-smallest-pairs input: %w", err))
+	}
+	output, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum k-smallest-pairs output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum arrays and requested pairs", Input: string(input), Want: string(output)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -111,6 +126,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[-2,-1],[1,2],1]`,
 		Want:  `[[-2,1]]`,
 	},
+	{
+		Name:  "Additional: Request every possible pair",
+		Input: `[[1,2],[3],2]`,
+		Want:  `[[1,3],[2,3]]`,
+	},
+	{
+		Name:  "Adversarial: A later first-array value beats a later second-array value",
+		Input: `[[1,2,100],[1,50,60],4]`,
+		Want:  `[[1,1],[2,1],[1,50],[2,50]]`,
+	},
+	{
+		Name:  "Boundary: Signed value limits",
+		Input: `[[-1000000000],[1000000000],1]`,
+		Want:  `[[-1000000000,1000000000]]`,
+	},
+	{
+		Name:  "Additional: Duplicate elements produce duplicate pairs",
+		Input: `[[1,1],[2,2],4]`,
+		Want:  `[[1,2],[1,2],[1,2],[1,2]]`,
+	},
+	maximumFindKPairsWithSmallestSumsCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

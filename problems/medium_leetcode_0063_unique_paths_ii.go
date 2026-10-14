@@ -80,6 +80,31 @@ func parseUniquePathsIiInput(input string) [][]int {
 	return obstacleGrid
 }
 
+func maximumUniquePathsIiCase() testrunner.Case {
+	obstacleGrid := make([][]int, 100)
+	for row := range obstacleGrid {
+		obstacleGrid[row] = make([]int, 100)
+		for column := range obstacleGrid[row] {
+			obstacleGrid[row][column] = 1
+		}
+	}
+	for column := range obstacleGrid[0] {
+		obstacleGrid[0][column] = 0
+	}
+	for row := range obstacleGrid {
+		obstacleGrid[row][99] = 0
+	}
+	input, err := json.Marshal([]any{obstacleGrid})
+	if err != nil {
+		panic(fmt.Errorf("build maximum unique-paths-ii input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum grid has exactly one open corridor",
+		Input: string(input),
+		Want:  `1`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -108,6 +133,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[0,0],[0,1]]]`,
 		Want:  `0`,
 	},
+	{
+		Name:  "Additional: Blocked start in a larger grid",
+		Input: `[[[1,0],[0,0]]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Open two by two grid",
+		Input: `[[[0,0],[0,0]]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Adversarial: Obstacle blocks the only single-row path",
+		Input: `[[[0,0,1,0]]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Adversarial: Obstacle blocks the only single-column path",
+		Input: `[[[0],[1],[0]]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Adversarial: First-row paths reset after an obstacle",
+		Input: `[[[0,0,1,0],[0,0,0,0]]]`,
+		Want:  `2`,
+	},
+	maximumUniquePathsIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

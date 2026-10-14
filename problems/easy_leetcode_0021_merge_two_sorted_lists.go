@@ -99,6 +99,45 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 	return dummy.Next, nil
 }
 
+func formatMergeTwoSortedListsOutput(head *ListNode) string {
+	values := make([]int, 0)
+	for node := head; node != nil; node = node.Next {
+		values = append(values, node.Val)
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format merge-two-sorted-lists output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumMergeTwoSortedListsCase() testrunner.Case {
+	list1 := make([]int, 25)
+	list2 := make([]int, 25)
+	want := make([]int, 50)
+	for index := range 25 {
+		list1[index] = index * 2
+		list2[index] = index*2 + 1
+	}
+	for index := range 50 {
+		want[index] = index
+	}
+
+	input, err := json.Marshal([]any{list1, list2})
+	if err != nil {
+		panic(fmt.Errorf("build maximum merge-two-sorted-lists input: %w", err))
+	}
+	output, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum merge-two-sorted-lists output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum total node count",
+		Input: string(input),
+		Want:  string(output),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -127,6 +166,37 @@ var sampleCases = []testrunner.Case{
 		Input: `[[],[-100,100]]`,
 		Want:  `[-100,100]`,
 	},
+	{
+		Name:  "Additional: Only left list populated",
+		Input: `[[-100,0,100],[]]`,
+		Want:  `[-100,0,100]`,
+	},
+	{
+		Name:  "Additional: Left list entirely precedes right",
+		Input: `[[1,2,3],[4,5,6]]`,
+		Want:  `[1,2,3,4,5,6]`,
+	},
+	{
+		Name:  "Additional: Right list entirely precedes left",
+		Input: `[[4,5,6],[1,2,3]]`,
+		Want:  `[1,2,3,4,5,6]`,
+	},
+	{
+		Name:  "Additional: Values alternate between lists",
+		Input: `[[1,3,5],[2,4,6]]`,
+		Want:  `[1,2,3,4,5,6]`,
+	},
+	{
+		Name:  "Additional: Equal values span both lists",
+		Input: `[[1,1,3],[1,2,2]]`,
+		Want:  `[1,1,1,2,2,3]`,
+	},
+	{
+		Name:  "Additional: Unequal list lengths",
+		Input: `[[1],[2,3,4,5]]`,
+		Want:  `[1,2,3,4,5]`,
+	},
+	maximumMergeTwoSortedListsCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -74,6 +74,18 @@ func parseLongestConsecutiveSequenceInput(input string) []int {
 	return nums
 }
 
+func maximumLongestConsecutiveSequenceCase() testrunner.Case {
+	nums := make([]int, 100000)
+	for index := range nums {
+		nums[index] = 49999 - index
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum longest-consecutive-sequence input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum descending consecutive run", Input: string(input), Want: `100000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -107,6 +119,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[-2,-1,0,2]]`,
 		Want:  `3`,
 	},
+	{
+		Name:  "Minimum: Single value",
+		Input: `[[42]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Boundary: Separated integer limits",
+		Input: `[[-1000000000,1000000000]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Adversarial: Unsorted duplicates surround the longest run",
+		Input: `[[5,2,99,3,4,3,1,100]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Competing runs choose the longer one",
+		Input: `[[-3,-2,10,11,12,13,-1]]`,
+		Want:  `4`,
+	},
+	maximumLongestConsecutiveSequenceCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

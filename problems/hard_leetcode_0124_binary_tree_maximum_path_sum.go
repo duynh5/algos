@@ -106,6 +106,24 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func makeMaximumBinaryTreeMaximumPathSumCase() testrunner.Case {
+	const nodeCount = 30000
+	values := make([]any, 0, 2*nodeCount-1)
+	values = append(values, 1000)
+	for index := 1; index < nodeCount; index++ {
+		values = append(values, nil, 1000)
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build binary-tree-maximum-path-sum input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum-depth positive skewed tree",
+		Input: string(input),
+		Want:  `30000000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -134,6 +152,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3]]`,
 		Want:  `6`,
 	},
+	{
+		Name:  "Additional: Negative branch must be ignored",
+		Input: `[[10,-20,30]]`,
+		Want:  `40`,
+	},
+	{
+		Name:  "Additional: Best path bends below root",
+		Input: `[[5,4,8,11,null,13,4,7,2,null,null,null,1]]`,
+		Want:  `48`,
+	},
+	{
+		Name:  "Additional: Zero-valued tree",
+		Input: `[[0,0,0]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Value boundaries",
+		Input: `[[-1000,1000,1000]]`,
+		Want:  `1000`,
+	},
+	makeMaximumBinaryTreeMaximumPathSumCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

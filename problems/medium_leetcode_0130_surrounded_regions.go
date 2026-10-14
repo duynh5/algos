@@ -101,6 +101,40 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 	return result, nil
 }
 
+func formatSurroundedRegionsOutput(board [][]byte) string {
+	rows := make([][]string, len(board))
+	for row := range board {
+		rows[row] = make([]string, len(board[row]))
+		for column, value := range board[row] {
+			rows[row][column] = string(value)
+		}
+	}
+	output, err := json.Marshal(rows)
+	if err != nil {
+		panic(fmt.Errorf("format surrounded-regions output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumSurroundedRegionsCase() testrunner.Case {
+	board := make([][]string, 200)
+	for row := range board {
+		board[row] = make([]string, 200)
+		for column := range board[row] {
+			board[row][column] = "O"
+		}
+	}
+	input, err := json.Marshal([]any{board})
+	if err != nil {
+		panic(fmt.Errorf("build maximum surrounded-regions input: %w", err))
+	}
+	want, err := json.Marshal(board)
+	if err != nil {
+		panic(fmt.Errorf("build maximum surrounded-regions output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum all-border-connected board", Input: string(input), Want: string(want)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -129,6 +163,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[["X","O","X"],["X","O","X"],["X","X","X"]]]`,
 		Want:  `[["X","O","X"],["X","O","X"],["X","X","X"]]`,
 	},
+	{
+		Name:  "Boundary: Single row cannot be surrounded",
+		Input: `[[["O","X","O","O"]]]`,
+		Want:  `[["O","X","O","O"]]`,
+	},
+	{
+		Name:  "Boundary: Single column cannot be surrounded",
+		Input: `[[["O"],["X"],["O"]]]`,
+		Want:  `[["O"],["X"],["O"]]`,
+	},
+	{
+		Name:  "Adversarial: Diagonal border contact does not protect a region",
+		Input: `[[["O","X","X"],["X","O","X"],["X","X","X"]]]`,
+		Want:  `[["O","X","X"],["X","X","X"],["X","X","X"]]`,
+	},
+	{
+		Name:  "Adversarial: Enclosed and border-connected regions coexist",
+		Input: `[[["X","O","X","X","X"],["X","O","X","O","X"],["X","X","X","O","X"],["X","O","X","X","X"]]]`,
+		Want:  `[["X","O","X","X","X"],["X","O","X","X","X"],["X","X","X","X","X"],["X","O","X","X","X"]]`,
+	},
+	maximumSurroundedRegionsCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

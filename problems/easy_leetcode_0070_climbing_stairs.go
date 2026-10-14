@@ -101,6 +101,31 @@ var sampleCases = []testrunner.Case{
 		Input: `[45]`,
 		Want:  `1836311903`,
 	},
+	{
+		Name:  "Additional: Next recurrence transition",
+		Input: `[5]`,
+		Want:  `8`,
+	},
+	{
+		Name:  "Additional: Two-digit staircase",
+		Input: `[10]`,
+		Want:  `89`,
+	},
+	{
+		Name:  "Additional: Mid-range staircase",
+		Input: `[20]`,
+		Want:  `10946`,
+	},
+	{
+		Name:  "Additional: Large staircase",
+		Input: `[35]`,
+		Want:  `14930352`,
+	},
+	{
+		Name:  "Boundary: Immediately below maximum",
+		Input: `[44]`,
+		Want:  `1134903170`,
+	},
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

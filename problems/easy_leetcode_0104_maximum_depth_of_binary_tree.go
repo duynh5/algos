@@ -102,6 +102,23 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumDepthOfBinaryTreeCase() testrunner.Case {
+	values := make([]any, 0, 19999)
+	values = append(values, 0)
+	for range 9999 {
+		values = append(values, 0, nil)
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum-depth tree case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Ten-thousand-node skewed tree",
+		Input: string(input),
+		Want:  `10000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -130,6 +147,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,null,3,null,4]]`,
 		Want:  `4`,
 	},
+	{
+		Name:  "Additional: Perfect balanced tree",
+		Input: `[[1,2,3,4,5,6,7]]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Adversarial: Deeper branch begins on right",
+		Input: `[[1,2,3,null,null,4,null,5]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum values",
+		Input: `[[-100,100,-100]]`,
+		Want:  `2`,
+	},
+	maximumDepthOfBinaryTreeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

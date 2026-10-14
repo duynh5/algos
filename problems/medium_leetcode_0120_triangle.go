@@ -80,6 +80,21 @@ func parseTriangleInput(input string) [][]int {
 	return triangle
 }
 
+func maximumTriangleCase() testrunner.Case {
+	triangle := make([][]int, 200)
+	for row := range triangle {
+		triangle[row] = make([]int, row+1)
+		for column := range triangle[row] {
+			triangle[row][column] = 10000
+		}
+	}
+	input, err := json.Marshal([]any{triangle})
+	if err != nil {
+		panic(fmt.Errorf("build maximum triangle input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum rows and values", Input: string(input), Want: `2000000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -94,15 +109,31 @@ var sampleCases = []testrunner.Case{
 		Want:  `-10`,
 	},
 	{
-		Name:  "Additional: Single negative value",
-		Input: `[[[-10]]]`,
-		Want:  `-10`,
-	},
-	{
 		Name:  "Additional: Negative interior choice",
 		Input: `[[[2],[-3,4],[6,-5,7]]]`,
 		Want:  `-6`,
 	},
+	{
+		Name:  "Minimum: Single maximum value",
+		Input: `[[[10000]]]`,
+		Want:  `10000`,
+	},
+	{
+		Name:  "Additional: Two rows choose the smaller child",
+		Input: `[[[1],[2,-3]]]`,
+		Want:  `-2`,
+	},
+	{
+		Name:  "Adversarial: Locally smallest choice blocks the best path",
+		Input: `[[[0],[1,2],[100,100,-100]]]`,
+		Want:  `-98`,
+	},
+	{
+		Name:  "Boundary: All minimum values",
+		Input: `[[[-10000],[-10000,-10000],[-10000,-10000,-10000]]]`,
+		Want:  `-30000`,
+	},
+	maximumTriangleCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

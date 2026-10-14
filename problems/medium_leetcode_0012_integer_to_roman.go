@@ -159,6 +159,46 @@ var sampleCases = []testrunner.Case{
 		Input: `[3999]`,
 		Want:  `"MMMCMXCIX"`,
 	},
+	{
+		Name:  "Boundary: Ones subtractive form for four",
+		Input: `[4]`,
+		Want:  `"IV"`,
+	},
+	{
+		Name:  "Boundary: Ones subtractive form for nine",
+		Input: `[9]`,
+		Want:  `"IX"`,
+	},
+	{
+		Name:  "Boundary: Tens subtractive form for forty",
+		Input: `[40]`,
+		Want:  `"XL"`,
+	},
+	{
+		Name:  "Boundary: Tens subtractive form for ninety",
+		Input: `[90]`,
+		Want:  `"XC"`,
+	},
+	{
+		Name:  "Boundary: Hundreds subtractive form for four hundred",
+		Input: `[400]`,
+		Want:  `"CD"`,
+	},
+	{
+		Name:  "Boundary: Hundreds subtractive form for nine hundred",
+		Input: `[900]`,
+		Want:  `"CM"`,
+	},
+	{
+		Name:  "Additional: Every additive symbol appears once",
+		Input: `[1666]`,
+		Want:  `"MDCLXVI"`,
+	},
+	{
+		Name:  "Additional: Maximum legal repeats in every place",
+		Input: `[3888]`,
+		Want:  `"MMMDCCCLXXXVIII"`,
+	},
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -88,6 +89,23 @@ func parseMinimumWindowSubstringInput(input string) (string, string) {
 	return s, t
 }
 
+func makeMaximumMinimumWindowSubstringCase() testrunner.Case {
+	value := strings.Repeat("a", 100000)
+	input, err := json.Marshal([]string{value, value})
+	if err != nil {
+		panic(fmt.Errorf("build minimum-window-substring input: %w", err))
+	}
+	expected, err := json.Marshal(value)
+	if err != nil {
+		panic(fmt.Errorf("build minimum-window-substring output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Both strings at maximum length",
+		Input: string(input),
+		Want:  string(expected),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -121,6 +139,27 @@ var sampleCases = []testrunner.Case{
 		Input: `["aaab","aab"]`,
 		Want:  `"aab"`,
 	},
+	{
+		Name:  "Additional: Matching is case-sensitive",
+		Input: `["aAbBcC","ABC"]`,
+		Want:  `"AbBcC"`,
+	},
+	{
+		Name:  "Additional: Minimum window is the whole source",
+		Input: `["cab","abc"]`,
+		Want:  `"cab"`,
+	},
+	{
+		Name:  "Additional: Surplus duplicates must be discarded",
+		Input: `["bbaaac","aba"]`,
+		Want:  `"baa"`,
+	},
+	{
+		Name:  "Additional: Repeated contractions change the answer",
+		Input: `["acbbaca","aba"]`,
+		Want:  `"baca"`,
+	},
+	makeMaximumMinimumWindowSubstringCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

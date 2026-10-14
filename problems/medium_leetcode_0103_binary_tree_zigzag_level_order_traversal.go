@@ -105,6 +105,33 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumBinaryTreeZigzagLevelOrderTraversalCase() testrunner.Case {
+	values := make([]int, 2000)
+	levels := make([][]int, 0, 11)
+	for index := range values {
+		values[index] = index%201 - 100
+	}
+	for start, width, depth := 0, 1, 0; start < len(values); start, width, depth = start+width, width*2, depth+1 {
+		end := min(start+width, len(values))
+		level := append([]int(nil), values[start:end]...)
+		if depth%2 == 1 {
+			for left, right := 0, len(level)-1; left < right; left, right = left+1, right-1 {
+				level[left], level[right] = level[right], level[left]
+			}
+		}
+		levels = append(levels, level)
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum binary-tree-zigzag-level-order-traversal input: %w", err))
+	}
+	want, err := json.Marshal(levels)
+	if err != nil {
+		panic(fmt.Errorf("build maximum binary-tree-zigzag-level-order-traversal output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum complete-prefix tree alternates every level", Input: string(input), Want: string(want)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -133,6 +160,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,4,5,6,7]]`,
 		Want:  `[[1],[3,2],[4,5,6,7]]`,
 	},
+	{
+		Name:  "Additional: Right-skewed tree",
+		Input: `[[1,null,2,null,3]]`,
+		Want:  `[[1],[2],[3]]`,
+	},
+	{
+		Name:  "Adversarial: Sparse fourth level reverses only present nodes",
+		Input: `[[1,2,3,null,4,5,null,6,7]]`,
+		Want:  `[[1],[3,2],[4,5],[7,6]]`,
+	},
+	{
+		Name:  "Boundary: Duplicate extreme values",
+		Input: `[[100,-100,100,-100]]`,
+		Want:  `[[100],[100,-100],[-100]]`,
+	},
+	maximumBinaryTreeZigzagLevelOrderTraversalCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

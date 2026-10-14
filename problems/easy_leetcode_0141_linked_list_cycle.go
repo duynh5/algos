@@ -71,7 +71,7 @@ type ListNode struct {
 	Next *ListNode
 }
 
-func parseLinkedListCycleInput(input string) (*ListNode, int) {
+func parseLinkedListCycleInput(input string) *ListNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse linked-list-cycle input: %w", err))
@@ -98,7 +98,7 @@ func parseLinkedListCycleInput(input string) (*ListNode, int) {
 		}
 		tail.Next = target
 	}
-	return head, pos
+	return head
 }
 
 func decodeListNode(raw json.RawMessage) (*ListNode, error) {
@@ -113,6 +113,22 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 		tail = tail.Next
 	}
 	return dummy.Next, nil
+}
+
+func maximumLinkedListCycleCase() testrunner.Case {
+	values := make([]int, 10000)
+	for index := range values {
+		values[index] = index - 5000
+	}
+	input, err := json.Marshal([]any{values, len(values) - 1})
+	if err != nil {
+		panic(fmt.Errorf("build maximum linked-list-cycle case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length tail self-cycle",
+		Input: string(input),
+		Want:  `true`,
+	}
 }
 
 // sampleCases contains the examples that every registered solution must pass.
@@ -148,6 +164,37 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,4],-1]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: Empty list",
+		Input: `[[],-1]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Two-node acyclic list",
+		Input: `[[1,2],-1]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Tail points to itself",
+		Input: `[[1,2,3],2]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Duplicate values without cycle",
+		Input: `[[1,1,1],-1]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Duplicate values with cycle",
+		Input: `[[1,1,1],1]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum node values",
+		Input: `[[-100000,100000],-1]`,
+		Want:  `false`,
+	},
+	maximumLinkedListCycleCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,
@@ -173,9 +220,8 @@ var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolut
 // =============================================================================
 
 func solveCurrentAttempt(input string) string {
-	head, pos := parseLinkedListCycleInput(input)
+	head := parseLinkedListCycleInput(input)
 	_ = head
-	_ = pos
 
 	// Implement your algorithm with the typed values above.
 	return ""

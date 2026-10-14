@@ -104,6 +104,23 @@ func parseIpoInput(input string) (int, int, []int, []int) {
 	return k, w, profits, capital
 }
 
+func makeMaximumIpoCase() testrunner.Case {
+	profits := make([]int, 100000)
+	capital := make([]int, 100000)
+	for index := range profits {
+		profits[index] = 10000
+	}
+	input, err := json.Marshal([]any{100000, 0, profits, capital})
+	if err != nil {
+		panic(fmt.Errorf("build ipo input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum projects and project limit",
+		Input: string(input),
+		Want:  `1000000000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -132,6 +149,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[3,0,[1,2,3],[0,1,3]]`,
 		Want:  `6`,
 	},
+	{
+		Name:  "Additional: Highest affordable profit unlocks best project",
+		Input: `[2,1,[2,100,3],[0,3,1]]`,
+		Want:  `104`,
+	},
+	{
+		Name:  "Additional: Zero-profit projects do not change capital",
+		Input: `[3,5,[0,0,0],[0,5,10]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Capital equal to requirement is affordable",
+		Input: `[1,10,[7],[10]]`,
+		Want:  `17`,
+	},
+	{
+		Name:  "Additional: Capital boundary",
+		Input: `[1,1000000000,[10000],[1000000000]]`,
+		Want:  `1000010000`,
+	},
+	makeMaximumIpoCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

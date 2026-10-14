@@ -60,6 +60,11 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
+type TreeNode struct {
+	Val         int
+	Left, Right *TreeNode
+}
+
 func parseConstructBinaryTreeFromInorderAndPostorderTraversalInput(input string) ([]int, []int) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
@@ -79,6 +84,56 @@ func parseConstructBinaryTreeFromInorderAndPostorderTraversalInput(input string)
 		panic(fmt.Errorf("parse construct-binary-tree-from-inorder-and-postorder-traversal argument postorder: %w", argumentError1))
 	}
 	return inorder, postorder
+}
+
+func formatConstructBinaryTreeFromInorderAndPostorderTraversalOutput(root *TreeNode) string {
+	if root == nil {
+		return `[]`
+	}
+	values := make([]*int, 0)
+	queue := []*TreeNode{root}
+	for len(queue) > 0 {
+		node := queue[0]
+		queue = queue[1:]
+		if node == nil {
+			values = append(values, nil)
+			continue
+		}
+		value := node.Val
+		values = append(values, &value)
+		queue = append(queue, node.Left, node.Right)
+	}
+	for len(values) > 0 && values[len(values)-1] == nil {
+		values = values[:len(values)-1]
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format construct-binary-tree-from-inorder-and-postorder-traversal output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumConstructBinaryTreeFromInorderAndPostorderTraversalCase() testrunner.Case {
+	inorder := make([]int, 3000)
+	postorder := make([]int, 3000)
+	output := make([]any, 0, 5999)
+	for index := range inorder {
+		inorder[index] = index - 1500
+		postorder[index] = 1499 - index
+		output = append(output, inorder[index])
+		if index+1 < len(inorder) {
+			output = append(output, nil)
+		}
+	}
+	input, err := json.Marshal([]any{inorder, postorder})
+	if err != nil {
+		panic(fmt.Errorf("build maximum construct-tree-inorder-postorder input: %w", err))
+	}
+	want, err := json.Marshal(output)
+	if err != nil {
+		panic(fmt.Errorf("build maximum construct-tree-inorder-postorder output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum right-skewed tree", Input: string(input), Want: string(want)}
 }
 
 // sampleCases contains the examples that every registered solution must pass.
@@ -104,6 +159,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3],[1,2,3]]`,
 		Want:  `[3,2,null,1]`,
 	},
+	{
+		Name:  "Additional: Perfect balanced tree",
+		Input: `[[1,2,3,4,5,6,7],[1,3,2,5,7,6,4]]`,
+		Want:  `[4,2,6,1,3,5,7]`,
+	},
+	{
+		Name:  "Adversarial: Root has a right subtree with a left child",
+		Input: `[[1,2,3],[2,3,1]]`,
+		Want:  `[1,null,3,2]`,
+	},
+	{
+		Name:  "Boundary: Signed value limits",
+		Input: `[[-3000,0,3000],[-3000,3000,0]]`,
+		Want:  `[0,-3000,3000]`,
+	},
+	maximumConstructBinaryTreeFromInorderAndPostorderTraversalCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

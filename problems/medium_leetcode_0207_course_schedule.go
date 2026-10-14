@@ -85,6 +85,20 @@ func parseCourseScheduleInput(input string) (int, [][]int) {
 	return numCourses, prerequisites
 }
 
+func maximumCourseScheduleCase() testrunner.Case {
+	prerequisites := make([][]int, 0, 5000)
+	for gap := 1; gap < 2000 && len(prerequisites) < 5000; gap++ {
+		for prerequisite := 0; prerequisite+gap < 2000 && len(prerequisites) < 5000; prerequisite++ {
+			prerequisites = append(prerequisites, []int{prerequisite + gap, prerequisite})
+		}
+	}
+	input, err := json.Marshal([]any{2000, prerequisites})
+	if err != nil {
+		panic(fmt.Errorf("build maximum course-schedule input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum acyclic course graph", Input: string(input), Want: `true`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -113,6 +127,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[4,[[1,0],[2,1],[3,2]]]`,
 		Want:  `true`,
 	},
+	{
+		Name:  "Minimum: One course without prerequisites",
+		Input: `[1,[]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Self prerequisite is a cycle",
+		Input: `[1,[[0,0]]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Diamond dependencies are acyclic",
+		Input: `[4,[[1,0],[2,0],[3,1],[3,2]]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Back edge closes a long cycle",
+		Input: `[5,[[1,0],[2,1],[3,2],[4,3],[0,4]]]`,
+		Want:  `false`,
+	},
+	maximumCourseScheduleCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

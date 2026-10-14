@@ -96,6 +96,37 @@ func parseWordLadderInput(input string) (string, string, []string) {
 	return beginWord, endWord, wordList
 }
 
+func makeMaximumWordLadderCase() testrunner.Case {
+	const wordLength = 10
+	const dictionarySize = 5000
+	beginWord := "aaaaaaaaaa"
+	endWord := "bbbbbbbbbb"
+	words := make([]string, 0, dictionarySize)
+	current := []byte(beginWord)
+	for index := range current {
+		current[index] = 'b'
+		words = append(words, string(current))
+	}
+	for number := 0; len(words) < dictionarySize; number++ {
+		word := []byte("zzzzzaaaaa")
+		value := number
+		for index := wordLength - 1; index >= 5; index-- {
+			word[index] = byte('a' + value%26)
+			value /= 26
+		}
+		words = append(words, string(word))
+	}
+	input, err := json.Marshal([]any{beginWord, endWord, words})
+	if err != nil {
+		panic(fmt.Errorf("build word-ladder input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum dictionary with length-ten transformation",
+		Input: string(input),
+		Want:  `11`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -124,6 +155,22 @@ var sampleCases = []testrunner.Case{
 		Input: `["a","c",["a","b","c"]]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Additional: End present but disconnected",
+		Input: `["hit","cog",["hot","dot","tod","cog"]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Begin word may also be in dictionary",
+		Input: `["hit","cog",["hit","hot","cot","cog"]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Cycles do not change shortest path",
+		Input: `["red","tax",["ted","tex","red","tax","tad","den","rex","pee"]]`,
+		Want:  `4`,
+	},
+	makeMaximumWordLadderCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

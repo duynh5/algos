@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -97,6 +98,20 @@ func parseIsomorphicStringsInput(input string) (string, string) {
 	return s, t
 }
 
+func maximumIsomorphicStringsCase() testrunner.Case {
+	s := strings.Repeat("ab", 25000)
+	t := strings.Repeat("xy", 25000)
+	input, err := json.Marshal([]any{s, t})
+	if err != nil {
+		panic(fmt.Errorf("build maximum isomorphic-strings case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length preserves a repeated bijection",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -126,10 +141,31 @@ var sampleCases = []testrunner.Case{
 		Want:  `false`,
 	},
 	{
-		Name:  "Additional: Repeated pattern mismatch",
-		Input: `["foo","bar"]`,
+		Name:  "Additional: One source character maps to two targets",
+		Input: `["aa","ab"]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: Repeated pattern matches",
+		Input: `["abab","cdcd"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Same distinct characters map to themselves",
+		Input: `["abcabc","abcabc"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: ASCII digits spaces and punctuation",
+		Input: `["12 1!","ab a?"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Mapping conflict appears at the final character",
+		Input: `["abcda","xyzuy"]`,
+		Want:  `false`,
+	},
+	maximumIsomorphicStringsCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

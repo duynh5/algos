@@ -92,6 +92,21 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 	return result, nil
 }
 
+func maximumMaximalSquareCase() testrunner.Case {
+	matrix := make([][]string, 300)
+	for row := range matrix {
+		matrix[row] = make([]string, 300)
+		for column := range matrix[row] {
+			matrix[row][column] = "1"
+		}
+	}
+	input, err := json.Marshal([]any{matrix})
+	if err != nil {
+		panic(fmt.Errorf("build maximum maximal-square input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum all-one matrix", Input: string(input), Want: `90000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -125,6 +140,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[["1","0"],["1","0"]]]`,
 		Want:  `1`,
 	},
+	{
+		Name:  "Boundary: Single all-one row",
+		Input: `[[["1","1","1","1"]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Non-square all-one matrix",
+		Input: `[[["1","1","1"],["1","1","1"]]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Adversarial: Central zero breaks every two-by-two square",
+		Input: `[[["1","1","1"],["1","0","1"],["1","1","1"]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Adversarial: Largest square begins away from the origin",
+		Input: `[[["0","0","0"],["0","1","1"],["0","1","1"]]]`,
+		Want:  `4`,
+	},
+	maximumMaximalSquareCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

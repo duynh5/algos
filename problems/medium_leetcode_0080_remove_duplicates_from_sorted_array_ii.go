@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -94,6 +95,42 @@ func parseRemoveDuplicatesFromSortedArrayIiInput(input string) []int {
 	return nums
 }
 
+func formatRemoveDuplicatesFromSortedArrayIiOutput(nums []int, k int) string {
+	if k < 0 || k > len(nums) {
+		panic(fmt.Sprintf("format remove-duplicates-from-sorted-array-ii output: k=%d outside [0,%d]", k, len(nums)))
+	}
+	var output strings.Builder
+	fmt.Fprintf(&output, "%d, nums = [", k)
+	for index := range nums {
+		if index > 0 {
+			output.WriteByte(',')
+		}
+		if index < k {
+			fmt.Fprint(&output, nums[index])
+		} else {
+			output.WriteByte('_')
+		}
+	}
+	output.WriteByte(']')
+	return output.String()
+}
+
+func maximumRemoveDuplicatesFromSortedArrayIiCase() testrunner.Case {
+	nums := make([]int, 30000)
+	for index := range nums {
+		nums[index] = -10000
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum remove-duplicates-from-sorted-array-ii input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum equal run keeps exactly two values",
+		Input: string(input),
+		Want:  formatRemoveDuplicatesFromSortedArrayIiOutput(nums, 2),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -122,6 +159,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,1,2,2]]`,
 		Want:  `4, nums = [1,1,2,2]`,
 	},
+	{
+		Name:  "Additional: Longer equal run keeps two values",
+		Input: `[[1,1,1,1,1]]`,
+		Want:  `2, nums = [1,1,_,_,_]`,
+	},
+	{
+		Name:  "Additional: Mixed duplicate runs preserve sorted order",
+		Input: `[[-2,-2,-2,-1,-1,0,0,0,0]]`,
+		Want:  `6, nums = [-2,-2,-1,-1,0,0,_,_,_]`,
+	},
+	{
+		Name:  "Boundary: Distinct signed limits need no removals",
+		Input: `[[-10000,0,10000]]`,
+		Want:  `3, nums = [-10000,0,10000]`,
+	},
+	{
+		Name:  "Adversarial: Excess duplicates occur at the end",
+		Input: `[[1,2,3,3,3]]`,
+		Want:  `4, nums = [1,2,3,3,_]`,
+	},
+	maximumRemoveDuplicatesFromSortedArrayIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

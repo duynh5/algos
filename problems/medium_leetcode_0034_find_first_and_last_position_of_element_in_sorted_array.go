@@ -84,6 +84,37 @@ func parseFindFirstAndLastPositionOfElementInSortedArrayInput(input string) ([]i
 	return nums, target
 }
 
+func formatFindFirstAndLastPositionOfElementInSortedArrayOutput(bounds []int) string {
+	output, err := json.Marshal(bounds)
+	if err != nil {
+		panic(fmt.Errorf("format find-first-and-last-position-of-element-in-sorted-array output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumFindFirstAndLastPositionOfElementInSortedArrayCase() testrunner.Case {
+	nums := make([]int, 100000)
+	for index := range nums {
+		switch {
+		case index < 25000:
+			nums[index] = -1
+		case index < 75000:
+			nums[index] = 0
+		default:
+			nums[index] = 1
+		}
+	}
+	input, err := json.Marshal([]any{nums, 0})
+	if err != nil {
+		panic(fmt.Errorf("build maximum find-first-and-last-position-of-element-in-sorted-array case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length contains a large middle target run",
+		Input: string(input),
+		Want:  `[25000,74999]`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -117,6 +148,37 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,3],2]`,
 		Want:  `[-1,-1]`,
 	},
+	{
+		Name:  "Additional: Single value absent",
+		Input: `[[1],2]`,
+		Want:  `[-1,-1]`,
+	},
+	{
+		Name:  "Additional: One match in the middle",
+		Input: `[[1,2,3],2]`,
+		Want:  `[1,1]`,
+	},
+	{
+		Name:  "Boundary: Matching run starts at index zero",
+		Input: `[[1,1,2,3],1]`,
+		Want:  `[0,1]`,
+	},
+	{
+		Name:  "Boundary: Matching run reaches final index",
+		Input: `[[1,2,3,3],3]`,
+		Want:  `[2,3]`,
+	},
+	{
+		Name:  "Boundary: Target below the array range",
+		Input: `[[1,2,3],0]`,
+		Want:  `[-1,-1]`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum values",
+		Input: `[[-1000000000,0,1000000000],1000000000]`,
+		Want:  `[2,2]`,
+	},
+	maximumFindFirstAndLastPositionOfElementInSortedArrayCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

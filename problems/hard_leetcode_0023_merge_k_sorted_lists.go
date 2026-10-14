@@ -123,6 +123,40 @@ func decodeListNodes(raw json.RawMessage) ([]*ListNode, error) {
 	return result, nil
 }
 
+func formatMergeKSortedListsOutput(head *ListNode) string {
+	values := make([]int, 0)
+	for node := head; node != nil; node = node.Next {
+		if len(values) == 10000 {
+			panic("format merge-k-sorted-lists output: list exceeds 10000 nodes or contains a cycle")
+		}
+		values = append(values, node.Val)
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format merge-k-sorted-lists output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumMergeKSortedListsCase() testrunner.Case {
+	lists := make([][]int, 10000)
+	want := make([]int, 10000)
+	for index := range lists {
+		value := 4999 - index
+		lists[index] = []int{value}
+		want[index] = -5000 + index
+	}
+	input, err := json.Marshal([]any{lists})
+	if err != nil {
+		panic(fmt.Errorf("build maximum merge-k-sorted-lists input: %w", err))
+	}
+	output, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum merge-k-sorted-lists output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum list count and total nodes", Input: string(input), Want: string(output)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -151,6 +185,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[],[1],[],[0,2]]]`,
 		Want:  `[0,1,2]`,
 	},
+	{
+		Name:  "Additional: Duplicate values across every list",
+		Input: `[[[1,1],[1],[1,1,1]]]`,
+		Want:  `[1,1,1,1,1,1]`,
+	},
+	{
+		Name:  "Adversarial: Lists have very uneven lengths",
+		Input: `[[[-5,-4,-3,-2,-1],[0],[1,2]]]`,
+		Want:  `[-5,-4,-3,-2,-1,0,1,2]`,
+	},
+	{
+		Name:  "Boundary: Signed value limits",
+		Input: `[[[-10000,10000],[-10000,0,10000]]]`,
+		Want:  `[-10000,-10000,0,10000,10000]`,
+	},
+	maximumMergeKSortedListsCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

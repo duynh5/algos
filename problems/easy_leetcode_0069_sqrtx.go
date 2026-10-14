@@ -98,6 +98,41 @@ var sampleCases = []testrunner.Case{
 		Input: `[2147483647]`,
 		Want:  `46340`,
 	},
+	{
+		Name:  "Additional: Small non-square two",
+		Input: `[2]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Small non-square three",
+		Input: `[3]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Immediately below perfect square",
+		Input: `[15]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Additional: Larger perfect square",
+		Input: `[100000000]`,
+		Want:  `10000`,
+	},
+	{
+		Name:  "Boundary: Immediately below largest square in range",
+		Input: `[2147395599]`,
+		Want:  `46339`,
+	},
+	{
+		Name:  "Boundary: Largest square in range",
+		Input: `[2147395600]`,
+		Want:  `46340`,
+	},
+	{
+		Name:  "Boundary: Immediately above largest square in range",
+		Input: `[2147395601]`,
+		Want:  `46340`,
+	},
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

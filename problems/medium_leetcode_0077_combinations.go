@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -76,6 +77,27 @@ func parseCombinationsInput(input string) (int, int) {
 	return n, k
 }
 
+func formatCombinationsOutput(combinations [][]int) string {
+	normalized := make([][]int, len(combinations))
+	for index, combination := range combinations {
+		normalized[index] = append([]int(nil), combination...)
+		sort.Ints(normalized[index])
+	}
+	sort.Slice(normalized, func(left, right int) bool {
+		for index := 0; index < len(normalized[left]) && index < len(normalized[right]); index++ {
+			if normalized[left][index] != normalized[right][index] {
+				return normalized[left][index] < normalized[right][index]
+			}
+		}
+		return len(normalized[left]) < len(normalized[right])
+	})
+	output, err := json.Marshal(normalized)
+	if err != nil {
+		panic(fmt.Errorf("format combinations output: %w", err))
+	}
+	return string(output)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -98,6 +120,31 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: Pairs from three values",
 		Input: `[3,2]`,
 		Want:  `[[1,2],[1,3],[2,3]]`,
+	},
+	{
+		Name:  "Additional: Choose one value",
+		Input: `[5,1]`,
+		Want:  `[[1],[2],[3],[4],[5]]`,
+	},
+	{
+		Name:  "Additional: Choose all but one value",
+		Input: `[5,4]`,
+		Want:  `[[1,2,3,4],[1,2,3,5],[1,2,4,5],[1,3,4,5],[2,3,4,5]]`,
+	},
+	{
+		Name:  "Adversarial: Six choose three returns every unique combination",
+		Input: `[6,3]`,
+		Want:  `[[1,2,3],[1,2,4],[1,2,5],[1,2,6],[1,3,4],[1,3,5],[1,3,6],[1,4,5],[1,4,6],[1,5,6],[2,3,4],[2,3,5],[2,3,6],[2,4,5],[2,4,6],[2,5,6],[3,4,5],[3,4,6],[3,5,6],[4,5,6]]`,
+	},
+	{
+		Name:  "Boundary: Maximum n choosing one value",
+		Input: `[20,1]`,
+		Want:  `[[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20]]`,
+	},
+	{
+		Name:  "Boundary: Maximum n choosing every value",
+		Input: `[20,20]`,
+		Want:  `[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]]`,
 	},
 }
 

@@ -72,6 +72,18 @@ func parseHouseRobberInput(input string) []int {
 	return nums
 }
 
+func maximumHouseRobberCase() testrunner.Case {
+	nums := make([]int, 100)
+	for index := range nums {
+		nums[index] = 400
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum house-robber input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum houses and values", Input: string(input), Want: `20000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -100,6 +112,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[5,10,10,5]]`,
 		Want:  `15`,
 	},
+	{
+		Name:  "Minimum: Single maximum-value house",
+		Input: `[[400]]`,
+		Want:  `400`,
+	},
+	{
+		Name:  "Additional: Two houses choose the larger",
+		Input: `[[1,400]]`,
+		Want:  `400`,
+	},
+	{
+		Name:  "Adversarial: Greedy largest-first choice is suboptimal",
+		Input: `[[2,3,2]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Adversarial: Equal middle values favor both ends",
+		Input: `[[2,1,1,2]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Zero-value gaps allow every positive house",
+		Input: `[[5,0,6,0,7]]`,
+		Want:  `18`,
+	},
+	maximumHouseRobberCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

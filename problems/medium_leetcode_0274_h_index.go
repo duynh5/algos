@@ -72,6 +72,18 @@ func parseHIndexInput(input string) []int {
 	return citations
 }
 
+func maximumHIndexCase() testrunner.Case {
+	citations := make([]int, 5000)
+	for index := range citations {
+		citations[index] = 1000
+	}
+	input, err := json.Marshal([]any{citations})
+	if err != nil {
+		panic(fmt.Errorf("build maximum h-index input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum papers and citations", Input: string(input), Want: `1000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -100,6 +112,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[3,3,3,3]]`,
 		Want:  `3`,
 	},
+	{
+		Name:  "Adversarial: Citation count above paper count is capped",
+		Input: `[[1000,1000]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Adversarial: One paper below the next threshold",
+		Input: `[[4,4,0,0]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Unsorted values straddle the threshold",
+		Input: `[[10,8,5,4,3]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Boundary: All maximum citations in a small set",
+		Input: `[[1000,1000,1000]]`,
+		Want:  `3`,
+	},
+	maximumHIndexCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

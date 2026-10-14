@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -74,6 +75,20 @@ func parseFindTheIndexOfTheFirstOccurrenceInAStringInput(input string) (string, 
 	return haystack, needle
 }
 
+func maximumFirstOccurrenceCase() testrunner.Case {
+	haystack := strings.Repeat("a", 10000)
+	needle := strings.Repeat("a", 9999) + "b"
+	input, err := json.Marshal([]any{haystack, needle})
+	if err != nil {
+		panic(fmt.Errorf("build maximum first-occurrence case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length repeated-prefix miss",
+		Input: string(input),
+		Want:  `-1`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -102,6 +117,32 @@ var sampleCases = []testrunner.Case{
 		Input: `["a","aa"]`,
 		Want:  `-1`,
 	},
+	{
+		Name:  "Additional: Exact multi-character match",
+		Input: `["algorithm","algorithm"]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Equal lengths without match",
+		Input: `["abc","abd"]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Adversarial: Overlapping false start",
+		Input: `["aaaab","aaab"]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Multi-character match at final position",
+		Input: `["abcxabcd","abcd"]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Adversarial: Repeated pattern returns first match",
+		Input: `["mississippi","issi"]`,
+		Want:  `1`,
+	},
+	maximumFirstOccurrenceCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

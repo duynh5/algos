@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -107,6 +109,47 @@ func parseSubstringWithConcatenationOfAllWordsInput(input string) (string, []str
 	return s, words
 }
 
+func formatSubstringWithConcatenationOfAllWordsOutput(indices []int) string {
+	sorted := append([]int(nil), indices...)
+	sort.Ints(sorted)
+	encoded, err := json.Marshal(sorted)
+	if err != nil {
+		panic(fmt.Errorf("format substring-with-concatenation output: %w", err))
+	}
+	return string(encoded)
+}
+
+func makeSubstringConcatenationCase(name, s string, words []string, want []int) testrunner.Case {
+	input, err := json.Marshal([]any{s, words})
+	if err != nil {
+		panic(fmt.Errorf("build substring-with-concatenation input: %w", err))
+	}
+	expected, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build substring-with-concatenation output: %w", err))
+	}
+	return testrunner.Case{Name: name, Input: string(input), Want: string(expected)}
+}
+
+func makeMaximumSubstringConcatenationCase() testrunner.Case {
+	const wordCount = 5000
+	const sourceLength = 10000
+	words := make([]string, wordCount)
+	for index := range words {
+		words[index] = "a"
+	}
+	want := make([]int, sourceLength-wordCount+1)
+	for index := range want {
+		want[index] = index
+	}
+	return makeSubstringConcatenationCase(
+		"Additional: Maximum source and word count with overlapping matches",
+		strings.Repeat("a", sourceLength),
+		words,
+		want,
+	)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -140,6 +183,27 @@ var sampleCases = []testrunner.Case{
 		Input: `["a",["a","a"]]`,
 		Want:  `[]`,
 	},
+	{
+		Name:  "Additional: Single word",
+		Input: `["mississippi",["issi"]]`,
+		Want:  `[1,4]`,
+	},
+	{
+		Name:  "Additional: Starts can use different word alignments",
+		Input: `["xbarfoobary",["bar","foo"]]`,
+		Want:  `[1,4]`,
+	},
+	{
+		Name:  "Additional: Extra duplicate invalidates a window",
+		Input: `["foofoofoobar",["foo","bar"]]`,
+		Want:  `[6]`,
+	},
+	{
+		Name:  "Additional: Maximum word length",
+		Input: `["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"]]`,
+		Want:  `[0]`,
+	},
+	makeMaximumSubstringConcatenationCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

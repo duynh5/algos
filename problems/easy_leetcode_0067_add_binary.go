@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -73,6 +74,23 @@ func parseAddBinaryInput(input string) (string, string) {
 	return a, b
 }
 
+func maximumAddBinaryCase() testrunner.Case {
+	a := strings.Repeat("1", 10000)
+	input, err := json.Marshal([]any{a, "1"})
+	if err != nil {
+		panic(fmt.Errorf("build maximum add-binary input: %w", err))
+	}
+	want, err := json.Marshal("1" + strings.Repeat("0", 10000))
+	if err != nil {
+		panic(fmt.Errorf("build maximum add-binary output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length carry grows result",
+		Input: string(input),
+		Want:  string(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -101,6 +119,32 @@ var sampleCases = []testrunner.Case{
 		Input: `["1","1010"]`,
 		Want:  `"1011"`,
 	},
+	{
+		Name:  "Additional: Zero is additive identity",
+		Input: `["0","10101"]`,
+		Want:  `"10101"`,
+	},
+	{
+		Name:  "Additional: Longer first operand",
+		Input: `["11100","10"]`,
+		Want:  `"11110"`,
+	},
+	{
+		Name:  "Additional: Carries at several positions",
+		Input: `["111","111"]`,
+		Want:  `"1110"`,
+	},
+	{
+		Name:  "Adversarial: Carry propagates across zero bits",
+		Input: `["10101","11011"]`,
+		Want:  `"110000"`,
+	},
+	{
+		Name:  "Additional: No carry",
+		Input: `["1000","1"]`,
+		Want:  `"1001"`,
+	},
+	maximumAddBinaryCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -75,6 +76,20 @@ func parseValidAnagramInput(input string) (string, string) {
 	return s, t
 }
 
+func maximumValidAnagramCase() testrunner.Case {
+	s := strings.Repeat("a", 25000) + strings.Repeat("z", 25000)
+	t := strings.Repeat("z", 25000) + strings.Repeat("a", 25000)
+	input, err := json.Marshal([]any{s, t})
+	if err != nil {
+		panic(fmt.Errorf("build maximum valid-anagram case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum lengths with reversed character groups",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -103,6 +118,27 @@ var sampleCases = []testrunner.Case{
 		Input: `["aabb","baba"]`,
 		Want:  `true`,
 	},
+	{
+		Name:  "Additional: Single different character",
+		Input: `["a","b"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Same character set with different frequencies",
+		Input: `["aabb","abbb"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Every lowercase letter can be reordered",
+		Input: `["abcdefghijklmnopqrstuvwxyz","zyxwvutsrqponmlkjihgfedcba"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: One missing letter replaced by a duplicate",
+		Input: `["abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxya"]`,
+		Want:  `false`,
+	},
+	maximumValidAnagramCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

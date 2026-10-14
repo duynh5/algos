@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -102,6 +103,21 @@ func parseInterleavingStringInput(input string) (string, string, string) {
 	return s1, s2, s3
 }
 
+func maximumInterleavingStringCase() testrunner.Case {
+	s1 := strings.Repeat("a", 100)
+	s2 := strings.Repeat("b", 100)
+	s3 := strings.Repeat("ab", 100)
+	input, err := json.Marshal([]any{s1, s2, s3})
+	if err != nil {
+		panic(fmt.Errorf("build maximum interleaving-string input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum source lengths alternate every character",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -135,6 +151,32 @@ var sampleCases = []testrunner.Case{
 		Input: `["aa","ab","aaba"]`,
 		Want:  `true`,
 	},
+	{
+		Name:  "Additional: Only second source populated",
+		Input: `["","abc","abc"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Second source may appear before first source",
+		Input: `["abc","def","defabc"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Valid interleaving switches sources repeatedly",
+		Input: `["abc","def","adbcef"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Characters match but second-source order is broken",
+		Input: `["abc","def","abdfec"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Correct length with wrong character counts",
+		Input: `["a","b","aa"]`,
+		Want:  `false`,
+	},
+	maximumInterleavingStringCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -117,6 +117,31 @@ var sampleCases = []testrunner.Case{
 		Input: `[["MinStack","push","push","getMin","top"],[[],[2147483647],[-2147483648],[],[]]]`,
 		Want:  `[null,null,null,-2147483648,-2147483648]`,
 	},
+	{
+		Name:  "Additional: Single element supports every valid query",
+		Input: `[["MinStack","push","top","getMin","pop"],[[],[7],[],[],[]]]`,
+		Want:  `[null,null,7,7,null]`,
+	},
+	{
+		Name:  "Additional: Increasing values keep the first minimum",
+		Input: `[["MinStack","push","push","push","getMin","pop","top","getMin"],[[],[1],[2],[3],[],[],[],[]]]`,
+		Want:  `[null,null,null,null,1,null,2,1]`,
+	},
+	{
+		Name:  "Additional: Decreasing values restore prior minimum",
+		Input: `[["MinStack","push","push","push","getMin","pop","getMin","top"],[[],[3],[2],[1],[],[],[],[]]]`,
+		Want:  `[null,null,null,null,1,null,2,2]`,
+	},
+	{
+		Name:  "Additional: Duplicate negative minimum survives one pop",
+		Input: `[["MinStack","push","push","push","push","getMin","pop","pop","getMin","top"],[[],[0],[-1],[-1],[2],[],[],[],[],[]]]`,
+		Want:  `[null,null,null,null,null,-1,null,null,-1,-1]`,
+	},
+	{
+		Name:  "Additional: Minimum returns to positive value",
+		Input: `[["MinStack","push","push","push","pop","getMin","pop","getMin","top"],[[],[5],[1],[4],[],[],[],[],[]]]`,
+		Want:  `[null,null,null,null,null,1,null,5,5]`,
+	},
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

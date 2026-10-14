@@ -107,6 +107,26 @@ var sampleCases = []testrunner.Case{
 		Input: `[2147483646,2147483647]`,
 		Want:  `2147483646`,
 	},
+	{
+		Name:  "Additional: Range stays within one binary prefix",
+		Input: `[12,15]`,
+		Want:  `12`,
+	},
+	{
+		Name:  "Additional: Two adjacent values clear only changing bits",
+		Input: `[10,11]`,
+		Want:  `10`,
+	},
+	{
+		Name:  "Boundary: Full nonnegative 32-bit range",
+		Input: `[0,2147483647]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Adversarial: Crossing a high-order bit clears the result",
+		Input: `[1073741823,1073741824]`,
+		Want:  `0`,
+	},
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

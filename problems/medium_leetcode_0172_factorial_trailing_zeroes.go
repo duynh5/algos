@@ -94,11 +94,6 @@ var sampleCases = []testrunner.Case{
 		Want:  `0`,
 	},
 	{
-		Name:  "Additional: First trailing zero",
-		Input: `[5]`,
-		Want:  `1`,
-	},
-	{
 		Name:  "Additional: Multiple factors of five",
 		Input: `[25]`,
 		Want:  `6`,
@@ -107,6 +102,31 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: Constraint maximum",
 		Input: `[10000]`,
 		Want:  `2499`,
+	},
+	{
+		Name:  "Boundary: Just below the first factor of five",
+		Input: `[4]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Transition: Just below a square of five",
+		Input: `[24]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Transition: Just above a square of five",
+		Input: `[26]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Adversarial: Cube of five contributes three factors",
+		Input: `[125]`,
+		Want:  `31`,
+	},
+	{
+		Name:  "Adversarial: Fifth power accumulates every divisor level",
+		Input: `[3125]`,
+		Want:  `781`,
 	},
 }
 

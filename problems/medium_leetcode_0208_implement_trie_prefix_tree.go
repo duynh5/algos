@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -93,13 +94,31 @@ func parseImplementTriePrefixTreeInput(input string) ([]string, [][]json.RawMess
 	return operations, arguments
 }
 
+func maximumLengthTrieCase() testrunner.Case {
+	word := strings.Repeat("a", 2000)
+	prefix := word[:1999]
+	otherWord := prefix + "b"
+	input, err := json.Marshal([]any{
+		[]string{"Trie", "insert", "search", "startsWith", "search"},
+		[]any{[]any{}, []any{word}, []any{word}, []any{prefix}, []any{otherWord}},
+	})
+	if err != nil {
+		panic(fmt.Errorf("build maximum-length trie case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length word and prefix",
+		Input: string(input),
+		Want:  `[null,null,true,true,false]`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
 		Input: `[["Trie","insert","search","search","startsWith","insert","search"],[[],["apple"],["apple"],["app"],["app"],["app"],["app"]]]`,
-		Want:  `[null, null, true, false, true, null, true]`,
+		Want:  `[null,null,true,false,true,null,true]`,
 	},
 	{
 		Name:  "Additional: Prefix is not automatically a word",
@@ -111,6 +130,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[["Trie","insert","insert","search"],[[],["a"],["a"],["a"]]]`,
 		Want:  `[null,null,null,true]`,
 	},
+	{
+		Name:  "Additional: Queries before first insertion",
+		Input: `[["Trie","search","startsWith","insert","search"],[[],["cat"],["c"],["cat"],["cat"]]]`,
+		Want:  `[null,false,false,null,true]`,
+	},
+	{
+		Name:  "Additional: Shared prefix branches",
+		Input: `[["Trie","insert","insert","insert","search","startsWith","search","startsWith"],[[],["apple"],["apply"],["apt"],["app"],["app"],["apply"],["aq"]]]`,
+		Want:  `[null,null,null,null,false,true,true,false]`,
+	},
+	{
+		Name:  "Additional: Short word inserted after longer word",
+		Input: `[["Trie","insert","insert","search","startsWith","search"],[[],["apple"],["app"],["app"],["apple"],["apple"]]]`,
+		Want:  `[null,null,null,true,true,true]`,
+	},
+	{
+		Name:  "Boundary: First and last alphabet letters",
+		Input: `[["Trie","insert","insert","search","search","startsWith","startsWith"],[[],["a"],["z"],["a"],["z"],["a"],["z"]]]`,
+		Want:  `[null,null,null,true,true,true,true]`,
+	},
+	{
+		Name:  "Additional: Complete word is also its own prefix",
+		Input: `[["Trie","insert","startsWith","search"],[[],["abc"],["abc"],["abc"]]]`,
+		Want:  `[null,null,true,true]`,
+	},
+	maximumLengthTrieCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

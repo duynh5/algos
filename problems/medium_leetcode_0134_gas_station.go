@@ -94,6 +94,18 @@ func parseGasStationInput(input string) ([]int, []int) {
 	return gas, cost
 }
 
+func maximumGasStationCase() testrunner.Case {
+	gas := make([]int, 100000)
+	cost := make([]int, 100000)
+	cost[len(cost)-2] = 1
+	gas[len(gas)-1] = 1
+	input, err := json.Marshal([]any{gas, cost})
+	if err != nil {
+		panic(fmt.Errorf("build maximum gas-station input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum route has a unique final start", Input: string(input), Want: `99999`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -122,6 +134,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3],[2,2,1]]`,
 		Want:  `1`,
 	},
+	{
+		Name:  "Boundary: Single zero-cost station",
+		Input: `[[0],[0]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Adversarial: Total gas suffices but only a late start works",
+		Input: `[[0,0,4,0],[1,1,1,1]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Adversarial: Exact total balance after several failed prefixes",
+		Input: `[[2,0,2,5],[3,2,3,1]]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Boundary: Maximum per-station values",
+		Input: `[[10000,0],[0,10000]]`,
+		Want:  `0`,
+	},
+	maximumGasStationCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

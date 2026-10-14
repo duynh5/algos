@@ -111,6 +111,18 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumCountCompleteTreeNodesCase() testrunner.Case {
+	values := make([]int, 50000)
+	for index := range values {
+		values[index] = index
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum count-complete-tree-nodes input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum complete tree", Input: string(input), Want: `50000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -139,6 +151,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,4]]`,
 		Want:  `4`,
 	},
+	{
+		Name:  "Additional: Two-node complete tree",
+		Input: `[[1,2]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Final level is half full",
+		Input: `[[1,2,3,4,5]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Boundary: Node values do not affect the count",
+		Input: `[[50000,0,50000]]`,
+		Want:  `3`,
+	},
+	maximumCountCompleteTreeNodesCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -10,6 +10,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -103,6 +106,44 @@ func parseRemoveElementInput(input string) ([]int, int) {
 	return nums, val
 }
 
+// formatRemoveElementOutput applies the custom judge's order-insensitive
+// comparison by sorting only the retained prefix before serializing it.
+func formatRemoveElementOutput(k int, nums []int) string {
+	retained := append([]int(nil), nums[:k]...)
+	sort.Ints(retained)
+	values := make([]string, len(nums))
+	for index := range values {
+		if index < k {
+			values[index] = strconv.Itoa(retained[index])
+		} else {
+			values[index] = "_"
+		}
+	}
+	return fmt.Sprintf("%d, nums = [%s]", k, strings.Join(values, ","))
+}
+
+func maximumRemoveElementCase() testrunner.Case {
+	nums := make([]int, 100)
+	retained := make([]int, 0, len(nums))
+	for index := range nums {
+		nums[index] = index % 51
+		if nums[index] != 25 {
+			retained = append(retained, nums[index])
+		}
+	}
+	input, err := json.Marshal([]any{nums, 25})
+	if err != nil {
+		panic(fmt.Errorf("build maximum remove-element input: %w", err))
+	}
+	formattedNums := make([]int, len(nums))
+	copy(formattedNums, retained)
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length with separated removals",
+		Input: string(input),
+		Want:  formatRemoveElementOutput(len(retained), formattedNums),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -114,7 +155,7 @@ var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 2",
 		Input: `[[0,1,2,2,3,0,4,2],2]`,
-		Want:  `5, nums = [0,1,4,0,3,_,_,_]`,
+		Want:  `5, nums = [0,0,1,3,4,_,_,_]`,
 	},
 	{
 		Name:  "Additional: Empty array",
@@ -131,6 +172,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2],3]`,
 		Want:  `2, nums = [1,2]`,
 	},
+	{
+		Name:  "Additional: Removals at beginning, middle, and end",
+		Input: `[[2,1,2,3,2],2]`,
+		Want:  `2, nums = [1,3,_,_,_]`,
+	},
+	{
+		Name:  "Additional: Duplicate retained values",
+		Input: `[[1,2,1,2,1],2]`,
+		Want:  `3, nums = [1,1,1,_,_]`,
+	},
+	{
+		Name:  "Boundary: Value exceeds element range",
+		Input: `[[0,25,50],100]`,
+		Want:  `3, nums = [0,25,50]`,
+	},
+	{
+		Name:  "Boundary: Remove zero while retaining maximum element",
+		Input: `[[0,50,0],0]`,
+		Want:  `1, nums = [50,_,_]`,
+	},
+	maximumRemoveElementCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

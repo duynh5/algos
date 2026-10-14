@@ -77,6 +77,22 @@ func parseJumpGameIiInput(input string) []int {
 	return nums
 }
 
+func maximumJumpGameIiCase() testrunner.Case {
+	nums := make([]int, 10000)
+	for index := range nums {
+		nums[index] = 1
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum jump-game-ii case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length requires every possible jump",
+		Input: string(input),
+		Want:  `9999`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -105,6 +121,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[2,1,1,1]]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Additional: Reachable zero trap can be skipped",
+		Input: `[[2,0,2,0,1]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Best launch point is inside the current frontier",
+		Input: `[[3,2,5,1,1,0,0,0]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Intermediate jump reaches the destination",
+		Input: `[[1,2,0,1]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Boundary: Maximum jump value reaches the end",
+		Input: `[[1000,0]]`,
+		Want:  `1`,
+	},
+	maximumJumpGameIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

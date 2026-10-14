@@ -83,6 +83,27 @@ func parseSearchA2dMatrixInput(input string) ([][]int, int) {
 	return matrix, target
 }
 
+func maximumSearchA2dMatrixCase() testrunner.Case {
+	matrix := make([][]int, 100)
+	value := -5000
+	for row := range matrix {
+		matrix[row] = make([]int, 100)
+		for column := range matrix[row] {
+			matrix[row][column] = value
+			value++
+		}
+	}
+	input, err := json.Marshal([]any{matrix, 1234})
+	if err != nil {
+		panic(fmt.Errorf("build maximum search-a-2d-matrix input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum matrix contains an interior target",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -111,6 +132,42 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[1,3],[5,7]],4]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: Target above matrix",
+		Input: `[[[1]],2]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Boundary: First matrix value at minimum limit",
+		Input: `[[[-10000,-5],[0,10000]],-10000]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Boundary: Last matrix value at maximum limit",
+		Input: `[[[-10000,-5],[0,10000]],10000]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: First value of a later row",
+		Input: `[[[1,3],[5,7]],5]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Single-row target absent inside its range",
+		Input: `[[[1,3,5,7]],4]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Single-column interior target",
+		Input: `[[[-3],[0],[8]],0]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Duplicate values within a row",
+		Input: `[[[1,1,2],[3,4,4]],1]`,
+		Want:  `true`,
+	},
+	maximumSearchA2dMatrixCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

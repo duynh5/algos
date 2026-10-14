@@ -91,6 +91,26 @@ func parseCourseScheduleIiInput(input string) (int, [][]int) {
 	return numCourses, prerequisites
 }
 
+func maximumCourseScheduleIiCase() testrunner.Case {
+	prerequisites := make([][]int, 0, 1999)
+	order := make([]int, 2000)
+	for course := range order {
+		order[course] = course
+		if course > 0 {
+			prerequisites = append(prerequisites, []int{course, course - 1})
+		}
+	}
+	input, err := json.Marshal([]any{2000, prerequisites})
+	if err != nil {
+		panic(fmt.Errorf("build maximum course-schedule-ii input: %w", err))
+	}
+	want, err := json.Marshal(order)
+	if err != nil {
+		panic(fmt.Errorf("build maximum course-schedule-ii output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum chain has a unique ordering", Input: string(input), Want: string(want)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -110,15 +130,26 @@ var sampleCases = []testrunner.Case{
 		Want:  `[0]`,
 	},
 	{
-		Name:  "Additional: One course",
-		Input: `[1,[]]`,
-		Want:  `[0]`,
-	},
-	{
 		Name:  "Additional: Cycle has no ordering",
 		Input: `[2,[[0,1],[1,0]]]`,
 		Want:  `[]`,
 	},
+	{
+		Name:  "Additional: Unique long-chain ordering",
+		Input: `[5,[[1,0],[2,1],[3,2],[4,3]]]`,
+		Want:  `[0,1,2,3,4]`,
+	},
+	{
+		Name:  "Adversarial: Back edge invalidates an otherwise linear chain",
+		Input: `[4,[[1,0],[2,1],[3,2],[0,3]]]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Adversarial: Disconnected cycle invalidates all courses",
+		Input: `[5,[[1,0],[3,2],[2,3]]]`,
+		Want:  `[]`,
+	},
+	maximumCourseScheduleIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

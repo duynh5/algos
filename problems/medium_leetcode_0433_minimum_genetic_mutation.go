@@ -112,9 +112,24 @@ var sampleCases = []testrunner.Case{
 		Want:  `-1`,
 	},
 	{
-		Name:  "Additional: One mutation",
-		Input: `["AACCGGTT","AACCGGTA",["AACCGGTA"]]`,
-		Want:  `1`,
+		Name:  "Adversarial: End exists but is disconnected",
+		Input: `["AAAAAAAA","CCCCCCCC",["CCCCCCCC"]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Shortest route ignores a dead-end branch",
+		Input: `["AAAAAAAA","AACCAAAA",["CAAAAAAA","ACAAAAAA","AACAAAAA","AACCAAAA"]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Boundary: Maximum bank supports eight mutations",
+		Input: `["AAAAAAAA","CCCCCCCC",["CAAAAAAA","CCAAAAAA","CCCAAAAA","CCCCAAAA","CCCCCAAA","CCCCCCAA","CCCCCCCA","CCCCCCCC","GGGGGGGG","TTTTTTTT"]]`,
+		Want:  `8`,
+	},
+	{
+		Name:  "Additional: All gene characters participate",
+		Input: `["ACGTACGT","TCGTACGA",["TCGTACGT","TCGTACGA"]]`,
+		Want:  `2`,
 	},
 }
 

@@ -96,6 +96,21 @@ func parseEvaluateReversePolishNotationInput(input string) []string {
 	return tokens
 }
 
+func maximumEvaluateReversePolishNotationCase() testrunner.Case {
+	tokens := make([]string, 0, 9999)
+	for index := 0; index < 5000; index++ {
+		tokens = append(tokens, "1")
+	}
+	for index := 1; index < 5000; index++ {
+		tokens = append(tokens, "+")
+	}
+	input, err := json.Marshal([]any{tokens})
+	if err != nil {
+		panic(fmt.Errorf("build maximum reverse-polish-notation input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Largest valid token sequence", Input: string(input), Want: `5000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -129,6 +144,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[["2","5","-"]]`,
 		Want:  `-3`,
 	},
+	{
+		Name:  "Minimum: Single operand",
+		Input: `[["-200"]]`,
+		Want:  `-200`,
+	},
+	{
+		Name:  "Adversarial: Subtraction preserves operand order",
+		Input: `[["10","3","2","-","-"]]`,
+		Want:  `9`,
+	},
+	{
+		Name:  "Adversarial: Negative dividend truncates toward zero",
+		Input: `[["-7","3","/"]]`,
+		Want:  `-2`,
+	},
+	{
+		Name:  "Boundary: Operand limits multiply safely",
+		Input: `[["-200","200","*"]]`,
+		Want:  `-40000`,
+	},
+	maximumEvaluateReversePolishNotationCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

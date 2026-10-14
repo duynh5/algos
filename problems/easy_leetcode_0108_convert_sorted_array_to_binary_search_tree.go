@@ -93,6 +93,31 @@ var sampleCases = []testrunner.Case{
 		Input: `[[-1,0,1]]`,
 		Want:  `[0,-1,1]`,
 	},
+	{
+		Name:  "Additional: Four values exercise both uneven subtrees",
+		Input: `[[1,2,3,4]]`,
+		Want:  `[3,2,4,1]`,
+	},
+	{
+		Name:  "Additional: Even length keeps the upper-middle convention recursively",
+		Input: `[[1,2,3,4,5,6]]`,
+		Want:  `[4,2,6,1,3,5]`,
+	},
+	{
+		Name:  "Additional: Perfect seven-node tree",
+		Input: `[[-3,-2,-1,0,1,2,3]]`,
+		Want:  `[0,-2,2,-3,-1,1,3]`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum values",
+		Input: `[[-10000,10000]]`,
+		Want:  `[10000,-10000]`,
+	},
+	{
+		Name:  "Adversarial: Eight values expose inconsistent midpoint choices",
+		Input: `[[-8,-5,-3,-1,2,4,7,9]]`,
+		Want:  `[2,-3,7,-5,-1,4,9,-8]`,
+	},
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

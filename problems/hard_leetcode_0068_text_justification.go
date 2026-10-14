@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -116,6 +117,37 @@ func parseTextJustificationInput(input string) ([]string, int) {
 	return words, maxWidth
 }
 
+func makeMaximumTextJustificationCase() testrunner.Case {
+	const word = "abcdefghijklmnopqrst"
+	const wordCount = 300
+	const width = 100
+	words := make([]string, wordCount)
+	for index := range words {
+		words[index] = word
+	}
+
+	lines := make([]string, 0, wordCount/4)
+	fullyJustified := word + strings.Repeat(" ", 7) + word + strings.Repeat(" ", 7) + word + strings.Repeat(" ", 6) + word
+	for index := 0; index < wordCount-4; index += 4 {
+		lines = append(lines, fullyJustified)
+	}
+	lines = append(lines, strings.Join(words[wordCount-4:], " ")+strings.Repeat(" ", 17))
+
+	input, err := json.Marshal([]any{words, width})
+	if err != nil {
+		panic(fmt.Errorf("build text-justification input: %w", err))
+	}
+	expected, err := json.Marshal(lines)
+	if err != nil {
+		panic(fmt.Errorf("build text-justification output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum word count and width",
+		Input: string(input),
+		Want:  string(expected),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -164,6 +196,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[["a","b","c"],4]`,
 		Want:  `["a b ","c   "]`,
 	},
+	{
+		Name:  "Additional: Minimum width",
+		Input: `[["a","b","c"],1]`,
+		Want:  `["a","b","c"]`,
+	},
+	{
+		Name:  "Additional: Left gap receives remainder space",
+		Input: `[["a","b","c","dddd"],6]`,
+		Want:  `["a  b c","dddd  "]`,
+	},
+	{
+		Name:  "Additional: Non-final single-word line",
+		Input: `[["longword","a","b"],8]`,
+		Want:  `["longword","a b     "]`,
+	},
+	makeMaximumTextJustificationCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

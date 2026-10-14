@@ -91,6 +91,26 @@ var sampleCases = []testrunner.Case{
 		Input: `["79"]`,
 		Want:  `["pw","px","py","pz","qw","qx","qy","qz","rw","rx","ry","rz","sw","sx","sy","sz"]`,
 	},
+	{
+		Name:  "Additional: Repeated digit preserves every positional choice",
+		Input: `["22"]`,
+		Want:  `["aa","ab","ac","ba","bb","bc","ca","cb","cc"]`,
+	},
+	{
+		Name:  "Additional: Mixed three-letter and four-letter digits",
+		Input: `["27"]`,
+		Want:  `["ap","aq","ar","as","bp","bq","br","bs","cp","cq","cr","cs"]`,
+	},
+	{
+		Name:  "Additional: Remaining three-letter single digit",
+		Input: `["8"]`,
+		Want:  `["t","u","v"]`,
+	},
+	{
+		Name:  "Boundary: Maximum four-digit length",
+		Input: `["2345"]`,
+		Want:  `["adgj","adgk","adgl","adhj","adhk","adhl","adij","adik","adil","aegj","aegk","aegl","aehj","aehk","aehl","aeij","aeik","aeil","afgj","afgk","afgl","afhj","afhk","afhl","afij","afik","afil","bdgj","bdgk","bdgl","bdhj","bdhk","bdhl","bdij","bdik","bdil","begj","begk","begl","behj","behk","behl","beij","beik","beil","bfgj","bfgk","bfgl","bfhj","bfhk","bfhl","bfij","bfik","bfil","cdgj","cdgk","cdgl","cdhj","cdhk","cdhl","cdij","cdik","cdil","cegj","cegk","cegl","cehj","cehk","cehl","ceij","ceik","ceil","cfgj","cfgk","cfgl","cfhj","cfhk","cfhl","cfij","cfik","cfil"]`,
+	},
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

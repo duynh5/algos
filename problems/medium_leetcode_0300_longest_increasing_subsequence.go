@@ -74,6 +74,18 @@ func parseLongestIncreasingSubsequenceInput(input string) []int {
 	return nums
 }
 
+func maximumLongestIncreasingSubsequenceCase() testrunner.Case {
+	nums := make([]int, 2500)
+	for index := range nums {
+		nums[index] = index - 1250
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum longest-increasing-subsequence input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum strictly increasing array", Input: string(input), Want: `2500`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -107,6 +119,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[2,2,2]]`,
 		Want:  `1`,
 	},
+	{
+		Name:  "Additional: Strictly increasing",
+		Input: `[[-3,-2,-1,0,1]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Adversarial: Best tails replace earlier larger values",
+		Input: `[[3,5,6,2,4,7]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Adversarial: Alternating highs and lows",
+		Input: `[[1,10,2,9,3,8,4,7]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Boundary: Signed value limits",
+		Input: `[[-10000,10000]]`,
+		Want:  `2`,
+	},
+	maximumLongestIncreasingSubsequenceCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

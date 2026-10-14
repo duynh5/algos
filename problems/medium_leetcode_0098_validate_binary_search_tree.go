@@ -109,6 +109,23 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumValidateBinarySearchTreeCase() testrunner.Case {
+	values := make([]any, 0, 19999)
+	values = append(values, -5000)
+	for value := -4999; value <= 4999; value++ {
+		values = append(values, nil, value)
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum validate-binary-search-tree input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-node increasing right chain is valid",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -137,6 +154,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[5,1,7,null,null,4,8]]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Boundary: Integer limits form a valid tree",
+		Input: `[[0,-2147483648,2147483647]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Duplicate right child is invalid",
+		Input: `[[1,null,1]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Deep duplicate of root is invalid",
+		Input: `[[2,1,3,null,null,2,4]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Left-subtree value exceeds the root",
+		Input: `[[5,3,7,2,6]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Increasing right-skewed tree",
+		Input: `[[1,null,2,null,3,null,4]]`,
+		Want:  `true`,
+	},
+	maximumValidateBinarySearchTreeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

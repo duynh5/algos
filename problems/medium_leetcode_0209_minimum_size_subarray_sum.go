@@ -81,6 +81,18 @@ func parseMinimumSizeSubarraySumInput(input string) (int, []int) {
 	return target, nums
 }
 
+func maximumMinimumSizeSubarraySumCase() testrunner.Case {
+	nums := make([]int, 100000)
+	for index := range nums {
+		nums[index] = 10000
+	}
+	input, err := json.Marshal([]any{1000000000, nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum minimum-size-subarray-sum input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum target needs the entire maximum array", Input: string(input), Want: `100000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -114,6 +126,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[8,[1,2,3,4,5]]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Boundary: Minimum target is met by one element",
+		Input: `[1,[10000]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Adversarial: Exact threshold appears only after removing a prefix",
+		Input: `[11,[1,2,3,4,5]]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Adversarial: Shortest valid window is in the middle",
+		Input: `[15,[1,2,8,7,1,1]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Boundary: Sum just below target is unreachable",
+		Input: `[1000000000,[10000,10000,10000]]`,
+		Want:  `0`,
+	},
+	maximumMinimumSizeSubarraySumCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

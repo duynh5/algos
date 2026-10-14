@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -77,6 +78,19 @@ func parseValidPalindromeInput(input string) string {
 	return s
 }
 
+func maximumValidPalindromeCase() testrunner.Case {
+	value := strings.Repeat("A,", 100000)
+	input, err := json.Marshal([]any{value})
+	if err != nil {
+		panic(fmt.Errorf("build maximum valid-palindrome case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length alternates letters and punctuation",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -110,6 +124,37 @@ var sampleCases = []testrunner.Case{
 		Input: `["0P"]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: Single uppercase letter",
+		Input: `["Z"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Numeric palindrome",
+		Input: `["12321"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Mixed letters and digits",
+		Input: `["1a2A1"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Underscore is ignored",
+		Input: `["ab_a"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Mismatch remains after punctuation is skipped",
+		Input: `["a.,b"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Quotation marks are ignored",
+		Input: `["\"a\""]`,
+		Want:  `true`,
+	},
+	maximumValidPalindromeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

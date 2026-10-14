@@ -104,7 +104,7 @@ var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
 		Input: `[["LRUCache","put","put","get","put","get","put","get","get","get"],[[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]]`,
-		Want:  `[null, null, null, 1, null, -1, null, -1, 3, 4]`,
+		Want:  `[null,null,null,1,null,-1,null,-1,3,4]`,
 	},
 	{
 		Name:  "Additional: Capacity one evicts immediately",
@@ -115,6 +115,36 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: Updating a key refreshes it",
 		Input: `[["LRUCache","put","put","put","put","get","get","get"],[[2],[1,1],[2,2],[1,9],[3,3],[2],[1],[3]]]`,
 		Want:  `[null,null,null,null,null,-1,9,3]`,
+	},
+	{
+		Name:  "Additional: Missing get does not change recency",
+		Input: `[["LRUCache","put","put","get","put","get","get","get"],[[2],[1,1],[2,2],[9],[3,3],[1],[2],[3]]]`,
+		Want:  `[null,null,null,-1,null,-1,2,3]`,
+	},
+	{
+		Name:  "Additional: Capacity one update avoids eviction",
+		Input: `[["LRUCache","put","put","get"],[[1],[0,0],[0,100000],[0]]]`,
+		Want:  `[null,null,null,100000]`,
+	},
+	{
+		Name:  "Boundary: Zero and maximum keys and values",
+		Input: `[["LRUCache","put","put","get","put","get","get","get"],[[2],[0,0],[10000,100000],[0],[5000,7],[10000],[0],[5000]]]`,
+		Want:  `[null,null,null,0,null,-1,0,7]`,
+	},
+	{
+		Name:  "Additional: Read refreshes key before eviction",
+		Input: `[["LRUCache","put","put","get","put","get","get","get"],[[2],[1,1],[2,2],[1],[3,3],[2],[1],[3]]]`,
+		Want:  `[null,null,null,1,null,-1,1,3]`,
+	},
+	{
+		Name:  "Additional: Evicted key can be inserted again",
+		Input: `[["LRUCache","put","get","put","put","get","get"],[[1],[1,1],[1],[2,2],[1,9],[2],[1]]]`,
+		Want:  `[null,null,1,null,null,-1,9]`,
+	},
+	{
+		Name:  "Boundary: Maximum capacity remains usable",
+		Input: `[["LRUCache","put","put","get","get"],[[3000],[0,0],[10000,100000],[0],[10000]]]`,
+		Want:  `[null,null,null,0,100000]`,
 	},
 }
 

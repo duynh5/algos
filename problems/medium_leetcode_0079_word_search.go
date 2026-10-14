@@ -103,6 +103,30 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 	return result, nil
 }
 
+func maximumWordSearchCase() testrunner.Case {
+	board := make([][]string, 6)
+	for row := range board {
+		board[row] = make([]string, 6)
+		for column := range board[row] {
+			board[row][column] = "Z"
+		}
+	}
+	board[0] = []string{"a", "b", "c", "d", "e", "f"}
+	board[1] = []string{"l", "k", "j", "i", "h", "g"}
+	board[2][0] = "m"
+	board[2][1] = "n"
+	board[2][2] = "o"
+	input, err := json.Marshal([]any{board, "abcdefghijklmno"})
+	if err != nil {
+		panic(fmt.Errorf("build maximum word-search input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum board and word follow a turning path",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -136,6 +160,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[["A","A"]],"AAA"]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: A word can traverse a row in reverse",
+		Input: `[[["A","B","C","D"]],"DCBA"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Diagonal cells are not adjacent",
+		Input: `[[["A","B"],["C","D"]],"AD"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Letter matching is case-sensitive",
+		Input: `[[["a","A"]],"aa"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Failed branch releases cells for another direction",
+		Input: `[[["A","A","B"],["A","C","C"]],"AABC"]`,
+		Want:  `true`,
+	},
+	maximumWordSearchCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

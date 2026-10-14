@@ -75,6 +75,22 @@ func parseContainerWithMostWaterInput(input string) []int {
 	return height
 }
 
+func maximumContainerWithMostWaterCase() testrunner.Case {
+	height := make([]int, 100000)
+	for index := range height {
+		height[index] = 10000
+	}
+	input, err := json.Marshal([]any{height})
+	if err != nil {
+		panic(fmt.Errorf("build maximum container-with-most-water case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length and height use the outermost lines",
+		Input: string(input),
+		Want:  `999990000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -89,8 +105,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `1`,
 	},
 	{
-		Name:  "Additional: Minimum two lines",
-		Input: `[[1,1]]`,
+		Name:  "Additional: Minimum length with unequal heights",
+		Input: `[[1,2]]`,
 		Want:  `1`,
 	},
 	{
@@ -103,6 +119,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,1]]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Additional: Best pair is strictly inside the endpoints",
+		Input: `[[1,100,0,100,1]]`,
+		Want:  `200`,
+	},
+	{
+		Name:  "Additional: Increasing heights balance width against height",
+		Input: `[[1,2,3,4,5]]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Decreasing heights balance width against height",
+		Input: `[[5,4,3,2,1]]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: One tall line cannot hold water alone",
+		Input: `[[0,10000,0]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Boundary: Maximum-height minimum-length container",
+		Input: `[[10000,10000]]`,
+		Want:  `10000`,
+	},
+	maximumContainerWithMostWaterCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

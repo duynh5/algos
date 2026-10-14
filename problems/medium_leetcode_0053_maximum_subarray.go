@@ -76,6 +76,22 @@ func parseMaximumSubarrayInput(input string) []int {
 	return nums
 }
 
+func maximumMaximumSubarrayCase() testrunner.Case {
+	nums := make([]int, 100000)
+	for index := range nums {
+		nums[index] = 10000
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum maximum-subarray input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length and values use the full array",
+		Input: string(input),
+		Want:  `1000000000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -109,6 +125,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[4,-1,2,-10,3]]`,
 		Want:  `5`,
 	},
+	{
+		Name:  "Boundary: Single minimum value",
+		Input: `[[-10000]]`,
+		Want:  `-10000`,
+	},
+	{
+		Name:  "Adversarial: All-negative maximum is first",
+		Input: `[[-1,-2,-3,-4]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Best range ends at final element",
+		Input: `[[-5,4,-1,2,1]]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Harmful prefix must be discarded",
+		Input: `[[-100,1,2,3]]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Zero is better than surrounding negatives",
+		Input: `[[0,-1,0]]`,
+		Want:  `0`,
+	},
+	maximumMaximumSubarrayCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

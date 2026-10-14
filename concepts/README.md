@@ -18,6 +18,7 @@ Every concept page should explain:
 - Complexity analysis: time, auxiliary space, amortized cost
 - Correctness: invariants, induction, and loop reasoning
 - Recursion and call-stack behavior
+- [Integer digit processing](foundations/integer-digits/)
 - Integer bounds, overflow, and modular arithmetic
 - Bit operations and binary representation
 

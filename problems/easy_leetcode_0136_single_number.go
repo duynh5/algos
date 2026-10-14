@@ -78,6 +78,26 @@ func parseSingleNumberInput(input string) []int {
 	return nums
 }
 
+func maximumSingleNumberCase() testrunner.Case {
+	nums := make([]int, 0, 29999)
+	for value := -14999; value <= -1; value++ {
+		nums = append(nums, value)
+	}
+	nums = append(nums, 30000)
+	for value := -1; value >= -14999; value-- {
+		nums = append(nums, value)
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum single-number case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum valid odd length",
+		Input: string(input),
+		Want:  `30000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -111,6 +131,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[0,1,0]]`,
 		Want:  `1`,
 	},
+	{
+		Name:  "Additional: Zero is unique",
+		Input: `[[-1,-1,0,2,2]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Negative values are paired",
+		Input: `[[-2,3,-2]]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Boundary: Minimum value is unique",
+		Input: `[[-30000,1,1,30000,30000]]`,
+		Want:  `-30000`,
+	},
+	{
+		Name:  "Boundary: Maximum value is unique",
+		Input: `[[-30000,-30000,30000]]`,
+		Want:  `30000`,
+	},
+	{
+		Name:  "Adversarial: Duplicate pairs are separated",
+		Input: `[[4,1,2,4,2]]`,
+		Want:  `1`,
+	},
+	maximumSingleNumberCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

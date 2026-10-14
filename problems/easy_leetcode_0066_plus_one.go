@@ -84,6 +84,32 @@ func parsePlusOneInput(input string) []int {
 	return digits
 }
 
+func formatPlusOneOutput(digits []int) string {
+	output, err := json.Marshal(digits)
+	if err != nil {
+		panic(fmt.Errorf("format plus-one output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumPlusOneCase() testrunner.Case {
+	digits := make([]int, 100)
+	for index := range digits {
+		digits[index] = 9
+	}
+	input, err := json.Marshal([]any{digits})
+	if err != nil {
+		panic(fmt.Errorf("build maximum plus-one input: %w", err))
+	}
+	want := make([]int, 101)
+	want[0] = 1
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length all-nine input",
+		Input: string(input),
+		Want:  formatPlusOneOutput(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -117,6 +143,37 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,9,9]]`,
 		Want:  `[2,0,0]`,
 	},
+	{
+		Name:  "Boundary: Zero",
+		Input: `[[0]]`,
+		Want:  `[1]`,
+	},
+	{
+		Name:  "Additional: Carry from final digit only",
+		Input: `[[1,2,9]]`,
+		Want:  `[1,3,0]`,
+	},
+	{
+		Name:  "Additional: Long trailing carry chain",
+		Input: `[[8,9,9,9]]`,
+		Want:  `[9,0,0,0]`,
+	},
+	{
+		Name:  "Adversarial: Internal nine without final carry",
+		Input: `[[1,9,8]]`,
+		Want:  `[1,9,9]`,
+	},
+	{
+		Name:  "Adversarial: Earlier nines remain when final digit is zero",
+		Input: `[[2,9,9,0]]`,
+		Want:  `[2,9,9,1]`,
+	},
+	{
+		Name:  "Additional: Carry crosses embedded zero",
+		Input: `[[1,0,9,9]]`,
+		Want:  `[1,1,0,0]`,
+	},
+	maximumPlusOneCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -84,13 +86,69 @@ func parseGroupAnagramsInput(input string) []string {
 	return strs
 }
 
+func formatGroupAnagramsOutput(groups [][]string) string {
+	normalized := make([][]string, len(groups))
+	for index, group := range groups {
+		normalized[index] = append([]string(nil), group...)
+		sort.Strings(normalized[index])
+	}
+	sort.Slice(normalized, func(left, right int) bool {
+		for index := 0; index < len(normalized[left]) && index < len(normalized[right]); index++ {
+			if normalized[left][index] != normalized[right][index] {
+				return normalized[left][index] < normalized[right][index]
+			}
+		}
+		return len(normalized[left]) < len(normalized[right])
+	})
+	output, err := json.Marshal(normalized)
+	if err != nil {
+		panic(fmt.Errorf("format group-anagrams output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumGroupAnagramsCountCase() testrunner.Case {
+	strs := make([]string, 10000)
+	for index := range strs {
+		if index%2 == 0 {
+			strs[index] = "ab"
+		} else {
+			strs[index] = "ba"
+		}
+	}
+	input, err := json.Marshal([]any{strs})
+	if err != nil {
+		panic(fmt.Errorf("build maximum group-anagrams count input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum input count belongs to one duplicate-rich group",
+		Input: string(input),
+		Want:  formatGroupAnagramsOutput([][]string{strs}),
+	}
+}
+
+func maximumGroupAnagramsStringLengthCase() testrunner.Case {
+	left := strings.Repeat("a", 50) + strings.Repeat("z", 50)
+	right := strings.Repeat("z", 50) + strings.Repeat("a", 50)
+	strs := []string{left, right}
+	input, err := json.Marshal([]any{strs})
+	if err != nil {
+		panic(fmt.Errorf("build maximum group-anagrams string input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length strings are grouped by full counts",
+		Input: string(input),
+		Want:  formatGroupAnagramsOutput([][]string{strs}),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
 		Input: `[["eat","tea","tan","ate","nat","bat"]]`,
-		Want:  `[["bat"],["nat","tan"],["ate","eat","tea"]]`,
+		Want:  `[["ate","eat","tea"],["bat"],["nat","tan"]]`,
 	},
 	{
 		Name:  "Official example 2",
@@ -112,6 +170,23 @@ var sampleCases = []testrunner.Case{
 		Input: `[["ab","ba"]]`,
 		Want:  `[["ab","ba"]]`,
 	},
+	{
+		Name:  "Additional: Duplicates remain inside their anagram group",
+		Input: `[["ab","ba","ab","abc","cab","bca","x"]]`,
+		Want:  `[["ab","ab","ba"],["abc","bca","cab"],["x"]]`,
+	},
+	{
+		Name:  "Additional: Equal-length non-anagrams stay separate",
+		Input: `[["ab","cd","ef"]]`,
+		Want:  `[["ab"],["cd"],["ef"]]`,
+	},
+	{
+		Name:  "Adversarial: Same character set with different frequencies",
+		Input: `[["abb","aab","bab","baa"]]`,
+		Want:  `[["aab","baa"],["abb","bab"]]`,
+	},
+	maximumGroupAnagramsStringLengthCase(),
+	maximumGroupAnagramsCountCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -71,6 +72,29 @@ func parseLongestCommonPrefixInput(input string) []string {
 	return strs
 }
 
+func maximumLongestCommonPrefixCase() testrunner.Case {
+	prefix := strings.Repeat("a", 199)
+	strs := make([]string, 200)
+	for index := range strs {
+		strs[index] = prefix + "a"
+	}
+	strs[len(strs)-1] = prefix + "b"
+
+	input, err := json.Marshal([]any{strs})
+	if err != nil {
+		panic(fmt.Errorf("build maximum longest-common-prefix input: %w", err))
+	}
+	want, err := json.Marshal(prefix)
+	if err != nil {
+		panic(fmt.Errorf("build maximum longest-common-prefix output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum string count and length",
+		Input: string(input),
+		Want:  string(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -99,6 +123,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[["interstellar","internet","internal"]]`,
 		Want:  `"inter"`,
 	},
+	{
+		Name:  "Additional: Every string is identical",
+		Input: `[["same","same","same"]]`,
+		Want:  `"same"`,
+	},
+	{
+		Name:  "Additional: First string is the complete prefix",
+		Input: `[["a","ab","abc"]]`,
+		Want:  `"a"`,
+	},
+	{
+		Name:  "Additional: Shortest string appears in the middle",
+		Input: `[["prefix","pre","prevent"]]`,
+		Want:  `"pre"`,
+	},
+	{
+		Name:  "Additional: Empty member appears last",
+		Input: `[["prefix","pre",""]]`,
+		Want:  `""`,
+	},
+	{
+		Name:  "Adversarial: Divergence at final character",
+		Input: `[["abcdefgh","abcdefgi","abcdefgj"]]`,
+		Want:  `"abcdefg"`,
+	},
+	maximumLongestCommonPrefixCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

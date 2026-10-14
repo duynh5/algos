@@ -121,7 +121,7 @@ var sampleCases = []testrunner.Case{
 		Want:  `1`,
 	},
 	{
-		Name:  "Additional: All subtractive pairs",
+		Name:  "Additional: Subtractive pairs CD, XL, and IV",
 		Input: `["CDXLIV"]`,
 		Want:  `444`,
 	},
@@ -129,6 +129,31 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: Maximum numeral",
 		Input: `["MMMCMXCIX"]`,
 		Want:  `3999`,
+	},
+	{
+		Name:  "Additional: Subtractive pair IX",
+		Input: `["IX"]`,
+		Want:  `9`,
+	},
+	{
+		Name:  "Additional: Adjacent subtractive groups",
+		Input: `["XLIX"]`,
+		Want:  `49`,
+	},
+	{
+		Name:  "Additional: Subtractive pairs CM, XC, and IX",
+		Input: `["CMXCIX"]`,
+		Want:  `999`,
+	},
+	{
+		Name:  "Additional: Every symbol in descending order",
+		Input: `["MDCLXVI"]`,
+		Want:  `1666`,
+	},
+	{
+		Name:  "Boundary: Maximum input length",
+		Input: `["MMMDCCCLXXXVIII"]`,
+		Want:  `3888`,
 	},
 }
 

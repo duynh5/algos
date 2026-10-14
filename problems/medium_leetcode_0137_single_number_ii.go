@@ -70,6 +70,19 @@ func parseSingleNumberIiInput(input string) []int {
 	return nums
 }
 
+func maximumSingleNumberIiCase() testrunner.Case {
+	nums := make([]int, 0, 29998)
+	for value := 0; value < 9999; value++ {
+		nums = append(nums, value, value, value)
+	}
+	nums = append(nums, -2147483648)
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum single-number-ii input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Largest valid input with minimum unique value", Input: string(input), Want: `-2147483648`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -98,6 +111,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[6,6,6,0]]`,
 		Want:  `0`,
 	},
+	{
+		Name:  "Boundary: Maximum signed integer is unique",
+		Input: `[[-1,-1,-1,2147483647]]`,
+		Want:  `2147483647`,
+	},
+	{
+		Name:  "Adversarial: Sign bit differs across repeated and unique values",
+		Input: `[[-2147483648,7,-2147483648,-2147483648]]`,
+		Want:  `7`,
+	},
+	{
+		Name:  "Additional: Multiple negative and positive triples",
+		Input: `[[-2,5,-2,5,42,-2,5,9,9,9]]`,
+		Want:  `42`,
+	},
+	maximumSingleNumberIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

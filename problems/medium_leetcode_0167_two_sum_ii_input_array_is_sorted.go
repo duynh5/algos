@@ -93,6 +93,17 @@ func parseTwoSumIiInputArrayIsSortedInput(input string) ([]int, int) {
 	return numbers, target
 }
 
+func maximumTwoSumIiInputArrayIsSortedCase() testrunner.Case {
+	numbers := make([]int, 30000)
+	numbers[len(numbers)-2] = 1
+	numbers[len(numbers)-1] = 2
+	input, err := json.Marshal([]any{numbers, 3})
+	if err != nil {
+		panic(fmt.Errorf("build maximum two-sum-ii input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum array solution uses final pair", Input: string(input), Want: `[29999,30000]`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -126,6 +137,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[-5,-1,4,8],3]`,
 		Want:  `[2,3]`,
 	},
+	{
+		Name:  "Boundary: Signed value limits",
+		Input: `[[-1000,-2,3,1000],0]`,
+		Want:  `[1,4]`,
+	},
+	{
+		Name:  "Adversarial: Solution is strictly inside both ends",
+		Input: `[[-10,-4,1,3,9,20],5]`,
+		Want:  `[2,5]`,
+	},
+	{
+		Name:  "Additional: Negative target uses two negative values",
+		Input: `[[-8,-5,-3,2,7],-8]`,
+		Want:  `[2,3]`,
+	},
+	maximumTwoSumIiInputArrayIsSortedCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

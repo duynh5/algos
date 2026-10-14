@@ -74,6 +74,25 @@ func parseMajorityElementInput(input string) []int {
 	return nums
 }
 
+func maximumMajorityElementCase() testrunner.Case {
+	nums := make([]int, 50000)
+	for index := 0; index < 24999; index++ {
+		nums[index] = -index - 1
+	}
+	for index := 24999; index < len(nums); index++ {
+		nums[index] = 1
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum majority-element case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length with bare majority",
+		Input: string(input),
+		Want:  `1`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -102,6 +121,37 @@ var sampleCases = []testrunner.Case{
 		Input: `[[2,1,1]]`,
 		Want:  `1`,
 	},
+	{
+		Name:  "Additional: Even length requires three of four",
+		Input: `[[2,2,1,2]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Majority appears at exact odd threshold",
+		Input: `[[1,2,1,2,1]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Adversarial: Candidate changes repeatedly",
+		Input: `[[1,2,3,2,2,2,2]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Zero is majority",
+		Input: `[[0,1,0]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Boundary: Minimum value is majority",
+		Input: `[[-1000000000,1000000000,-1000000000]]`,
+		Want:  `-1000000000`,
+	},
+	{
+		Name:  "Additional: Every value is the majority",
+		Input: `[[7,7,7,7,7]]`,
+		Want:  `7`,
+	},
+	maximumMajorityElementCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

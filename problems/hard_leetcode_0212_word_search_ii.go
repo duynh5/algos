@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -102,6 +103,45 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 	return result, nil
 }
 
+func formatWordSearchIiOutput(words []string) string {
+	sorted := append([]string(nil), words...)
+	sort.Strings(sorted)
+	encoded, err := json.Marshal(sorted)
+	if err != nil {
+		panic(fmt.Errorf("format word-search-ii output: %w", err))
+	}
+	return string(encoded)
+}
+
+func makeMaximumWordSearchIiCase() testrunner.Case {
+	board := make([][]string, 12)
+	for row := range board {
+		board[row] = make([]string, 12)
+		for column := range board[row] {
+			board[row][column] = "a"
+		}
+	}
+	words := make([]string, 30000)
+	for number := range words {
+		word := []byte("aaaaaaaaaa")
+		value := number
+		for index := len(word) - 1; index >= 0; index-- {
+			word[index] = byte('a' + value%26)
+			value /= 26
+		}
+		words[number] = string(word)
+	}
+	input, err := json.Marshal([]any{board, words})
+	if err != nil {
+		panic(fmt.Errorf("build word-search-ii input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum board and dictionary",
+		Input: string(input),
+		Want:  `["aaaaaaaaaa"]`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -130,6 +170,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[["a","b"]],["a","ab"]]`,
 		Want:  `["a","ab"]`,
 	},
+	{
+		Name:  "Additional: Multiple paths return each word once",
+		Input: `[[["a","a"],["a","a"]],["a","aa","aaa","aaaa"]]`,
+		Want:  `["a","aa","aaa","aaaa"]`,
+	},
+	{
+		Name:  "Additional: Diagonal cells are not adjacent",
+		Input: `[[["a","x"],["x","b"]],["ab"]]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Maximum-length words in both directions",
+		Input: `[[["a","b","c","d","e","f","g","h","i","j"]],["abcdefghij","jihgfedcba","abcdefghi"]]`,
+		Want:  `["abcdefghi","abcdefghij","jihgfedcba"]`,
+	},
+	makeMaximumWordSearchIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

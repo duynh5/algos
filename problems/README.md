@@ -39,7 +39,7 @@ Archive and run problems with:
 
 ## Problems
 - [easy_leetcode_0001_two_sum_practice.go](easy_leetcode_0001_two_sum_practice.go)
-- [easy_leetcode_0009_palindrome_number.go](easy_leetcode_0009_palindrome_number.go)
+- [solved_easy_leetcode_0009_palindrome_number.go](solved_easy_leetcode_0009_palindrome_number.go)
 - [easy_leetcode_0013_roman_to_integer.go](easy_leetcode_0013_roman_to_integer.go)
 - [easy_leetcode_0014_longest_common_prefix.go](easy_leetcode_0014_longest_common_prefix.go)
 - [easy_leetcode_0020_valid_parentheses.go](easy_leetcode_0020_valid_parentheses.go)

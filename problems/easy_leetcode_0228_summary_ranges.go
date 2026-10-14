@@ -89,6 +89,33 @@ func parseSummaryRangesInput(input string) []int {
 	return nums
 }
 
+func formatSummaryRangesOutput(ranges []string) string {
+	output, err := json.Marshal(ranges)
+	if err != nil {
+		panic(fmt.Errorf("format summary-ranges output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumSummaryRangesCase() testrunner.Case {
+	nums := make([]int, 0, 20)
+	ranges := make([]string, 0, 10)
+	for group := range 10 {
+		start := group * 3
+		nums = append(nums, start, start+1)
+		ranges = append(ranges, fmt.Sprintf("%d->%d", start, start+1))
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum summary-ranges input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length alternates ten short ranges",
+		Input: string(input),
+		Want:  formatSummaryRangesOutput(ranges),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -117,6 +144,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[-1,0,1,3]]`,
 		Want:  `["-1->1","3"]`,
 	},
+	{
+		Name:  "Additional: Entire array is one range",
+		Input: `[[1,2,3,4]]`,
+		Want:  `["1->4"]`,
+	},
+	{
+		Name:  "Additional: Every value is isolated",
+		Input: `[[-3,-1,1,3]]`,
+		Want:  `["-3","-1","1","3"]`,
+	},
+	{
+		Name:  "Boundary: Two consecutive values form a range",
+		Input: `[[5,6]]`,
+		Want:  `["5->6"]`,
+	},
+	{
+		Name:  "Boundary: Two separated values stay singletons",
+		Input: `[[5,7]]`,
+		Want:  `["5","7"]`,
+	},
+	{
+		Name:  "Boundary: Consecutive runs at both integer limits",
+		Input: `[[-2147483648,-2147483647,2147483646,2147483647]]`,
+		Want:  `["-2147483648->-2147483647","2147483646->2147483647"]`,
+	},
+	maximumSummaryRangesCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

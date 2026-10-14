@@ -106,7 +106,7 @@ var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
 		Input: `[["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"],[[],[1],[2],[],[3],[]]]`,
-		Want:  `[null, null, null, 1.5, null, 2.0]`,
+		Want:  `[null,null,null,1.5,null,2.0]`,
 	},
 	{
 		Name:  "Additional: Single stream value",
@@ -117,6 +117,31 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: Negative even-sized stream",
 		Input: `[["MedianFinder","addNum","addNum","findMedian"],[[],[-5],[-1],[]]]`,
 		Want:  `[null,null,null,-3.0]`,
+	},
+	{
+		Name:  "Additional: Unsorted arrivals cross odd and even sizes",
+		Input: `[["MedianFinder","addNum","addNum","addNum","findMedian","addNum","findMedian"],[[],[10],[1],[7],[],[2],[]]]`,
+		Want:  `[null,null,null,null,7.0,null,4.5]`,
+	},
+	{
+		Name:  "Additional: Duplicate values preserve the median",
+		Input: `[["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"],[[],[2],[2],[],[2],[]]]`,
+		Want:  `[null,null,null,2.0,null,2.0]`,
+	},
+	{
+		Name:  "Boundary: Values span both constraint extremes",
+		Input: `[["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"],[[],[-100000],[100000],[],[0],[]]]`,
+		Want:  `[null,null,null,0.0,null,0.0]`,
+	},
+	{
+		Name:  "Additional: Repeated queries do not mutate the stream",
+		Input: `[["MedianFinder","addNum","findMedian","findMedian","addNum","findMedian","findMedian"],[[],[4],[],[],[6],[],[]]]`,
+		Want:  `[null,null,4.0,4.0,null,5.0,5.0]`,
+	},
+	{
+		Name:  "Additional: Descending arrivals",
+		Input: `[["MedianFinder","addNum","addNum","addNum","addNum","addNum","findMedian"],[[],[5],[4],[3],[2],[1],[]]]`,
+		Want:  `[null,null,null,null,null,null,3.0]`,
 	},
 }
 

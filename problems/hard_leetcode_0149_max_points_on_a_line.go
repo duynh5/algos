@@ -70,6 +70,23 @@ func parseMaxPointsOnALineInput(input string) [][]int {
 	return points
 }
 
+func makeMaximumMaxPointsOnALineCase() testrunner.Case {
+	points := make([][]int, 300)
+	for index := range points {
+		x := index - 149
+		points[index] = []int{x, 3*x + 7}
+	}
+	input, err := json.Marshal([]any{points})
+	if err != nil {
+		panic(fmt.Errorf("build max-points-on-a-line input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum number of collinear points",
+		Input: string(input),
+		Want:  `300`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -98,6 +115,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[0,0],[1,1],[2,2],[2,3]]]`,
 		Want:  `3`,
 	},
+	{
+		Name:  "Additional: Horizontal line",
+		Input: `[[[-3,5],[0,5],[4,5],[4,6]]]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Additional: Negative slope from both directions",
+		Input: `[[[0,0],[1,-1],[-1,1],[2,-2],[2,1]]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Equivalent non-unit slopes normalize together",
+		Input: `[[[0,0],[2,4],[3,6],[-1,-2],[1,2],[2,3]]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Coordinate boundaries",
+		Input: `[[[-10000,-10000],[0,0],[10000,10000],[-10000,10000]]]`,
+		Want:  `3`,
+	},
+	makeMaximumMaxPointsOnALineCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

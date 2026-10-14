@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -83,6 +84,20 @@ func parseReverseWordsInAStringInput(input string) string {
 	return s
 }
 
+func maximumReverseWordsInAStringCase() testrunner.Case {
+	s := strings.Repeat("a ", 4999) + "ab"
+	want := "ab " + strings.Repeat("a ", 4998) + "a"
+	input, err := json.Marshal([]any{s})
+	if err != nil {
+		panic(fmt.Errorf("build maximum reverse-words input: %w", err))
+	}
+	output, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum reverse-words output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum-length string", Input: string(input), Want: string(output)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -111,6 +126,22 @@ var sampleCases = []testrunner.Case{
 		Input: `["a   good   example"]`,
 		Want:  `"example good a"`,
 	},
+	{
+		Name:  "Minimum: One-character word",
+		Input: `["x"]`,
+		Want:  `"x"`,
+	},
+	{
+		Name:  "Additional: Case and digits remain unchanged",
+		Input: `["Go  123 CODE"]`,
+		Want:  `"CODE 123 Go"`,
+	},
+	{
+		Name:  "Adversarial: Uneven leading trailing and internal spaces",
+		Input: `["    one two     three "]`,
+		Want:  `"three two one"`,
+	},
+	maximumReverseWordsInAStringCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

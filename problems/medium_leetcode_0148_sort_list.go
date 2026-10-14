@@ -91,6 +91,39 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 	return dummy.Next, nil
 }
 
+func formatSortListOutput(head *ListNode) string {
+	values := make([]int, 0)
+	for node := head; node != nil; node = node.Next {
+		if len(values) == 50000 {
+			panic("format sort-list output: list exceeds 50000 nodes or contains a cycle")
+		}
+		values = append(values, node.Val)
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format sort-list output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumSortListCase() testrunner.Case {
+	values := make([]int, 50000)
+	wantValues := make([]int, 50000)
+	for index := range values {
+		values[index] = 25000 - index
+		wantValues[index] = -24999 + index
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum sort-list input: %w", err))
+	}
+	want, err := json.Marshal(wantValues)
+	if err != nil {
+		panic(fmt.Errorf("build maximum sort-list output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum descending list", Input: string(input), Want: string(want)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -119,6 +152,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[3,-1,3,0]]`,
 		Want:  `[-1,0,3,3]`,
 	},
+	{
+		Name:  "Additional: Already sorted list",
+		Input: `[[-3,-1,0,2,4]]`,
+		Want:  `[-3,-1,0,2,4]`,
+	},
+	{
+		Name:  "Adversarial: Reverse-sorted odd-length list",
+		Input: `[[5,4,3,2,1]]`,
+		Want:  `[1,2,3,4,5]`,
+	},
+	{
+		Name:  "Additional: Every value is equal",
+		Input: `[[2,2,2,2]]`,
+		Want:  `[2,2,2,2]`,
+	},
+	{
+		Name:  "Boundary: Signed value limits",
+		Input: `[[100000,-100000,0]]`,
+		Want:  `[-100000,0,100000]`,
+	},
+	maximumSortListCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

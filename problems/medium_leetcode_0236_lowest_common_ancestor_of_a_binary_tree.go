@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -70,7 +71,7 @@ type TreeNode struct {
 	Left, Right, Next *TreeNode
 }
 
-func parseLowestCommonAncestorOfABinaryTreeInput(input string) (*TreeNode, int, int) {
+func parseLowestCommonAncestorOfABinaryTreeInput(input string) (*TreeNode, *TreeNode, *TreeNode) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-tree input: %w", err))
@@ -92,7 +93,28 @@ func parseLowestCommonAncestorOfABinaryTreeInput(input string) (*TreeNode, int, 
 	if argumentError2 != nil {
 		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-tree argument q: %w", argumentError2))
 	}
-	return root, p, q
+	var pNode, qNode *TreeNode
+	queue := []*TreeNode{root}
+	for len(queue) > 0 && (pNode == nil || qNode == nil) {
+		node := queue[0]
+		queue = queue[1:]
+		if node.Val == p {
+			pNode = node
+		}
+		if node.Val == q {
+			qNode = node
+		}
+		if node.Left != nil {
+			queue = append(queue, node.Left)
+		}
+		if node.Right != nil {
+			queue = append(queue, node.Right)
+		}
+	}
+	if pNode == nil || qNode == nil {
+		panic("parse lowest-common-ancestor input: p or q is absent from the tree")
+	}
+	return root, pNode, qNode
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
@@ -125,6 +147,38 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func formatLowestCommonAncestorOfABinaryTreeOutput(node *TreeNode) string {
+	if node == nil {
+		return `null`
+	}
+	return strconv.Itoa(node.Val)
+}
+
+func maximumLowestCommonAncestorOfABinaryTreeCase() testrunner.Case {
+	values := make([]int, 100000)
+	for index := range values {
+		values[index] = index - 50000
+	}
+	pIndex, qIndex := 99998, 99999
+	left, right := pIndex, qIndex
+	for left != right {
+		if left > right {
+			left = (left - 1) / 2
+		} else {
+			right = (right - 1) / 2
+		}
+	}
+	input, err := json.Marshal([]any{values, values[pIndex], values[qIndex]})
+	if err != nil {
+		panic(fmt.Errorf("build maximum lowest-common-ancestor input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum tree with two deepest targets",
+		Input: string(input),
+		Want:  strconv.Itoa(values[left]),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -153,6 +207,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,null,3],2,3]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Additional: Siblings have their parent as ancestor",
+		Input: `[[0,-1,1,-2,null,null,2],-2,-1]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Adversarial: Targets lie deep in different subtrees",
+		Input: `[[10,5,15,3,7,12,18,1,4,6,8],1,8]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Boundary: Signed value limits",
+		Input: `[[0,-1000000000,1000000000],-1000000000,1000000000]`,
+		Want:  `0`,
+	},
+	maximumLowestCommonAncestorOfABinaryTreeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

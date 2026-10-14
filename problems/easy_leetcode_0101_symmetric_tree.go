@@ -102,6 +102,19 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumSymmetricTreeCase() testrunner.Case {
+	values := make([]int, 1000)
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum symmetric-tree case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum node count has asymmetric final level",
+		Input: string(input),
+		Want:  `false`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -126,10 +139,36 @@ var sampleCases = []testrunner.Case{
 		Want:  `true`,
 	},
 	{
-		Name:  "Additional: Mirrored values with different shapes",
-		Input: `[[1,2,2,null,3,null,3]]`,
+		Name:  "Additional: Unequal immediate children",
+		Input: `[[1,2,3]]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: Equal immediate children",
+		Input: `[[1,2,2]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Only left child exists",
+		Input: `[[1,2]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Identical subtrees are not mirrors",
+		Input: `[[1,2,2,3,null,3,null]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Deep mirrored position has different value",
+		Input: `[[1,2,2,3,4,4,5]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Boundary: Symmetric minimum and maximum values",
+		Input: `[[0,-100,-100,100,null,null,100]]`,
+		Want:  `true`,
+	},
+	maximumSymmetricTreeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -92,6 +94,39 @@ func parseRemoveDuplicatesFromSortedArrayInput(input string) []int {
 	return nums
 }
 
+func formatRemoveDuplicatesFromSortedArrayOutput(k int, nums []int) string {
+	values := make([]string, len(nums))
+	for index := range values {
+		if index < k {
+			values[index] = strconv.Itoa(nums[index])
+		} else {
+			values[index] = "_"
+		}
+	}
+	return fmt.Sprintf("%d, nums = [%s]", k, strings.Join(values, ","))
+}
+
+func maximumRemoveDuplicatesFromSortedArrayCase() testrunner.Case {
+	nums := make([]int, 30000)
+	for index := range nums {
+		nums[index] = -100 + index*201/len(nums)
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum remove-duplicates input: %w", err))
+	}
+
+	wantNums := make([]int, len(nums))
+	for index := range 201 {
+		wantNums[index] = index - 100
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length spans every allowed value",
+		Input: string(input),
+		Want:  formatRemoveDuplicatesFromSortedArrayOutput(201, wantNums),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -120,6 +155,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[-1,0,1]]`,
 		Want:  `3, nums = [-1,0,1]`,
 	},
+	{
+		Name:  "Boundary: Duplicate minimum and maximum values",
+		Input: `[[-100,-100,100,100]]`,
+		Want:  `2, nums = [-100,100,_,_]`,
+	},
+	{
+		Name:  "Additional: Duplicate runs at both ends",
+		Input: `[[1,1,2,3,3]]`,
+		Want:  `3, nums = [1,2,3,_,_]`,
+	},
+	{
+		Name:  "Additional: Several runs of different lengths",
+		Input: `[[-2,-2,-1,-1,0,1,1,2,2]]`,
+		Want:  `5, nums = [-2,-1,0,1,2,_,_,_,_]`,
+	},
+	{
+		Name:  "Adversarial: Long runs surround singleton",
+		Input: `[[-1,-1,-1,0,1,1,1]]`,
+		Want:  `3, nums = [-1,0,1,_,_,_,_]`,
+	},
+	maximumRemoveDuplicatesFromSortedArrayCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

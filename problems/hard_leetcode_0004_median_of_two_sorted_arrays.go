@@ -83,6 +83,24 @@ func parseMedianOfTwoSortedArraysInput(input string) ([]int, []int) {
 	return nums1, nums2
 }
 
+func formatMedianOfTwoSortedArraysOutput(value float64) string {
+	return fmt.Sprintf("%.5f", value)
+}
+
+func maximumMedianOfTwoSortedArraysCase() testrunner.Case {
+	nums1 := make([]int, 1000)
+	nums2 := make([]int, 1000)
+	for index := range nums1 {
+		nums1[index] = index * 2
+		nums2[index] = index*2 + 1
+	}
+	input, err := json.Marshal([]any{nums1, nums2})
+	if err != nil {
+		panic(fmt.Errorf("build maximum median-two-sorted-arrays input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum combined length interleaves evenly", Input: string(input), Want: `999.50000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -102,15 +120,31 @@ var sampleCases = []testrunner.Case{
 		Want:  `1.00000`,
 	},
 	{
-		Name:  "Additional: Even combined length",
-		Input: `[[1,2],[3,4]]`,
-		Want:  `2.50000`,
-	},
-	{
 		Name:  "Additional: Negative values",
 		Input: `[[-5,-3],[-4,-2]]`,
 		Want:  `-3.50000`,
 	},
+	{
+		Name:  "Additional: First array is empty with even length",
+		Input: `[[],[1,2,3,4]]`,
+		Want:  `2.50000`,
+	},
+	{
+		Name:  "Additional: Duplicate values span both arrays",
+		Input: `[[1,2,2],[2,2,3]]`,
+		Want:  `2.00000`,
+	},
+	{
+		Name:  "Boundary: Signed limits average without overflow",
+		Input: `[[-1000000],[1000000]]`,
+		Want:  `0.00000`,
+	},
+	{
+		Name:  "Adversarial: Highly unbalanced array lengths",
+		Input: `[[100],[1,2,3,4,5,6]]`,
+		Want:  `4.00000`,
+	},
+	maximumMedianOfTwoSortedArraysCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

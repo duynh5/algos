@@ -76,6 +76,18 @@ func parseFindPeakElementInput(input string) []int {
 	return nums
 }
 
+func maximumFindPeakElementCase() testrunner.Case {
+	nums := make([]int, 1000)
+	for index := range nums {
+		nums[index] = index - 500
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum find-peak-element input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum strictly increasing array", Input: string(input), Want: `999`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -104,6 +116,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,4]]`,
 		Want:  `3`,
 	},
+	{
+		Name:  "Additional: Unique interior peak",
+		Input: `[[-3,-1,4,2,0]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Boundary: Two values peak on the left",
+		Input: `[[2147483647,-2147483648]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Boundary: Two values peak on the right",
+		Input: `[[-2147483648,2147483647]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Adversarial: Peak immediately left of the midpoint",
+		Input: `[[1,5,4,3,2]]`,
+		Want:  `1`,
+	},
+	maximumFindPeakElementCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

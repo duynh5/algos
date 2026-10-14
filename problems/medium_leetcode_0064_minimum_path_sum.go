@@ -73,6 +73,25 @@ func parseMinimumPathSumInput(input string) [][]int {
 	return grid
 }
 
+func maximumMinimumPathSumCase() testrunner.Case {
+	grid := make([][]int, 200)
+	for row := range grid {
+		grid[row] = make([]int, 200)
+		for column := range grid[row] {
+			grid[row][column] = 200
+		}
+	}
+	input, err := json.Marshal([]any{grid})
+	if err != nil {
+		panic(fmt.Errorf("build maximum minimum-path-sum input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum dimensions and values count every path cell",
+		Input: string(input),
+		Want:  `79800`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -101,6 +120,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[0,9],[0,0]]]`,
 		Want:  `0`,
 	},
+	{
+		Name:  "Additional: Single column",
+		Input: `[[[1],[2],[3]]]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Boundary: One cell at maximum value",
+		Input: `[[[200]]]`,
+		Want:  `200`,
+	},
+	{
+		Name:  "Adversarial: Cheapest immediate move leads to an expensive route",
+		Input: `[[[1,1,100],[2,100,100],[2,2,1]]]`,
+		Want:  `8`,
+	},
+	{
+		Name:  "Additional: Cheap interior corridor determines the route",
+		Input: `[[[1,100,100],[1,1,100],[100,1,1]]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Start and destination costs are both included",
+		Input: `[[[5,1],[1,5]]]`,
+		Want:  `11`,
+	},
+	maximumMinimumPathSumCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

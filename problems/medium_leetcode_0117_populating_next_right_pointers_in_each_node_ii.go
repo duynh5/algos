@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -118,6 +120,53 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func formatPopulatingNextRightPointersInEachNodeIiOutput(root *TreeNode) string {
+	if root == nil {
+		return `[]`
+	}
+	parts := make([]string, 0)
+	for levelStart := root; levelStart != nil; {
+		var nextLevelStart *TreeNode
+		for node := levelStart; node != nil; node = node.Next {
+			parts = append(parts, strconv.Itoa(node.Val))
+			if nextLevelStart == nil {
+				if node.Left != nil {
+					nextLevelStart = node.Left
+				} else if node.Right != nil {
+					nextLevelStart = node.Right
+				}
+			}
+		}
+		parts = append(parts, "#")
+		levelStart = nextLevelStart
+	}
+	return "[" + strings.Join(parts, ",") + "]"
+}
+
+func maximumPopulatingNextRightPointersInEachNodeIiCase() testrunner.Case {
+	values := make([]int, 6000)
+	parts := make([]string, 0, 6013)
+	for index := range values {
+		values[index] = index%201 - 100
+	}
+	for start, width := 0, 1; start < len(values); start, width = start+width, width*2 {
+		end := min(start+width, len(values))
+		for _, value := range values[start:end] {
+			parts = append(parts, strconv.Itoa(value))
+		}
+		parts = append(parts, "#")
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum populate-next-pointers input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum complete-prefix tree links every level",
+		Input: string(input),
+		Want:  "[" + strings.Join(parts, ",") + "]",
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -141,6 +190,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,null,5,null,7]]`,
 		Want:  `[1,#,2,3,#,5,7,#]`,
 	},
+	{
+		Name:  "Additional: Left-skewed tree",
+		Input: `[[1,2,null,3]]`,
+		Want:  `[1,#,2,#,3,#]`,
+	},
+	{
+		Name:  "Additional: Right-skewed tree",
+		Input: `[[1,null,2,null,3]]`,
+		Want:  `[1,#,2,#,3,#]`,
+	},
+	{
+		Name:  "Adversarial: Children link across multiple missing slots",
+		Input: `[[1,2,3,4,null,null,7,null,5,6]]`,
+		Want:  `[1,#,2,3,#,4,7,#,5,6,#]`,
+	},
+	{
+		Name:  "Boundary: Duplicate extreme values",
+		Input: `[[100,-100,100,-100,null,null,-100]]`,
+		Want:  `[100,#,-100,100,#,-100,-100,#]`,
+	},
+	maximumPopulatingNextRightPointersInEachNodeIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

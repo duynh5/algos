@@ -76,6 +76,31 @@ func parseMergeIntervalsInput(input string) [][]int {
 	return intervals
 }
 
+func formatMergeIntervalsOutput(intervals [][]int) string {
+	output, err := json.Marshal(intervals)
+	if err != nil {
+		panic(fmt.Errorf("format merge-intervals output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumMergeIntervalsCase() testrunner.Case {
+	intervals := make([][]int, 10000)
+	for index := range intervals {
+		start := 9999 - index
+		intervals[index] = []int{start, start + 1}
+	}
+	input, err := json.Marshal([]any{intervals})
+	if err != nil {
+		panic(fmt.Errorf("build maximum merge-intervals input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum reverse-ordered touching chain merges fully",
+		Input: string(input),
+		Want:  formatMergeIntervalsOutput([][]int{{0, 10000}}),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -109,6 +134,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[1,2],[2,3]]]`,
 		Want:  `[[1,3]]`,
 	},
+	{
+		Name:  "Additional: Disjoint unsorted intervals become ordered",
+		Input: `[[[5,6],[1,2],[3,4]]]`,
+		Want:  `[[1,2],[3,4],[5,6]]`,
+	},
+	{
+		Name:  "Additional: Duplicate intervals collapse",
+		Input: `[[[1,3],[1,3],[1,3]]]`,
+		Want:  `[[1,3]]`,
+	},
+	{
+		Name:  "Adversarial: Equal starts retain the farthest end",
+		Input: `[[[1,2],[1,5],[1,3]]]`,
+		Want:  `[[1,5]]`,
+	},
+	{
+		Name:  "Adversarial: Overlap is transitive across a chain",
+		Input: `[[[3,4],[1,2],[2,3]]]`,
+		Want:  `[[1,4]]`,
+	},
+	{
+		Name:  "Boundary: Disjoint point intervals at value limits",
+		Input: `[[[10000,10000],[0,0]]]`,
+		Want:  `[[0,0],[10000,10000]]`,
+	},
+	maximumMergeIntervalsCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

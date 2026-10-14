@@ -100,6 +100,42 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 	return dummy.Next, nil
 }
 
+func formatRemoveNthNodeFromEndOfListOutput(head *ListNode) string {
+	values := make([]int, 0)
+	for node := head; node != nil; node = node.Next {
+		values = append(values, node.Val)
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format remove-nth-node-from-end-of-list output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumRemoveNthNodeFromEndOfListCase() testrunner.Case {
+	values := make([]int, 30)
+	want := make([]int, 0, 29)
+	for index := range values {
+		values[index] = index
+		if index != 15 {
+			want = append(want, index)
+		}
+	}
+	input, err := json.Marshal([]any{values, 15})
+	if err != nil {
+		panic(fmt.Errorf("build maximum remove-nth-node-from-end-of-list input: %w", err))
+	}
+	wantOutput, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum remove-nth-node-from-end-of-list output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length list removes an interior node",
+		Input: string(input),
+		Want:  string(wantOutput),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -124,15 +160,26 @@ var sampleCases = []testrunner.Case{
 		Want:  `[2]`,
 	},
 	{
-		Name:  "Additional: Remove tail",
-		Input: `[[1,2],1]`,
-		Want:  `[1]`,
-	},
-	{
 		Name:  "Additional: Remove middle of even list",
 		Input: `[[1,2,3,4],2]`,
 		Want:  `[1,2,4]`,
 	},
+	{
+		Name:  "Additional: Remove middle of odd list",
+		Input: `[[1,2,3,4,5],3]`,
+		Want:  `[1,2,4,5]`,
+	},
+	{
+		Name:  "Adversarial: Duplicate values do not identify the node",
+		Input: `[[1,1,2,1],2]`,
+		Want:  `[1,1,1]`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum node values",
+		Input: `[[0,100],1]`,
+		Want:  `[0]`,
+	},
+	maximumRemoveNthNodeFromEndOfListCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

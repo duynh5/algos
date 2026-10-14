@@ -71,12 +71,12 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-type randomListEntry struct {
-	Value       int
-	RandomIndex *int
+type RandomNode struct {
+	Val          int
+	Next, Random *RandomNode
 }
 
-func parseCopyListWithRandomPointerInput(input string) []randomListEntry {
+func parseCopyListWithRandomPointerInput(input string) *RandomNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse copy-list-with-random-pointer input: %w", err))
@@ -91,19 +91,83 @@ func parseCopyListWithRandomPointerInput(input string) []randomListEntry {
 	return head
 }
 
-func decodeRandomList(raw json.RawMessage) ([]randomListEntry, error) {
+func decodeRandomList(raw json.RawMessage) (*RandomNode, error) {
 	var pairs [][]*int
 	if err := json.Unmarshal(raw, &pairs); err != nil {
 		return nil, err
 	}
-	result := make([]randomListEntry, len(pairs))
+	if len(pairs) == 0 {
+		return nil, nil
+	}
+	nodes := make([]*RandomNode, len(pairs))
 	for index, pair := range pairs {
 		if len(pair) != 2 || pair[0] == nil {
 			return nil, fmt.Errorf("entry %d must contain [value, randomIndex]", index)
 		}
-		result[index] = randomListEntry{Value: *pair[0], RandomIndex: pair[1]}
+		nodes[index] = &RandomNode{Val: *pair[0]}
+		if index > 0 {
+			nodes[index-1].Next = nodes[index]
+		}
 	}
-	return result, nil
+	for index, pair := range pairs {
+		if pair[1] == nil {
+			continue
+		}
+		if *pair[1] < 0 || *pair[1] >= len(nodes) {
+			return nil, fmt.Errorf("entry %d has out-of-range random index %d", index, *pair[1])
+		}
+		nodes[index].Random = nodes[*pair[1]]
+	}
+	return nodes[0], nil
+}
+
+func formatCopyListWithRandomPointerOutput(head *RandomNode) string {
+	nodes := make([]*RandomNode, 0)
+	indexByNode := make(map[*RandomNode]int)
+	for node := head; node != nil; node = node.Next {
+		if len(nodes) == 1000 {
+			panic("format copy-list-with-random-pointer output: list exceeds 1000 nodes or contains a cycle")
+		}
+		indexByNode[node] = len(nodes)
+		nodes = append(nodes, node)
+	}
+	pairs := make([][2]any, len(nodes))
+	for index, node := range nodes {
+		pairs[index][0] = node.Val
+		if node.Random == nil {
+			pairs[index][1] = nil
+		} else if randomIndex, ok := indexByNode[node.Random]; ok {
+			pairs[index][1] = randomIndex
+		} else {
+			panic("format copy-list-with-random-pointer output: random pointer leaves copied list")
+		}
+	}
+	output, err := json.Marshal(pairs)
+	if err != nil {
+		panic(fmt.Errorf("format copy-list-with-random-pointer output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumCopyListWithRandomPointerCase() testrunner.Case {
+	pairs := make([][2]int, 1000)
+	for index := range pairs {
+		if index%2 == 0 {
+			pairs[index][0] = -10000
+		} else {
+			pairs[index][0] = 10000
+		}
+		pairs[index][1] = len(pairs) - 1 - index
+	}
+	input, err := json.Marshal([]any{pairs})
+	if err != nil {
+		panic(fmt.Errorf("build maximum copy-random-list input: %w", err))
+	}
+	want, err := json.Marshal(pairs)
+	if err != nil {
+		panic(fmt.Errorf("build maximum copy-random-list output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum list with mirrored random pointers", Input: string(input), Want: string(want)}
 }
 
 // sampleCases contains the examples that every registered solution must pass.
@@ -134,6 +198,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[-1,null]]]`,
 		Want:  `[[-1,null]]`,
 	},
+	{
+		Name:  "Minimum: Empty list",
+		Input: `[[]]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Adversarial: Forward and backward random references",
+		Input: `[[[-10000,2],[0,0],[10000,1]]]`,
+		Want:  `[[-10000,2],[0,0],[10000,1]]`,
+	},
+	{
+		Name:  "Additional: Every random pointer is null",
+		Input: `[[[1,null],[1,null],[1,null]]]`,
+		Want:  `[[1,null],[1,null],[1,null]]`,
+	},
+	maximumCopyListWithRandomPointerCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

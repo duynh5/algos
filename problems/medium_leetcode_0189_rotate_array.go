@@ -86,6 +86,32 @@ func parseRotateArrayInput(input string) ([]int, int) {
 	return nums, k
 }
 
+func formatRotateArrayOutput(nums []int) string {
+	output, err := json.Marshal(nums)
+	if err != nil {
+		panic(fmt.Errorf("format rotate-array output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumRotateArrayCase() testrunner.Case {
+	nums := make([]int, 100000)
+	want := make([]int, 100000)
+	for index := range nums {
+		nums[index] = index
+		want[index] = (index + 1) % len(nums)
+	}
+	input, err := json.Marshal([]any{nums, 99999})
+	if err != nil {
+		panic(fmt.Errorf("build maximum rotate-array input: %w", err))
+	}
+	output, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum rotate-array output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum array rotates left by one equivalently", Input: string(input), Want: string(output)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -114,6 +140,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[7],100000]`,
 		Want:  `[7]`,
 	},
+	{
+		Name:  "Boundary: Rotation equal to length",
+		Input: `[[1,2,3,4],4]`,
+		Want:  `[1,2,3,4]`,
+	},
+	{
+		Name:  "Additional: Duplicate values retain positions",
+		Input: `[[1,1,2,2,3],2]`,
+		Want:  `[2,3,1,1,2]`,
+	},
+	{
+		Name:  "Adversarial: Non-coprime rotation has multiple cycles",
+		Input: `[[0,1,2,3,4,5],2]`,
+		Want:  `[4,5,0,1,2,3]`,
+	},
+	{
+		Name:  "Boundary: Signed integer limits",
+		Input: `[[-2147483648,0,2147483647],1]`,
+		Want:  `[2147483647,-2147483648,0]`,
+	},
+	maximumRotateArrayCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

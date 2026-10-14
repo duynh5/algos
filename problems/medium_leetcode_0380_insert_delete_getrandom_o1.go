@@ -100,7 +100,7 @@ var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
 		Input: `[["RandomizedSet","insert","remove","insert","getRandom","remove","insert","getRandom"],[[],[1],[2],[2],[],[1],[2],[]]]`,
-		Want:  `[null, true, false, true, 2, true, false, 2]`,
+		Want:  `[null,true,false,true,2,true,false,2]`,
 	},
 	{
 		Name:  "Additional: Duplicate insert and missing removal",
@@ -111,6 +111,31 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: Single deterministic random value",
 		Input: `[["RandomizedSet","insert","getRandom","remove"],[[],[-1],[],[-1]]]`,
 		Want:  `[null,true,-1,true]`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum integers",
+		Input: `[["RandomizedSet","insert","insert","remove","getRandom"],[[],[-2147483648],[2147483647],[-2147483648],[]]]`,
+		Want:  `[null,true,true,true,2147483647]`,
+	},
+	{
+		Name:  "Additional: Removing middle value keeps index map valid",
+		Input: `[["RandomizedSet","insert","insert","insert","remove","remove","getRandom"],[[],[10],[20],[30],[20],[10],[]]]`,
+		Want:  `[null,true,true,true,true,true,30]`,
+	},
+	{
+		Name:  "Additional: Removed value can be inserted again",
+		Input: `[["RandomizedSet","insert","remove","insert","getRandom"],[[],[5],[5],[5],[]]]`,
+		Want:  `[null,true,true,true,5]`,
+	},
+	{
+		Name:  "Additional: Set can become empty and recover",
+		Input: `[["RandomizedSet","insert","remove","insert","getRandom"],[[],[1],[1],[2],[]]]`,
+		Want:  `[null,true,true,true,2]`,
+	},
+	{
+		Name:  "Boundary: Zero supports repeated lifecycle",
+		Input: `[["RandomizedSet","remove","insert","getRandom","remove","insert","getRandom"],[[],[0],[0],[],[0],[0],[]]]`,
+		Want:  `[null,false,true,0,true,true,0]`,
 	},
 }
 

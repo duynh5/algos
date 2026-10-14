@@ -99,6 +99,25 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 	return result, nil
 }
 
+func maximumNumberOfIslandsCase() testrunner.Case {
+	grid := make([][]string, 300)
+	for row := range grid {
+		grid[row] = make([]string, 300)
+		for column := range grid[row] {
+			if (row+column)%2 == 0 {
+				grid[row][column] = "1"
+			} else {
+				grid[row][column] = "0"
+			}
+		}
+	}
+	input, err := json.Marshal([]any{grid})
+	if err != nil {
+		panic(fmt.Errorf("build maximum number-of-islands input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum checkerboard grid", Input: string(input), Want: `45000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -127,6 +146,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[["1","0"],["0","1"]]]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Boundary: Single all-land row",
+		Input: `[[["1","1","1","1"]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Boundary: Single alternating column",
+		Input: `[[["1"],["0"],["1"],["0"],["1"]]]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Adversarial: Narrow bridge joins apparent regions",
+		Input: `[[["1","1","0","1","1"],["0","1","1","1","0"]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Water holes do not split surrounding land",
+		Input: `[[["1","1","1"],["1","0","1"],["1","1","1"]]]`,
+		Want:  `1`,
+	},
+	maximumNumberOfIslandsCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

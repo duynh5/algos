@@ -105,6 +105,63 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func formatInvertBinaryTreeOutput(root *TreeNode) string {
+	if root == nil {
+		return `[]`
+	}
+	values := make([]any, 0)
+	queue := []*TreeNode{root}
+	for len(queue) > 0 {
+		node := queue[0]
+		queue = queue[1:]
+		if node == nil {
+			values = append(values, nil)
+			continue
+		}
+		values = append(values, node.Val)
+		queue = append(queue, node.Left, node.Right)
+	}
+	for len(values) > 0 && values[len(values)-1] == nil {
+		values = values[:len(values)-1]
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format invert-binary-tree output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumInvertBinaryTreeCase() testrunner.Case {
+	inputTree := make([]any, 0, 199)
+	inputTree = append(inputTree, 0)
+	for value := 1; value < 100; value++ {
+		inputTree = append(inputTree, nil, value)
+	}
+
+	invertedTree := make([]any, 0, 198)
+	invertedTree = append(invertedTree, 0)
+	for value := 1; value < 100; value++ {
+		invertedTree = append(invertedTree, value)
+		if value < 99 {
+			invertedTree = append(invertedTree, nil)
+		}
+	}
+
+	input, err := json.Marshal([]any{inputTree})
+	if err != nil {
+		panic(fmt.Errorf("build maximum invert-binary-tree input: %w", err))
+	}
+	want, err := json.Marshal(invertedTree)
+	if err != nil {
+		panic(fmt.Errorf("build maximum invert-binary-tree output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-node right chain becomes a left chain",
+		Input: string(input),
+		Want:  string(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -133,6 +190,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,null,3]]`,
 		Want:  `[1,null,2,null,3]`,
 	},
+	{
+		Name:  "Additional: Right-only tree becomes left-only",
+		Input: `[[1,null,2,null,3]]`,
+		Want:  `[1,2,null,3]`,
+	},
+	{
+		Name:  "Additional: Sparse asymmetric subtrees retain their nodes",
+		Input: `[[1,2,3,null,4,null,5]]`,
+		Want:  `[1,3,2,5,null,4]`,
+	},
+	{
+		Name:  "Additional: Duplicate values do not identify tree positions",
+		Input: `[[1,1,1,1,null,null,1]]`,
+		Want:  `[1,1,1,1,null,null,1]`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum node values",
+		Input: `[[0,-100,100]]`,
+		Want:  `[0,100,-100]`,
+	},
+	maximumInvertBinaryTreeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

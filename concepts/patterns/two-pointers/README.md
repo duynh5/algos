@@ -45,4 +45,5 @@ sum is too large, decreasing `right` is the only move that can reduce it.
 
 ## Related problems
 
-No solved problems are linked yet.
+- [LeetCode 9: Palindrome Number](../../../problems/solved_easy_leetcode_0009_palindrome_number.go)
+  compares mirrored digits with inward-moving endpoints in its direct solution.

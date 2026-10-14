@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -78,6 +79,19 @@ func parseLengthOfLastWordInput(input string) string {
 	return s
 }
 
+func maximumLengthOfLastWordCase() testrunner.Case {
+	value := strings.Repeat("a", 5000) + strings.Repeat(" ", 5000)
+	input, err := json.Marshal([]any{value})
+	if err != nil {
+		panic(fmt.Errorf("build maximum length-of-last-word case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length with trailing spaces",
+		Input: string(input),
+		Want:  `5000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -111,6 +125,27 @@ var sampleCases = []testrunner.Case{
 		Input: `["long phrase x"]`,
 		Want:  `1`,
 	},
+	{
+		Name:  "Additional: Leading spaces before single word",
+		Input: `["   alphabet"]`,
+		Want:  `8`,
+	},
+	{
+		Name:  "Additional: Repeated spaces between words",
+		Input: `["one  two   three"]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Additional: Several one-letter words",
+		Input: `["a b c"]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Long single word",
+		Input: `["supercalifragilisticexpialidocious"]`,
+		Want:  `34`,
+	},
+	maximumLengthOfLastWordCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

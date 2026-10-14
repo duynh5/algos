@@ -90,6 +90,19 @@ func parseFindMinimumInRotatedSortedArrayInput(input string) []int {
 	return nums
 }
 
+func maximumFindMinimumInRotatedSortedArrayCase() testrunner.Case {
+	nums := make([]int, 5000)
+	nums[0] = 2499
+	for index := 1; index < len(nums); index++ {
+		nums[index] = -2501 + index
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum find-minimum-rotated-array input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum array rotated once", Input: string(input), Want: `-2500`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -123,6 +136,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[4,5,6,1,2,3]]`,
 		Want:  `1`,
 	},
+	{
+		Name:  "Additional: Two values remain sorted",
+		Input: `[[-1,1]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Adversarial: Minimum is the final element",
+		Input: `[[2,3,4,5,1]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Boundary: Signed value limits across the pivot",
+		Input: `[[0,5000,-5000,-1]]`,
+		Want:  `-5000`,
+	},
+	{
+		Name:  "Additional: Negative rotated values",
+		Input: `[[-2,-1,-5,-4,-3]]`,
+		Want:  `-5`,
+	},
+	maximumFindMinimumInRotatedSortedArrayCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

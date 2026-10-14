@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -78,6 +79,20 @@ func parseRansomNoteInput(input string) (string, string) {
 	return ransomNote, magazine
 }
 
+func maximumRansomNoteCase() testrunner.Case {
+	ransomNote := strings.Repeat("a", 50000) + strings.Repeat("z", 50000)
+	magazine := strings.Repeat("z", 50000) + strings.Repeat("a", 50000)
+	input, err := json.Marshal([]any{ransomNote, magazine})
+	if err != nil {
+		panic(fmt.Errorf("build maximum ransom-note case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum lengths use every available letter",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -102,8 +117,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `true`,
 	},
 	{
-		Name:  "Additional: Repeated letter shortage",
-		Input: `["aa","ab"]`,
+		Name:  "Additional: Ransom note is longer than magazine",
+		Input: `["abc","ab"]`,
 		Want:  `false`,
 	},
 	{
@@ -111,6 +126,22 @@ var sampleCases = []testrunner.Case{
 		Input: `["abc","cbad"]`,
 		Want:  `true`,
 	},
+	{
+		Name:  "Additional: Exact multiset may appear in any order",
+		Input: `["aabbcc","cbacba"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Same letters but one frequency is short",
+		Input: `["aabbc","abbcc"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Repeated rare letter is fully available",
+		Input: `["zzzy","yzzz"]`,
+		Want:  `true`,
+	},
+	maximumRansomNoteCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

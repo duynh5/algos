@@ -91,6 +91,45 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 	return dummy.Next, nil
 }
 
+func formatRotateListOutput(head *ListNode) string {
+	values := make([]int, 0)
+	for node := head; node != nil; node = node.Next {
+		if len(values) == 500 {
+			panic("format rotate-list output: list exceeds 500 nodes or contains a cycle")
+		}
+		values = append(values, node.Val)
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format rotate-list output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumRotateListCase() testrunner.Case {
+	values := make([]int, 500)
+	for index := range values {
+		values[index] = -100
+	}
+	input, err := json.Marshal([]any{values, 2000000000})
+	if err != nil {
+		panic(fmt.Errorf("build maximum rotate-list input: %w", err))
+	}
+	rawValues, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("build maximum rotate-list values: %w", err))
+	}
+	head, err := decodeListNode(rawValues)
+	if err != nil {
+		panic(fmt.Errorf("build maximum rotate-list output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum node count and rotation preserve repeated values",
+		Input: string(input),
+		Want:  formatRotateListOutput(head),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -119,6 +158,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3],6]`,
 		Want:  `[1,2,3]`,
 	},
+	{
+		Name:  "Boundary: Single node with maximum rotations",
+		Input: `[[100],2000000000]`,
+		Want:  `[100]`,
+	},
+	{
+		Name:  "Boundary: Signed node values rotate once",
+		Input: `[[-100,0,100],1]`,
+		Want:  `[100,-100,0]`,
+	},
+	{
+		Name:  "Additional: Rotate by one less than the length",
+		Input: `[[1,2,3,4,5],4]`,
+		Want:  `[2,3,4,5,1]`,
+	},
+	{
+		Name:  "Additional: Odd rotations swap a two-node list",
+		Input: `[[1,2],3]`,
+		Want:  `[2,1]`,
+	},
+	{
+		Name:  "Boundary: Maximum rotations require modulo reduction",
+		Input: `[[1,2,3],2000000000]`,
+		Want:  `[2,3,1]`,
+	},
+	maximumRotateListCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

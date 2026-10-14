@@ -98,14 +98,44 @@ var sampleCases = []testrunner.Case{
 		Want:  `true`,
 	},
 	{
-		Name:  "Additional: Small unhappy cycle",
-		Input: `[2]`,
+		Name:  "Additional: Known unhappy cycle entry",
+		Input: `[4]`,
 		Want:  `false`,
 	},
 	{
 		Name:  "Additional: Happy after several steps",
 		Input: `[7]`,
 		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Reaches one in one transformation",
+		Input: `[10]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Zero digits do not affect sum",
+		Input: `[100]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Converges through official sequence",
+		Input: `[68]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Different value enters unhappy cycle",
+		Input: `[20]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Boundary: Large power of ten",
+		Input: `[1000000000]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Boundary: Maximum input is unhappy",
+		Input: `[2147483647]`,
+		Want:  `false`,
 	},
 }
 

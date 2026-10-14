@@ -95,6 +95,21 @@ func parseSnakesAndLaddersInput(input string) [][]int {
 	return board
 }
 
+func maximumSnakesAndLaddersCase() testrunner.Case {
+	board := make([][]int, 20)
+	for row := range board {
+		board[row] = make([]int, 20)
+		for column := range board[row] {
+			board[row][column] = -1
+		}
+	}
+	input, err := json.Marshal([]any{board})
+	if err != nil {
+		panic(fmt.Errorf("build maximum snakes-and-ladders input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum empty board", Input: string(input), Want: `67`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -118,6 +133,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]]]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Adversarial: Chained ladders apply only once per roll",
+		Input: `[[[-1,9,-1],[-1,-1,-1],[-1,8,-1]]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Adversarial: Every first-roll destination snakes back",
+		Input: `[[[1,-1,-1],[1,1,1],[-1,1,1]]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Ladder jumps directly to the final square",
+		Input: `[[[-1,-1,-1],[-1,-1,-1],[-1,9,-1]]]`,
+		Want:  `1`,
+	},
+	maximumSnakesAndLaddersCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -102,18 +102,49 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func formatAverageOfLevelsInBinaryTreeOutput(averages []float64) string {
+	output, err := json.Marshal(averages)
+	if err != nil {
+		panic(fmt.Errorf("format average-of-levels-in-binary-tree output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumAverageOfLevelsInBinaryTreeCase() testrunner.Case {
+	const nodeCount = 10000
+	const nodeValue = 2147483647
+	values := make([]int, nodeCount)
+	for index := range values {
+		values[index] = nodeValue
+	}
+	averages := make([]float64, 0, 14)
+	for remaining, width := nodeCount, 1; remaining > 0; width *= 2 {
+		averages = append(averages, nodeValue)
+		remaining -= min(remaining, width)
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum average-of-levels-in-binary-tree case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum nodes all hold the maximum value",
+		Input: string(input),
+		Want:  formatAverageOfLevelsInBinaryTreeOutput(averages),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
 		Input: `[[3,9,20,null,null,15,7]]`,
-		Want:  `[3.00000,14.50000,11.00000]`,
+		Want:  `[3,14.5,11]`,
 	},
 	{
 		Name:  "Official example 2",
 		Input: `[[3,9,20,15,7]]`,
-		Want:  `[3.00000,14.50000,11.00000]`,
+		Want:  `[3,14.5,11]`,
 	},
 	{
 		Name:  "Additional: Single node",
@@ -130,6 +161,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,4]]`,
 		Want:  `[1,2.5,4]`,
 	},
+	{
+		Name:  "Additional: Sparse tree keeps level membership",
+		Input: `[[1,2,3,null,4,5,null,6]]`,
+		Want:  `[1,2.5,4.5,6]`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum values average safely",
+		Input: `[[0,-2147483648,2147483647]]`,
+		Want:  `[0,-0.5]`,
+	},
+	{
+		Name:  "Additional: Three-node level produces a repeating fraction",
+		Input: `[[0,1,2,0,0,1]]`,
+		Want:  `[0,1.5,0.3333333333333333]`,
+	},
+	{
+		Name:  "Additional: Right-skewed tree has one value per level",
+		Input: `[[1,null,2,null,3,null,4]]`,
+		Want:  `[1,2,3,4]`,
+	},
+	maximumAverageOfLevelsInBinaryTreeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

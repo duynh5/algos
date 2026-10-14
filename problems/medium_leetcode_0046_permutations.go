@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -73,6 +74,26 @@ func parsePermutationsInput(input string) []int {
 	return nums
 }
 
+func formatPermutationsOutput(permutations [][]int) string {
+	normalized := make([][]int, len(permutations))
+	for index, permutation := range permutations {
+		normalized[index] = append([]int(nil), permutation...)
+	}
+	sort.Slice(normalized, func(left, right int) bool {
+		for index := 0; index < len(normalized[left]) && index < len(normalized[right]); index++ {
+			if normalized[left][index] != normalized[right][index] {
+				return normalized[left][index] < normalized[right][index]
+			}
+		}
+		return len(normalized[left]) < len(normalized[right])
+	})
+	output, err := json.Marshal(normalized)
+	if err != nil {
+		panic(fmt.Errorf("format permutations output: %w", err))
+	}
+	return string(output)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -95,6 +116,26 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: Two signed values",
 		Input: `[[-1,0]]`,
 		Want:  `[[-1,0],[0,-1]]`,
+	},
+	{
+		Name:  "Additional: Negative zero and positive values",
+		Input: `[[-1,0,1]]`,
+		Want:  `[[-1,0,1],[-1,1,0],[0,-1,1],[0,1,-1],[1,-1,0],[1,0,-1]]`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum values",
+		Input: `[[-10,10]]`,
+		Want:  `[[-10,10],[10,-10]]`,
+	},
+	{
+		Name:  "Adversarial: Descending input still yields every ordering",
+		Input: `[[3,2,1]]`,
+		Want:  `[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]`,
+	},
+	{
+		Name:  "Additional: Four values produce twenty-four permutations",
+		Input: `[[1,2,3,4]]`,
+		Want:  `[[1,2,3,4],[1,2,4,3],[1,3,2,4],[1,3,4,2],[1,4,2,3],[1,4,3,2],[2,1,3,4],[2,1,4,3],[2,3,1,4],[2,3,4,1],[2,4,1,3],[2,4,3,1],[3,1,2,4],[3,1,4,2],[3,2,1,4],[3,2,4,1],[3,4,1,2],[3,4,2,1],[4,1,2,3],[4,1,3,2],[4,2,1,3],[4,2,3,1],[4,3,1,2],[4,3,2,1]]`,
 	},
 }
 

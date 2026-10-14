@@ -74,6 +74,24 @@ func parseProductOfArrayExceptSelfInput(input string) []int {
 	return nums
 }
 
+func maximumProductOfArrayExceptSelfCase() testrunner.Case {
+	nums := make([]int, 100000)
+	want := make([]int, 100000)
+	for index := range nums {
+		nums[index] = 1
+		want[index] = 1
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum product-except-self input: %w", err))
+	}
+	output, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum product-except-self output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum all-one array", Input: string(input), Want: string(output)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -102,6 +120,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[0,1,2,0]]`,
 		Want:  `[0,0,0,0]`,
 	},
+	{
+		Name:  "Boundary: Two signed-limit factors",
+		Input: `[[-30,30]]`,
+		Want:  `[30,-30]`,
+	},
+	{
+		Name:  "Additional: Odd number of negative factors",
+		Input: `[[-1,-2,-3]]`,
+		Want:  `[6,3,2]`,
+	},
+	{
+		Name:  "Adversarial: Zero is at the first position",
+		Input: `[[0,-2,3,-4]]`,
+		Want:  `[24,0,0,0]`,
+	},
+	{
+		Name:  "Additional: Unit signs alternate output signs",
+		Input: `[[-1,1,-1,1]]`,
+		Want:  `[-1,1,-1,1]`,
+	},
+	maximumProductOfArrayExceptSelfCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -108,6 +109,41 @@ func parseEvaluateDivisionInput(input string) ([][]string, []float64, [][]string
 	return equations, values, queries
 }
 
+func formatEvaluateDivisionOutput(values []float64) string {
+	parts := make([]string, len(values))
+	for index, value := range values {
+		parts[index] = fmt.Sprintf("%.5f", value)
+	}
+	return "[" + strings.Join(parts, ",") + "]"
+}
+
+func maximumEvaluateDivisionCase() testrunner.Case {
+	equations := make([][]string, 20)
+	values := make([]float64, 20)
+	forward := 1.0
+	for index := range equations {
+		equations[index] = []string{fmt.Sprintf("v%d", index), fmt.Sprintf("v%d", index+1)}
+		values[index] = 1.2
+		forward *= values[index]
+	}
+	queries := make([][]string, 20)
+	want := make([]float64, 20)
+	for index := range queries {
+		if index%2 == 0 {
+			queries[index] = []string{"v0", "v20"}
+			want[index] = forward
+		} else {
+			queries[index] = []string{"v20", "v0"}
+			want[index] = 1 / forward
+		}
+	}
+	input, err := json.Marshal([]any{equations, values, queries})
+	if err != nil {
+		panic(fmt.Errorf("build maximum evaluate-division input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum equation and query chains", Input: string(input), Want: formatEvaluateDivisionOutput(want)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -136,6 +172,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[["x","y"]],[4.0],[["y","x"]]]`,
 		Want:  `[0.25000]`,
 	},
+	{
+		Name:  "Additional: Query crosses several equations",
+		Input: `[[["a","b"],["b","c"],["c","d"]],[2.0,3.0,4.0],[["a","d"],["d","a"]]]`,
+		Want:  `[24.00000,0.04167]`,
+	},
+	{
+		Name:  "Adversarial: Disconnected known components cannot divide",
+		Input: `[[["a","b"],["x","y"]],[2.0,5.0],[["a","y"],["x","y"]]]`,
+		Want:  `[-1.00000,5.00000]`,
+	},
+	{
+		Name:  "Boundary: Maximum direct ratio",
+		Input: `[[["a1","b2"]],[20.0],[["a1","b2"],["b2","a1"]]]`,
+		Want:  `[20.00000,0.05000]`,
+	},
+	maximumEvaluateDivisionCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

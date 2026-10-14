@@ -111,6 +111,24 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumSameTreeCase() testrunner.Case {
+	p := make([]int, 100)
+	for index := range p {
+		p[index] = index - 50
+	}
+	q := append([]int(nil), p...)
+	q[len(q)-1] = 10000
+	input, err := json.Marshal([]any{p, q})
+	if err != nil {
+		panic(fmt.Errorf("build maximum same-tree case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum node count differs at final leaf",
+		Input: string(input),
+		Want:  `false`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -140,10 +158,36 @@ var sampleCases = []testrunner.Case{
 		Want:  `false`,
 	},
 	{
-		Name:  "Additional: Same values in different shapes",
-		Input: `[[1,2],[1,null,2]]`,
+		Name:  "Additional: Empty first tree only",
+		Input: `[[],[1]]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: Different root values",
+		Input: `[[1],[2]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Identical left-skewed trees",
+		Input: `[[1,2,null,3,null,4],[1,2,null,3,null,4]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Same values in different deeper shapes",
+		Input: `[[1,2,3,4],[1,2,3,null,4]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Difference appears at deep leaf",
+		Input: `[[1,2,3,4,5],[1,2,3,4,6]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Boundary: Identical minimum and maximum values",
+		Input: `[[-10000,null,10000],[-10000,null,10000]]`,
+		Want:  `true`,
+	},
+	maximumSameTreeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

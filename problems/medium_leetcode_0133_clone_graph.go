@@ -85,7 +85,12 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
-func parseCloneGraphInput(input string) [][]int {
+type GraphNode struct {
+	Val       int
+	Neighbors []*GraphNode
+}
+
+func parseCloneGraphInput(input string) *GraphNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse clone-graph input: %w", err))
@@ -93,12 +98,88 @@ func parseCloneGraphInput(input string) [][]int {
 	if len(args) != 1 {
 		panic(fmt.Sprintf("parse clone-graph input: got %d arguments, want 1", len(args)))
 	}
-	var edges [][]int
-	argumentError0 := json.Unmarshal(args[0], &edges)
+	node, argumentError0 := decodeGraph(args[0])
 	if argumentError0 != nil {
 		panic(fmt.Errorf("parse clone-graph argument edges: %w", argumentError0))
 	}
-	return edges
+	return node
+}
+
+func decodeGraph(raw json.RawMessage) (*GraphNode, error) {
+	var adjacency [][]int
+	if err := json.Unmarshal(raw, &adjacency); err != nil {
+		return nil, err
+	}
+	if len(adjacency) == 0 {
+		return nil, nil
+	}
+	nodes := make([]*GraphNode, len(adjacency))
+	for index := range nodes {
+		nodes[index] = &GraphNode{Val: index + 1}
+	}
+	for index, neighbors := range adjacency {
+		for _, neighborValue := range neighbors {
+			if neighborValue < 1 || neighborValue > len(nodes) {
+				return nil, fmt.Errorf("node %d has out-of-range neighbor %d", index+1, neighborValue)
+			}
+			nodes[index].Neighbors = append(nodes[index].Neighbors, nodes[neighborValue-1])
+		}
+	}
+	return nodes[0], nil
+}
+
+func formatCloneGraphOutput(node *GraphNode) string {
+	if node == nil {
+		return `[]`
+	}
+	adjacency := make([][]int, 0)
+	seen := make(map[*GraphNode]bool)
+	queue := []*GraphNode{node}
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:]
+		if seen[current] {
+			continue
+		}
+		seen[current] = true
+		for len(adjacency) < current.Val {
+			adjacency = append(adjacency, nil)
+		}
+		for _, neighbor := range current.Neighbors {
+			adjacency[current.Val-1] = append(adjacency[current.Val-1], neighbor.Val)
+			if !seen[neighbor] {
+				queue = append(queue, neighbor)
+			}
+		}
+	}
+	for index := range adjacency {
+		if adjacency[index] == nil {
+			adjacency[index] = []int{}
+		}
+	}
+	output, err := json.Marshal(adjacency)
+	if err != nil {
+		panic(fmt.Errorf("format clone-graph output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumCloneGraphCase() testrunner.Case {
+	adjacency := make([][]int, 100)
+	for index := range adjacency {
+		previous := (index+99)%100 + 1
+		next := (index+1)%100 + 1
+		adjacency[index] = []int{previous, next}
+	}
+	input, err := json.Marshal([]any{adjacency})
+	if err != nil {
+		panic(fmt.Errorf("build maximum clone-graph input: %w", err))
+	}
+	want, err := json.Marshal(adjacency)
+	if err != nil {
+		panic(fmt.Errorf("build maximum clone-graph output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum-node cycle", Input: string(input), Want: string(want)}
 }
 
 // sampleCases contains the examples that every registered solution must pass.
@@ -129,6 +210,17 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[2],[1,3],[2]]]`,
 		Want:  `[[2],[1,3],[2]]`,
 	},
+	{
+		Name:  "Additional: Three-node complete graph",
+		Input: `[[[2,3],[1,3],[1,2]]]`,
+		Want:  `[[2,3],[1,3],[1,2]]`,
+	},
+	{
+		Name:  "Adversarial: Cycle requires visited-node tracking",
+		Input: `[[[2,3],[1,3],[1,2,4],[3]]]`,
+		Want:  `[[2,3],[1,3],[1,2,4],[3]]`,
+	},
+	maximumCloneGraphCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

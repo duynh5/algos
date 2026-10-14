@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -81,6 +82,27 @@ func parse3sumInput(input string) []int {
 	return nums
 }
 
+func format3sumOutput(triplets [][]int) string {
+	normalized := make([][]int, len(triplets))
+	for index, triplet := range triplets {
+		normalized[index] = append([]int(nil), triplet...)
+		sort.Ints(normalized[index])
+	}
+	sort.Slice(normalized, func(left, right int) bool {
+		for index := 0; index < len(normalized[left]) && index < len(normalized[right]); index++ {
+			if normalized[left][index] != normalized[right][index] {
+				return normalized[left][index] < normalized[right][index]
+			}
+		}
+		return len(normalized[left]) < len(normalized[right])
+	})
+	output, err := json.Marshal(normalized)
+	if err != nil {
+		panic(fmt.Errorf("format 3sum output: %w", err))
+	}
+	return string(output)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -113,6 +135,36 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: No zero-sum triplet",
 		Input: `[[1,2,3,4]]`,
 		Want:  `[]`,
+	},
+	{
+		Name:  "Additional: Minimum length has one triplet",
+		Input: `[[-1,0,1]]`,
+		Want:  `[[-1,0,1]]`,
+	},
+	{
+		Name:  "Additional: All-negative input has no solution",
+		Input: `[[-4,-3,-2,-1]]`,
+		Want:  `[]`,
+	},
+	{
+		Name:  "Boundary: Value extremes cancel with zero",
+		Input: `[[100000,-100000,0]]`,
+		Want:  `[[-100000,0,100000]]`,
+	},
+	{
+		Name:  "Adversarial: Heavy duplicates produce four unique triplets",
+		Input: `[[-4,-2,-2,-2,0,1,2,2,2,4]]`,
+		Want:  `[[-4,0,4],[-4,2,2],[-2,-2,4],[-2,0,2]]`,
+	},
+	{
+		Name:  "Adversarial: Zero triplet coexists with a mixed triplet",
+		Input: `[[-1,0,0,0,1]]`,
+		Want:  `[[-1,0,1],[0,0,0]]`,
+	},
+	{
+		Name:  "Additional: Several distinct pairs complete different anchors",
+		Input: `[[-2,-1,0,1,2,3]]`,
+		Want:  `[[-2,-1,3],[-2,0,2],[-1,0,1]]`,
 	},
 }
 

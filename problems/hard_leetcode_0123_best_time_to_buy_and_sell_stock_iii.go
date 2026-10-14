@@ -80,6 +80,24 @@ func parseBestTimeToBuyAndSellStockIiiInput(input string) []int {
 	return prices
 }
 
+func makeMaximumBestTimeToBuyAndSellStockIiiCase() testrunner.Case {
+	prices := make([]int, 100000)
+	for index := range prices {
+		if index%2 == 1 {
+			prices[index] = 100000
+		}
+	}
+	input, err := json.Marshal([]any{prices})
+	if err != nil {
+		panic(fmt.Errorf("build best-time-to-buy-and-sell-stock-iii input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum alternating prices still allow only two trades",
+		Input: string(input),
+		Want:  `200000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -113,6 +131,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,5,2,8]]`,
 		Want:  `10`,
 	},
+	{
+		Name:  "Additional: Flat prices",
+		Input: `[[5,5,5,5]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Best two among three rises",
+		Input: `[[0,5,0,100,0,6]]`,
+		Want:  `106`,
+	},
+	{
+		Name:  "Additional: Second buy follows first sale",
+		Input: `[[1,4,2,8]]`,
+		Want:  `9`,
+	},
+	{
+		Name:  "Additional: Price boundaries",
+		Input: `[[100000,0,100000]]`,
+		Want:  `100000`,
+	},
+	makeMaximumBestTimeToBuyAndSellStockIiiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -73,6 +73,24 @@ func parseBestTimeToBuyAndSellStockInput(input string) []int {
 	return prices
 }
 
+func maximumBestTimeToBuyAndSellStockCase() testrunner.Case {
+	prices := make([]int, 100000)
+	for index := range prices {
+		prices[index] = 5000
+	}
+	prices[0] = 0
+	prices[len(prices)-1] = 10000
+	input, err := json.Marshal([]any{prices})
+	if err != nil {
+		panic(fmt.Errorf("build maximum stock case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum day count and profit",
+		Input: string(input),
+		Want:  `10000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -101,6 +119,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[3,3,3]]`,
 		Want:  `0`,
 	},
+	{
+		Name:  "Additional: Better opportunity follows early profit",
+		Input: `[[2,4,1,7]]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Repeated lowest price",
+		Input: `[[5,1,1,5]]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Adversarial: Best buy occurs near end",
+		Input: `[[8,7,6,1,10]]`,
+		Want:  `9`,
+	},
+	{
+		Name:  "Boundary: Minimum then maximum price",
+		Input: `[[0,10000]]`,
+		Want:  `10000`,
+	},
+	{
+		Name:  "Boundary: Maximum precedes minimum",
+		Input: `[[10000,0]]`,
+		Want:  `0`,
+	},
+	maximumBestTimeToBuyAndSellStockCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -79,6 +79,24 @@ func parseBestTimeToBuyAndSellStockIvInput(input string) (int, []int) {
 	return k, prices
 }
 
+func makeMaximumBestTimeToBuyAndSellStockIvCase() testrunner.Case {
+	prices := make([]int, 1000)
+	for index := range prices {
+		if index%2 == 1 {
+			prices[index] = 1000
+		}
+	}
+	input, err := json.Marshal([]any{100, prices})
+	if err != nil {
+		panic(fmt.Errorf("build best-time-to-buy-and-sell-stock-iv input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum transaction budget on maximum-length prices",
+		Input: string(input),
+		Want:  `100000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -107,6 +125,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[3,[5,4,3,2]]`,
 		Want:  `0`,
 	},
+	{
+		Name:  "Additional: One transaction spans local dip",
+		Input: `[1,[1,5,2,10]]`,
+		Want:  `9`,
+	},
+	{
+		Name:  "Additional: Limited budget selects best rises",
+		Input: `[2,[1,10,2,9,3,8]]`,
+		Want:  `16`,
+	},
+	{
+		Name:  "Additional: Flat prices",
+		Input: `[100,[7,7,7,7]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Price boundaries",
+		Input: `[1,[1000,0,1000]]`,
+		Want:  `1000`,
+	},
+	makeMaximumBestTimeToBuyAndSellStockIvCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

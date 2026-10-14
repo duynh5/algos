@@ -100,6 +100,43 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 	return dummy.Next, nil
 }
 
+func formatReverseLinkedListIiOutput(head *ListNode) string {
+	values := make([]int, 0)
+	for node := head; node != nil; node = node.Next {
+		if len(values) == 500 {
+			panic("format reverse-linked-list-ii output: list exceeds 500 nodes or contains a cycle")
+		}
+		values = append(values, node.Val)
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format reverse-linked-list-ii output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumReverseLinkedListIiCase() testrunner.Case {
+	values := make([]int, 500)
+	wantValues := make([]int, 500)
+	for index := range values {
+		values[index] = -500 + index
+		wantValues[index] = -1 - index
+	}
+	input, err := json.Marshal([]any{values, 1, 500})
+	if err != nil {
+		panic(fmt.Errorf("build maximum reverse-linked-list-ii input: %w", err))
+	}
+	want, err := json.Marshal(wantValues)
+	if err != nil {
+		panic(fmt.Errorf("build maximum reverse-linked-list-ii output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum list is reversed from first through last node",
+		Input: string(input),
+		Want:  string(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -123,6 +160,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3],2,2]`,
 		Want:  `[1,2,3]`,
 	},
+	{
+		Name:  "Additional: Reverse a proper prefix",
+		Input: `[[1,2,3,4,5],1,3]`,
+		Want:  `[3,2,1,4,5]`,
+	},
+	{
+		Name:  "Additional: Reverse a proper suffix",
+		Input: `[[1,2,3,4,5],3,5]`,
+		Want:  `[1,2,5,4,3]`,
+	},
+	{
+		Name:  "Adversarial: Reverse only the two middle nodes",
+		Input: `[[1,2,3,4],2,3]`,
+		Want:  `[1,3,2,4]`,
+	},
+	{
+		Name:  "Minimum: Reverse a two-node list",
+		Input: `[[1,2],1,2]`,
+		Want:  `[2,1]`,
+	},
+	{
+		Name:  "Boundary: Reverse signed value limits",
+		Input: `[[-500,0,500],1,3]`,
+		Want:  `[500,0,-500]`,
+	},
+	maximumReverseLinkedListIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

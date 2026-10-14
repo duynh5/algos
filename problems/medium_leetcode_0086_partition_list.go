@@ -93,6 +93,46 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 	return dummy.Next, nil
 }
 
+func formatPartitionListOutput(head *ListNode) string {
+	values := make([]int, 0)
+	for node := head; node != nil; node = node.Next {
+		if len(values) == 200 {
+			panic("format partition-list output: list exceeds 200 nodes or contains a cycle")
+		}
+		values = append(values, node.Val)
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format partition-list output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumPartitionListCase() testrunner.Case {
+	values := make([]int, 0, 200)
+	wantValues := make([]int, 0, 200)
+	for offset := 0; offset < 100; offset++ {
+		values = append(values, -100+offset, 1+offset)
+		wantValues = append(wantValues, -100+offset)
+	}
+	for value := 1; value <= 100; value++ {
+		wantValues = append(wantValues, value)
+	}
+	input, err := json.Marshal([]any{values, 0})
+	if err != nil {
+		panic(fmt.Errorf("build maximum partition-list input: %w", err))
+	}
+	want, err := json.Marshal(wantValues)
+	if err != nil {
+		panic(fmt.Errorf("build maximum partition-list output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum alternating list preserves both partition orders",
+		Input: string(input),
+		Want:  string(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -121,6 +161,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[2,1,2],2]`,
 		Want:  `[1,2,2]`,
 	},
+	{
+		Name:  "Additional: All nodes at or above partition",
+		Input: `[[3,4,3],3]`,
+		Want:  `[3,4,3]`,
+	},
+	{
+		Name:  "Additional: Singleton list",
+		Input: `[[1],1]`,
+		Want:  `[1]`,
+	},
+	{
+		Name:  "Adversarial: Partitioning is stable rather than sorting",
+		Input: `[[3,1,2,4,0],3]`,
+		Want:  `[1,2,0,3,4]`,
+	},
+	{
+		Name:  "Boundary: Minimum pivot leaves every node on the right",
+		Input: `[[-100,0,100],-200]`,
+		Want:  `[-100,0,100]`,
+	},
+	{
+		Name:  "Boundary: Maximum pivot leaves every node on the left",
+		Input: `[[-100,0,100],200]`,
+		Want:  `[-100,0,100]`,
+	},
+	maximumPartitionListCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

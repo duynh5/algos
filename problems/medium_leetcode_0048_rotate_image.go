@@ -70,6 +70,33 @@ func parseRotateImageInput(input string) [][]int {
 	return matrix
 }
 
+func formatRotateImageOutput(matrix [][]int) string {
+	output, err := json.Marshal(matrix)
+	if err != nil {
+		panic(fmt.Errorf("format rotate-image output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumRotateImageCase() testrunner.Case {
+	matrix := make([][]int, 20)
+	for row := range matrix {
+		matrix[row] = make([]int, 20)
+		for column := range matrix[row] {
+			matrix[row][column] = -1000
+		}
+	}
+	input, err := json.Marshal([]any{matrix})
+	if err != nil {
+		panic(fmt.Errorf("build maximum rotate-image input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum matrix of minimum values is rotation-invariant",
+		Input: string(input),
+		Want:  formatRotateImageOutput(matrix),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -93,6 +120,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[1,2],[3,4]]]`,
 		Want:  `[[3,1],[4,2]]`,
 	},
+	{
+		Name:  "Boundary: Two by two includes signed value limits",
+		Input: `[[[-1000,0],[1,1000]]]`,
+		Want:  `[[1,-1000],[1000,0]]`,
+	},
+	{
+		Name:  "Additional: Negative values rotate clockwise around the center",
+		Input: `[[[-1,-2,-3],[-4,-5,-6],[-7,-8,-9]]]`,
+		Want:  `[[-7,-4,-1],[-8,-5,-2],[-9,-6,-3]]`,
+	},
+	{
+		Name:  "Adversarial: Repeated values still move by position",
+		Input: `[[[1,1,2],[3,4,2],[3,4,4]]]`,
+		Want:  `[[3,3,1],[4,4,1],[4,2,2]]`,
+	},
+	maximumRotateImageCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

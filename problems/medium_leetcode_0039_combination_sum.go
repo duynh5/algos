@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -88,6 +89,43 @@ func parseCombinationSumInput(input string) ([]int, int) {
 	return candidates, target
 }
 
+func formatCombinationSumOutput(combinations [][]int) string {
+	normalized := make([][]int, len(combinations))
+	for index, combination := range combinations {
+		normalized[index] = append([]int(nil), combination...)
+		sort.Ints(normalized[index])
+	}
+	sort.Slice(normalized, func(left, right int) bool {
+		for index := 0; index < len(normalized[left]) && index < len(normalized[right]); index++ {
+			if normalized[left][index] != normalized[right][index] {
+				return normalized[left][index] < normalized[right][index]
+			}
+		}
+		return len(normalized[left]) < len(normalized[right])
+	})
+	output, err := json.Marshal(normalized)
+	if err != nil {
+		panic(fmt.Errorf("format combination-sum output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumCombinationSumCandidatesCase() testrunner.Case {
+	candidates := make([]int, 30)
+	for index := range candidates {
+		candidates[index] = index + 2
+	}
+	input, err := json.Marshal([]any{candidates, 1})
+	if err != nil {
+		panic(fmt.Errorf("build maximum combination-sum candidates case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum candidate count with minimum target",
+		Input: string(input),
+		Want:  `[]`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -107,11 +145,6 @@ var sampleCases = []testrunner.Case{
 		Want:  `[]`,
 	},
 	{
-		Name:  "Additional: Target below every candidate",
-		Input: `[[2],1]`,
-		Want:  `[]`,
-	},
-	{
 		Name:  "Additional: One repeated candidate",
 		Input: `[[2],4]`,
 		Want:  `[[2,2]]`,
@@ -121,6 +154,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[3,5],5]`,
 		Want:  `[[5]]`,
 	},
+	{
+		Name:  "Additional: Candidate order does not affect combinations",
+		Input: `[[7,2,3,6],7]`,
+		Want:  `[[2,2,3],[7]]`,
+	},
+	{
+		Name:  "Additional: Exact candidate coexists with repeated choices",
+		Input: `[[2,3,5],7]`,
+		Want:  `[[2,2,3],[2,5]]`,
+	},
+	{
+		Name:  "Additional: Several branches reach the same target",
+		Input: `[[8,7,4,3],11]`,
+		Want:  `[[3,4,4],[3,8],[4,7]]`,
+	},
+	{
+		Name:  "Boundary: Maximum target requires deep repeated use",
+		Input: `[[2],40]`,
+		Want:  `[[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]]`,
+	},
+	{
+		Name:  "Boundary: Maximum candidate exactly matches maximum target",
+		Input: `[[40],40]`,
+		Want:  `[[40]]`,
+	},
+	maximumCombinationSumCandidatesCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

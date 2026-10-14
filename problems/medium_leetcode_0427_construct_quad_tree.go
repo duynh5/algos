@@ -91,6 +91,12 @@ Constraints:
 //
 // This intentionally unsolved practice archive follows the workbench template.
 
+type QuadNode struct {
+	Val                                        bool
+	IsLeaf                                     bool
+	TopLeft, TopRight, BottomLeft, BottomRight *QuadNode
+}
+
 func parseConstructQuadTreeInput(input string) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
@@ -105,6 +111,54 @@ func parseConstructQuadTreeInput(input string) [][]int {
 		panic(fmt.Errorf("parse construct-quad-tree argument grid: %w", argumentError0))
 	}
 	return grid
+}
+
+func formatConstructQuadTreeOutput(root *QuadNode) string {
+	if root == nil {
+		return `[]`
+	}
+	values := make([]any, 0)
+	queue := []*QuadNode{root}
+	for len(queue) > 0 {
+		node := queue[0]
+		queue = queue[1:]
+		if node == nil {
+			values = append(values, nil)
+			continue
+		}
+		value := 0
+		if node.IsLeaf && node.Val || !node.IsLeaf {
+			value = 1
+		}
+		leaf := 0
+		if node.IsLeaf {
+			leaf = 1
+			queue = append(queue, nil, nil, nil, nil)
+		} else {
+			queue = append(queue, node.TopLeft, node.TopRight, node.BottomLeft, node.BottomRight)
+		}
+		values = append(values, [2]int{leaf, value})
+	}
+	for len(values) > 0 && values[len(values)-1] == nil {
+		values = values[:len(values)-1]
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format construct-quad-tree output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumConstructQuadTreeCase() testrunner.Case {
+	grid := make([][]int, 64)
+	for row := range grid {
+		grid[row] = make([]int, 64)
+	}
+	input, err := json.Marshal([]any{grid})
+	if err != nil {
+		panic(fmt.Errorf("build maximum construct-quad-tree input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum uniform grid collapses to one leaf", Input: string(input), Want: `[[1,0]]`}
 }
 
 // sampleCases contains the examples that every registered solution must pass.
@@ -135,6 +189,17 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[1,1],[1,1]]]`,
 		Want:  `[[1,1]]`,
 	},
+	{
+		Name:  "Additional: Four uniform quadrants",
+		Input: `[[[1,1,0,0],[1,1,0,0],[0,0,1,1],[0,0,1,1]]]`,
+		Want:  `[[0,1],[1,1],[1,0],[1,0],[1,1]]`,
+	},
+	{
+		Name:  "Adversarial: Only the top-left quadrant subdivides",
+		Input: `[[[0,1,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]]]`,
+		Want:  `[[0,1],[0,1],[1,0],[1,0],[1,0],[1,0],[1,1],[1,1],[1,0]]`,
+	},
+	maximumConstructQuadTreeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

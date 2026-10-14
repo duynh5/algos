@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -64,6 +65,53 @@ func parseGenerateParenthesesInput(input string) int {
 	return n
 }
 
+func formatGenerateParenthesesOutput(combinations []string) string {
+	sorted := append([]string(nil), combinations...)
+	sort.Strings(sorted)
+	encoded, err := json.Marshal(sorted)
+	if err != nil {
+		panic(fmt.Errorf("format generate-parentheses output: %w", err))
+	}
+	return string(encoded)
+}
+
+func makeMaximumGenerateParenthesesCase() testrunner.Case {
+	type state struct {
+		value       string
+		open, close int
+	}
+	const pairs = 8
+	stack := []state{{}}
+	combinations := make([]string, 0, 1430)
+	for len(stack) > 0 {
+		last := len(stack) - 1
+		current := stack[last]
+		stack = stack[:last]
+		if len(current.value) == 2*pairs {
+			combinations = append(combinations, current.value)
+			continue
+		}
+		if current.close < current.open {
+			stack = append(stack, state{value: current.value + ")", open: current.open, close: current.close + 1})
+		}
+		if current.open < pairs {
+			stack = append(stack, state{value: current.value + "(", open: current.open + 1, close: current.close})
+		}
+	}
+	if len(combinations) != 1430 {
+		panic(fmt.Sprintf("build generate-parentheses output: got %d combinations, want 1430", len(combinations)))
+	}
+	expected, err := json.Marshal(combinations)
+	if err != nil {
+		panic(fmt.Errorf("build generate-parentheses output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum pair count",
+		Input: `[8]`,
+		Want:  string(expected),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -78,15 +126,16 @@ var sampleCases = []testrunner.Case{
 		Want:  `["()"]`,
 	},
 	{
-		Name:  "Additional: Minimum pair",
-		Input: `[1]`,
-		Want:  `["()"]`,
-	},
-	{
 		Name:  "Additional: Two pairs",
 		Input: `[2]`,
 		Want:  `["(())","()()"]`,
 	},
+	{
+		Name:  "Additional: Four pairs cover every nesting transition",
+		Input: `[4]`,
+		Want:  `["(((())))","((()()))","((())())","((()))()","(()(()))","(()()())","(()())()","(())(())","(())()()","()((()))","()(()())","()(())()","()()(())","()()()()"]`,
+	},
+	makeMaximumGenerateParenthesesCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

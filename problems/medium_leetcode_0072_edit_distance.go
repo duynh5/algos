@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -89,6 +90,20 @@ func parseEditDistanceInput(input string) (string, string) {
 	return word1, word2
 }
 
+func maximumEditDistanceCase() testrunner.Case {
+	word1 := strings.Repeat("a", 500)
+	word2 := strings.Repeat("b", 500)
+	input, err := json.Marshal([]any{word1, word2})
+	if err != nil {
+		panic(fmt.Errorf("build maximum edit-distance input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length disjoint words replace every character",
+		Input: string(input),
+		Want:  `500`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -117,6 +132,37 @@ var sampleCases = []testrunner.Case{
 		Input: `["algorithm","algorithm"]`,
 		Want:  `0`,
 	},
+	{
+		Name:  "Additional: Insert every character",
+		Input: `["","abc"]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Minimum: One replacement",
+		Input: `["a","b"]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Insert in the middle",
+		Input: `["ac","abc"]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Adversarial: Transposition requires two permitted operations",
+		Input: `["ab","ba"]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Repeated characters need one deletion",
+		Input: `["aaaa","aaa"]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Long common prefix and suffix isolate one replacement",
+		Input: `["abcxdef","abcydef"]`,
+		Want:  `1`,
+	},
+	maximumEditDistanceCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

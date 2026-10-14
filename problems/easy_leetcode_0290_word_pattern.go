@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -103,6 +104,24 @@ func parseWordPatternInput(input string) (string, string) {
 	return pattern, s
 }
 
+func maximumWordPatternCase() testrunner.Case {
+	pattern := strings.Repeat("abc", 100)
+	words := make([]string, len(pattern))
+	mapping := []string{"alphaaaaa", "betabbbbb", "gammacccc"}
+	for index := range words {
+		words[index] = mapping[index%len(mapping)]
+	}
+	input, err := json.Marshal([]any{pattern, strings.Join(words, " ")})
+	if err != nil {
+		panic(fmt.Errorf("build maximum word-pattern case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum pattern length with near-maximum sentence",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -136,6 +155,27 @@ var sampleCases = []testrunner.Case{
 		Input: `["ab","dog dog"]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: One pattern letter maps to two words",
+		Input: `["aa","dog cat"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Pattern has more letters than words",
+		Input: `["ab","dog"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Distinct letters map to distinct words",
+		Input: `["abc","dog cat fish"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Repeated palindrome pattern remains consistent",
+		Input: `["abcba","one two three two one"]`,
+		Want:  `true`,
+	},
+	maximumWordPatternCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

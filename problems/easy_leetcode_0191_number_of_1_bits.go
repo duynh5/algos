@@ -119,6 +119,31 @@ var sampleCases = []testrunner.Case{
 		Input: `[1431655765]`,
 		Want:  `16`,
 	},
+	{
+		Name:  "Additional: Ten contiguous low bits",
+		Input: `[1023]`,
+		Want:  `10`,
+	},
+	{
+		Name:  "Additional: Power of two after dense run",
+		Input: `[1024]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Sparse high and low bits",
+		Input: `[1073741825]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Adversarial: Alternating bits ending in zero",
+		Input: `[1431655764]`,
+		Want:  `15`,
+	},
+	{
+		Name:  "Boundary: Maximum value without low bit",
+		Input: `[2147483646]`,
+		Want:  `30`,
+	},
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

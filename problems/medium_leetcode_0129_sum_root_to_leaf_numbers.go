@@ -119,6 +119,15 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumSumRootToLeafNumbersCase() testrunner.Case {
+	values := make([]int, 1000)
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum sum-root-to-leaf-numbers input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum-node zero tree", Input: string(input), Want: `0`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -147,6 +156,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[9,1,2]]`,
 		Want:  `183`,
 	},
+	{
+		Name:  "Additional: Leading zeroes preserve later digits",
+		Input: `[[0,1,2,3,4]]`,
+		Want:  `29`,
+	},
+	{
+		Name:  "Adversarial: Internal node is not counted as a leaf",
+		Input: `[[1,2,3,4]]`,
+		Want:  `137`,
+	},
+	{
+		Name:  "Boundary: Maximum depth with a 32-bit-safe path value",
+		Input: `[[2,0,null,0,null,0,null,0,null,0,null,0,null,0,null,0,null,0]]`,
+		Want:  `2000000000`,
+	},
+	{
+		Name:  "Additional: Leaves at different depths",
+		Input: `[[1,2,3,null,4]]`,
+		Want:  `137`,
+	},
+	maximumSumRootToLeafNumbersCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

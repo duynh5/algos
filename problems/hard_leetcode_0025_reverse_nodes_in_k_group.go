@@ -97,6 +97,46 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 	return dummy.Next, nil
 }
 
+func formatReverseNodesInKGroupOutput(head *ListNode) string {
+	values := make([]int, 0)
+	for head != nil && len(values) < 5000 {
+		values = append(values, head.Val)
+		head = head.Next
+	}
+	if head != nil {
+		panic("format reverse-nodes-in-k-group output: list exceeds 5000 nodes or contains a cycle")
+	}
+	encoded, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format reverse-nodes-in-k-group output: %w", err))
+	}
+	return string(encoded)
+}
+
+func makeReverseNodesInKGroupCase(name string, values []int, k int, want []int) testrunner.Case {
+	input, err := json.Marshal([]any{values, k})
+	if err != nil {
+		panic(fmt.Errorf("build reverse-nodes-in-k-group input: %w", err))
+	}
+	expected, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build reverse-nodes-in-k-group output: %w", err))
+	}
+	return testrunner.Case{Name: name, Input: string(input), Want: string(expected)}
+}
+
+func makeMaximumReverseNodesInKGroupCase() testrunner.Case {
+	values := make([]int, 5000)
+	want := make([]int, 5000)
+	for index := range values {
+		values[index] = index % 1001
+	}
+	for index := range values {
+		want[index] = values[len(values)-1-index]
+	}
+	return makeReverseNodesInKGroupCase("Additional: Constraint maximum single group", values, len(values), want)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -125,6 +165,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,4,5],3]`,
 		Want:  `[3,2,1,4,5]`,
 	},
+	{
+		Name:  "Additional: Minimum list with reversal",
+		Input: `[[0,1000],2]`,
+		Want:  `[1000,0]`,
+	},
+	{
+		Name:  "Additional: Several complete groups",
+		Input: `[[1,2,3,4,5,6],2]`,
+		Want:  `[2,1,4,3,6,5]`,
+	},
+	{
+		Name:  "Additional: Group just smaller than list",
+		Input: `[[1,2,3,4,5,6],5]`,
+		Want:  `[5,4,3,2,1,6]`,
+	},
+	{
+		Name:  "Additional: Duplicate values do not identify nodes",
+		Input: `[[7,7,8,8,7],2]`,
+		Want:  `[7,7,8,8,7]`,
+	},
+	makeMaximumReverseNodesInKGroupCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

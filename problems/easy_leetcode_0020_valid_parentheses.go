@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -94,6 +95,19 @@ func parseValidParenthesesInput(input string) string {
 	return s
 }
 
+func maximumValidParenthesesCase() testrunner.Case {
+	value := strings.Repeat("(", 5000) + strings.Repeat(")", 5000)
+	input, err := json.Marshal([]any{value})
+	if err != nil {
+		panic(fmt.Errorf("build maximum valid-parentheses case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length valid nesting",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -133,10 +147,41 @@ var sampleCases = []testrunner.Case{
 		Want:  `true`,
 	},
 	{
-		Name:  "Additional: Correct counts but crossed order",
-		Input: `["([)]"]`,
+		Name:  "Additional: Minimum unmatched closer",
+		Input: `["]"]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: Deep same-type nesting",
+		Input: `["[[[]]]"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Concatenated nested groups",
+		Input: `["([]){}[()]"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Extra closer after valid prefix",
+		Input: `["()]"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Unclosed opener after valid prefix",
+		Input: `["()[]{"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Correct totals but wrong nested type",
+		Input: `["{[}]"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Odd length cannot close",
+		Input: `["(()"]`,
+		Want:  `false`,
+	},
+	maximumValidParenthesesCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

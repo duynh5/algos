@@ -106,7 +106,7 @@ var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
 		Input: `[["BSTIterator","next","next","hasNext","next","hasNext","next","hasNext","next","hasNext"],[[[7,3,15,null,null,9,20]],[],[],[],[],[],[],[],[],[]]]`,
-		Want:  `[null, 3, 7, true, 9, true, 15, true, 20, false]`,
+		Want:  `[null,3,7,true,9,true,15,true,20,false]`,
 	},
 	{
 		Name:  "Additional: Single-node iterator",
@@ -117,6 +117,31 @@ var sampleCases = []testrunner.Case{
 		Name:  "Additional: Right-skewed iterator",
 		Input: `[["BSTIterator","next","next","next","hasNext"],[[[1,null,2,null,3]],[],[],[],[]]]`,
 		Want:  `[null,1,2,3,false]`,
+	},
+	{
+		Name:  "Additional: Left-skewed iterator",
+		Input: `[["BSTIterator","hasNext","hasNext","next","next","next","hasNext"],[[[3,2,null,1]],[],[],[],[],[],[]]]`,
+		Want:  `[null,true,true,1,2,3,false]`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum node values",
+		Input: `[["BSTIterator","next","next","next","hasNext"],[[[2,0,1000000]],[],[],[],[]]]`,
+		Want:  `[null,0,2,1000000,false]`,
+	},
+	{
+		Name:  "Additional: Complete balanced tree",
+		Input: `[["BSTIterator","next","next","next","next","next","next","next","hasNext"],[[[4,2,6,1,3,5,7]],[],[],[],[],[],[],[],[]]]`,
+		Want:  `[null,1,2,3,4,5,6,7,false]`,
+	},
+	{
+		Name:  "Additional: Right subtree contains a left chain",
+		Input: `[["BSTIterator","next","hasNext","next","next","hasNext","next","hasNext"],[[[5,null,8,6,null,null,7]],[],[],[],[],[],[],[]]]`,
+		Want:  `[null,5,true,6,7,true,8,false]`,
+	},
+	{
+		Name:  "Additional: Repeated hasNext after exhaustion",
+		Input: `[["BSTIterator","next","hasNext","hasNext"],[[[42]],[],[],[]]]`,
+		Want:  `[null,42,false,false]`,
 	},
 }
 

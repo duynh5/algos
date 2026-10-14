@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -96,6 +97,24 @@ func parseDesignAddAndSearchWordsDataStructureInput(input string) ([]string, [][
 	return operations, arguments
 }
 
+func maximumLengthWordDictionaryCase() testrunner.Case {
+	word := strings.Repeat("a", 25)
+	twoWildcardQuery := "." + strings.Repeat("a", 23) + "."
+	otherWord := strings.Repeat("a", 24) + "b"
+	input, err := json.Marshal([]any{
+		[]string{"WordDictionary", "addWord", "search", "search", "search"},
+		[]any{[]any{}, []any{word}, []any{word}, []any{twoWildcardQuery}, []any{otherWord}},
+	})
+	if err != nil {
+		panic(fmt.Errorf("build maximum-length word-dictionary case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length word and two wildcards",
+		Input: string(input),
+		Want:  `[null,null,true,true,false]`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -114,6 +133,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[["WordDictionary","addWord","search","search"],[[],["cat"],["c.t"],["..t"]]]`,
 		Want:  `[null,null,true,true]`,
 	},
+	{
+		Name:  "Additional: Queries before first insertion",
+		Input: `[["WordDictionary","search","addWord","search"],[[],["a"],["a"],["a"]]]`,
+		Want:  `[null,false,null,true]`,
+	},
+	{
+		Name:  "Additional: One-character wildcard",
+		Input: `[["WordDictionary","addWord","search","search"],[[],["a"],["."],["b"]]]`,
+		Want:  `[null,null,true,false]`,
+	},
+	{
+		Name:  "Additional: Wildcards at both ends",
+		Input: `[["WordDictionary","addWord","search","search"],[[],["code"],[".od."],["c..e"]]]`,
+		Want:  `[null,null,true,true]`,
+	},
+	{
+		Name:  "Additional: Wildcard explores sibling branches",
+		Input: `[["WordDictionary","addWord","addWord","addWord","search","search","search"],[[],["bad"],["bed"],["bid"],["b.d"],[".ed"],["b.."]]]`,
+		Want:  `[null,null,null,null,true,true,true]`,
+	},
+	{
+		Name:  "Additional: Duplicate insertion is idempotent",
+		Input: `[["WordDictionary","addWord","addWord","search"],[[],["same"],["same"],["same"]]]`,
+		Want:  `[null,null,null,true]`,
+	},
+	maximumLengthWordDictionaryCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

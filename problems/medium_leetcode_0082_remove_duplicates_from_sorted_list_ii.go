@@ -90,6 +90,37 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 	return dummy.Next, nil
 }
 
+func formatRemoveDuplicatesFromSortedListIiOutput(head *ListNode) string {
+	values := make([]int, 0)
+	for node := head; node != nil; node = node.Next {
+		if len(values) == 300 {
+			panic("format remove-duplicates-from-sorted-list-ii output: list exceeds 300 nodes or contains a cycle")
+		}
+		values = append(values, node.Val)
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format remove-duplicates-from-sorted-list-ii output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumRemoveDuplicatesFromSortedListIiCase() testrunner.Case {
+	values := make([]int, 0, 300)
+	for value := -100; value < 50; value++ {
+		values = append(values, value, value)
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum remove-duplicates-from-sorted-list-ii input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum list removes every duplicated pair",
+		Input: string(input),
+		Want:  formatRemoveDuplicatesFromSortedListIiOutput(nil),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -118,6 +149,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,3]]`,
 		Want:  `[1,2]`,
 	},
+	{
+		Name:  "Additional: Single node remains",
+		Input: `[[1]]`,
+		Want:  `[1]`,
+	},
+	{
+		Name:  "Additional: Duplicate prefix is removed",
+		Input: `[[1,1,2]]`,
+		Want:  `[2]`,
+	},
+	{
+		Name:  "Additional: A run longer than two is removed entirely",
+		Input: `[[1,1,1,2]]`,
+		Want:  `[2]`,
+	},
+	{
+		Name:  "Adversarial: Separate duplicate runs preserve intervening uniques",
+		Input: `[[-100,-100,-99,0,1,1,100]]`,
+		Want:  `[-99,0,100]`,
+	},
+	{
+		Name:  "Boundary: Distinct signed limits remain",
+		Input: `[[-100,0,100]]`,
+		Want:  `[-100,0,100]`,
+	},
+	maximumRemoveDuplicatesFromSortedListIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

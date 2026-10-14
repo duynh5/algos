@@ -118,6 +118,27 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumBinaryTreeRightSideViewCase() testrunner.Case {
+	tree := make([]any, 0, 199)
+	want := make([]int, 100)
+	for index := range want {
+		want[index] = index%201 - 100
+		tree = append(tree, want[index])
+		if index > 0 && index+1 < len(want) {
+			tree = append(tree, nil)
+		}
+	}
+	input, err := json.Marshal([]any{tree})
+	if err != nil {
+		panic(fmt.Errorf("build maximum right-side-view input: %w", err))
+	}
+	output, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum right-side-view output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum left chain exposes every node", Input: string(input), Want: string(output)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -151,6 +172,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,4]]`,
 		Want:  `[1,3,4]`,
 	},
+	{
+		Name:  "Additional: Single extreme-valued node",
+		Input: `[[-100]]`,
+		Want:  `[-100]`,
+	},
+	{
+		Name:  "Adversarial: Deeper left branch outlives the right subtree",
+		Input: `[[1,2,3,4,null,null,null,5]]`,
+		Want:  `[1,3,4,5]`,
+	},
+	{
+		Name:  "Additional: Sparse nodes choose the rightmost present value",
+		Input: `[[1,2,3,null,5,6,null,7]]`,
+		Want:  `[1,3,6,7]`,
+	},
+	maximumBinaryTreeRightSideViewCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -91,6 +91,26 @@ var sampleCases = []testrunner.Case{
 		Want:  `0`,
 	},
 	{
+		Name:  "Additional: Five queens",
+		Input: `[5]`,
+		Want:  `10`,
+	},
+	{
+		Name:  "Additional: Six queens",
+		Input: `[6]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Seven queens",
+		Input: `[7]`,
+		Want:  `40`,
+	},
+	{
+		Name:  "Additional: Eight queens",
+		Input: `[8]`,
+		Want:  `92`,
+	},
+	{
 		Name:  "Additional: Constraint maximum",
 		Input: `[9]`,
 		Want:  `352`,

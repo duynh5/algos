@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -67,6 +68,23 @@ func parseLongestPalindromicSubstringInput(input string) string {
 	return s
 }
 
+func maximumLongestPalindromicSubstringCase() testrunner.Case {
+	s := strings.Repeat("a", 1000)
+	input, err := json.Marshal([]any{s})
+	if err != nil {
+		panic(fmt.Errorf("build maximum longest-palindromic-substring case: %w", err))
+	}
+	want, err := json.Marshal(s)
+	if err != nil {
+		panic(fmt.Errorf("build maximum longest-palindromic-substring output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length is one palindrome",
+		Input: string(input),
+		Want:  string(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -95,6 +113,27 @@ var sampleCases = []testrunner.Case{
 		Input: `["forgeeksskeegfor"]`,
 		Want:  `"geeksskeeg"`,
 	},
+	{
+		Name:  "Additional: Odd palindrome begins at first character",
+		Input: `["racecarx"]`,
+		Want:  `"racecar"`,
+	},
+	{
+		Name:  "Additional: Even palindrome is surrounded",
+		Input: `["xabccbay"]`,
+		Want:  `"abccba"`,
+	},
+	{
+		Name:  "Additional: Even palindrome reaches final character",
+		Input: `["xyzzy"]`,
+		Want:  `"yzzy"`,
+	},
+	{
+		Name:  "Additional: Digits form the unique longest palindrome",
+		Input: `["ab12321cd"]`,
+		Want:  `"12321"`,
+	},
+	maximumLongestPalindromicSubstringCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

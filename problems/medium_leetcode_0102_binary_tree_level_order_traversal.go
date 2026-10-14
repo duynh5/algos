@@ -105,6 +105,27 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumBinaryTreeLevelOrderTraversalCase() testrunner.Case {
+	values := make([]int, 2000)
+	levels := make([][]int, 0, 11)
+	for index := range values {
+		values[index] = index%2001 - 1000
+	}
+	for start, width := 0, 1; start < len(values); start, width = start+width, width*2 {
+		end := min(start+width, len(values))
+		levels = append(levels, values[start:end])
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum binary-tree-level-order-traversal input: %w", err))
+	}
+	want, err := json.Marshal(levels)
+	if err != nil {
+		panic(fmt.Errorf("build maximum binary-tree-level-order-traversal output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum complete-prefix tree", Input: string(input), Want: string(want)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -133,6 +154,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,3,4,5,6,7]]`,
 		Want:  `[[1],[2,3],[4,5,6,7]]`,
 	},
+	{
+		Name:  "Additional: Right-skewed tree",
+		Input: `[[1,null,2,null,3]]`,
+		Want:  `[[1],[2],[3]]`,
+	},
+	{
+		Name:  "Adversarial: Sparse tree retains left-to-right order",
+		Input: `[[1,2,3,null,4,5,null,6]]`,
+		Want:  `[[1],[2,3],[4,5],[6]]`,
+	},
+	{
+		Name:  "Boundary: Duplicate extreme values",
+		Input: `[[1000,-1000,1000,-1000]]`,
+		Want:  `[[1000],[-1000,1000],[-1000]]`,
+	},
+	maximumBinaryTreeLevelOrderTraversalCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

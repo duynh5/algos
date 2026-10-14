@@ -75,6 +75,18 @@ func parseKthLargestElementInAnArrayInput(input string) ([]int, int) {
 	return nums, k
 }
 
+func maximumKthLargestElementInAnArrayCase() testrunner.Case {
+	nums := make([]int, 100000)
+	for index := range nums {
+		nums[index] = index%20001 - 10000
+	}
+	input, err := json.Marshal([]any{nums, 100000})
+	if err != nil {
+		panic(fmt.Errorf("build maximum kth-largest input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum input asks for the minimum", Input: string(input), Want: `-10000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -103,6 +115,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[3,1,2],3]`,
 		Want:  `1`,
 	},
+	{
+		Name:  "Boundary: Largest signed-limit value",
+		Input: `[[-10000,0,10000],1]`,
+		Want:  `10000`,
+	},
+	{
+		Name:  "Adversarial: Rank counts duplicates rather than distinct values",
+		Input: `[[9,9,9,8,7],3]`,
+		Want:  `9`,
+	},
+	{
+		Name:  "Additional: Negative values with repeated pivot rank",
+		Input: `[[-5,-1,-3,-1,-2],2]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Additional: Already descending input",
+		Input: `[[5,4,3,2,1],4]`,
+		Want:  `2`,
+	},
+	maximumKthLargestElementInAnArrayCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

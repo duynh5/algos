@@ -70,6 +70,22 @@ func parseJumpGameInput(input string) []int {
 	return nums
 }
 
+func maximumJumpGameCase() testrunner.Case {
+	nums := make([]int, 10000)
+	for index := range nums {
+		nums[index] = 1
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum jump-game input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length advances one position at a time",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -98,6 +114,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[2,0,0]]`,
 		Want:  `true`,
 	},
+	{
+		Name:  "Minimum: Final zero is reachable",
+		Input: `[[1,0]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Taking the longest immediate jump gets stuck",
+		Input: `[[2,3,0,1,4]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Progress ends at a late zero",
+		Input: `[[2,3,1,1,0,1]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Exact jump lands on final zero",
+		Input: `[[3,0,0,0]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Boundary: Maximum jump value reaches the end",
+		Input: `[[100000,0]]`,
+		Want:  `true`,
+	},
+	maximumJumpGameCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

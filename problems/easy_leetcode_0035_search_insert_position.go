@@ -82,6 +82,22 @@ func parseSearchInsertPositionInput(input string) ([]int, int) {
 	return nums, target
 }
 
+func maximumSearchInsertPositionCase() testrunner.Case {
+	nums := make([]int, 10000)
+	for index := range nums {
+		nums[index] = -10000 + index*2
+	}
+	input, err := json.Marshal([]any{nums, 0})
+	if err != nil {
+		panic(fmt.Errorf("build maximum search-insert-position case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length midpoint match",
+		Input: string(input),
+		Want:  `5000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -115,6 +131,37 @@ var sampleCases = []testrunner.Case{
 		Input: `[[-5,-3,-1],-2]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Additional: Insert after single value",
+		Input: `[[1],2]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Find first element",
+		Input: `[[1,3,5,6],1]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Find final element",
+		Input: `[[1,3,5,6],6]`,
+		Want:  `3`,
+	},
+	{
+		Name:  "Adversarial: Insert between two values",
+		Input: `[[1,3],2]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Boundary: Insert between minimum and maximum values",
+		Input: `[[-10000,10000],0]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Boundary: Find maximum target",
+		Input: `[[-10000,10000],10000]`,
+		Want:  `1`,
+	},
+	maximumSearchInsertPositionCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -130,6 +131,27 @@ func parseSimplifyPathInput(input string) string {
 	return path
 }
 
+func formatSimplifyPathOutput(path string) string {
+	output, err := json.Marshal(path)
+	if err != nil {
+		panic(fmt.Errorf("format simplify-path output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumSimplifyPathCase() testrunner.Case {
+	path := strings.Repeat("/", 3000)
+	input, err := json.Marshal([]any{path})
+	if err != nil {
+		panic(fmt.Errorf("build maximum simplify-path input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-length separator-only path is root",
+		Input: string(input),
+		Want:  formatSimplifyPathOutput("/"),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -168,6 +190,37 @@ var sampleCases = []testrunner.Case{
 		Input: `["/.hidden/.."]`,
 		Want:  `"/"`,
 	},
+	{
+		Name:  "Minimum: Root path",
+		Input: `["/"]`,
+		Want:  `"/"`,
+	},
+	{
+		Name:  "Additional: Separator-only path",
+		Input: `["////"]`,
+		Want:  `"/"`,
+	},
+	{
+		Name:  "Additional: Current and parent segments cancel nested names",
+		Input: `["/a/./b/../../c/"]`,
+		Want:  `"/c"`,
+	},
+	{
+		Name:  "Adversarial: Multi-dot segments other than two dots are names",
+		Input: `["/..hidden/.../..x/...."]`,
+		Want:  `"/..hidden/.../..x/...."`,
+	},
+	{
+		Name:  "Additional: Digits and underscores remain in directory names",
+		Input: `["/a_1//b2/../c_3"]`,
+		Want:  `"/a_1/c_3"`,
+	},
+	{
+		Name:  "Adversarial: Repeated parents above root are ignored",
+		Input: `["/../../../../x"]`,
+		Want:  `"/x"`,
+	},
+	maximumSimplifyPathCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

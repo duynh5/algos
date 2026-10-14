@@ -80,6 +80,38 @@ func parseSetMatrixZeroesInput(input string) [][]int {
 	return matrix
 }
 
+func formatSetMatrixZeroesOutput(matrix [][]int) string {
+	output, err := json.Marshal(matrix)
+	if err != nil {
+		panic(fmt.Errorf("format set-matrix-zeroes output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumSetMatrixZeroesCase() testrunner.Case {
+	matrix := make([][]int, 200)
+	want := make([][]int, 200)
+	for row := range matrix {
+		matrix[row] = make([]int, 200)
+		want[row] = make([]int, 200)
+		for column := range matrix[row] {
+			matrix[row][column] = 2147483647
+		}
+	}
+	for column := range matrix[0] {
+		matrix[0][column] = 0
+	}
+	input, err := json.Marshal([]any{matrix})
+	if err != nil {
+		panic(fmt.Errorf("build maximum set-matrix-zeroes input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum matrix first row zeroes every column",
+		Input: string(input),
+		Want:  formatSetMatrixZeroesOutput(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -108,6 +140,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[0,2],[3,4]]]`,
 		Want:  `[[0,0],[0,4]]`,
 	},
+	{
+		Name:  "Additional: Zero in a single row zeroes the whole row",
+		Input: `[[[1,0,3,4]]]`,
+		Want:  `[[0,0,0,0]]`,
+	},
+	{
+		Name:  "Additional: Zero in a single column zeroes the whole column",
+		Input: `[[[1],[0],[3]]]`,
+		Want:  `[[0],[0],[0]]`,
+	},
+	{
+		Name:  "Adversarial: First-row zero marks its column without clearing others",
+		Input: `[[[1,0,3],[4,5,6]]]`,
+		Want:  `[[0,0,0],[4,0,6]]`,
+	},
+	{
+		Name:  "Adversarial: First-column zero marks its row and column",
+		Input: `[[[1,2],[0,4],[5,6]]]`,
+		Want:  `[[0,2],[0,0],[0,6]]`,
+	},
+	{
+		Name:  "Boundary: Nonzero integer limits remain unchanged",
+		Input: `[[[-2147483648,1],[2,2147483647]]]`,
+		Want:  `[[-2147483648,1],[2,2147483647]]`,
+	},
+	maximumSetMatrixZeroesCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

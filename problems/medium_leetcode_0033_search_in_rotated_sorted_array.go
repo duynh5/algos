@@ -88,6 +88,24 @@ func parseSearchInRotatedSortedArrayInput(input string) ([]int, int) {
 	return nums, target
 }
 
+func maximumSearchInRotatedSortedArrayCase() testrunner.Case {
+	const length = 5000
+	const rotation = 1234
+	nums := make([]int, length)
+	for index := range nums {
+		nums[index] = -2500 + (index+rotation)%length
+	}
+	input, err := json.Marshal([]any{nums, -2500})
+	if err != nil {
+		panic(fmt.Errorf("build maximum search-in-rotated-sorted-array case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length finds a target across the rotation",
+		Input: string(input),
+		Want:  `3766`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -112,15 +130,41 @@ var sampleCases = []testrunner.Case{
 		Want:  `0`,
 	},
 	{
-		Name:  "Additional: Single value absent",
-		Input: `[[1],0]`,
-		Want:  `-1`,
-	},
-	{
 		Name:  "Additional: Unrotated array",
 		Input: `[[1,2,3,4],3]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Additional: Target is first value before the pivot",
+		Input: `[[4,5,6,7,0,1,2],4]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Target is final value after the pivot",
+		Input: `[[4,5,6,7,0,1,2],2]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Boundary: Two-element rotation finds the second value",
+		Input: `[[3,1],1]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Rotation by one places minimum last",
+		Input: `[[2,3,4,5,1],1]`,
+		Want:  `4`,
+	},
+	{
+		Name:  "Additional: Near-full rotation places maximum first",
+		Input: `[[5,1,2,3,4],5]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Boundary: Signed value limits",
+		Input: `[[0,10000,-10000],-10000]`,
+		Want:  `2`,
+	},
+	maximumSearchInRotatedSortedArrayCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

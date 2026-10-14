@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -77,6 +78,20 @@ func parseIsSubsequenceInput(input string) (string, string) {
 	return s, t
 }
 
+func maximumIsSubsequenceCase() testrunner.Case {
+	s := strings.Repeat("z", 100)
+	t := strings.Repeat("a", 9900) + s
+	input, err := json.Marshal([]any{s, t})
+	if err != nil {
+		panic(fmt.Errorf("build maximum is-subsequence case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum target length matches at the final positions",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -105,6 +120,32 @@ var sampleCases = []testrunner.Case{
 		Input: `["a",""]`,
 		Want:  `false`,
 	},
+	{
+		Name:  "Additional: Equal strings are subsequences",
+		Input: `["abc","abc"]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Longer candidate cannot be a subsequence",
+		Input: `["abcd","abc"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Adversarial: Enough characters in the wrong order",
+		Input: `["aaaaab","baaaaa"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Repeated matches require distinct positions",
+		Input: `["aaa","aa"]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Noncontiguous characters preserve order",
+		Input: `["ace","abcde"]`,
+		Want:  `true`,
+	},
+	maximumIsSubsequenceCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

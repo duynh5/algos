@@ -78,6 +78,23 @@ func parseContainsDuplicateIiInput(input string) ([]int, int) {
 	return nums, k
 }
 
+func maximumContainsDuplicateIiCase() testrunner.Case {
+	nums := make([]int, 100000)
+	for index := range nums {
+		nums[index] = index
+	}
+	nums[len(nums)-1] = nums[0]
+	input, err := json.Marshal([]any{nums, len(nums) - 1})
+	if err != nil {
+		panic(fmt.Errorf("build maximum contains-duplicate-ii case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum length with farthest possible duplicate",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -111,6 +128,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,2,1],2]`,
 		Want:  `true`,
 	},
+	{
+		Name:  "Boundary: Duplicate one position beyond k",
+		Input: `[[1,2,3,1],2]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Later occurrence creates a qualifying pair",
+		Input: `[[1,2,1,3,1],2]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Additional: Negative and extreme values compare normally",
+		Input: `[[-1000000000,0,1000000000,-1000000000],3]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Boundary: Maximum k with no duplicates",
+		Input: `[[1,2,3],100000]`,
+		Want:  `false`,
+	},
+	maximumContainsDuplicateIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

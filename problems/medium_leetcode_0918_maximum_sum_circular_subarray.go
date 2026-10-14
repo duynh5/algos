@@ -80,6 +80,18 @@ func parseMaximumSumCircularSubarrayInput(input string) []int {
 	return nums
 }
 
+func maximumMaximumSumCircularSubarrayCase() testrunner.Case {
+	nums := make([]int, 30000)
+	for index := range nums {
+		nums[index] = 30000
+	}
+	input, err := json.Marshal([]any{nums})
+	if err != nil {
+		panic(fmt.Errorf("build maximum circular-subarray input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum positive array", Input: string(input), Want: `900000000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -104,15 +116,31 @@ var sampleCases = []testrunner.Case{
 		Want:  `-5`,
 	},
 	{
-		Name:  "Additional: All negative",
-		Input: `[[-3,-2,-3]]`,
-		Want:  `-2`,
+		Name:  "Additional: Single positive value",
+		Input: `[[30000]]`,
+		Want:  `30000`,
 	},
 	{
-		Name:  "Additional: Best subarray wraps",
-		Input: `[[5,-3,5]]`,
+		Name:  "Additional: All positive values use the whole array",
+		Input: `[[1,2,3,4]]`,
 		Want:  `10`,
 	},
+	{
+		Name:  "Adversarial: Wrapped optimum excludes a deep middle loss",
+		Input: `[[8,-1,-3,8]]`,
+		Want:  `16`,
+	},
+	{
+		Name:  "Adversarial: All-negative input must remain non-empty",
+		Input: `[[-30000,-1,-2]]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Boundary: Zero can be the best non-empty subarray",
+		Input: `[[-1,0,-2]]`,
+		Want:  `0`,
+	},
+	maximumMaximumSumCircularSubarrayCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

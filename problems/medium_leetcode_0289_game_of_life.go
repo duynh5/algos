@@ -92,6 +92,36 @@ func parseGameOfLifeInput(input string) [][]int {
 	return board
 }
 
+func formatGameOfLifeOutput(board [][]int) string {
+	output, err := json.Marshal(board)
+	if err != nil {
+		panic(fmt.Errorf("format game-of-life output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumGameOfLifeCase() testrunner.Case {
+	board := make([][]int, 25)
+	want := make([][]int, 25)
+	for row := range board {
+		board[row] = make([]int, 25)
+		want[row] = make([]int, 25)
+		for column := range board[row] {
+			board[row][column] = 1
+		}
+	}
+	want[0][0], want[0][24], want[24][0], want[24][24] = 1, 1, 1, 1
+	input, err := json.Marshal([]any{board})
+	if err != nil {
+		panic(fmt.Errorf("build maximum game-of-life input: %w", err))
+	}
+	output, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum game-of-life output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum all-live board overpopulates except corners", Input: string(input), Want: string(output)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -120,6 +150,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[0,1,0],[0,1,0],[0,1,0]]]`,
 		Want:  `[[0,0,0],[1,1,1],[0,0,0]]`,
 	},
+	{
+		Name:  "Minimum: Single dead cell remains dead",
+		Input: `[[[0]]]`,
+		Want:  `[[0]]`,
+	},
+	{
+		Name:  "Boundary: One-row triplet keeps only its center",
+		Input: `[[[1,1,1]]]`,
+		Want:  `[[0,1,0]]`,
+	},
+	{
+		Name:  "Adversarial: Birth depends on diagonal neighbors",
+		Input: `[[[1,0,1],[0,0,0],[0,1,0]]]`,
+		Want:  `[[0,0,0],[0,1,0],[0,0,0]]`,
+	},
+	{
+		Name:  "Adversarial: Updates must be simultaneous",
+		Input: `[[[1,1,0],[1,0,0],[0,0,0]]]`,
+		Want:  `[[1,1,0],[1,1,0],[0,0,0]]`,
+	},
+	maximumGameOfLifeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

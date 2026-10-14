@@ -102,6 +102,23 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumMinimumAbsoluteDifferenceInBstCase() testrunner.Case {
+	values := make([]any, 0, 19999)
+	values = append(values, 0)
+	for value := 1; value < 10000; value++ {
+		values = append(values, nil, value)
+	}
+	input, err := json.Marshal([]any{values})
+	if err != nil {
+		panic(fmt.Errorf("build maximum minimum-absolute-difference-in-bst case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum-node increasing chain",
+		Input: string(input),
+		Want:  `1`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -130,6 +147,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[10,5,20,3,8,15,30]]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Adversarial: Closest pair crosses a subtree boundary",
+		Input: `[[10,5,20,null,9]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Additional: Closest leaves share an internal ancestor",
+		Input: `[[50,25,75,10,40,60,90,null,null,39,41]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Boundary: Entire value domain with a middle node",
+		Input: `[[50000,0,100000]]`,
+		Want:  `50000`,
+	},
+	{
+		Name:  "Additional: Left-skewed tree",
+		Input: `[[4,3,null,2,null,1]]`,
+		Want:  `1`,
+	},
+	maximumMinimumAbsoluteDifferenceInBstCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

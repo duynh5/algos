@@ -84,6 +84,18 @@ func parseMinimumNumberOfArrowsToBurstBalloonsInput(input string) [][]int {
 	return points
 }
 
+func maximumMinimumNumberOfArrowsToBurstBalloonsCase() testrunner.Case {
+	points := make([][]int, 100000)
+	for index := range points {
+		points[index] = []int{index * 2, index*2 + 1}
+	}
+	input, err := json.Marshal([]any{points})
+	if err != nil {
+		panic(fmt.Errorf("build maximum balloon-arrows input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum disjoint balloons", Input: string(input), Want: `100000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -117,6 +129,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[-2147483648,-1],[0,2147483647]]]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Additional: Nested balloons share one arrow",
+		Input: `[[[1,10],[2,9],[3,8],[4,7]]]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Adversarial: Unsorted intervals require endpoint ordering",
+		Input: `[[[9,12],[1,4],[3,10],[11,15]]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Adversarial: Touching chain cannot all share one arrow",
+		Input: `[[[1,2],[2,3],[3,4]]]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Boundary: Extreme intervals overlap at zero",
+		Input: `[[[-2147483648,0],[0,2147483647]]]`,
+		Want:  `1`,
+	},
+	maximumMinimumNumberOfArrowsToBurstBalloonsCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

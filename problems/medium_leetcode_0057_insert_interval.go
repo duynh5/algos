@@ -88,6 +88,31 @@ func parseInsertIntervalInput(input string) ([][]int, []int) {
 	return intervals, newInterval
 }
 
+func formatInsertIntervalOutput(intervals [][]int) string {
+	output, err := json.Marshal(intervals)
+	if err != nil {
+		panic(fmt.Errorf("format insert-interval output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumInsertIntervalCase() testrunner.Case {
+	intervals := make([][]int, 10000)
+	for index := range intervals {
+		point := index * 2
+		intervals[index] = []int{point, point}
+	}
+	input, err := json.Marshal([]any{intervals, []int{1, 19997}})
+	if err != nil {
+		panic(fmt.Errorf("build maximum insert-interval input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum interval count merges a large middle range",
+		Input: string(input),
+		Want:  formatInsertIntervalOutput([][]int{{0, 0}, {1, 19997}, {19998, 19998}}),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -116,6 +141,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[2,3],[5,7]],[1,8]]`,
 		Want:  `[[1,8]]`,
 	},
+	{
+		Name:  "Additional: Insert after all intervals",
+		Input: `[[[0,1],[3,5]],[7,9]]`,
+		Want:  `[[0,1],[3,5],[7,9]]`,
+	},
+	{
+		Name:  "Adversarial: Integer adjacency without a shared point stays separate",
+		Input: `[[[1,2],[4,5]],[3,3]]`,
+		Want:  `[[1,2],[3,3],[4,5]]`,
+	},
+	{
+		Name:  "Adversarial: New interval touches and bridges both neighbors",
+		Input: `[[[1,2],[5,7]],[2,5]]`,
+		Want:  `[[1,7]]`,
+	},
+	{
+		Name:  "Additional: New interval is contained by an existing interval",
+		Input: `[[[1,10]],[3,4]]`,
+		Want:  `[[1,10]]`,
+	},
+	{
+		Name:  "Boundary: Point intervals at coordinate limits stay separate",
+		Input: `[[[0,0]],[100000,100000]]`,
+		Want:  `[[0,0],[100000,100000]]`,
+	},
+	maximumInsertIntervalCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

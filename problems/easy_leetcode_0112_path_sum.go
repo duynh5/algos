@@ -120,6 +120,23 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumPathSumCase() testrunner.Case {
+	values := make([]any, 0, 9999)
+	values = append(values, 1)
+	for range 4999 {
+		values = append(values, 0, nil)
+	}
+	input, err := json.Marshal([]any{values, 1})
+	if err != nil {
+		panic(fmt.Errorf("build maximum path-sum case: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Five-thousand-node matching path",
+		Input: string(input),
+		Want:  `true`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -153,6 +170,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[-2,null,-3],-5]`,
 		Want:  `true`,
 	},
+	{
+		Name:  "Additional: Single-node path misses",
+		Input: `[[5],0]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Matching path is on right",
+		Input: `[[1,2,3],4]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Zero-valued root is not a leaf",
+		Input: `[[0,1],0]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Positive and negative values cancel",
+		Input: `[[1,-2,-3,1,3,-2,null,-1],-1]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Boundary: Minimum and maximum node values",
+		Input: `[[1000,-1000,1000],0]`,
+		Want:  `true`,
+	},
+	maximumPathSumCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -81,6 +81,20 @@ func parseBestTimeToBuyAndSellStockIiInput(input string) []int {
 	return prices
 }
 
+func maximumBestTimeToBuyAndSellStockIiCase() testrunner.Case {
+	prices := make([]int, 30000)
+	for index := range prices {
+		if index%2 == 1 {
+			prices[index] = 10000
+		}
+	}
+	input, err := json.Marshal([]any{prices})
+	if err != nil {
+		panic(fmt.Errorf("build maximum best-time-to-buy-and-sell-stock-ii input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum alternating prices realize every gain", Input: string(input), Want: `150000000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -114,6 +128,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,3,2,5]]`,
 		Want:  `5`,
 	},
+	{
+		Name:  "Boundary: Zero and maximum price",
+		Input: `[[0,10000]]`,
+		Want:  `10000`,
+	},
+	{
+		Name:  "Adversarial: Plateaus do not interrupt a rising opportunity",
+		Input: `[[1,2,2,3,1,1,4]]`,
+		Want:  `5`,
+	},
+	{
+		Name:  "Adversarial: Multiple valleys and peaks",
+		Input: `[[5,1,4,2,7,0,3]]`,
+		Want:  `11`,
+	},
+	maximumBestTimeToBuyAndSellStockIiCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

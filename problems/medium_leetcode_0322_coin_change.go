@@ -83,6 +83,15 @@ func parseCoinChangeInput(input string) ([]int, int) {
 	return coins, amount
 }
 
+func maximumCoinChangeCase() testrunner.Case {
+	coins := []int{1, 10001, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 2147483647}
+	input, err := json.Marshal([]any{coins, 10000})
+	if err != nil {
+		panic(fmt.Errorf("build maximum coin-change input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum amount and denomination count", Input: string(input), Want: `10000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -107,15 +116,31 @@ var sampleCases = []testrunner.Case{
 		Want:  `0`,
 	},
 	{
-		Name:  "Additional: Unreachable amount",
-		Input: `[[2],3]`,
-		Want:  `-1`,
-	},
-	{
 		Name:  "Additional: Greedy choice is suboptimal",
 		Input: `[[1,3,4],6]`,
 		Want:  `2`,
 	},
+	{
+		Name:  "Additional: Exact denomination uses one coin",
+		Input: `[[2,7,10],10]`,
+		Want:  `1`,
+	},
+	{
+		Name:  "Adversarial: Common divisor cannot make the amount",
+		Input: `[[4,6,10],7]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Boundary: Maximum denomination exceeds the amount",
+		Input: `[[2147483647],10000]`,
+		Want:  `-1`,
+	},
+	{
+		Name:  "Adversarial: Best combination mixes denominations",
+		Input: `[[2,5,10,1],27]`,
+		Want:  `4`,
+	},
+	maximumCoinChangeCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -109,6 +109,21 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func maximumKthSmallestElementInABstCase() testrunner.Case {
+	values := make([]any, 0, 19999)
+	for value := 1; value <= 10000; value++ {
+		values = append(values, value)
+		if value < 10000 {
+			values = append(values, nil)
+		}
+	}
+	input, err := json.Marshal([]any{values, 10000})
+	if err != nil {
+		panic(fmt.Errorf("build maximum kth-smallest-bst input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum right-skewed BST asks for largest rank", Input: string(input), Want: `10000`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -137,6 +152,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[5,3,7,2,4,6,8],4]`,
 		Want:  `5`,
 	},
+	{
+		Name:  "Boundary: Minimum and maximum node values",
+		Input: `[[5000,0,10000],1]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Left-skewed BST",
+		Input: `[[4,3,null,2,null,1],2]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Adversarial: Rank lies inside the right subtree's left branch",
+		Input: `[[5,2,8,1,3,6,9,null,null,null,4],6]`,
+		Want:  `6`,
+	},
+	maximumKthSmallestElementInABstCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -69,6 +69,21 @@ func parseTrappingRainWaterInput(input string) []int {
 	return height
 }
 
+func makeMaximumTrappingRainWaterCase() testrunner.Case {
+	heights := make([]int, 20000)
+	heights[0] = 100000
+	heights[len(heights)-1] = 100000
+	input, err := json.Marshal([]any{heights})
+	if err != nil {
+		panic(fmt.Errorf("build trapping-rain-water input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum-width and maximum-height basin",
+		Input: string(input),
+		Want:  `1999800000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -97,6 +112,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[5,0,5]]`,
 		Want:  `5`,
 	},
+	{
+		Name:  "Additional: Decreasing heights",
+		Input: `[[5,4,3,2,1,0]]`,
+		Want:  `0`,
+	},
+	{
+		Name:  "Additional: Equal-height plateaus",
+		Input: `[[3,3,0,0,3,3]]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Nested basins need changing boundaries",
+		Input: `[[5,2,1,2,1,5]]`,
+		Want:  `14`,
+	},
+	{
+		Name:  "Additional: All zero heights",
+		Input: `[[0,0,0,0]]`,
+		Want:  `0`,
+	},
+	makeMaximumTrappingRainWaterCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -93,6 +94,23 @@ func parseZigzagConversionInput(input string) (string, int) {
 	return s, numRows
 }
 
+func maximumZigzagConversionCase() testrunner.Case {
+	s := strings.Repeat("Ab,.", 250)
+	input, err := json.Marshal([]any{s, 1000})
+	if err != nil {
+		panic(fmt.Errorf("build maximum zigzag-conversion input: %w", err))
+	}
+	want, err := json.Marshal(s)
+	if err != nil {
+		panic(fmt.Errorf("build maximum zigzag-conversion output: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum string and row count preserve order",
+		Input: string(input),
+		Want:  string(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -126,6 +144,32 @@ var sampleCases = []testrunner.Case{
 		Input: `["ABCDE",2]`,
 		Want:  `"ACEBD"`,
 	},
+	{
+		Name:  "Boundary: Row count equals string length",
+		Input: `["ABC",3]`,
+		Want:  `"ABC"`,
+	},
+	{
+		Name:  "Boundary: Row count exceeds string length",
+		Input: `["ABC",4]`,
+		Want:  `"ABC"`,
+	},
+	{
+		Name:  "Additional: Three rows include a diagonal return",
+		Input: `["ABCDE",3]`,
+		Want:  `"AEBDC"`,
+	},
+	{
+		Name:  "Additional: Four rows complete one full cycle",
+		Input: `["ABCDEFG",4]`,
+		Want:  `"AGBFCED"`,
+	},
+	{
+		Name:  "Additional: Punctuation participates in the zigzag",
+		Input: `["A,B.C",3]`,
+		Want:  `"AC,.B"`,
+	},
+	maximumZigzagConversionCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

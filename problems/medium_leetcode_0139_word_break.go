@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
@@ -87,6 +88,22 @@ func parseWordBreakInput(input string) (string, []string) {
 	return s, wordDict
 }
 
+func maximumWordBreakCase() testrunner.Case {
+	dictionary := make([]string, 0, 1000)
+	dictionary = append(dictionary, "a")
+	for value := 0; value < 999; value++ {
+		first := byte('a' + value/(26*26))
+		second := byte('a' + value/26%26)
+		third := byte('a' + value%26)
+		dictionary = append(dictionary, "b"+string([]byte{first, second, third}))
+	}
+	input, err := json.Marshal([]any{strings.Repeat("a", 300), dictionary})
+	if err != nil {
+		panic(fmt.Errorf("build maximum word-break input: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum string and dictionary sizes", Input: string(input), Want: `true`}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -120,6 +137,27 @@ var sampleCases = []testrunner.Case{
 		Input: `["aaaa",["a","aa"]]`,
 		Want:  `true`,
 	},
+	{
+		Name:  "Adversarial: Segmentation must backtrack from a valid prefix",
+		Input: `["cars",["car","ca","rs"]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Adversarial: Many valid prefixes still leave an invalid suffix",
+		Input: `["aaaaaaaaaaaaaaaaab",["a","aa","aaa","aaaa","aaaaa"]]`,
+		Want:  `false`,
+	},
+	{
+		Name:  "Additional: Dictionary words may be longer than the target",
+		Input: `["go",["golang","go"]]`,
+		Want:  `true`,
+	},
+	{
+		Name:  "Boundary: Maximum dictionary word length",
+		Input: `["abcdefghijklmnopqrst",["abcdefghijklmnopqrst"]]`,
+		Want:  `true`,
+	},
+	maximumWordBreakCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

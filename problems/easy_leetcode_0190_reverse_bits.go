@@ -120,6 +120,31 @@ var sampleCases = []testrunner.Case{
 		Input: `[2147483646]`,
 		Want:  `2147483646`,
 	},
+	{
+		Name:  "Additional: Third bit moves near high end",
+		Input: `[4]`,
+		Want:  `536870912`,
+	},
+	{
+		Name:  "Additional: Fourth bit moves near high end",
+		Input: `[8]`,
+		Want:  `268435456`,
+	},
+	{
+		Name:  "Additional: High input bit becomes low output bit",
+		Input: `[1073741824]`,
+		Want:  `2`,
+	},
+	{
+		Name:  "Additional: Dense block of low bits",
+		Input: `[65534]`,
+		Want:  `2147418112`,
+	},
+	{
+		Name:  "Adversarial: Alternating bits",
+		Input: `[1431655764]`,
+		Want:  `715827882`,
+	},
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -70,6 +70,37 @@ func parseSpiralMatrixInput(input string) [][]int {
 	return matrix
 }
 
+func formatSpiralMatrixOutput(values []int) string {
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format spiral-matrix output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumSpiralMatrixCase() testrunner.Case {
+	matrix := make([][]int, 10)
+	want := make([]int, 100)
+	for row := range matrix {
+		matrix[row] = make([]int, 10)
+		for column := range matrix[row] {
+			matrix[row][column] = -100
+		}
+	}
+	for index := range want {
+		want[index] = -100
+	}
+	input, err := json.Marshal([]any{matrix})
+	if err != nil {
+		panic(fmt.Errorf("build maximum spiral-matrix input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum dimensions visit every repeated value once",
+		Input: string(input),
+		Want:  formatSpiralMatrixOutput(want),
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -98,6 +129,32 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[1],[2],[3]]]`,
 		Want:  `[1,2,3]`,
 	},
+	{
+		Name:  "Additional: Two by two matrix",
+		Input: `[[[1,2],[3,4]]]`,
+		Want:  `[1,2,4,3]`,
+	},
+	{
+		Name:  "Adversarial: Two rows are not traversed twice",
+		Input: `[[[1,2,3],[4,5,6]]]`,
+		Want:  `[1,2,3,6,5,4]`,
+	},
+	{
+		Name:  "Adversarial: Two columns are not traversed twice",
+		Input: `[[[1,2],[3,4],[5,6]]]`,
+		Want:  `[1,2,4,6,5,3]`,
+	},
+	{
+		Name:  "Additional: Four by four has a complete inner layer",
+		Input: `[[[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]]`,
+		Want:  `[1,2,3,4,8,12,16,15,14,13,9,5,6,7,11,10]`,
+	},
+	{
+		Name:  "Boundary: Signed limits and duplicates preserve positions",
+		Input: `[[[-100,0,100],[100,0,-100]]]`,
+		Want:  `[-100,0,100,-100,0,100]`,
+	},
+	maximumSpiralMatrixCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

@@ -111,6 +111,52 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
+func formatFlattenBinaryTreeToLinkedListOutput(root *TreeNode) string {
+	values := make([]any, 0)
+	for node := root; node != nil; node = node.Right {
+		if len(values) == 4000 {
+			panic("format flatten-binary-tree-to-linked-list output: right chain exceeds 2000 nodes or contains a cycle")
+		}
+		if node.Left != nil {
+			panic("format flatten-binary-tree-to-linked-list output: flattened node has a left child")
+		}
+		if len(values) > 0 {
+			values = append(values, nil)
+		}
+		values = append(values, node.Val)
+	}
+	output, err := json.Marshal(values)
+	if err != nil {
+		panic(fmt.Errorf("format flatten-binary-tree-to-linked-list output: %w", err))
+	}
+	return string(output)
+}
+
+func maximumFlattenBinaryTreeToLinkedListCase() testrunner.Case {
+	inputTree := make([]any, 0, 3999)
+	want := make([]any, 0, 3999)
+	for index := 0; index < 2000; index++ {
+		value := index%201 - 100
+		inputTree = append(inputTree, value)
+		want = append(want, value)
+		if index+1 < 2000 {
+			if index > 0 {
+				inputTree = append(inputTree, nil)
+			}
+			want = append(want, nil)
+		}
+	}
+	input, err := json.Marshal([]any{inputTree})
+	if err != nil {
+		panic(fmt.Errorf("build maximum flatten-binary-tree input: %w", err))
+	}
+	output, err := json.Marshal(want)
+	if err != nil {
+		panic(fmt.Errorf("build maximum flatten-binary-tree output: %w", err))
+	}
+	return testrunner.Case{Name: "Boundary: Maximum left chain becomes a right chain", Input: string(input), Want: string(output)}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -139,6 +185,22 @@ var sampleCases = []testrunner.Case{
 		Input: `[[1,null,2,null,3]]`,
 		Want:  `[1,null,2,null,3]`,
 	},
+	{
+		Name:  "Adversarial: Right subtree follows the entire left subtree",
+		Input: `[[1,2,3,null,4,5,6]]`,
+		Want:  `[1,null,2,null,4,null,3,null,5,null,6]`,
+	},
+	{
+		Name:  "Additional: Sparse mixed tree",
+		Input: `[[1,null,2,3,4]]`,
+		Want:  `[1,null,2,null,3,null,4]`,
+	},
+	{
+		Name:  "Boundary: Duplicate extreme values",
+		Input: `[[100,-100,100]]`,
+		Want:  `[100,null,-100,null,100]`,
+	},
+	maximumFlattenBinaryTreeToLinkedListCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,

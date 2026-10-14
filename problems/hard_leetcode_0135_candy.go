@@ -79,6 +79,22 @@ func parseCandyInput(input string) []int {
 	return ratings
 }
 
+func makeMaximumCandyCase() testrunner.Case {
+	ratings := make([]int, 50000)
+	for index := range ratings {
+		ratings[index] = index + 1
+	}
+	input, err := json.Marshal([]any{ratings})
+	if err != nil {
+		panic(fmt.Errorf("build candy input: %w", err))
+	}
+	return testrunner.Case{
+		Name:  "Additional: Maximum strictly increasing ratings",
+		Input: string(input),
+		Want:  `1250025000`,
+	}
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -107,6 +123,27 @@ var sampleCases = []testrunner.Case{
 		Input: `[[2,1,2]]`,
 		Want:  `5`,
 	},
+	{
+		Name:  "Additional: Long symmetric mountain",
+		Input: `[[1,2,3,4,3,2,1]]`,
+		Want:  `16`,
+	},
+	{
+		Name:  "Additional: Plateau resets both slopes",
+		Input: `[[1,2,2,1]]`,
+		Want:  `6`,
+	},
+	{
+		Name:  "Additional: Alternating peaks",
+		Input: `[[1,0,1,0,1]]`,
+		Want:  `8`,
+	},
+	{
+		Name:  "Additional: Rating boundaries",
+		Input: `[[50000,0]]`,
+		Want:  `3`,
+	},
+	makeMaximumCandyCase(),
 }
 
 // archiveReady remains false until the current attempt, three agent solutions,
