@@ -43,6 +43,19 @@ fi
 # Build the archive fixture from the canonical template so this workflow test
 # does not depend on whether the repository's active problem is complete.
 awk '
+  /^var sampleCases = \[\]testrunner.Case\{$/ {
+    print
+    print "\t{Name: \"First fixture\", Input: \"first\", Want: \"\"},"
+    print "\t{Name: \"Second fixture\", Input: \"second\", Want: \"\"},"
+    replacing_cases = 1
+    next
+  }
+  replacing_cases && /^}$/ {
+    print
+    replacing_cases = 0
+    next
+  }
+  replacing_cases { next }
   /^const archiveReady = false$/ {
     print "const archiveReady = true"
     next
@@ -84,6 +97,26 @@ rg -q 'solved_easy_leetcode_0001_two_sum.go' "$temporary_root/problems/README.md
 
 ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" solved_easy_leetcode_0001_two_sum.go
 ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" problems/solved_easy_leetcode_0001_two_sum.go
+
+case_output=$(ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" --case 1 solved_easy_leetcode_0001_two_sum.go)
+if [[ $case_output != *"PASS  current attempt / First fixture"* || $case_output == *"Second fixture"* ]]; then
+  echo "error: focused problem run returned unexpected output:" >&2
+  echo "$case_output" >&2
+  exit 1
+fi
+if out_of_range_output=$(ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" --case 3 solved_easy_leetcode_0001_two_sum.go 2>&1); then
+  echo "error: out-of-range focused problem run unexpectedly succeeded" >&2
+  exit 1
+fi
+if [[ $out_of_range_output != *"case 3 is out of range; 2 cases configured"* ]]; then
+  echo "error: focused problem run returned an unexpected range error:" >&2
+  echo "$out_of_range_output" >&2
+  exit 1
+fi
+if ALGOS_REPO_ROOT=$temporary_root "$script_directory/run-problem.sh" --case 0 solved_easy_leetcode_0001_two_sum.go >/dev/null 2>&1; then
+  echo "error: non-positive focused case unexpectedly succeeded" >&2
+  exit 1
+fi
 
 git -C "$temporary_root" init --quiet
 git -C "$temporary_root" config user.email "workflow-test@example.com"

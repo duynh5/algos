@@ -33,6 +33,7 @@ Archive and run problems with:
 
 ```bash
 ./scripts/archive-workbench.sh easy 1 two-sum
+./scripts/run-problem.sh --case 1 solved_easy_leetcode_0001_two_sum.go
 ./scripts/run-problem.sh solved_easy_leetcode_0001_two_sum.go
 ./scripts/test-problems.sh
 ```
@@ -44,7 +45,7 @@ Archive and run problems with:
 - [solved_easy_leetcode_0014_longest_common_prefix.go](solved_easy_leetcode_0014_longest_common_prefix.go)
 - [solved_easy_leetcode_0020_valid_parentheses.go](solved_easy_leetcode_0020_valid_parentheses.go)
 - [easy_leetcode_0021_merge_two_sorted_lists.go](easy_leetcode_0021_merge_two_sorted_lists.go)
-- [easy_leetcode_0026_remove_duplicates_from_sorted_array.go](easy_leetcode_0026_remove_duplicates_from_sorted_array.go)
+- [solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go](solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go)
 - [easy_leetcode_0027_remove_element.go](easy_leetcode_0027_remove_element.go)
 - [easy_leetcode_0028_find_the_index_of_the_first_occurrence_in_a_string.go](easy_leetcode_0028_find_the_index_of_the_first_occurrence_in_a_string.go)
 - [easy_leetcode_0035_search_insert_position.go](easy_leetcode_0035_search_insert_position.go)

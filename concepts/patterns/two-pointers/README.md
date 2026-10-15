@@ -19,6 +19,19 @@ begins at the last output slot. Writing the larger unread value preserves the
 invariant that the suffix after the output pointer is complete and sorted. It
 also avoids overwriting unread values in the first array.
 
+## Compacting a sorted array in place
+
+For a sorted array, duplicates are adjacent. Keep a read pointer scanning every
+value and a write pointer at the next output slot. The first value is already
+unique. For each later value, compare it with the last kept value at
+`values[write-1]`; copy it to `values[write]` and advance `write` only when the
+values differ.
+
+The invariant is that `values[:write]` contains each distinct value from the
+processed prefix exactly once, in its original order. Because `write` never
+passes `read`, writes cannot destroy unread input. This performs one scan and
+uses no auxiliary collection.
+
 ## Expanding around palindrome centers
 
 Every palindrome has one center: a character for odd lengths or a gap between
@@ -47,6 +60,7 @@ sum is too large, decreasing `right` is the only move that can reduce it.
 - Inward pair search: O(n) time and O(1) extra space.
 - Forward merge with an output buffer: O(m+n) time and O(m+n) extra space.
 - Backward merge into existing capacity: O(m+n) time and O(1) extra space.
+- In-place sorted compaction: O(n) time and O(1) extra space.
 
 ## Pitfalls
 
@@ -59,6 +73,8 @@ sum is too large, decreasing `right` is the only move that can reduce it.
   Merge backward when its unused capacity is at the end.
 - Padding values are storage, not input data; use the populated lengths rather
   than testing whether a value is zero.
+- Sorted compaction should compare against the last kept value, not merely the
+  prior output slot before establishing that the kept prefix is non-empty.
 - Alternating which endpoint moves after a mismatch does not prove that the
   discarded boundary is safe and can skip the longest palindrome.
 - Check both character and gap centers; checking only character centers misses
@@ -70,3 +86,5 @@ sum is too large, decreasing `right` is the only move that can reduce it.
   compares mirrored digits with inward-moving endpoints in its direct solution.
 - [LeetCode 5: Longest Palindromic Substring](../../../problems/solved_medium_leetcode_0005_longest_palindromic_substring.go)
   expands mirrored byte pointers outward from every possible center.
+- [LeetCode 26: Remove Duplicates from Sorted Array](../../../problems/solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go)
+  compacts unique values with forward read and write positions.

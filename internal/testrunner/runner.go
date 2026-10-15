@@ -6,8 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
+	"strconv"
 	"strings"
 )
+
+const caseNumberEnvironmentVariable = "ALGOS_RUN_PROBLEM_CASE_NUMBER"
 
 // DecodeJSONArgs decodes a positional JSON array into the provided destinations.
 func DecodeJSONArgs(input string, destinations ...any) error {
@@ -51,8 +55,15 @@ type Result struct {
 	Passed   bool
 }
 
-// Run evaluates every solution against every case and writes a concise report.
+// Run evaluates every solution against the configured cases and writes a concise report.
+// ALGOS_RUN_PROBLEM_CASE_NUMBER limits execution to one one-based case when set.
 func Run(output io.Writer, cases []Case, solutions []Solution) error {
+	selectedCases, err := selectCases(cases, os.Getenv(caseNumberEnvironmentVariable))
+	if err != nil {
+		return err
+	}
+	cases = selectedCases
+
 	if len(cases) == 0 {
 		fmt.Fprintln(output, "No sample cases configured.")
 		return nil
@@ -82,6 +93,22 @@ func Run(output io.Writer, cases []Case, solutions []Solution) error {
 		return fmt.Errorf("%d sample checks failed", failures)
 	}
 	return nil
+}
+
+func selectCases(cases []Case, requestedCase string) ([]Case, error) {
+	if requestedCase == "" {
+		return cases, nil
+	}
+
+	caseNumber, err := strconv.Atoi(requestedCase)
+	if err != nil || caseNumber < 1 {
+		return nil, fmt.Errorf("%s must be a positive integer, got %q", caseNumberEnvironmentVariable, requestedCase)
+	}
+	if caseNumber > len(cases) {
+		return nil, fmt.Errorf("case %d is out of range; %d cases configured", caseNumber, len(cases))
+	}
+
+	return cases[caseNumber-1 : caseNumber], nil
 }
 
 // Evaluate returns every solution/case comparison without printing a report.

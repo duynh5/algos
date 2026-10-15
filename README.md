@@ -41,7 +41,7 @@ Git, `gofmt`, and `rg` (ripgrep). The module currently declares Go 1.26.3.
 | Command | Purpose and behavior |
 | --- | --- |
 | `./scripts/workbench.sh` | Runs the active workbench program and then its package tests. Equivalent to `go run ./workbench` followed by `go test ./workbench`. |
-| `./scripts/run-problem.sh [<filename>]` | Runs one file under `problems/`. With no filename, runs the sole modified or untracked problem file and fails if that choice is missing or ambiguous. An explicit basename or `problems/<filename>` must use the `[solved_]<difficulty>_<source>_<problem-id>_<slug>.go` naming format. |
+| `./scripts/run-problem.sh [--case <number>] [<filename>]` | Runs one file under `problems/`. By default it runs every configured case; `--case` runs one case using a one-based number. With no filename, it runs the sole modified or untracked problem file and fails if that choice is missing or ambiguous. An explicit basename or `problems/<filename>` must use the `[solved_]<difficulty>_<source>_<problem-id>_<slug>.go` naming format. |
 | `./scripts/test-problems.sh` | Runs every completed problem file. Files containing `archiveReady = false` are reported and skipped. |
 | `./scripts/archive-workbench.sh <easy\|medium\|hard> <problem-id> <descriptive-slug> [source]` | Validates the completed workbench, creates a standalone `solved_` file under `problems/`, adds its metadata, runs it, and appends it to `problems/README.md`. The source defaults to `leetcode`; the command refuses an incomplete workbench or an existing destination. |
 | `./scripts/reset-workbench.sh` | Restores `workbench/main.go` and `main_test.go` from their canonical templates after validating the replacement. It refuses to discard an unfinished workbench. |
@@ -52,6 +52,7 @@ Examples:
 ```bash
 ./scripts/workbench.sh
 ./scripts/run-problem.sh
+./scripts/run-problem.sh --case 1 easy_leetcode_0066_plus_one.go
 ./scripts/run-problem.sh easy_leetcode_0066_plus_one.go
 ./scripts/archive-workbench.sh easy 1 two-sum
 ./scripts/reset-workbench.sh
@@ -169,6 +170,7 @@ analysis sections and marks the archive ready:
 
 ```bash
 ./scripts/run-problem.sh
+./scripts/run-problem.sh --case 1 solved_easy_leetcode_0001_two_sum.go
 ./scripts/run-problem.sh solved_easy_leetcode_0001_two_sum.go
 ./scripts/test-problems.sh
 ```

@@ -58,26 +58,36 @@ ID metadata used under `problems/`. Do not put the retrieved problem in
 
 ## Active Problem Workflow
 
-When the user asks for help with, an answer to, or a review of "the problem in
-the workbench," treat `workbench/main.go` as the single source of truth for the
-statement, samples, current attempt, solutions, and analysis.
+When the user asks for help with, an answer to, or a review of "the current
+problem" without naming a file, inspect both `workbench/main.go` and unsolved
+practice files directly under `problems/`. Treat a non-template workbench as a
+candidate, and use the modified or untracked unsolved practice file as a
+candidate when exactly one contains current-attempt work. If exactly one
+candidate exists, use it as the single source of truth for the statement,
+samples, current attempt, solutions, and analysis. If both locations or
+multiple practice files are plausible, ask the user which file to review.
 
-A request to review the workbench problem is an implementation request unless
-the user explicitly asks for findings only or says not to edit files. Complete
-the full workflow below, including the preserved current attempt, three
-agent-authored solutions, and their analysis; do not stop after reporting
+When the user explicitly asks about "the problem in the workbench," treat
+`workbench/main.go` as that single source of truth. When the resolved current
+problem is under `problems/`, apply this workflow to that file in place and do
+not move it through the workbench.
+
+A request to review the resolved current problem is an implementation request
+unless the user explicitly asks for findings only or says not to edit files.
+Complete the full workflow below, including the preserved current attempt,
+three agent-authored solutions, and their analysis; do not stop after reporting
 review findings.
 
 When the user says "fill in," treat it as an input-setup request, not as a
 request to solve the problem. Fill in the input from the problem statement in
-`workbench/main.go` as executable code, then add inputs and examples covering
-all valid edge cases, boundary conditions, adversarial cases, and constraint
-extremes. Complete the parsing and formatting setup described below so the
-user's current implementation receives strongly typed arguments, while
+the resolved problem file as executable code, then add inputs and examples
+covering all valid edge cases, boundary conditions, adversarial cases, and
+constraint extremes. Complete the parsing and formatting setup described below
+so the user's current implementation receives strongly typed arguments, while
 preserving the user's algorithm body.
 
-1. Read `workbench/main.go`, `workbench/main_test.go`, and the relevant concept
-   pages before changing code.
+1. Read the resolved problem file, `workbench/main_test.go` when the problem is
+   in the workbench, and the relevant concept pages before changing code.
 2. Keep shared judge-owned types and problem-specific parsing and formatting
    adapters in a compact support block before `sampleCases`. Preserve readable
    statement serialization in the cases, convert structural values inside
@@ -109,20 +119,21 @@ preserving the user's algorithm body.
    educational approach may exceed judge limits, but it must still be correct
    for inputs it can finish. Do not manufacture meaningless variants.
 6. Give each agent-authored approach a descriptive function name and register
-   it in `agentSolutions` in `workbench/main.go`. Register the preserved attempt
-   separately as `currentAttemptSolution`, then combine it with the three agent
-   solutions in `solutions`. Even when the preferred approach uses the same
-   method as the current attempt, implement it in a separate descriptive
-   function. Keep judge-required platform functions as thin wrappers around the
-   preferred agent approach when appropriate. Reserve full-width section
-   banners for `CURRENT ATTEMPT` and `AGENT SOLUTIONS`. Use compact one-line
-   labels for adapters, registries, and other supporting functions.
+   it in `agentSolutions` in the resolved problem file. Register the preserved
+   attempt separately as `currentAttemptSolution`, then combine it with the
+   three agent solutions in `solutions`. Even when the preferred approach uses
+   the same method as the current attempt, implement it in a separate
+   descriptive function. Keep judge-required platform functions as thin
+   wrappers around the preferred agent approach when appropriate. Reserve
+   full-width section banners for `CURRENT ATTEMPT` and `AGENT SOLUTIONS`. Use
+   compact one-line labels for adapters, registries, and other supporting
+   functions.
 7. Run the same `sampleCases` and table-driven regression cases against the
    current attempt and all three agent approaches.
    Include supplied examples, minimum or empty inputs when valid, boundary
    conditions, duplicate or adversarial values, and at least one case that
    distinguishes a common incorrect solution.
-8. In the analysis section of `workbench/main.go`, explain each approach, its
+8. In the resolved problem file's analysis section, explain each approach, its
    correctness argument, and its time and auxiliary-space complexity. State
    best, average, and worst cases when they differ, and account for recursion,
    preprocessing, output, and meaningful Go allocations. For each solution,
@@ -130,10 +141,11 @@ preserving the user's algorithm body.
    variables, pointers, data structures, and state changes step by step so the
    reader can map the example directly to the code; an outcome-only example is
    not sufficient.
-9. Run `./scripts/workbench.sh` and `go test ./...` before claiming that the
-   solutions pass. Set `archiveReady` to `true` only after these checks pass and
-   the current attempt, all three agent solutions, and their analysis are
-   complete.
+9. For a workbench problem, run `./scripts/workbench.sh` and `go test ./...`.
+   For a problem under `problems/`, run `./scripts/run-problem.sh <filename>`,
+   `./scripts/test-problems.sh`, and `go test ./...`. Set `archiveReady` to
+   `true` only after the location-appropriate checks pass and the current
+   attempt, all three agent solutions, and their analysis are complete.
 
 Do not replace a non-template workbench problem with a new one until its work
 has been archived or the user explicitly says to discard it.

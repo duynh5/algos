@@ -62,6 +62,44 @@ func TestRunReportsPassesAndFailures(t *testing.T) {
 	}
 }
 
+func TestRunSelectsConfiguredCase(t *testing.T) {
+	t.Setenv(caseNumberEnvironmentVariable, "2")
+	cases := []Case{
+		{Name: "First", Input: "first", Want: "FIRST"},
+		{Name: "Second", Input: "second", Want: "SECOND"},
+	}
+	var output bytes.Buffer
+
+	if err := Run(&output, cases, []Solution{{Name: "uppercase", Run: strings.ToUpper}}); err != nil {
+		t.Fatalf("Run() error = %v, want nil", err)
+	}
+	if strings.Contains(output.String(), "First") {
+		t.Fatalf("Run() output includes unselected case:\n%s", output.String())
+	}
+	if !strings.Contains(output.String(), "PASS  uppercase / Second") {
+		t.Fatalf("Run() output missing selected case:\n%s", output.String())
+	}
+}
+
+func TestRunRejectsOutOfRangeConfiguredCase(t *testing.T) {
+	t.Setenv(caseNumberEnvironmentVariable, "2")
+	cases := []Case{{Name: "Only case"}}
+
+	err := Run(&bytes.Buffer{}, cases, []Solution{{Name: "identity", Run: func(input string) string { return input }}})
+	if err == nil || err.Error() != "case 2 is out of range; 1 cases configured" {
+		t.Fatalf("Run() error = %v, want out-of-range error", err)
+	}
+}
+
+func TestRunRejectsInvalidConfiguredCase(t *testing.T) {
+	t.Setenv(caseNumberEnvironmentVariable, "invalid")
+
+	err := Run(&bytes.Buffer{}, []Case{{Name: "Only case"}}, []Solution{{Name: "identity", Run: func(input string) string { return input }}})
+	if err == nil || !strings.Contains(err.Error(), "must be a positive integer") {
+		t.Fatalf("Run() error = %v, want positive-integer error", err)
+	}
+}
+
 func TestRunRejectsInvalidRegistration(t *testing.T) {
 	cases := []Case{{Name: "Example"}}
 	solutions := []Solution{

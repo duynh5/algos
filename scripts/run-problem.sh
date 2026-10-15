@@ -3,7 +3,7 @@
 set -euo pipefail
 
 usage() {
-  echo "usage: $0 [<[solved_]difficulty_source_problem_id_name.go>]" >&2
+  echo "usage: $0 [--case <number>] [<[solved_]difficulty_source_problem_id_name.go>]" >&2
 }
 
 fail() {
@@ -58,15 +58,51 @@ detect_active_problem() {
   esac
 }
 
-if [[ $# -gt 1 ]]; then
-  usage
-  exit 2
+case_number=
+requested_file=
+case_option_seen=false
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --case)
+      if [[ $case_option_seen == true || $# -lt 2 ]]; then
+        usage
+        exit 2
+      fi
+      case_option_seen=true
+      case_number=$2
+      shift 2
+      ;;
+    --case=*)
+      if [[ $case_option_seen == true ]]; then
+        usage
+        exit 2
+      fi
+      case_option_seen=true
+      case_number=${1#--case=}
+      shift
+      ;;
+    --*)
+      fail "unknown option: $1"
+      ;;
+    *)
+      if [[ -n $requested_file ]]; then
+        usage
+        exit 2
+      fi
+      requested_file=$1
+      shift
+      ;;
+  esac
+done
+
+if [[ $case_option_seen == true && ! $case_number =~ ^[1-9][0-9]*$ ]]; then
+  fail "--case must be a positive integer"
 fi
 
-if [[ $# -eq 0 ]]; then
+if [[ -z $requested_file ]]; then
   filename=$(detect_active_problem)
 else
-  requested_file=$1
   case $requested_file in
     problems/*) filename=${requested_file#problems/} ;;
     */*) fail "provide a filename or problems/<filename>" ;;
@@ -79,4 +115,4 @@ problem_file="$repository_root/problems/$filename"
 
 [[ -f $problem_file ]] || fail "$problem_file was not found"
 
-(cd "$repository_root" && go run "$problem_file")
+(cd "$repository_root" && ALGOS_RUN_PROBLEM_CASE_NUMBER=$case_number go run "$problem_file")
