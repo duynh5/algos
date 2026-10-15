@@ -32,6 +32,20 @@ processed prefix exactly once, in its original order. Because `write` never
 passes `read`, writes cannot destroy unread input. This performs one scan and
 uses no auxiliary collection.
 
+## Compacting by a predicate
+
+The same read/write boundary works when the array is not sorted and the goal is
+to retain every value that satisfies a predicate. Let the read position inspect
+each value and let `write` identify the first slot after the valid prefix. Skip
+values that should be removed; otherwise copy the value to `values[write]` and
+advance `write`.
+
+The invariant is that `values[:write]` contains exactly the retained values
+from the processed prefix, in their original order. The write position never
+passes the read position, so overwriting the current slot cannot destroy unread
+input. If the problem permits reordering and removed values are rare, swapping
+a removed value with the active suffix is another O(n)-time, O(1)-space option.
+
 ## Expanding around palindrome centers
 
 Every palindrome has one center: a character for odd lengths or a gap between
@@ -61,6 +75,7 @@ sum is too large, decreasing `right` is the only move that can reduce it.
 - Forward merge with an output buffer: O(m+n) time and O(m+n) extra space.
 - Backward merge into existing capacity: O(m+n) time and O(1) extra space.
 - In-place sorted compaction: O(n) time and O(1) extra space.
+- In-place predicate compaction: O(n) time and O(1) extra space.
 
 ## Pitfalls
 
@@ -75,6 +90,8 @@ sum is too large, decreasing `right` is the only move that can reduce it.
   than testing whether a value is zero.
 - Sorted compaction should compare against the last kept value, not merely the
   prior output slot before establishing that the kept prefix is non-empty.
+- Predicate compaction should advance the write position only after retaining a
+  value; advancing it for a removed value leaves gaps in the valid prefix.
 - Alternating which endpoint moves after a mismatch does not prove that the
   discarded boundary is safe and can skip the longest palindrome.
 - Check both character and gap centers; checking only character centers misses
@@ -88,3 +105,5 @@ sum is too large, decreasing `right` is the only move that can reduce it.
   expands mirrored byte pointers outward from every possible center.
 - [LeetCode 26: Remove Duplicates from Sorted Array](../../../problems/solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go)
   compacts unique values with forward read and write positions.
+- [LeetCode 27: Remove Element](../../../problems/solved_easy_leetcode_0027_remove_element.go)
+  compacts values that do not match a removal predicate.
