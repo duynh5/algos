@@ -48,7 +48,7 @@ Archive and run problems with:
 - [solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go](solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go)
 - [easy_leetcode_0027_remove_element.go](easy_leetcode_0027_remove_element.go)
 - [easy_leetcode_0028_find_the_index_of_the_first_occurrence_in_a_string.go](easy_leetcode_0028_find_the_index_of_the_first_occurrence_in_a_string.go)
-- [easy_leetcode_0035_search_insert_position.go](easy_leetcode_0035_search_insert_position.go)
+- [solved_easy_leetcode_0035_search_insert_position.go](solved_easy_leetcode_0035_search_insert_position.go)
 - [easy_leetcode_0058_length_of_last_word.go](easy_leetcode_0058_length_of_last_word.go)
 - [easy_leetcode_0066_plus_one.go](easy_leetcode_0066_plus_one.go)
 - [easy_leetcode_0067_add_binary.go](easy_leetcode_0067_add_binary.go)

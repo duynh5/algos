@@ -27,4 +27,5 @@ than the target.
 
 ## Related problems
 
-No solved problems are linked yet.
+- [LeetCode 35: Search Insert Position](../../../problems/solved_easy_leetcode_0035_search_insert_position.go)
+  applies the lower-bound invariant directly.
