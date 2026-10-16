@@ -107,7 +107,7 @@ Archive and run problems with:
 - [medium_leetcode_0019_remove_nth_node_from_end_of_list.go](medium_leetcode_0019_remove_nth_node_from_end_of_list.go)
 - [medium_leetcode_0022_generate_parentheses.go](medium_leetcode_0022_generate_parentheses.go)
 - [medium_leetcode_0033_search_in_rotated_sorted_array.go](medium_leetcode_0033_search_in_rotated_sorted_array.go)
-- [medium_leetcode_0034_find_first_and_last_position_of_element_in_sorted_array.go](medium_leetcode_0034_find_first_and_last_position_of_element_in_sorted_array.go)
+- [solved_medium_leetcode_0034_find_first_and_last_position_of_element_in_sorted_array.go](solved_medium_leetcode_0034_find_first_and_last_position_of_element_in_sorted_array.go)
 - [medium_leetcode_0036_valid_sudoku.go](medium_leetcode_0036_valid_sudoku.go)
 - [medium_leetcode_0039_combination_sum.go](medium_leetcode_0039_combination_sum.go)
 - [medium_leetcode_0045_jump_game_ii.go](medium_leetcode_0045_jump_game_ii.go)

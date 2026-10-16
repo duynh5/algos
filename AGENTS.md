@@ -123,11 +123,14 @@ preserving the user's algorithm body.
    attempt separately as `currentAttemptSolution`, then combine it with the
    three agent solutions in `solutions`. Even when the preferred approach uses
    the same method as the current attempt, implement it in a separate
-   descriptive function. Keep judge-required platform functions as thin
-   wrappers around the preferred agent approach when appropriate. Reserve
-   full-width section banners for `CURRENT ATTEMPT` and `AGENT SOLUTIONS`. Use
-   compact one-line labels for adapters, registries, and other supporting
-   functions.
+   descriptive function. Define helpers used exclusively by one agent-authored
+   solution as local function values inside that solution function; do not
+   scatter one approach across file-scope helper declarations. Keep only shared
+   adapters, shared types or helpers, and judge-required platform entry points
+   at file scope. Keep judge-required platform functions as thin wrappers around
+   the preferred agent approach when appropriate. Reserve full-width section
+   banners for `CURRENT ATTEMPT` and `AGENT SOLUTIONS`. Use compact one-line
+   labels for adapters, registries, and other supporting functions.
 7. Run the same `sampleCases` and table-driven regression cases against the
    current attempt and all three agent approaches.
    Include supplied examples, minimum or empty inputs when valid, boundary
