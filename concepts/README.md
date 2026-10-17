@@ -47,7 +47,7 @@ Every concept page should explain:
 - Divide and conquer
 - Greedy algorithms
 - Backtracking
-- Dynamic programming
+- [Dynamic programming](algorithms/dynamic-programming/)
 - String matching
 - Number theory and combinatorics
 
