@@ -107,13 +107,15 @@ preserving the user's algorithm body.
    algorithm body intact except for the problem-specific parsing or formatting
    setup explicitly described above. Do not refactor it into a helper, rename
    its variables, or use it as a substitute for one of the three agent-authored
-   solutions. Explain what is correct, the first failing assumption or
-   bottleneck, and how the relevant invariant guides the correction. Explicitly
-   compare the current attempt with each agent-authored solution. When they use
-   the same core algorithm, data structure, or invariant, state that relationship
-   in the analysis and describe only the material implementation differences;
-   do not imply that a cleaned-up implementation is a distinct algorithm. The
-   three agent-authored approaches must still be distinct from one another.
+   solutions. Every review must score the current attempt out of 100 and briefly
+   explain both the score and any deductions in the problem analysis and final
+   response. Explain what is correct, the first failing assumption or bottleneck,
+   and how the relevant invariant guides the correction. Explicitly compare the
+   current attempt with each agent-authored solution. When they use the same core
+   algorithm, data structure, or invariant, state that relationship in the
+   analysis and describe only the material implementation differences; do not
+   imply that a cleaned-up implementation is a distinct algorithm. The three
+   agent-authored approaches must still be distinct from one another.
 4. Link the problem to existing pages under `concepts/`. Add or improve a
    concept page when the necessary reference does not exist.
 5. Produce three distinct correct approaches: a direct or brute force

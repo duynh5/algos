@@ -52,7 +52,7 @@ Archive and run problems with:
 - [easy_leetcode_0058_length_of_last_word.go](easy_leetcode_0058_length_of_last_word.go)
 - [easy_leetcode_0066_plus_one.go](easy_leetcode_0066_plus_one.go)
 - [easy_leetcode_0067_add_binary.go](easy_leetcode_0067_add_binary.go)
-- [easy_leetcode_0069_sqrtx.go](easy_leetcode_0069_sqrtx.go)
+- [solved_easy_leetcode_0069_sqrtx.go](solved_easy_leetcode_0069_sqrtx.go)
 - [easy_leetcode_0070_climbing_stairs.go](easy_leetcode_0070_climbing_stairs.go)
 - [easy_leetcode_0088_merge_sorted_array_practice.go](easy_leetcode_0088_merge_sorted_array_practice.go)
 - [easy_leetcode_0100_same_tree.go](easy_leetcode_0100_same_tree.go)
