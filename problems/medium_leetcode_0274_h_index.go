@@ -84,6 +84,10 @@ func maximumHIndexCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Maximum papers and citations", Input: string(input), Want: `1000`}
 }
 
+func formatHIndexOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

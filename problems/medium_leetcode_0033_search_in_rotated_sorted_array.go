@@ -106,6 +106,10 @@ func maximumSearchInRotatedSortedArrayCase() testrunner.Case {
 	}
 }
 
+func formatSearchInRotatedSortedArrayOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -193,6 +197,27 @@ func solveCurrentAttempt(input string) string {
 	nums, target := parseSearchInRotatedSortedArrayInput(input)
 	_ = nums
 	_ = target
+	left, right := 0, len(nums)
+
+	for left > right {
+		middle := left + (right-left)/2
+		if nums[middle] == target {
+			return formatSearchInRotatedSortedArrayOutput(middle)
+		}
+		if nums[left] <= nums[middle] {
+			if target >= nums[left] && target < nums[middle] {
+				right = middle - 1
+			} else {
+				left = middle
+			}
+		} else {
+			if target >= nums[middle] && target < nums[right] {
+				left = middle
+			} else {
+				right = middle - 1
+			}
+		}
+	}
 
 	// Implement your algorithm with the typed values above.
 	return ""

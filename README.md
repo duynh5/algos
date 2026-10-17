@@ -25,7 +25,7 @@ commands.
 
 | Request | Result |
 | --- | --- |
-| `retrieve <problem-url>` | Verifies the authoritative page, then creates an unsolved practice file under `problems/` from `workbench/main.go.template`. It includes metadata, the prompt, typed adapters, official examples, and additional edge cases, while leaving the current attempt and agent solutions unsolved. |
+| `retrieve <problem-url>` | Verifies the authoritative page, then creates an unsolved practice file under `problems/` from `workbench/main.go.template`. It includes metadata, the prompt, typed input and output adapters, official examples, and additional edge cases, while leaving the current attempt and agent solutions unsolved. |
 | `fill in` | Completes input cases, parsing, and output formatting for the active workbench problem without solving or replacing the current algorithm. |
 | `review the problem in the workbench` | Preserves the current attempt, adds direct, improved, and preferred solutions, runs shared regression cases, and completes the correctness and complexity analysis. |
 | `review problems/<practice-file>.go` | Applies the same three-solution review workflow directly to a retrieved practice file without moving it through the workbench. |
@@ -102,8 +102,9 @@ statement, sample cases, your preserved attempt, the three completed
 agent-authored solutions, and their analysis.
 
 1. Paste the statement into the `PROBLEM` block comment.
-2. Add problem-specific types and input/output adapters when the judge uses
-   structural values such as linked lists or trees.
+2. Add problem-specific types, a typed input parser, and an output formatter.
+   Ordinary results can delegate to `testrunner.FormatJSONOutput`; structural
+   judges such as linked lists or trees need their statement representation.
 3. Paste each example into the `sampleCases` slice using the included template.
 4. Implement `solveCurrentAttempt`.
 5. Ask Codex to review or solve "the problem in the workbench."
@@ -162,7 +163,7 @@ registration checks.
 
 Run one archived problem or all completed archives. Unsolved practice archives
 use the same section layout as the workbench: they include official fixtures
-and typed input adapters, a blank current-attempt function, an empty agent
+and typed input/output adapters, a blank current-attempt function, an empty agent
 solution registry, and blank analysis headings. After implementing the current
 attempt, run that file directly to exercise it against its sample cases. The
 bulk runner skips practice archives until a later review fills the solution and

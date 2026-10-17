@@ -84,6 +84,10 @@ func maximumHouseRobberCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Maximum houses and values", Input: string(input), Want: `20000`}
 }
 
+func formatHouseRobberOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

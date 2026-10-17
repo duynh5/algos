@@ -111,6 +111,10 @@ func maximumCourseScheduleIiCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Maximum chain has a unique ordering", Input: string(input), Want: string(want)}
 }
 
+func formatCourseScheduleIiOutput(result []int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

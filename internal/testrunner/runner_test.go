@@ -42,6 +42,41 @@ func TestDecodeJSONArgsReturnsArgumentContext(t *testing.T) {
 	}
 }
 
+func TestFormatJSONOutput(t *testing.T) {
+	tests := []struct {
+		name  string
+		value any
+		want  string
+	}{
+		{name: "integer", value: 42, want: `42`},
+		{name: "string", value: "answer", want: `"answer"`},
+		{name: "slice", value: []int{2, 1}, want: `[2,1]`},
+		{name: "nil slice", value: []int(nil), want: `[]`},
+		{name: "nested nil slice", value: [][]int{nil, []int{1}}, want: `[[],[1]]`},
+		{name: "heterogeneous operations", value: []any{nil, true, 3}, want: `[null,true,3]`},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := FormatJSONOutput(test.value); got != test.want {
+				t.Fatalf("FormatJSONOutput() = %q, want %q", got, test.want)
+			}
+		})
+	}
+}
+
+func TestFormatJSONOutputPanicsForUnsupportedValue(t *testing.T) {
+	defer func() {
+		recovered := recover()
+		err, isError := recovered.(error)
+		if recovered == nil || !isError || !strings.Contains(err.Error(), "format JSON output") {
+			t.Fatalf("FormatJSONOutput() panic = %v, want contextual formatting error", recovered)
+		}
+	}()
+
+	FormatJSONOutput(make(chan int))
+}
+
 func TestRunReportsPassesAndFailures(t *testing.T) {
 	cases := []Case{{Name: "Example", Input: "hello", Want: "HELLO"}}
 	solutions := []Solution{

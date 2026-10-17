@@ -25,7 +25,7 @@ ID metadata used under `problems/`. Do not put the retrieved problem in
    difficulty and source names and zero-padding numeric problem IDs to at least
    four digits.
 3. Fill in the complete prompt, source metadata, problem-specific judge-owned
-   types, strongly typed input parser, structural output formatter when needed,
+   types, strongly typed input parser, problem-specific output formatter,
    and all official examples as executable `sampleCases`.
 4. Add useful valid coverage beyond the official examples, including minimum,
    boundary, duplicate, adversarial, transition, and constraint-extreme cases
@@ -98,9 +98,11 @@ preserving the user's algorithm body.
    problem-specific parser and call it at the start of the user's current
    implementation so the parsed, strongly typed arguments are ready for their
    algorithm. Keep setup used only by the current attempt at the top of that
-   function. Add and wire an output formatter at the same boundary when the
-   judge result needs structural serialization. Preserve the user's algorithm
-   body while adding this setup.
+   function. Add and wire a problem-specific output formatter at the same
+   boundary for every problem. Ordinary scalar and collection results should
+   use `testrunner.FormatJSONOutput`; structural and custom-judge results must
+   convert to the statement's representation first. Preserve the user's
+   algorithm body while adding this setup.
 3. Preserve and review the user's attempt. Keep `solveCurrentAttempt` and its
    algorithm body intact except for the problem-specific parsing or formatting
    setup explicitly described above. Do not refactor it into a helper, rename

@@ -12,6 +12,151 @@ import (
 	"unicode"
 )
 
+func problemOutputType(entry catalogEntry, meta metadata, parameters []parameter) string {
+	if meta.SystemDesign {
+		return "operationResults"
+	}
+	if entry.ID == "138" {
+		return "randomList"
+	}
+	if entry.ID == "133" {
+		return "graphNode"
+	}
+	if entry.ID == "427" {
+		return "quadNode"
+	}
+	if meta.Output != nil {
+		if meta.Output.ParamIndex < 0 || meta.Output.ParamIndex >= len(parameters) {
+			panic(fmt.Sprintf("problem %s output parameter index %d is out of range", entry.ID, meta.Output.ParamIndex))
+		}
+		return parameters[meta.Output.ParamIndex].Type
+	}
+	return meta.Return.Type
+}
+
+func writeOutputFormatter(output *bytes.Buffer, entry catalogEntry, functionName string, meta metadata, parameters []parameter) {
+	if entry.ID == "26" || entry.ID == "27" || entry.ID == "80" {
+		writeRetainedPrefixOutputFormatter(output, entry, functionName)
+		return
+	}
+	problemType := problemOutputType(entry, meta, parameters)
+	resultType := goType(problemType)
+	fmt.Fprintf(output, "func format%sOutput(result %s) string {\n", functionName, resultType)
+	switch problemType {
+	case "TreeNode":
+		writeTreeOutputFormatter(output, entry)
+	case "ListNode":
+		fmt.Fprintln(output, "\tvalues := make([]int, 0)")
+		fmt.Fprintln(output, "\tfor node := result; node != nil; node = node.Next {")
+		fmt.Fprintln(output, "\t\tif len(values) == 100000 { panic(\"format output: linked list exceeds 100000 nodes or contains a cycle\") }")
+		fmt.Fprintln(output, "\t\tvalues = append(values, node.Val)")
+		fmt.Fprintln(output, "\t}")
+		fmt.Fprintln(output, "\treturn testrunner.FormatJSONOutput(values)")
+	case "character[][]":
+		fmt.Fprintln(output, "\trows := make([][]string, len(result))")
+		fmt.Fprintln(output, "\tfor row := range result { rows[row] = make([]string, len(result[row])); for column, value := range result[row] { rows[row][column] = string(value) } }")
+		fmt.Fprintln(output, "\treturn testrunner.FormatJSONOutput(rows)")
+	case "randomList":
+		fmt.Fprintln(output, "\tpairs := make([][2]any, len(result))")
+		fmt.Fprintln(output, "\tfor index, entry := range result { pairs[index] = [2]any{entry.Value, entry.RandomIndex} }")
+		fmt.Fprintln(output, "\treturn testrunner.FormatJSONOutput(pairs)")
+	case "graphNode":
+		writeGraphOutputFormatter(output)
+	case "quadNode":
+		writeQuadTreeOutputFormatter(output)
+	case "double":
+		fmt.Fprintln(output, "\treturn fmt.Sprintf(\"%.5f\", result)")
+	case "double[]", "list<double>":
+		fmt.Fprintln(output, "\tformatted := \"[\"")
+		fmt.Fprintln(output, "\tfor index, value := range result { if index > 0 { formatted += \",\" }; formatted += fmt.Sprintf(\"%.5f\", value) }")
+		fmt.Fprintln(output, "\treturn formatted + \"]\"")
+	default:
+		fmt.Fprintln(output, "\treturn testrunner.FormatJSONOutput(result)")
+	}
+	fmt.Fprintln(output, "}")
+	fmt.Fprintln(output)
+}
+
+func writeGraphOutputFormatter(output *bytes.Buffer) {
+	fmt.Fprintln(output, "\tif result == nil { return `[]` }")
+	fmt.Fprintln(output, "\tadjacency := make([][]int, 0)")
+	fmt.Fprintln(output, "\tseen := make(map[*GraphNode]bool); queue := []*GraphNode{result}")
+	fmt.Fprintln(output, "\tfor len(queue) > 0 {")
+	fmt.Fprintln(output, "\t\tnode := queue[0]; queue = queue[1:]; if seen[node] { continue }; seen[node] = true")
+	fmt.Fprintln(output, "\t\tif len(seen) > 100 { panic(\"format output: graph exceeds 100 nodes\") }")
+	fmt.Fprintln(output, "\t\tfor len(adjacency) < node.Val { adjacency = append(adjacency, nil) }")
+	fmt.Fprintln(output, "\t\tfor _, neighbor := range node.Neighbors { adjacency[node.Val-1] = append(adjacency[node.Val-1], neighbor.Val); if !seen[neighbor] { queue = append(queue, neighbor) } }")
+	fmt.Fprintln(output, "\t}")
+	fmt.Fprintln(output, "\treturn testrunner.FormatJSONOutput(adjacency)")
+}
+
+func writeQuadTreeOutputFormatter(output *bytes.Buffer) {
+	fmt.Fprintln(output, "\tif result == nil { return `[]` }")
+	fmt.Fprintln(output, "\tvalues := make([]any, 0); queue := []*QuadNode{result}")
+	fmt.Fprintln(output, "\tfor len(queue) > 0 {")
+	fmt.Fprintln(output, "\t\tnode := queue[0]; queue = queue[1:]")
+	fmt.Fprintln(output, "\t\tif node == nil { values = append(values, nil); continue }")
+	fmt.Fprintln(output, "\t\tleaf, value := 0, 0; if node.IsLeaf { leaf = 1 }; if node.Val || !node.IsLeaf { value = 1 }")
+	fmt.Fprintln(output, "\t\tvalues = append(values, [2]int{leaf, value})")
+	fmt.Fprintln(output, "\t\tif node.IsLeaf { queue = append(queue, nil, nil, nil, nil) } else { queue = append(queue, node.TopLeft, node.TopRight, node.BottomLeft, node.BottomRight) }")
+	fmt.Fprintln(output, "\t\tif len(values) > 5500 { panic(\"format output: quad tree exceeds its maximum serialized size or contains a cycle\") }")
+	fmt.Fprintln(output, "\t}")
+	fmt.Fprintln(output, "\tfor len(values) > 0 && values[len(values)-1] == nil { values = values[:len(values)-1] }")
+	fmt.Fprintln(output, "\treturn testrunner.FormatJSONOutput(values)")
+}
+
+func writeRetainedPrefixOutputFormatter(output *bytes.Buffer, entry catalogEntry, functionName string) {
+	fmt.Fprintf(output, "func format%sOutput(k int, nums []int) string {\n", functionName)
+	fmt.Fprintln(output, "\tif k < 0 || k > len(nums) { panic(fmt.Sprintf(\"format output: k=%d outside [0,%d]\", k, len(nums))) }")
+	if entry.ID == "27" {
+		fmt.Fprintln(output, "\tretained := append([]int(nil), nums[:k]...)")
+		fmt.Fprintln(output, "\tfor index := 1; index < len(retained); index++ { for current := index; current > 0 && retained[current] < retained[current-1]; current-- { retained[current], retained[current-1] = retained[current-1], retained[current] } }")
+		fmt.Fprintln(output, "\tnums = append(retained, nums[k:]...)")
+	}
+	fmt.Fprintln(output, "\tformatted := fmt.Sprintf(\"%d, nums = [\", k)")
+	fmt.Fprintln(output, "\tfor index := range nums { if index > 0 { formatted += \",\" }; if index < k { formatted += fmt.Sprint(nums[index]) } else { formatted += \"_\" } }")
+	fmt.Fprintln(output, "\treturn formatted + \"]\"")
+	fmt.Fprintln(output, "}")
+	fmt.Fprintln(output)
+}
+
+func writeTreeOutputFormatter(output *bytes.Buffer, entry catalogEntry) {
+	if entry.ID == "236" {
+		fmt.Fprintln(output, "\tif result == nil { return `null` }")
+		fmt.Fprintln(output, "\treturn testrunner.FormatJSONOutput(result.Val)")
+		return
+	}
+	if entry.ID == "117" {
+		fmt.Fprintln(output, "\tif result == nil { return `[]` }")
+		fmt.Fprintln(output, "\tparts := make([]string, 0)")
+		fmt.Fprintln(output, "\tfor levelStart := result; levelStart != nil; {")
+		fmt.Fprintln(output, "\t\tvar nextLevelStart *TreeNode")
+		fmt.Fprintln(output, "\t\tfor node := levelStart; node != nil; node = node.Next {")
+		fmt.Fprintln(output, "\t\t\tparts = append(parts, fmt.Sprint(node.Val))")
+		fmt.Fprintln(output, "\t\t\tif nextLevelStart == nil { if node.Left != nil { nextLevelStart = node.Left } else if node.Right != nil { nextLevelStart = node.Right } }")
+		fmt.Fprintln(output, "\t\t}")
+		fmt.Fprintln(output, "\t\tparts = append(parts, \"#\")")
+		fmt.Fprintln(output, "\t\tlevelStart = nextLevelStart")
+		fmt.Fprintln(output, "\t}")
+		fmt.Fprintln(output, "\tformatted := \"[\"")
+		fmt.Fprintln(output, "\tfor index, part := range parts { if index > 0 { formatted += \",\" }; formatted += part }")
+		fmt.Fprintln(output, "\treturn formatted + \"]\"")
+		return
+	}
+	fmt.Fprintln(output, "\tif result == nil { return `[]` }")
+	fmt.Fprintln(output, "\tvalues := make([]any, 0)")
+	fmt.Fprintln(output, "\tqueue := []*TreeNode{result}")
+	fmt.Fprintln(output, "\tnodeCount := 0")
+	fmt.Fprintln(output, "\tfor len(queue) > 0 {")
+	fmt.Fprintln(output, "\t\tnode := queue[0]; queue = queue[1:]")
+	fmt.Fprintln(output, "\t\tif node == nil { values = append(values, nil); continue }")
+	fmt.Fprintln(output, "\t\tnodeCount++; if nodeCount > 100000 { panic(\"format output: tree exceeds 100000 nodes or contains a cycle\") }")
+	fmt.Fprintln(output, "\t\tvalues = append(values, node.Val); queue = append(queue, node.Left, node.Right)")
+	fmt.Fprintln(output, "\t}")
+	fmt.Fprintln(output, "\tfor len(values) > 0 && values[len(values)-1] == nil { values = values[:len(values)-1] }")
+	fmt.Fprintln(output, "\treturn testrunner.FormatJSONOutput(values)")
+}
+
 func writeStructuralDecoders(output *bytes.Buffer, parameters []parameter) {
 	types := make(map[string]bool)
 	for _, param := range parameters {
@@ -97,7 +242,8 @@ func writeWorkbenchScaffold(output *bytes.Buffer, functionName string, parameter
 		fmt.Fprintf(output, "\t_ = %s\n", name)
 	}
 	fmt.Fprintln(output)
-	fmt.Fprintln(output, "\t// Implement your algorithm with the typed values above.")
+	fmt.Fprintln(output, "\t// Implement your algorithm with the typed values above, then pass its")
+	fmt.Fprintf(output, "\t// typed result to format%sOutput.\n", functionName)
 	fmt.Fprintln(output, "\treturn \"\"")
 	fmt.Fprintln(output, "}")
 	fmt.Fprintln(output)
@@ -184,6 +330,12 @@ func goType(problemType string) string {
 		return "[]*ListNode"
 	case "operationArguments":
 		return "[][]json.RawMessage"
+	case "operationResults":
+		return "[]any"
+	case "graphNode":
+		return "*GraphNode"
+	case "quadNode":
+		return "*QuadNode"
 	case "randomList":
 		return "[]randomListEntry"
 	default:

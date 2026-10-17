@@ -251,8 +251,9 @@ func renderArchive(entry catalogEntry, q question, meta metadata) ([]byte, error
 	fmt.Fprintln(&output, "//")
 	fmt.Fprintln(&output, "// This intentionally unsolved practice archive follows the workbench template.")
 	fmt.Fprintln(&output)
-	writeSupportTypes(&output, entry, parameters)
+	writeSupportTypes(&output, entry, parameters, problemOutputType(entry, meta, parameters))
 	writeParser(&output, entry, functionName, parameters)
+	writeOutputFormatter(&output, entry, functionName, meta, parameters)
 	writeCases(&output, cases)
 	writeWorkbenchScaffold(&output, functionName, parameters)
 	return output.Bytes(), nil
@@ -355,11 +356,12 @@ func cleanHTML(source string) string {
 	return strings.TrimSpace(text)
 }
 
-func writeSupportTypes(output *bytes.Buffer, entry catalogEntry, parameters []parameter) {
+func writeSupportTypes(output *bytes.Buffer, entry catalogEntry, parameters []parameter, outputType string) {
 	types := make(map[string]bool)
 	for _, param := range parameters {
 		types[param.Type] = true
 	}
+	types[outputType] = true
 	if types["TreeNode"] {
 		fmt.Fprintln(output, "type TreeNode struct {")
 		fmt.Fprintln(output, "\tVal int")
@@ -378,6 +380,20 @@ func writeSupportTypes(output *bytes.Buffer, entry catalogEntry, parameters []pa
 		fmt.Fprintln(output, "type randomListEntry struct {")
 		fmt.Fprintln(output, "\tValue int")
 		fmt.Fprintln(output, "\tRandomIndex *int")
+		fmt.Fprintln(output, "}")
+		fmt.Fprintln(output)
+	}
+	if types["graphNode"] {
+		fmt.Fprintln(output, "type GraphNode struct {")
+		fmt.Fprintln(output, "\tVal int")
+		fmt.Fprintln(output, "\tNeighbors []*GraphNode")
+		fmt.Fprintln(output, "}")
+		fmt.Fprintln(output)
+	}
+	if types["quadNode"] {
+		fmt.Fprintln(output, "type QuadNode struct {")
+		fmt.Fprintln(output, "\tVal, IsLeaf bool")
+		fmt.Fprintln(output, "\tTopLeft, TopRight, BottomLeft, BottomRight *QuadNode")
 		fmt.Fprintln(output, "}")
 		fmt.Fprintln(output)
 	}

@@ -25,6 +25,13 @@ PASTE THE COMPLETE PROBLEM ABOVE THIS LINE
 // after the problem, such as parseTwoSumInput. Put setup used only by the
 // current attempt at the top of solveCurrentAttempt below.
 
+// formatCurrentProblemOutput serializes ordinary scalar, slice, and matrix
+// results for the test runner. Rename it for the problem and replace its body
+// only when the judge uses a structural or custom output representation.
+func formatCurrentProblemOutput(result any) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Add one entry per example. Encode arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
@@ -65,11 +72,12 @@ var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolut
 // solveCurrentAttempt is the only function you need to change initially. It
 // receives the exact sample input string and returns the expected output form.
 // Parse with the problem-specific adapter above, keep the algorithm strongly
-// typed, and format structural output with a problem-specific formatter.
+// typed, and pass the result to the problem-specific output formatter.
 // Leading and trailing whitespace is ignored during comparison; internal
 // whitespace remains significant.
 func solveCurrentAttempt(input string) string {
-	// Parse input, implement your algorithm, and return the formatted answer.
+	// Parse input, implement your algorithm, then return
+	// formatCurrentProblemOutput(result).
 	return ""
 }
 

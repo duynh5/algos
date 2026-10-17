@@ -8,8 +8,9 @@ sample execution lives in [`internal/testrunner`](../internal/testrunner/).
 ## Quick start
 
 1. Paste the problem into the `PROBLEM` block comment in `main.go`.
-2. Define shared judge-owned types and problem-specific input/output adapters
-   in the compact support block immediately below the statement.
+2. Define shared judge-owned types, a problem-specific input parser, and a
+   problem-specific output formatter in the compact support block immediately
+   below the statement.
 3. Add every supplied example to the `sampleCases` slice.
 4. Implement `solveCurrentAttempt` using the typed adapter values.
 5. Run `./scripts/workbench.sh` from the repository root.
@@ -18,9 +19,8 @@ sample execution lives in [`internal/testrunner`](../internal/testrunner/).
 When you ask Codex to add the inputs or examples, it also completes the initial
 input setup in your current implementation: it creates or updates the
 problem-specific parser and calls it at the start of `solveCurrentAttempt`, so
-your algorithm begins with strongly typed arguments. If structural output needs
-conversion, Codex also wires the matching formatter without replacing your
-algorithm body.
+your algorithm begins with strongly typed arguments. Codex also wires the
+matching output formatter without replacing your algorithm body.
 
 The agent sets `archiveReady` to `true` only after the completed problem, the
 preserved current attempt, and all three agent-authored solutions pass their
@@ -52,9 +52,11 @@ func parseTwoSumInput(input string) ([]int, int) {
 Structural problems keep the same readable sample representation and perform
 the conversion inside their adapter. For example, a linked-list parser decodes
 two `[]int` arguments and builds two `*ListNode` values. Trees, graphs, matrices,
-and custom judge types follow the same pattern. Add a problem-specific formatter
-when the typed result also needs conversion back to the statement's output
-form. Handle decoding and formatting errors at these adapter boundaries.
+and custom judge types follow the same pattern. Every problem has a
+problem-specific formatter: ordinary scalar and collection results delegate to
+`testrunner.FormatJSONOutput`, while structural or custom results convert to the
+statement's output form first. Handle decoding and formatting errors at these
+adapter boundaries.
 
 If copied problem text contains the uncommon sequence `*/`, change it to `* /`
 so it does not close the Go block comment early.

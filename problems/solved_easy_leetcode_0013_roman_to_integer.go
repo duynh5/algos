@@ -129,6 +129,10 @@ var romanTokens = [...]romanToken{
 	{symbol: "I", value: 1},
 }
 
+func formatRomanToIntegerOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

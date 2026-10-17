@@ -86,6 +86,10 @@ func maximumLongestConsecutiveSequenceCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Maximum descending consecutive run", Input: string(input), Want: `100000`}
 }
 
+func formatLongestConsecutiveSequenceOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

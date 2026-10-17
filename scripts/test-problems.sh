@@ -22,6 +22,10 @@ if [[ ${#problem_files[@]} -eq 0 ]]; then
 fi
 
 for problem_file in "${problem_files[@]}"; do
+  if ! rg -q '^func format[A-Za-z0-9]+Output\(' "$problem_file"; then
+    echo "error: $(basename "$problem_file") has no problem-specific output formatter" >&2
+    exit 1
+  fi
   if rg -q '^const archiveReady = false$' "$problem_file"; then
     echo "Skipping $(basename "$problem_file") (unfinished practice archive)"
     continue

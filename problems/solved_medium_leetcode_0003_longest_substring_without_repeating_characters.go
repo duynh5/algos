@@ -59,6 +59,10 @@ func parseLongestSubstringInput(input string) string {
 	return s
 }
 
+func formatLongestSubstringWithoutRepeatingCharactersOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Add one entry per example. Encode arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

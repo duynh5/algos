@@ -88,6 +88,10 @@ func parseMinimumGeneticMutationInput(input string) (string, string, []string) {
 	return startGene, endGene, bank
 }
 
+func formatMinimumGeneticMutationOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

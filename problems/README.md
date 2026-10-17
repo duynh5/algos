@@ -5,7 +5,7 @@ files contain their statement, samples, preserved current attempt, three
 agent-authored solutions, and correctness and complexity analysis. Unsolved
 practice files follow the same section layout, but leave the current-attempt
 body, agent solution registry, and analysis content blank for later work. They
-retain the source statement, official examples, typed input adapters, and
+retain the source statement, official examples, typed input/output adapters, and
 `archiveReady = false` marker.
 
 After implementing a practice file's current attempt, run that file directly

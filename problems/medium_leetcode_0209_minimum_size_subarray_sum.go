@@ -93,6 +93,10 @@ func maximumMinimumSizeSubarraySumCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Maximum target needs the entire maximum array", Input: string(input), Want: `100000`}
 }
 
+func formatMinimumSizeSubarraySumOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

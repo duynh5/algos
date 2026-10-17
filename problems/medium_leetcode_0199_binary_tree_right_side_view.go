@@ -139,6 +139,10 @@ func maximumBinaryTreeRightSideViewCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Maximum left chain exposes every node", Input: string(input), Want: string(output)}
 }
 
+func formatBinaryTreeRightSideViewOutput(result []int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

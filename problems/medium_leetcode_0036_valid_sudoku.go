@@ -116,6 +116,10 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 	return result, nil
 }
 
+func formatValidSudokuOutput(result bool) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

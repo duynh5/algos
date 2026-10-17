@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -29,6 +30,42 @@ func DecodeJSONArgs(input string, destinations ...any) error {
 		}
 	}
 	return nil
+}
+
+// FormatJSONOutput serializes a typed algorithm result into the JSON text used
+// by sample cases. Nil slices are emitted as [] to match judge collection
+// output. Problem-specific formatters should wrap this helper when the judge
+// uses ordinary JSON output.
+func FormatJSONOutput(value any) string {
+	output, err := json.Marshal(normalizeJSONOutputValue(reflect.ValueOf(value)))
+	if err != nil {
+		panic(fmt.Errorf("format JSON output: %w", err))
+	}
+	return string(output)
+}
+
+func normalizeJSONOutputValue(value reflect.Value) any {
+	if !value.IsValid() {
+		return nil
+	}
+	if value.Kind() == reflect.Interface {
+		if value.IsNil() {
+			return nil
+		}
+		return normalizeJSONOutputValue(value.Elem())
+	}
+	if value.Kind() != reflect.Slice && value.Kind() != reflect.Array {
+		return value.Interface()
+	}
+	if value.Kind() == reflect.Slice && value.IsNil() {
+		return []any{}
+	}
+
+	items := make([]any, value.Len())
+	for index := range items {
+		items[index] = normalizeJSONOutputValue(value.Index(index))
+	}
+	return items
 }
 
 // Case describes one sample input and its expected output.

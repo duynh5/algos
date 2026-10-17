@@ -88,6 +88,10 @@ func maximumFindPeakElementCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Maximum strictly increasing array", Input: string(input), Want: `999`}
 }
 
+func formatFindPeakElementOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

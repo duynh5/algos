@@ -103,6 +103,10 @@ func maximumFindKPairsWithSmallestSumsCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Maximum arrays and requested pairs", Input: string(input), Want: string(output)}
 }
 
+func formatFindKPairsWithSmallestSumsOutput(result [][]int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

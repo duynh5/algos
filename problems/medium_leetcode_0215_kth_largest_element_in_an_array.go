@@ -87,6 +87,10 @@ func maximumKthLargestElementInAnArrayCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Maximum input asks for the minimum", Input: string(input), Want: `-10000`}
 }
 
+func formatKthLargestElementInAnArrayOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

@@ -110,6 +110,10 @@ func makeMaximumNestedBasicCalculatorCase() testrunner.Case {
 	}
 }
 
+func formatBasicCalculatorOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

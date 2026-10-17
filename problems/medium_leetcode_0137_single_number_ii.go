@@ -83,6 +83,10 @@ func maximumSingleNumberIiCase() testrunner.Case {
 	return testrunner.Case{Name: "Boundary: Largest valid input with minimum unique value", Input: string(input), Want: `-2147483648`}
 }
 
+func formatSingleNumberIiOutput(result int) string {
+	return testrunner.FormatJSONOutput(result)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{

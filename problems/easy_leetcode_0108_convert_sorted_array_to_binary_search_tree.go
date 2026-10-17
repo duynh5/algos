@@ -70,6 +70,38 @@ func parseConvertSortedArrayToBinarySearchTreeInput(input string) []int {
 	return nums
 }
 
+type TreeNode struct {
+	Val               int
+	Left, Right, Next *TreeNode
+}
+
+func formatConvertSortedArrayToBinarySearchTreeOutput(root *TreeNode) string {
+	if root == nil {
+		return "[]"
+	}
+	values := make([]any, 0)
+	queue := []*TreeNode{root}
+	nodeCount := 0
+	for len(queue) > 0 {
+		node := queue[0]
+		queue = queue[1:]
+		if node == nil {
+			values = append(values, nil)
+			continue
+		}
+		nodeCount++
+		if nodeCount > 10000 {
+			panic("format convert-sorted-array-to-binary-search-tree output: tree exceeds 10000 nodes or contains a cycle")
+		}
+		values = append(values, node.Val)
+		queue = append(queue, node.Left, node.Right)
+	}
+	for len(values) > 0 && values[len(values)-1] == nil {
+		values = values[:len(values)-1]
+	}
+	return testrunner.FormatJSONOutput(values)
+}
+
 // sampleCases contains the examples that every registered solution must pass.
 // Inputs encode the judge arguments as a positional JSON array.
 var sampleCases = []testrunner.Case{
