@@ -4,6 +4,11 @@ This index is the learning roadmap and coverage tracker. Linked entries have a
 dedicated explanation and tested Go example. Unlinked entries are planned and
 should be added when studying the topic or when a solved problem needs them.
 
+When the difficult part is choosing an approach, start with the
+[problem-solving method selection guide](patterns/#problem-solving-method-selection-guide).
+It maps problem signals and constraints to likely methods, then lists the
+conditions that must be true before each method is safe to use.
+
 Every concept page should explain:
 
 - what the concept models and when to recognize it;
@@ -12,6 +17,12 @@ Every concept page should explain:
 - an idiomatic Go template or implementation when applicable;
 - common mistakes and boundary cases;
 - links to representative solved problems.
+
+This curriculum is a living reference. When a reviewed problem introduces a
+new method, recognition signal, invariant, warning, or representative example,
+update the owning concept page. Update the method selection guide when that
+evidence changes how a solver should choose between approaches. Link to the
+owning page instead of duplicating its detailed explanation.
 
 ## Foundations
 
