@@ -248,12 +248,30 @@ comparison possible without relying on rounded decimal values.
 as `2/4`. Before filing the values, rewrite both labels as `1/2`. Then equal
 amounts always go into the same drawer.
 
+#### Shared divisors and multiples (GCD and LCM)
+
+The **greatest common divisor (GCD)** is the largest positive integer that
+divides two values. Euclid's algorithm finds it by repeatedly replacing
+`(a, b)` with `(b, a % b)` until `b` is zero. For `gcd(18, 12)`, the pairs are
+`(18, 12)`, `(12, 6)`, and `(6, 0)`, so the answer is `6`.
+
+The **least common multiple (LCM)** is the smallest positive integer divisible
+by both values. For non-negative `a` and `b`, calculate it with:
+
+```text
+lcm(a, b) = a / gcd(a, b) * b
+```
+
+For `18` and `12`, this gives `18 / 6 * 12 = 36`. Dividing before multiplying
+reduces the chance of overflow, but the final result can still be too large for
+the integer type. If either value is zero, return an LCM of zero before using
+the formula. For negative inputs, use their non-negative magnitudes.
+
 #### Fractions and ratios
 
 For a fraction stored as `(numerator, denominator)`:
 
-1. Find the greatest common divisor (GCD), which is the largest positive
-   integer that divides both values.
+1. Find the GCD of the numerator and denominator.
 2. Divide both values by the GCD.
 3. Keep any negative sign on the numerator, so the denominator is positive.
 
@@ -262,32 +280,51 @@ the sign moves to the numerator. The equal fractions `2/4`, `3/6`, and
 `-1/-2` all become `(1, 2)`. These pairs can safely be used as map keys because
 equal fractions now produce equal keys.
 
-Euclid's algorithm finds the GCD by repeatedly replacing `(a, b)` with
-`(b, a % b)` until `b` is zero. For `gcd(18, 12)`, the pairs are `(18, 12)`,
-`(12, 6)`, and `(6, 0)`, so the answer is `6`. Work with non-negative
-magnitudes and handle zero deliberately. In particular, `(0, 0)` is not a
-valid fraction and must not reach a division step. Any zero denominator is
-invalid. A zero numerator with a non-zero denominator should become `(0, 1)`.
+A zero denominator is invalid and must not reach the division step. A zero
+numerator with a non-zero denominator should become `(0, 1)`.
 
-For non-negative `a` and `b`, first return zero if either value is zero.
-Otherwise, calculate the least common multiple (LCM) with
-`a / gcd(a, b) * b`. Divide before multiplying to reduce the chance of integer
-overflow. This only reduces the risk; the final result can still be too large
-for the chosen integer type.
+#### Grouping points on the same line without rounding
 
-#### Slopes without rounding
+Pick one point as the starting point. For every other point, calculate the
+horizontal and vertical movement in the usual `(x, y)` order:
 
-For points with integer coordinates, store a slope as the pair
-`(change in y, change in x)` instead of as a floating-point number. Reduce the
-pair like a fraction and use one sign rule. For example, `(2, -4)` becomes
-`(-1, 2)`.
+```text
+changeX = otherX - startX
+changeY = otherY - startY
+```
 
-Choose one fixed pair for every vertical line and another for every horizontal
-line, such as `(1, 0)` and `(0, 1)`. Two identical points produce `(0, 0)`;
-count them separately because they do not define a slope. This representation
-lets a map group equal slopes without decimal rounding. Calculate the two
-coordinate differences in a type large enough to hold them before reducing the
-pair.
+The pair `(changeX, changeY)` describes the movement from the starting point.
+The slope would be `changeY / changeX`, but division is unnecessary. Movement
+pairs `(1, 2)`, `(2, 4)`, and `(-1, -2)` all follow the same straight line.
+Reduce them to one shared pair so a map can count them together.
+
+For example, start at `(1, 1)`:
+
+| Other point | Movement from `(1, 1)` | Reduced pair |
+| --- | --- | --- |
+| `(2, 3)` | `(1, 2)` | `(1, 2)` |
+| `(3, 5)` | `(2, 4)` | `(1, 2)` |
+| `(0, -1)` | `(-1, -2)` | `(1, 2)` |
+
+Every row has the same reduced pair, so all four points are on one line.
+
+Normalize each movement pair in this order:
+
+1. Calculate both changes in an integer type large enough to hold the
+   subtraction.
+2. If both changes are zero, the points are identical. Count the duplicate
+   separately because it does not define a direction.
+3. If `changeX` is zero, use one fixed pair such as `(0, 1)` for every vertical
+   line.
+4. If `changeY` is zero, use one fixed pair such as `(1, 0)` for every
+   horizontal line.
+5. Otherwise, ignore the signs while finding the GCD, then divide both changes
+   by it. If `changeX` is negative, reverse both signs so the first value is
+   always positive.
+
+Using reduced integer pairs avoids decimal rounding. More importantly, it
+guarantees that every movement along the same line produces exactly the same
+map key.
 
 #### Remainders and division with negative values
 
