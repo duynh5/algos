@@ -1,38 +1,64 @@
 # Integer Digit Processing
 
-Decimal digits can be processed without converting an integer to a string.
-For a nonnegative value, `value % 10` extracts the final digit and `value / 10`
-removes it. A loop can therefore inspect digits from right to left.
+## Mental model
 
-## Reversing digits
+An integer's decimal digits can be removed from right to left without first
+turning the number into text:
 
-To append an extracted digit to another integer:
+- `value % 10` returns the final digit;
+- `value / 10` removes the final digit because integer division drops the
+  remainder.
+
+For example, `123 % 10` is `3`, and `123 / 10` is `12`.
+
+## Worked example: reversing digits
+
+To move each extracted digit into a new integer:
 
 ```go
 reversed = reversed*10 + value%10
 value /= 10
 ```
 
-After `k` iterations, `value` is the original number with its last `k` digits
-removed, while `reversed` contains those digits in reverse order. When `value`
-reaches zero, `reversed` is the complete decimal reversal.
+Starting with `value = 120` and `reversed = 0`:
 
-## Integer safety
+| Step | Extracted digit | New `reversed` | Remaining `value` |
+| --- | --- | --- | --- |
+| 1 | `0` | `0` | `12` |
+| 2 | `2` | `2` | `1` |
+| 3 | `1` | `21` | `0` |
 
-Check `reversed > (limit-digit)/10` before multiplying and adding when the
-reversed value might exceed its integer type. A wider intermediate is enough
-when the input contract guarantees that every possible reversal fits it.
+The result is `21`, not `021`, because an integer does not store leading zeroes.
 
-Negative values need an explicit contract: their sign is not a decimal digit.
-Reversing `120` produces `21`, because integers do not preserve leading zeroes.
+## Invariant (fact that remains true)
 
-## Complexity
+After `k` passes, `value` is the original number with its final `k` digits
+removed. `reversed` contains those removed digits in the opposite order. When
+`value` reaches zero, every digit has moved.
 
-Processing every digit takes Theta(d) time for a `d`-digit value and O(1)
-auxiliary space. Reversing only half the digits has the same asymptotic bounds
-with roughly half as many iterations.
+## Preventing integer overflow
+
+Multiplying by `10` may exceed the largest value the integer type can hold.
+Before calculating `reversed*10 + digit`, check:
+
+```go
+reversed > (limit-digit)/10
+```
+
+If the comparison is true, the next result would exceed `limit`. The package
+function returns `false` instead of performing that unsafe calculation.
+
+Negative inputs need an explicit rule because the minus sign is not a digit.
+`ReverseNonNegative` rejects them and accepts zero.
+
+## Work and memory
+
+For a number with `d` digits, the loop performs `d` passes, so it uses `O(d)`
+work. It stores only the current digit and two integers, so it uses `O(1)` extra
+memory.
 
 ## Related problems
 
 - [LeetCode 9: Palindrome Number](../../../problems/solved_easy_leetcode_0009_palindrome_number.go)
-  compares full reversal with the original and also demonstrates half reversal.
+  compares a full reversal with the original number and also shows how reversing
+  only half of the digits can prove the same result.

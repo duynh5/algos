@@ -1,7 +1,8 @@
 # Data Structures
 
-Data-structure pages focus on invariants, operation costs, Go representation,
-and the tradeoff that makes a structure useful.
+Data-structure pages explain what information a structure stores, what remains
+true after each operation, how it is represented in Go, how much work its
+operations require, and when another structure would be a better choice.
 
 Available:
 

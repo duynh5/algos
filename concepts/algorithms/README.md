@@ -1,7 +1,8 @@
 # Algorithms
 
-Algorithm pages explain the preconditions, invariant, termination argument, and
-complexity of a general procedure.
+Algorithm pages explain four things about a reusable procedure: what must be
+true before it can be used, what remains true while it runs, why it eventually
+stops, and how its work and memory use grow with the input.
 
 Available:
 

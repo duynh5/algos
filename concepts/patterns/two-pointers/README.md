@@ -1,109 +1,120 @@
 # Two Pointers
 
-The two-pointers pattern tracks two meaningful positions instead of repeatedly
-scanning a range. Common forms move inward from both ends, advance through two
-sorted inputs, move at different speeds, or maintain the boundary of a valid
-window. Pointers can also move symmetrically outward from a candidate center.
+## Mental model
 
-`PairSumSorted` demonstrates inward-moving pointers on ascending data.
+Here, a **pointer** simply means a position being tracked. Two pointers avoid
+restarting a scan by moving two meaningful positions in a coordinated way.
+
+Common forms:
+
+- start at both ends and move inward;
+- move through two sorted inputs together;
+- use one position to read and another to write;
+- move outward from the center of a possible palindrome; or
+- move through a linked list at different speeds.
+
+For every move, explain why the position being left behind cannot be needed
+again.
+
+## Finding a pair in sorted values
+
+`PairSumSorted` starts at the smallest and largest values.
+
+**Example:** Find two values totaling `9` in `[1, 2, 4, 7, 11]`.
+
+1. `1 + 11 = 12`, which is too large. Moving the left position would only make
+   the sum larger, so move the right position left.
+2. `1 + 7 = 8`, which is too small. Moving the right position would only make
+   the sum smaller, so move the left position right.
+3. `2 + 7 = 9`, so return those positions.
+
+**Invariant (fact that remains true):** No pair using a position already passed
+by `left` or `right` can meet the target. Sorted order is what makes each
+discarded position safe.
 
 ## Merging sorted arrays
 
-For two sorted inputs, each pointer identifies the smallest unread value. Move
-the pointer whose value is emitted; when either input is exhausted, the other
-input's unread suffix can be copied without further comparisons.
+For two sorted inputs, track the smallest unread value in each one. Copy the
+smaller value to the output and advance only its position.
 
-When the first array has spare capacity at its end, merge backward instead.
-Pointers begin at both inputs' largest populated values, and a third pointer
-begins at the last output slot. Writing the larger unread value preserves the
-invariant that the suffix after the output pointer is complete and sorted. It
-also avoids overwriting unread values in the first array.
+**Example:** Merge `[1, 4]` and `[2, 3]`. Compare `1` with `2` and write `1`;
+then compare `4` with `2` and write `2`; then write `3`; finally copy the
+remaining `4`. The result is `[1, 2, 3, 4]`.
 
-## Compacting a sorted array in place
+If the first array has unused positions at its end, fill it backward. Start at
+the largest real value in each input and write the larger one into the final
+unused position. Filling forward could overwrite a value in the first array
+before it has been read.
 
-For a sorted array, duplicates are adjacent. Keep a read pointer scanning every
-value and a write pointer at the next output slot. The first value is already
-unique. For each later value, compare it with the last kept value at
-`values[write-1]`; copy it to `values[write]` and advance `write` only when the
-values differ.
+## Removing values inside the same array
 
-The invariant is that `values[:write]` contains each distinct value from the
-processed prefix exactly once, in its original order. Because `write` never
-passes `read`, writes cannot destroy unread input. This performs one scan and
-uses no auxiliary collection.
+Use a **read** position to inspect every value and a **write** position to mark
+where the next retained value belongs.
 
-## Compacting by a predicate
+For sorted values, duplicates are next to one another. Keep the first value,
+then copy a later value only when it differs from the last retained value.
 
-The same read/write boundary works when the array is not sorted and the goal is
-to retain every value that satisfies a predicate. Let the read position inspect
-each value and let `write` identify the first slot after the valid prefix. Skip
-values that should be removed; otherwise copy the value to `values[write]` and
-advance `write`.
+**Example:** In `[1, 1, 2, 2, 3]`, keep the first `1`, skip the second `1`, keep
+the first `2`, skip the second `2`, and keep `3`. The first three array
+positions become `[1, 2, 3]`, and the write position ends at `3`.
 
-The invariant is that `values[:write]` contains exactly the retained values
-from the processed prefix, in their original order. The write position never
-passes the read position, so overwriting the current slot cannot destroy unread
-input. If the problem permits reordering and removed values are rare, swapping
-a removed value with the active suffix is another O(n)-time, O(1)-space option.
+The same method removes values from unsorted input: copy a value only when it
+passes the problem's keep/remove test.
+
+**Invariant (fact that remains true):** `values[:write]`, the part before the
+write position, contains exactly the retained values seen so far in their
+original order. Because the write position never passes the read position,
+writing cannot destroy unread input.
 
 ## Expanding around palindrome centers
 
-Every palindrome has one center: a character for odd lengths or a gap between
-characters for even lengths. Try all `n` character centers and `n-1` gap
-centers. For each center, move `left` and `right` outward together while their
-characters match.
+A palindrome reads the same forward and backward. Its center is either one
+character, for an odd length, or the gap between two characters, for an even
+length. Try every character and every gap as a center, then move left and right
+while the characters match.
 
-The invariant is that the range between the pointers is already palindromic
-before the next matching pair is included. Equal endpoints alone are not
-enough: the enclosed range must also be a palindrome. Testing every center is
-what provides coverage; expanding only from the whole string's midpoint can
-miss a palindrome elsewhere.
+**Example:** In `"babad"`, start at the center character `a`. The neighboring
+characters are both `b`, so the matching range grows to `"bab"`. The next pair
+would go beyond the left side and stop.
 
-Center expansion uses O(1) auxiliary space. Its best case is Theta(n) when
-each center stops after constant work, and its worst case is Theta(n^2) when
-many centers expand across much of the input.
+The characters between the two positions must already form a palindrome before
+another matching pair is added. Testing only the center of the complete string
+can miss a palindrome centered elsewhere.
 
-## Invariant
+## Work and memory
 
-For indices outside `[left, right]`, no pair can meet the target. When the sum
-is too small, advancing `left` is the only move that can increase it. When the
-sum is too large, decreasing `right` is the only move that can reduce it.
+| Use | Work | Extra memory |
+| --- | --- | --- |
+| Inward pair search | `O(n)` | `O(1)` |
+| Merge into a new output array | `O(m+n)` | `O(m+n)` |
+| Merge backward into existing unused space | `O(m+n)` | `O(1)` |
+| Remove values or repeated copies in the same array | `O(n)` | `O(1)` |
+| Expand around every palindrome center | Between `O(n)` and `O(n^2)` | `O(1)` |
 
-## Complexity
+Palindrome expansion stops quickly in the best case. In the worst case, many
+centers expand across much of the string.
 
-- Inward pair search: O(n) time and O(1) extra space.
-- Forward merge with an output buffer: O(m+n) time and O(m+n) extra space.
-- Backward merge into existing capacity: O(m+n) time and O(1) extra space.
-- In-place sorted compaction: O(n) time and O(1) extra space.
-- In-place predicate compaction: O(n) time and O(1) extra space.
+## Common mistakes
 
-## Pitfalls
-
-- The inward-moving pair-sum version requires sorted input.
-- Define whether indices or values must be returned.
-- Negative values are valid when the data remains sorted. Do not reuse this
-  movement rule when the problem's predicate breaks monotonicity.
-- Ensure adding two input values cannot overflow `int` for the problem limits.
-- A forward in-place merge can overwrite unread values in the destination.
-  Merge backward when its unused capacity is at the end.
-- Padding values are storage, not input data; use the populated lengths rather
-  than testing whether a value is zero.
-- Sorted compaction should compare against the last kept value, not merely the
-  prior output slot before establishing that the kept prefix is non-empty.
-- Predicate compaction should advance the write position only after retaining a
-  value; advancing it for a removed value leaves gaps in the valid prefix.
-- Alternating which endpoint moves after a mismatch does not prove that the
-  discarded boundary is safe and can skip the longest palindrome.
-- Check both character and gap centers; checking only character centers misses
-  even-length palindromes.
+- The inward pair-sum method requires sorted input.
+- Confirm whether the problem asks for positions or values.
+- Negative values are fine when the data is sorted; sorted order, not whether
+  values are positive, justifies the pointer movement.
+- Check that adding two values cannot exceed Go's `int` limit for the problem.
+- When merging into unused space at the end of the first array, use the supplied
+  populated lengths. A zero may be real input rather than empty padding.
+- Advance the write position only after retaining a value; otherwise gaps appear
+  in the retained portion.
+- For palindromes, test both character centers and gap centers so even lengths
+  are included.
 
 ## Related problems
 
 - [LeetCode 9: Palindrome Number](../../../problems/solved_easy_leetcode_0009_palindrome_number.go)
-  compares mirrored digits with inward-moving endpoints in its direct solution.
+  compares digits from both ends.
 - [LeetCode 5: Longest Palindromic Substring](../../../problems/solved_medium_leetcode_0005_longest_palindromic_substring.go)
-  expands mirrored byte pointers outward from every possible center.
+  expands from every possible center.
 - [LeetCode 26: Remove Duplicates from Sorted Array](../../../problems/solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go)
-  compacts unique values with forward read and write positions.
+  keeps one copy of each value with read and write positions.
 - [LeetCode 27: Remove Element](../../../problems/solved_easy_leetcode_0027_remove_element.go)
-  compacts values that do not match a removal predicate.
+  keeps every value that differs from the requested removal value.

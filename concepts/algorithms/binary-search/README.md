@@ -1,48 +1,85 @@
 # Binary Search and Bounds
 
-Binary search applies when a search space has a monotonic decision: after some
-boundary, a predicate remains true. Searching a sorted slice is the most common
-example, but the same reasoning supports binary search over an answer range.
+## Mental model
 
-## Invariant
+Binary search repeatedly tests the middle possible answer and discards one half.
+It is safe only when all "no" answers form one consecutive group and all "yes"
+answers form another, so the result changes at most once.
 
-`LowerBound` maintains a half-open interval `[left, right)` containing the first
-index whose value could be at least the target. When the interval is empty,
-`left` is the insertion point.
+The most familiar example is finding a value in sorted data. The same idea can
+find the smallest numeric answer for which a yes/no test succeeds.
 
-`UpperBound` uses the same interval but finds the first value strictly greater
-than the target.
+## Recognize it
 
-## Rotated arrays
+Use binary search when:
 
-A distinct-value sorted array that has been rotated is not globally sorted,
-but every non-empty search interval has at least one sorted half. After checking
-the midpoint for equality, compare the interval endpoints to determine which
-half is sorted. Keep that half only when its inclusive outer endpoint and
-exclusive midpoint bounds contain the target; otherwise keep the other half.
+- the values are sorted;
+- the problem asks for the first or last position meeting a condition; or
+- possible numeric answers have a single boundary between failure and success.
 
-With a closed `[left, right]` interval, every nonmatching step must exclude the
-midpoint with `middle+1` or `middle-1`. If the interval becomes empty, the
-target is absent.
+Do not use it merely because the answer is a number. You must be able to explain
+why testing the middle rules out an entire half.
 
-## Complexity
+## Finding lower and upper bounds
 
-- Time: O(log n)
-- Extra space: O(1)
+`LowerBound` finds the first position whose value is at least the target.
+`UpperBound` finds the first position whose value is greater than the target.
+`Search` uses `LowerBound`, then returns the first matching position or `-1` when
+the target is absent.
 
-## Pitfalls
+Both functions keep a range written as `[left, right)`. This notation includes
+`left` but excludes `right`. The range therefore contains `right - left`
+possible positions and is empty when `left == right`.
 
-- Ordinary bounds require globally sorted input; rotated input needs the
-  sorted-half invariant described above.
-- Be deliberate about whether equality belongs on the left or right side.
-- Prefer `left + (right-left)/2` to make the midpoint rule explicit and safe.
-- A valid insertion point can equal `len(values)`.
-- In a rotated search, include the sorted half's outer endpoint when testing
-  target membership; excluding it can discard a valid boundary match.
+**Example:** Find the first value at least `3` in `[1, 3, 3, 5]`.
+
+1. Start with possible positions `[0, 4)`.
+2. Test position `2`, whose value is `3`. The answer may be position `2` or
+   earlier, so keep `[0, 2)`.
+3. Test position `1`, whose value is `3`. Again keep that position and anything
+   earlier, producing `[0, 1)`.
+4. Test position `0`, whose value is `1`. It is too small, so discard it.
+5. The range is empty at position `1`, which is the first valid position.
+
+**Invariant (fact that remains true):** Before every test, the first acceptable
+position is somewhere in `[left, right)`. When the range becomes empty, `left`
+is where the target could be inserted without breaking the sorted order.
+
+## Sorted arrays that wrap around
+
+An array such as `[4, 5, 6, 1, 2, 3]` was sorted and then shifted. The whole
+array is no longer sorted, but at least one side of any tested middle position
+is still sorted.
+
+**Example:** To find `2`, first test `6`. The left portion `[4, 5, 6]` is sorted,
+but `2` is not between `4` and `6`, so discard it and search `[1, 2, 3]`. The
+next middle value is `2`.
+
+When using a range that includes both endpoints, discard a tested middle with
+`middle + 1` or `middle - 1`. Keeping the same middle can prevent the search
+from finishing.
+
+## Work and memory
+
+- Time: `O(log n)`, because every test removes about half of the remaining
+  positions.
+- Extra space: `O(1)`, because the loop stores only a few positions.
+
+## Common mistakes
+
+- Ordinary lower and upper bounds require fully sorted input. Wrapped sorted
+  input needs the separate rule described above.
+- Decide whether a value equal to the target belongs in the kept left or right
+  half; that choice determines whether you find the first or last boundary.
+- Calculate the middle as `left + (right-left)/2`.
+- A valid insertion position may equal `len(values)`, meaning the new value
+  belongs after every existing value.
+- In a wrapped-array search, include the sorted side's outer value when checking
+  whether the target lies on that side.
 
 ## Related problems
 
 - [LeetCode 35: Search Insert Position](../../../problems/solved_easy_leetcode_0035_search_insert_position.go)
-  applies the lower-bound invariant directly.
+  finds the first position whose value is at least the target.
 - [LeetCode 33: Search in Rotated Sorted Array](../../../problems/solved_medium_leetcode_0033_search_in_rotated_sorted_array.go)
-  identifies the sorted half of each active interval.
+  identifies the sorted side after each middle test.

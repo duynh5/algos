@@ -1,36 +1,55 @@
 # Directional Scans
 
-A directional scan is useful when the contribution of the current item depends
-on a nearby item. Choose the direction that makes that dependency part of the
-state already processed instead of repeatedly looking ahead or rescanning.
+## Mental model
 
-`SumWithSmallerLeftValuesSubtracted` demonstrates the form used by ordered
-symbol systems: scan from right to left, subtract a value when it is smaller
-than its right neighbor, and add it otherwise.
+Sometimes an item's meaning depends on the item beside it. Scan in the direction
+that makes that neighbor already known instead of repeatedly looking ahead.
 
-## Invariant
+For a rule based on the right neighbor, moving from right to left means the
+neighbor was processed in the previous step. For a rule based on the left
+neighbor, moving from left to right is usually simpler.
 
-Before each iteration, `total` is the signed sum of the suffix to the right of
-the current index, and `rightValue` is the first value in that suffix. Applying
-the local rule to the current value extends the invariant by one position.
+## Worked example
 
-## Complexity
+Roman numeral `IV` means `4`: `I` is smaller than the `V` immediately to its
+right, so subtract `1` instead of adding it.
 
-- Time: Theta(n), because every value is visited once.
-- Extra space: O(1), because only the total and neighboring value are retained.
+Using numeric values `[1, 5]` from right to left:
 
-## Pitfalls
+1. Add `5`; the total is `5`, and remember `5` as the right neighbor.
+2. `1` is smaller than `5`, so subtract it; the total is `4`.
 
-- The local rule must be justified by the input's grammar or ordering contract.
-  It is not valid for arbitrary sequences just because two adjacent values can
-  be compared.
-- Pick the scan direction from the dependency. A right-neighbor rule is usually
-  simpler from right to left; a left-neighbor rule is usually simpler forward.
-- Define the empty-input identity deliberately. This example returns zero.
-- Update the remembered neighbor on every iteration, including subtraction.
+`SumWithSmallerLeftValuesSubtracted` implements this local rule for a slice of
+nonnegative integers. It starts the remembered right value at zero so the
+rightmost nonnegative value is added.
+
+## Invariant (fact that remains true)
+
+Before processing a position, every value to its right has already been added or
+subtracted according to the rule, and `rightValue` is the value immediately to
+its right. Applying the rule once extends the correct result one position to the
+left.
+
+## Work and memory
+
+- Work: `O(n)`, because every value is visited once.
+- Extra memory: `O(1)`, because only the total and the neighboring value are
+  retained.
+
+## Common mistakes
+
+- A neighboring-value rule must come from the problem. Comparing adjacent
+  values does not make the rule correct for every sequence.
+- This implementation assumes nonnegative values. When values may be negative,
+  add the rightmost value separately instead of comparing it with an initial
+  zero.
+- Choose the direction from the neighbor you need to know.
+- Decide what empty input means. This implementation returns zero.
+- Update the remembered neighbor after every value, including a value that was
+  subtracted.
 
 ## Related problems
 
 - [LeetCode 13: Roman to Integer](../../../problems/solved_easy_leetcode_0013_roman_to_integer.go)
-  uses this pattern because canonical subtractive notation places a smaller
-  symbol immediately before the larger symbol that changes its sign.
+  subtracts a smaller symbol only when it appears immediately before the larger
+  symbol that changes its meaning.

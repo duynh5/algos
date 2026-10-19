@@ -1,33 +1,37 @@
 # Problem Index
 
-This is a flat archive of individually runnable Go programs. Completed problem
-files contain their statement, samples, preserved current attempt, three
-agent-authored solutions, and correctness and complexity analysis. Unsolved
-practice files follow the same section layout, but leave the current-attempt
-body, agent solution registry, and analysis content blank for later work. They
-retain the source statement, official examples, typed input/output adapters, and
-`archiveReady = false` marker.
+Every problem is a Go file directly inside this directory, and each file can be
+run on its own. A completed file contains the problem statement, test cases, the
+user's original attempt, three agent-authored solutions, an explanation of why
+each solution works, and its work and memory costs.
 
-After implementing a practice file's current attempt, run that file directly
-to execute its sample cases through
-[`internal/testrunner`](../internal/testrunner/). The bulk test script skips
-unfinished practice archives; a later agent review can add the three solutions
-and analysis, then mark the archive ready for repository-wide execution.
+A newly retrieved practice file has the same sections, but its current solution,
+list of agent solutions, and analysis begin blank. It still includes the source
+statement, official examples, helpers that convert sample text into specific Go
+values such as integers or slices and convert results back to text, and
+`archiveReady = false`. The current solution may later contain work while the
+file remains unfinished.
+
+After implementing a practice file's current attempt, run that file directly to
+check it against its sample cases. The shared code in
+[`internal/testrunner`](../internal/testrunner/) performs those comparisons. The
+bulk test script skips unfinished practice files. A later review adds the three
+solutions and analysis before changing `archiveReady` to `true`.
 
 Completed filenames use
 `solved_<difficulty>_<source>_<problem_id>_<descriptive_slug>.go`; blank
-practice files omit `solved_`. Numeric problem IDs are zero-padded to at least
-four digits so ordinary filename sorting follows numeric ID order within each
-existing status, difficulty, and source group:
+practice files omit `solved_`. Numeric problem IDs contain leading zeroes until
+they are at least four digits long. This keeps ordinary filename sorting in
+numeric order inside the same completion status, difficulty, and source group:
 
 - `solved_easy_leetcode_0001_two_sum.go`
 - `medium_leetcode_0322_coin_change.go`
-- `hard_leetcode_0072_edit_distance.go`
+- `hard_leetcode_0004_median_of_two_sorted_arrays.go`
 
-LeetCode is the default source; pass another source explicitly when archiving
-an exception. A source URL can remain inside the file for attribution. Every
-archived file starts with `//go:build ignore`, which prevents directory-wide Go
-commands from combining independent `main` programs.
+LeetCode is the default source. Pass another source explicitly when archiving a
+problem from elsewhere. A source URL can remain inside the file for attribution.
+Every problem file starts with `//go:build ignore`. This tells package-wide Go
+commands not to combine these independent `main` programs into one package.
 
 Archive and run problems with:
 
@@ -39,14 +43,14 @@ Archive and run problems with:
 ```
 
 ## Problems
-- [easy_leetcode_0001_two_sum_practice.go](easy_leetcode_0001_two_sum_practice.go)
+
 - [solved_easy_leetcode_0009_palindrome_number.go](solved_easy_leetcode_0009_palindrome_number.go)
-- [easy_leetcode_0013_roman_to_integer.go](easy_leetcode_0013_roman_to_integer.go)
+- [solved_easy_leetcode_0013_roman_to_integer.go](solved_easy_leetcode_0013_roman_to_integer.go)
 - [solved_easy_leetcode_0014_longest_common_prefix.go](solved_easy_leetcode_0014_longest_common_prefix.go)
 - [solved_easy_leetcode_0020_valid_parentheses.go](solved_easy_leetcode_0020_valid_parentheses.go)
-- [easy_leetcode_0021_merge_two_sorted_lists.go](easy_leetcode_0021_merge_two_sorted_lists.go)
+- [solved_easy_leetcode_0021_merge_two_sorted_lists.go](solved_easy_leetcode_0021_merge_two_sorted_lists.go)
 - [solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go](solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go)
-- [easy_leetcode_0027_remove_element.go](easy_leetcode_0027_remove_element.go)
+- [solved_easy_leetcode_0027_remove_element.go](solved_easy_leetcode_0027_remove_element.go)
 - [easy_leetcode_0028_find_the_index_of_the_first_occurrence_in_a_string.go](easy_leetcode_0028_find_the_index_of_the_first_occurrence_in_a_string.go)
 - [solved_easy_leetcode_0035_search_insert_position.go](solved_easy_leetcode_0035_search_insert_position.go)
 - [easy_leetcode_0058_length_of_last_word.go](easy_leetcode_0058_length_of_last_word.go)
@@ -54,7 +58,6 @@ Archive and run problems with:
 - [easy_leetcode_0067_add_binary.go](easy_leetcode_0067_add_binary.go)
 - [solved_easy_leetcode_0069_sqrtx.go](solved_easy_leetcode_0069_sqrtx.go)
 - [solved_easy_leetcode_0070_climbing_stairs.go](solved_easy_leetcode_0070_climbing_stairs.go)
-- [easy_leetcode_0088_merge_sorted_array_practice.go](easy_leetcode_0088_merge_sorted_array_practice.go)
 - [easy_leetcode_0100_same_tree.go](easy_leetcode_0100_same_tree.go)
 - [easy_leetcode_0101_symmetric_tree.go](easy_leetcode_0101_symmetric_tree.go)
 - [easy_leetcode_0104_maximum_depth_of_binary_tree.go](easy_leetcode_0104_maximum_depth_of_binary_tree.go)
@@ -96,9 +99,7 @@ Archive and run problems with:
 - [hard_leetcode_0224_basic_calculator.go](hard_leetcode_0224_basic_calculator.go)
 - [hard_leetcode_0295_find_median_from_data_stream.go](hard_leetcode_0295_find_median_from_data_stream.go)
 - [hard_leetcode_0502_ipo.go](hard_leetcode_0502_ipo.go)
-- [medium_leetcode_0002_add_two_numbers_practice.go](medium_leetcode_0002_add_two_numbers_practice.go)
-- [medium_leetcode_0003_longest_substring_without_repeating_characters_practice.go](medium_leetcode_0003_longest_substring_without_repeating_characters_practice.go)
-- [medium_leetcode_0005_longest_palindromic_substring.go](medium_leetcode_0005_longest_palindromic_substring.go)
+- [solved_medium_leetcode_0005_longest_palindromic_substring.go](solved_medium_leetcode_0005_longest_palindromic_substring.go)
 - [medium_leetcode_0006_zigzag_conversion.go](medium_leetcode_0006_zigzag_conversion.go)
 - [medium_leetcode_0011_container_with_most_water.go](medium_leetcode_0011_container_with_most_water.go)
 - [medium_leetcode_0012_integer_to_roman.go](medium_leetcode_0012_integer_to_roman.go)
@@ -162,7 +163,7 @@ Archive and run problems with:
 - [medium_leetcode_0172_factorial_trailing_zeroes.go](medium_leetcode_0172_factorial_trailing_zeroes.go)
 - [medium_leetcode_0173_binary_search_tree_iterator.go](medium_leetcode_0173_binary_search_tree_iterator.go)
 - [medium_leetcode_0189_rotate_array.go](medium_leetcode_0189_rotate_array.go)
-- [medium_leetcode_0198_house_robber.go](medium_leetcode_0198_house_robber.go)
+- [solved_medium_leetcode_0198_house_robber.go](solved_medium_leetcode_0198_house_robber.go)
 - [medium_leetcode_0199_binary_tree_right_side_view.go](medium_leetcode_0199_binary_tree_right_side_view.go)
 - [medium_leetcode_0200_number_of_islands.go](medium_leetcode_0200_number_of_islands.go)
 - [medium_leetcode_0201_bitwise_and_of_numbers_range.go](medium_leetcode_0201_bitwise_and_of_numbers_range.go)

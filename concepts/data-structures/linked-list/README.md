@@ -1,48 +1,81 @@
 # Linked Lists
 
-A singly linked list stores each value in a node that points to the next node.
-It is useful when an algorithm must advance through a sequence without random
-access, or when it must splice nodes without shifting later values.
+## Mental model
 
-## Invariant
+A singly linked list is a chain of nodes. Each node stores one value and a link
+to the next node. The first node is the **head**; a `nil` next link marks the
+end.
 
-Starting at the head and repeatedly following `Next` visits nodes in list
-order. An acyclic list eventually reaches `nil`. Code that builds a result with
-a tail pointer maintains a second invariant: `tail` is always the final node,
-so appending a node takes constant time.
+Unlike an array, a linked list cannot jump directly to position `i`. Reaching a
+position requires following links from the head. In exchange, code can reconnect
+known nodes without shifting every later value.
+
+## Operations in this package
+
+- `FromSlice` builds a list in the slice's order.
+- `ToSlice` follows links from the head and collects the values.
+- `Reverse` changes every next link so the chain points in the opposite
+  direction.
+
+## Worked example: reversing a list
+
+Reverse `1 -> 2 -> 3 -> nil` while keeping three positions:
+
+1. `previous` is `nil` and `current` is node `1`. Save node `2`, point `1` to
+   `nil`, then advance.
+2. `previous` is node `1` and `current` is node `2`. Save node `3`, point `2` to
+   `1`, then advance.
+3. `previous` is node `2` and `current` is node `3`. Save `nil`, point `3` to
+   `2`, then advance.
+4. `current` is `nil`, so `previous` is the new head of
+   `3 -> 2 -> 1 -> nil`.
+
+Saving the next node before changing the link is essential; otherwise the
+unvisited remainder of the list is lost.
+
+## Invariants (facts that remain true)
+
+- Following `Next` from the head visits nodes in list order and eventually
+  reaches `nil` when the list contains no loop.
+- While building a list with a `tail` position, `tail` always names the final
+  node. A new node can therefore be attached without walking from the head.
+- During reversal, `previous` is the already reversed portion and `current` is
+  the first node not yet reversed.
 
 ## Common techniques
 
-- Use a dummy head when the first result node should not need special handling.
-- Advance separate pointers independently when input lists can have different
+- A **dummy head** is a temporary node placed before the real first node. It
+  avoids separate code for inserting or replacing the head.
+- Two positions can advance independently when input lists have different
   lengths.
-- Use fast and slow pointers when detecting a cycle or locating a midpoint.
-- Reverse a list by retaining the next node before redirecting `Next`.
-- For reverse-order digit arithmetic, process corresponding nodes with a carry:
-  output `sum % 10` and carry `sum / 10` to the next position.
+- Fast and slow positions can detect a loop or locate the middle.
+- For numbers stored with the lowest digit first, add matching nodes and carry
+  `sum / 10` to the next position; the current output digit is `sum % 10`.
 
-## Complexity
+## Work and memory
 
-| Operation | Time | Extra space |
+| Operation | Work | Extra memory |
 | --- | --- | --- |
-| Traverse or search | O(n) | O(1) |
-| Insert after a known node | O(1) | O(1) |
-| Reverse iteratively | O(n) | O(1) |
-| Copy to or from a slice | O(n) | O(n) |
+| Visit or search the entire list | `O(n)` | `O(1)` |
+| Insert after a node already in hand | `O(1)` | `O(1)` |
+| Reverse with a loop | `O(n)` | `O(1)` |
+| Copy all values to or from a slice | `O(n)` | `O(n)` |
 
-These space bounds exclude nodes created for the returned list. A recursive
-traversal additionally consumes O(n) call-stack space.
+These memory amounts do not count nodes required for a returned result. A
+version that uses nested function calls can also keep as many as `n` unfinished
+calls in memory.
 
-## Pitfalls
+## Common mistakes
 
-- Save `node.Next` before overwriting it during a reversal.
-- Handle an empty head and a one-node list explicitly through loop conditions.
-- Do not lose the head while advancing a working pointer.
-- A malformed cycle prevents ordinary `nil`-terminated traversal from ending.
-- Count recursion depth as auxiliary space; prefer iteration when lists may be
-  long.
+- Save `node.Next` before replacing it during reversal.
+- Make loop conditions handle an empty list and a one-node list.
+- Keep the original head when it is still needed; advancing the only reference
+  can make earlier nodes unreachable.
+- Following links one by one never ends if the list links back to an earlier
+  node.
+- Prefer a loop when a list may be too long for deeply nested function calls.
 
 ## Related problems
 
-- [Add Two Numbers (Easy)](../../../problems/solved_easy_leetcode_0002_add_two_numbers.go)
-- [Merge Two Sorted Lists (Easy)](../../../problems/solved_easy_leetcode_0021_merge_two_sorted_lists.go)
+- [LeetCode 2: Add Two Numbers](../../../problems/solved_easy_leetcode_0002_add_two_numbers.go)
+- [LeetCode 21: Merge Two Sorted Lists](../../../problems/solved_easy_leetcode_0021_merge_two_sorted_lists.go)
