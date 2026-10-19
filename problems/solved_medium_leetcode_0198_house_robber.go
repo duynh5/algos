@@ -291,7 +291,7 @@ Current attempt:
   the state names obscure which prefix each value represents, making the update
   order harder to audit than descriptive rolling-state names would be.
 - Relevant concept and invariant: This is bottom-up dynamic programming; see
-  ../concepts/algorithms/dynamic-programming/README.md. If best(i) is the
+  ../concepts/README.md#dynamic-programming. If best(i) is the
   optimum through house i, then best(i)=max(best(i-1), best(i-2)+nums[i]).
   Only the preceding two states are needed, so retaining the whole table is
   unnecessary.

@@ -285,7 +285,7 @@ Current attempt:
   initial interval costs at most a small constant number of iterations and
   does not change the O(log x) complexity.
 - Relevant concept and invariant: This is binary search over an answer range;
-  see ../concepts/algorithms/binary-search/README.md. Before each iteration,
+  see ../concepts/README.md#binary-search. Before each iteration,
   every integer below low has been proved feasible and every integer above
   high has been proved infeasible. If mid < x/mid, mid is feasible, so low can
   move to mid+1. If mid > x/mid, mid is infeasible, so high can move to mid-1.

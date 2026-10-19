@@ -280,7 +280,7 @@ Current attempt:
   reverse of a valid input such as 2147483647 exceeds int. Using int64 as in
   Solution 2 or reversing only half as in Solution 3 removes that dependency.
 - Relevant concept and invariant: See
-  concepts/foundations/integer-digits/README.md. After k iterations, remaining
+  concepts/README.md#integer-digit-processing. After k iterations, remaining
   is x with its final k decimal digits removed, while reversed contains those k
   digits in reverse order.
 - Concrete example: For x=1221, (remaining,reversed) changes from (1221,0) to

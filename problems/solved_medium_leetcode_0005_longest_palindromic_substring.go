@@ -217,7 +217,7 @@ func expandCurrentAttemptPalindrome(s string, left, right int) (start, length in
 // =============================================================================
 // AGENT SOLUTIONS
 //
-// See concepts/patterns/two-pointers/README.md for the center-expansion
+// See concepts/README.md#two-pointers for the center-expansion
 // invariant used by the preferred solution.
 // =============================================================================
 
@@ -328,7 +328,7 @@ Current attempt:
 - First failing assumption or bottleneck: No correctness failure remains. Its
   worst-case bottleneck is repeated expansion across overlapping palindromes,
   which takes Theta(n^2) comparisons for inputs such as 1,000 equal bytes.
-- Relevant concept and invariant: See concepts/patterns/two-pointers/README.md.
+- Relevant concept and invariant: See concepts/README.md#two-pointers.
   Before each outward step, the range inside left and right is palindromic; a
   matching pair extends it without breaking that property. Unlike the direct
   solution, the attempt constructs palindromes instead of rechecking complete

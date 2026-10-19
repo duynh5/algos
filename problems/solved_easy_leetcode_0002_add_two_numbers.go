@@ -324,7 +324,7 @@ Current attempt:
   storage and bypasses the linked-list structure that already exposes digits in
   addition order.
 - Relevant concept and invariant: See
-  concepts/data-structures/linked-list/README.md. Before processing a position,
+  concepts/README.md#linked-lists. Before processing a position,
   carry is exactly the overflow from the less-significant position. The result
   node is (digit1 + digit2 + carry) % 10, and the next carry is that sum / 10.
 

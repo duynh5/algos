@@ -301,7 +301,7 @@ Current attempt:
   trailing implementation reminder is also stale, but remains untouched as
   part of the preserved body.
 - Relevant concept and invariant: See
-  concepts/patterns/common-prefix-scan/README.md. Before each outer iteration,
+  concepts/README.md#common-prefix-scan. Before each outer iteration,
   longest is exactly strs[0][:i], and every processed string shares it. The
   inner loop either proves column i is shared or returns the already-proven
   prefix, so the invariant is preserved.

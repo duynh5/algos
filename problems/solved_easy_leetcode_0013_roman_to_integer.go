@@ -367,7 +367,7 @@ Current attempt:
   a []string, and the 13-entry map is allocated and populated for every call.
   A long condition also duplicates facts already encoded by the pair entries.
 - Relevant concept and invariant: See
-  concepts/patterns/directional-scan/README.md. Before each loop iteration, sum
+  concepts/README.md#directional-scan. Before each loop iteration, sum
   equals the value of the fully consumed prefix. The next iteration consumes
   either one additive symbol or one complete subtractive pair, preserving that
   invariant and guaranteeing progress.

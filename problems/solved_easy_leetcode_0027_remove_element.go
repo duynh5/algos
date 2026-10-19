@@ -84,7 +84,7 @@ Constraints:
 // solveCurrentAttempt below.
 //
 // This completed problem archive follows the workbench template.
-// Concept: concepts/patterns/two-pointers/README.md
+// Concept: concepts/README.md#two-pointers
 
 func parseRemoveElementInput(input string) ([]int, int) {
 	var args []json.RawMessage

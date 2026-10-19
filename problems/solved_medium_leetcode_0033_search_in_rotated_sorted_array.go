@@ -338,7 +338,7 @@ Current attempt:
   difficulty is the asymmetric boundary logic: [left,middle) uses an inclusive
   left endpoint, while (middle,right] uses an inclusive right endpoint.
 - Relevant concept and invariant: As described in
-  concepts/algorithms/binary-search/README.md, at least one half of a rotated
+  concepts/README.md#binary-search, at least one half of a rotated
   distinct-value interval is sorted. After testing the midpoint, endpoint
   comparisons must determine whether target is inside that sorted half; only
   then is it safe to discard the other half. Exhaustion means absent, not an
