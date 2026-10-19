@@ -16,6 +16,18 @@ because they are the names used in problems, documentation, and interviews.
 When a technical term first appears, the nearby text explains it in ordinary
 language. You should not need to know the term before reading its explanation.
 
+Every concept follows the same teaching order whenever the topic needs it:
+
+1. **Plain-language picture:** what to imagine before learning the formal name.
+2. **Concrete example:** real values traced one step at a time.
+3. **Formal rule:** the invariant, data structure, or algorithmic idea.
+4. **Cost and limits:** how much work and memory it uses, and when it is the
+   wrong tool.
+
+An **ELI5** note appears when the formal explanation can hide the simple idea.
+ELI5 means "explain it like I am five": it is an intuition aid, not a separate
+or less accurate rule. Read it first, then use the precise explanation to code.
+
 The coverage is cross-checked against the repository's
 [Top Interview 150 manifest](../scripts/top-interview-150.tsv), LeetCode's
 [Top Interview 150](https://leetcode.com/studyplan/top-interview-150/), the
@@ -99,6 +111,18 @@ The hidden constant still matters in real programs, but the maximum input size
 usually tells you which growth rates are impossible before small code-level
 speed differences matter.
 
+**ELI5:** Imagine looking for a name in a phone book with 1,000 pages.
+Checking every page is `O(n)`. Opening near the middle and repeatedly throwing
+away the half that cannot contain the name is `O(log n)`. Comparing every page
+with every other page is `O(n^2)`. If the phone book doubles in size, the first
+method does about twice the work, the second needs only about one extra check,
+and the third does about four times the work.
+
+**Concrete comparison:** For 1,024 items, a full scan can inspect 1,024 items.
+A halving search needs at most about 10 decisions because `2^10 = 1,024`.
+Examining every ordered pair can approach 1,048,576 comparisons. Big-O ignores
+small implementation details so these growth differences remain visible.
+
 ### Correctness and invariants
 
 An **invariant** is simply a fact the algorithm keeps true while it runs. For
@@ -115,6 +139,17 @@ algorithm is correct, answer these questions:
 5. **At the end:** Why does the maintained fact make the returned answer
    correct?
 
+**ELI5:** Think of tidying toys into a box from left to right. Your rule is:
+"everything left of my hand is already in the right place." After moving one
+toy, that rule must still be true. When your hand reaches the end, the rule
+covers every toy. An algorithm invariant works the same way.
+
+**Worked example:** To move all non-zero values forward in `[0, 5, 0, 2]`, let
+`read` inspect each position and let `write` point to the next output position.
+Before every step, `values[:write]` contains exactly the non-zero values already
+seen: first `[]`, then `[5]`, and finally `[5, 2]`. The invariant explains both
+why no non-zero value is lost and why their original order is preserved.
+
 ### Recursion and saved work
 
 **Recursion** means that a function calls itself to solve a smaller part of the
@@ -123,6 +158,17 @@ and where execution should continue afterward. If there can be `d` unfinished
 calls, they use `O(d)` memory even when the code does not create a slice or map.
 Use a stack data structure instead when the nesting may become too deep, or
 when the saved work must be inspected and controlled directly.
+
+**ELI5:** Recursion is like opening a smaller box inside a box. You cannot
+finish closing the outer box until the inner one is finished, so you leave a
+note on each open box saying what to do next. The computer keeps the same kind
+of note for every unfinished function call.
+
+For `factorial(4)`, the calls wait as `4 * factorial(3)`, then
+`3 * factorial(2)`, then `2 * factorial(1)`. After `factorial(1)` returns `1`,
+the waiting calls finish in reverse order: `2`, then `6`, then `24`. There are
+four nested calls, so the call stack uses `O(n)` extra memory even though the
+function creates no explicit collection.
 
 ### Integer limits and bits
 
@@ -139,6 +185,15 @@ Bits are useful when each position is an independent yes/no flag, the input is
 defined as a fixed-width binary value, or an arithmetic identity lets many
 values cancel. Do not reach for bit operations merely because the inputs are
 integers; ordinary arithmetic or a set is often clearer.
+
+**ELI5:** A bitmask is a row of light switches. Switch `k` answers one yes/no
+question: is item `k` selected? Turning switches on, off, or checking them lets
+one integer represent many independent choices.
+
+For three permissions (read, write, and execute), use bits `0`, `1`, and `2`.
+The value `5` is binary `101`, so read and execute are on while write is off.
+`mask & (1 << 1)` checks write; `mask | (1 << 1)` turns it on and changes the
+mask from `101` to `111`.
 
 Useful identities for an integer `x` include:
 
@@ -316,6 +371,17 @@ it will live for a long time and the larger array is no longer needed. A Go
 string is a read-only sequence of bytes. Reading `text[i]` returns one byte,
 which is not always a complete Unicode character.
 
+**Plain-language picture:** An array is a row of numbered lockers. A slice is a
+view through which some consecutive lockers are visible. Two slices can look
+like separate lists while still viewing the same lockers underneath.
+
+**Worked example:** If `base := []int{10, 20, 30, 40}` and
+`middle := base[1:3]`, then `middle` sees `[20, 30]`. Setting `middle[0] = 99`
+also changes `base` to `[10, 99, 30, 40]` because both slices refer to the same
+underlying array. An append that exceeds `middle`'s capacity allocates a new
+underlying array; changes through the returned slice then no longer affect
+`base`.
+
 Arrays also provide an addressable position for every value. When values are
 guaranteed to lie in a small range, a frequency slice can replace a hash map.
 When values are guaranteed to encode valid positions and mutation is allowed,
@@ -420,6 +486,15 @@ search process one distance layer before the next. A **deque** (double-ended
 queue) supports adding and removing at both ends. It is useful when both the
 oldest candidate and the newest candidate may become irrelevant.
 
+**ELI5:** A queue is a line at a ticket counter: the person who arrived first
+is served first. A deque is a line with a door at both ends, so people can enter
+or leave from either side.
+
+**Worked example:** Starting with queue `[A, B]`, adding `C` produces
+`[A, B, C]`. Removing one item returns `A`, leaving `[B, C]`. This exact order
+is why a maze search visits every cell one step away before any cell two steps
+away.
+
 With a Go slice, keep a `head` index instead of repeatedly shifting every item:
 
 ```go
@@ -448,6 +523,16 @@ A tree is a graph with no cycles and exactly one route between any two nodes.
 In a rooted binary tree, every node has at most a left and right child. Be clear
 about whether `nil` children, parent links, duplicate values, or node identity
 matter; equal values do not make two nodes the same node.
+
+**ELI5:** Picture a family tree turned upside down. Start at one root, follow
+branches to children, and never find a branch that loops back to where it
+started. A binary tree merely limits each node to at most two children.
+
+**Worked example:** In a binary-search tree with root `8`, left child `3`, and
+right child `10`, searching for `10` compares with `8`, goes right because
+`10 > 8`, and finds it. Searching for `4` goes left at `8`, then right at `3`.
+If that link is `nil`, the value is absent. Each comparison rules out one whole
+subtree only because the ordering rule holds for every descendant.
 
 The common depth-first traversal orders differ only in when the current node is
 handled:
@@ -498,9 +583,19 @@ a parent and child. The conversion and search both take `O(n)` time and space.
 A graph stores vertices and connections. Decide these properties before
 choosing an algorithm:
 
+**ELI5:** A graph is a map of things and the allowed moves between them. The
+things are called vertices or nodes; the connections are called edges. Cities
+and roads, people and friendships, courses and prerequisites, and grid cells
+and legal moves are all the same basic shape.
+
+**Worked example:** For roads `A-B`, `A-C`, and `C-D`, an adjacency list can be
+`A: [B, C]`, `B: [A]`, `C: [A, D]`, `D: [C]`. A search starting at `A` marks
+`A`, schedules `B` and `C`, then reaches `D` through `C`. Marking a town when
+it is scheduled prevents the reverse road from scheduling it again.
+
 - **Directed or undirected:** an undirected edge must normally appear in both
   adjacency lists; a directed edge has one direction and contributes to the
-  destination's indegree.
+  destination's **indegree**, meaning its number of incoming edges.
 - **Weighted or unweighted:** BFS minimizes edge count, not arbitrary total
   weight.
 - **Cyclic or acyclic:** a general graph needs reached-state tracking; a rooted
@@ -509,9 +604,10 @@ choosing an algorithm:
   an outer loop is needed when every component matters.
 
 An adjacency list uses `O(V + E)` space and is the usual representation for a
-sparse graph. An adjacency matrix uses `O(V^2)` space but answers whether one
-specific edge exists in constant time. An edge list is convenient when an
-algorithm repeatedly scans every edge, as Bellman-Ford does.
+**sparse graph**, where relatively few of the possible vertex pairs have an
+edge. An adjacency matrix uses `O(V^2)` space but answers whether one specific
+edge exists in constant time. An edge list is convenient when an algorithm
+repeatedly scans every edge, as Bellman-Ford does.
 
 Mark a vertex reached when it is scheduled, not later when it is removed from a
 stack or queue. Otherwise several neighbors may schedule the same vertex and
@@ -575,8 +671,9 @@ Write the cross-structure invariant before implementing operations. For a
 randomized set, every slice position and map index must agree after a swap. For
 an LRU cache, every map entry must name exactly one linked-list node, and the
 list order must match recency. Most bugs in these designs come from updating
-only one representation or mishandling the first or last node; sentinel nodes
-can remove many boundary cases.
+only one representation or mishandling the first or last node. Permanent dummy
+nodes called **sentinels** can stand just before and after the real entries, so
+insertion and removal do not need separate empty-list or end-of-list cases.
 
 ### Streaming and online processing
 
@@ -863,7 +960,7 @@ Jump directly to a card:
   [breadth-first search](#breadth-first-search),
   [topological sort](#topological-sort),
   [Dijkstra](#dijkstra-shortest-paths),
-  [Bellman-Ford](#bellman-ford-shortest-paths), and
+  [Bellman-Ford](#bellman-ford-shortest-paths),
   [disjoint-set union](#disjoint-set-union), and
   [minimum spanning tree](#minimum-spanning-tree).
 
@@ -955,6 +1052,12 @@ phases when later actions must see a snapshot of earlier state. Extract a helper
 only when it represents one rule clearly, such as flushing a completed output
 line or checking one matrix neighbor.
 
+**Worked example:** A robot starts at `(0, 0)`, facing north, with commands
+`move`, `right`, `move`. Store only its position and direction. The first move
+changes the position to `(0, 1)`. Turning right changes the direction to east
+without moving. The final move changes the position to `(1, 1)`. Each command
+is one state transition, and the number of unread commands proves progress.
+
 **Why it stays correct:** Before each step, the stored state represents exactly
 the process after the already completed steps. Applying the written rule once
 produces the specified next state and advances the progress measure.
@@ -965,10 +1068,13 @@ index with a count, or adding a fallback that hides an impossible state. Build
 tests around empty or smallest inputs, transitions between phases, exact fits,
 and one item beyond an exact fit.
 
-Simulation normally takes time proportional to the number of simulated events
-plus the required output. Before accepting it, use the constraints to ensure
-that the number of events is bounded; never simulate one step per unit when a
-timestamp or value may be enormous and the state can jump directly.
+**Work and memory:** If the process has `e` events, simulation usually takes
+`O(e)` time plus the time needed to produce its output. Extra memory is the
+state being tracked, which may be `O(1)` for a few values or larger when the
+process must retain a board, history, or pending events.
+
+**Reject it when:** The required event count is too large for the constraints
+and the rules allow the state to jump directly to a later time or value.
 
 ##### Hash map or set
 
@@ -1030,10 +1136,17 @@ explicitly; a comparator must be consistent and transitive. If equal items
 must keep their previous order, use a stable sort or include the original
 position as a tie-breaker.
 
-Comparison sorting takes `O(n log n)` time in general. Go's `sort.Ints` and
+**Worked example:** To detect duplicates in `[4, 1, 4, 2]`, sort it into
+`[1, 2, 4, 4]`, then compare neighbors. The two `4`s become adjacent, so one
+linear scan finds them. Sorting costs more than a set for this one question,
+but the same ordering may also support later range or pair queries.
+
+**Work and memory:** Standard comparison sorts are usually budgeted as
+`O(n log n)` time, although a poorly implemented quicksort can degrade to
+`O(n^2)`. Extra memory depends on the chosen sorting algorithm; copying the
+input to preserve it uses `O(n)` additional memory. Go's `sort.Ints` and
 `sort.Slice` modify the slice and are not stable; `sort.SliceStable` preserves
-equal elements' order at an additional practical cost. Copy the slice first
-when mutation is not allowed.
+equal elements' order at an additional practical cost.
 
 When integer keys occupy a small known range of size `k`, counting occurrences
 can sort or group them in `O(n + k)` time and `O(k)` extra memory. This is useful
@@ -1115,9 +1228,17 @@ of the pattern is still useful after a mismatch.
 naive restart would compare the same text characters many times. For a short
 pattern or one search, the straightforward method may still be best.
 
-The naive method tries every possible start and compares until a mismatch. For
-text length `n` and pattern length `m`, its worst case is `O(nm)`, such as many
-repeated `a` characters followed by a mismatch.
+**Work and memory:** The naive method tries every possible start and compares
+until a mismatch. For text length `n` and pattern length `m`, its worst case is
+`O(nm)` time and `O(1)` extra memory, such as many repeated `a` characters
+followed by a mismatch. KMP takes `O(n + m)` time and stores an `O(m)` fallback
+table.
+
+**Worked example:** Search for `abab` in `ababab`. After matching the first
+four characters, the answer is position `0`. If the pattern were `abac`, the
+comparison would fail after matching `aba`. KMP remembers that the matched text
+ends with `a`, which is also the start of the pattern, so it resumes with one
+character already matched instead of checking that text from scratch.
 
 **KMP prefix fallback:** Precompute for each pattern prefix the length of its
 longest proper prefix that is also a suffix. After a mismatch, fall back to that
@@ -1136,6 +1257,10 @@ match, or use a collision policy accepted by the problem.
 correct for judge inputs defined in bytes or ASCII but can split UTF-8 encoded
 characters. KMP is valuable when its worst-case guarantee matters; it is not a
 requirement to replace a clear linear-library search in every interview.
+
+**Reject it when:** One short or one-off search is clearer with a direct scan
+or a standard library operation, or when the match permits edits, reordered
+characters, or another relationship that exact string matching does not model.
 
 ##### Parsing and state machines
 
@@ -1158,6 +1283,12 @@ digits -> stop`. Before `value = value*10 + digit`, check the bound using
 `value > (limit-digit)/10`. Apply the sign according to the required range;
 the negative limit may have a larger magnitude than the positive limit.
 
+**Worked example:** Parsing `"  -42x"` begins in `leading space`, moves to
+`optional sign` at `-`, enters `digits` at `4`, builds `42`, and stops at `x`.
+The sign then produces `-42`. By contrast, `"4-2"` is rejected or stopped at
+`-` according to the stated grammar; the sign transition is no longer legal
+after digits have begun.
+
 For arithmetic expressions, a stack handles nested parentheses, while operator
 precedence can be handled by operator/value stacks or by recursive-descent
 functions for grammar levels such as expression, term, and factor. Decide
@@ -1169,6 +1300,14 @@ spaces or arbitrary spacing.
 legal way that prefix may continue and the accumulated values represent exactly
 the completed tokens. Each transition consumes input or terminates, so the
 parser cannot silently loop on an invalid character.
+
+**Work and memory:** Reading `n` input characters once takes `O(n)` time. A
+simple number parser can use `O(1)` extra memory. Nested expressions may need a
+stack whose size is proportional to the nesting depth, and retaining every
+token can require `O(n)` memory.
+
+**Reject it when:** The input has no meaningful grammar or phases, or a
+well-tested standard parser already implements exactly the required language.
 
 ##### Two pointers
 
@@ -1337,6 +1476,12 @@ some geometric algorithms use this shape.
 the input is divided, and exactly what information the combine step needs. Then
 write a recurrence that includes both recursive work and the combine cost.
 
+**Worked example:** Merge-sort `[4, 1, 3, 2]` by splitting it into `[4, 1]`
+and `[3, 2]`. Those split into one-item lists, which are already sorted. Merge
+them into `[1, 4]` and `[2, 3]`, then compare the two front values repeatedly to
+produce `[1, 2, 3, 4]`. No subproblem needs information from its sibling until
+the final merge.
+
 For merge sort, each call sorts two halves, then merges them by repeatedly
 taking the smaller unread value. The invariant during merging is that the
 output prefix is sorted and contains exactly the smallest values consumed from
@@ -1355,6 +1500,16 @@ subproblems do not overlap. Dynamic programming is needed when different
 branches repeatedly ask for the same state. Memoizing a divide-and-conquer
 recursion because its parts overlap has effectively turned it into DP.
 
+**Work and memory:** The cost depends on the number and sizes of the smaller
+parts plus the work needed to combine them. Write that relationship before
+claiming a bound: merge sort is `O(n log n)` time with `O(n)` merge storage,
+while exponentiation by squaring is `O(log |n|)` time and can use `O(1)` extra
+memory as a loop.
+
+**Reject it when:** Splits can remain badly unbalanced, the parts repeatedly
+solve the same smaller questions, or combining their answers costs as much as
+solving the original problem directly.
+
 ##### Kadane's algorithm (best subarray scan)
 
 **Mental model:** At each position, keep the best consecutive section that must
@@ -1367,6 +1522,11 @@ For value `x`, update:
 endingHere = max(x, endingHere + x)
 bestOverall = max(bestOverall, endingHere)
 ```
+
+**Worked example:** For `[-2, 3, -1, 4, -5]`, `endingHere` becomes `-2`, `3`,
+`2`, `6`, and `1`. At `3`, starting fresh beats extending `-2`. At `-1` and
+`4`, extending remains better. `bestOverall` reaches `6`, representing the
+consecutive section `[3, -1, 4]`.
 
 **Why it stays correct:** Every non-empty subarray ending at the current
 position is either the current value alone or a subarray ending at the previous
@@ -1384,9 +1544,11 @@ non-wrapping subarray. Compare that value with ordinary Kadane, except when all
 values are negative: removing the minimum would remove the whole array and
 produce the invalid empty answer.
 
-The scan takes `O(n)` time and `O(1)` extra memory. It applies to additive
-contiguous objectives with this extension-or-restart property, not to arbitrary
-subsequences or objectives whose state needs more than the best ending value.
+**Work and memory:** The scan takes `O(n)` time and `O(1)` extra memory.
+
+**Reject it when:** The answer may skip values, is not additive, or deciding
+whether to extend needs more information than the best section ending at the
+previous position.
 
 ##### Stack
 
@@ -1459,10 +1621,21 @@ of violations or the amount required to repair the window. Shrink while the
 budget is exceeded; afterward the window is the longest valid one ending at
 the current right position under that invariant.
 
+**Worked example:** Find the shortest positive-number range with sum at least
+`7` in `[2, 3, 1, 2, 4, 3]`. Grow the window until `[2, 3, 1, 2]` sums to `8`,
+then remove values from the left while the sum stays large enough. Later the
+window `[4, 3]` reaches `7` with length `2`, which is the best answer. Positive
+values make shrinking safe because adding future values can never reduce the
+sum.
+
 **Why moving the window is safe:** Before advancing `left`, explain why no
 future value could make the current starting position part of a better answer.
 For example, when all values are positive and the sum is already too large,
 adding more values can only make it larger.
+
+**Work and memory:** Each end moves forward at most `n` times, so the usual
+window scan takes `O(n)` time. A running sum uses `O(1)` extra memory; character
+or value counts use memory proportional to the number of distinct values kept.
 
 **Reject it when:** The answer may skip items, or adding an item can make the
 condition switch back and forth unpredictably. Mixed positive and negative
@@ -1502,6 +1675,10 @@ can answer "smallest value seen so far" but cannot generally be subtracted to
 recover an arbitrary range minimum; use a monotonic deque for moving ranges or
 a range-query structure for arbitrary updates and queries.
 
+**Work and memory:** Building summaries for `n` values takes `O(n)` time and
+usually `O(n)` memory. Each sum, count, or XOR range query then takes `O(1)`
+time when its answer can be recovered from two stored prefixes.
+
 **Reject it when:** The requested property cannot be recovered by combining two
 running summaries. For example, you cannot find a range's smallest value by
 subtracting two previously stored smallest values.
@@ -1530,6 +1707,9 @@ at position `4`. Running totals across the original four positions become
 decreases immediately after that update ends. Every position between those
 points receives the update exactly once.
 
+**Work and memory:** Recording `u` updates and rebuilding `n` final values
+takes `O(u + n)` time and `O(n)` extra memory.
+
 **Reject it when:** You must answer detailed questions after every individual
 update rather than after the updates have been collected.
 
@@ -1537,6 +1717,16 @@ update rather than after the updates have been collected.
 
 **Mental model:** Store summaries for a hierarchy of ranges so an update or
 query touches only `O(log n)` summaries instead of rescanning the entire input.
+
+**ELI5:** Imagine asking for the total number of marbles in boxes `1` through
+`12`. Instead of recounting every box, keep trustworthy totals for useful
+groups of boxes. A query combines a few groups, and changing one box repairs
+only the groups that contain it.
+
+**Worked example:** A segment tree over `[2, 1, 5, 3]` stores leaf sums and
+combines them upward: `[2, 1]` has sum `3`, `[5, 3]` has sum `8`, and the whole
+range has sum `11`. Changing `5` to `6` updates its leaf, the right-half sum to
+`9`, and the root to `12`; the unrelated left half stays untouched.
 
 A **Fenwick tree** (binary indexed tree) is compact and especially useful for
 point updates plus prefix sums. With one-based positions, `i & -i` gives the
@@ -1547,16 +1737,19 @@ and the structure uses `O(n)` memory. A range sum is the difference of two
 prefix sums.
 
 A **segment tree** stores one summary for each range in a binary partition of
-the array. It builds in `O(n)`, answers associative range queries such as sum,
-minimum, or maximum in `O(log n)`, and handles point updates in `O(log n)`.
+the array. It builds in `O(n)` and handles point updates in `O(log n)`. It also
+answers range queries such as sum, minimum, or maximum in `O(log n)` when the
+combining rule is **associative**, meaning that grouping the same values in a
+different way does not change the answer.
 Lazy propagation records a pending range update at an internal node and pushes
 it to children only when necessary, supporting many range updates and range
 queries without visiting every element.
 
 The invariant is that every node's stored value correctly summarizes its range
 after accounting for any pending update. Define interval boundaries and the
-combine identity explicitly: zero is an identity for sum, but not for minimum
-over arbitrary positive and negative inputs.
+combine **identity**, or neutral starting value, explicitly: zero is an
+identity for sum because adding it changes nothing, but zero is not a safe
+starting value for a minimum over arbitrary positive and negative inputs.
 
 Prefer a prefix array for immutable data, a difference array when all updates
 can be collected before one final reconstruction, and these trees only when
@@ -1569,6 +1762,15 @@ preserving their order. It lets a Fenwick or segment tree answer value-range
 queries even when the original values are negative or enormous. Include every
 endpoint that a query may use, and distinguish value rank from original input
 position.
+
+**Work and memory:** Both trees use `O(n)` memory. A Fenwick tree supports
+prefix queries and point updates in `O(log n)` time. A segment tree builds in
+`O(n)` time and usually supports each compatible query or update in
+`O(log n)` time.
+
+**Reject it when:** The data never changes, all updates can be collected before
+one final pass, or the number of operations is small enough that a direct scan
+is clearer and fast enough.
 
 ##### Greedy
 
@@ -1707,9 +1909,9 @@ meetings form another scheduling problem of the same kind, so the same argument
 applies again. Repeating this replacement proof shows that every choice made by
 the algorithm is safe, not merely that it works for the example above.
 
-Sorting costs `O(n log n)` time, and the scan costs `O(n)` time. The scan uses
-`O(1)` extra memory when the meetings are sorted in place, excluding the
-space used to return the selected meetings.
+**Work and memory:** Sorting costs `O(n log n)` time, and the scan costs `O(n)`
+time. The scan uses `O(1)` extra memory when the meetings are sorted in place,
+excluding the space used to return the selected meetings.
 
 **Why it stays correct:** After every choice, the best final value is still
 achievable. The method removes only alternatives that are unnecessary for
@@ -1769,16 +1971,17 @@ The crucial detail is that undoing `b` restores exactly `[a]`, and undoing `a`
 restores exactly `[]`. Each sibling branch therefore begins with only the
 choices made on its own path.
 
-Generating subsets visits `2^n` complete branches. Saving a copy of every
-subset takes `O(n * 2^n)` total time and `O(n * 2^n)` output space. The current
-path and unfinished function calls use `O(n)` extra memory, excluding the output.
+**Work and memory:** Generating subsets visits `2^n` complete branches. Saving
+a copy of every subset takes `O(n * 2^n)` total time and `O(n * 2^n)` output
+space. The current path and unfinished function calls use `O(n)` extra memory,
+excluding the output.
 
 **Why it stays correct:** At the start of each recursive call, the partial
 answer and its supporting facts describe exactly the choices on the path to
 that call. After the call returns, undoing its choice restores exactly what the
 caller had before trying that branch.
 
-**Choose another method when:**
+**Reject it when:**
 
 - Use **greedy** when one next choice can be proved not to reduce the best
   result still possible, so the other branches may be discarded.
@@ -1808,23 +2011,28 @@ remember where to return.
 and subdirectories first. Once a subdirectory has been fully explored, return
 its total and add it to its parent directory's size.
 
-**Why it stays correct:** Every position marked reached has either been fully explored or
-is waiting on the current return path. No position needs to be scheduled twice.
+**Why it stays correct:** Every position marked reached has either been fully
+explored or is waiting on the current return path. No position needs to be
+scheduled twice.
 
 **Common trap:** Nested function calls consume memory. A path with too many
 steps may exceed the program's call limit, so use your own stack collection for
 very deep inputs.
 
-With an adjacency list, a complete traversal takes `O(V + E)` time because it
-visits each vertex and examines each edge a constant number of times. Reached
-state and the explicit or recursive stack use `O(V)` extra memory in the worst
-case.
+**Work and memory:** With an adjacency list, a complete traversal takes
+`O(V + E)` time because it visits each vertex and examines each edge a constant
+number of times. Reached state and the explicit or recursive stack use `O(V)`
+extra memory in the worst case.
 
 For cycle detection, one permanent `visited` flag is not always enough. In a
 directed graph, use three states: unseen, currently on the active DFS path, and
 fully finished. An edge to an active vertex is a directed cycle; an edge to a
 finished vertex is not. In an undirected graph, ignore the edge back to the
 current vertex's parent and treat another visited neighbor as a cycle.
+
+**Reject it when:** You need a route with the fewest equal-cost moves; use BFS
+instead. Also avoid recursive DFS when a valid path can be too deep for the
+call stack unless the environment guarantees enough stack space.
 
 ##### Breadth-first search
 
@@ -1857,8 +2065,8 @@ smaller frontier can reduce the number of states explored dramatically, though
 the worst-case asymptotic bound may be unchanged. Keep the two visited-distance
 maps separate so the meeting distance can be combined correctly.
 
-With an adjacency list, ordinary BFS takes `O(V + E)` time and `O(V)` extra
-memory for its queue, distances, and reached state.
+**Work and memory:** With an adjacency list, ordinary BFS takes `O(V + E)` time
+and `O(V)` extra memory for its queue, distances, and reached state.
 
 **Reject it when:** Moves have different costs. The route with the fewest moves
 may then cost more than a longer route; use Dijkstra's algorithm when all costs
@@ -1877,20 +2085,34 @@ Count each task's unfinished prerequisites. Add every task with a count of zero
 to a first-in, first-out queue. When one task finishes, subtract one from the
 count of every task that depended on it.
 
+**Worked example:** Suppose `Shop` must happen before `Cook`, and `Cook` before
+`Eat`. Initially only `Shop` has zero unfinished prerequisites, so output it.
+That reduces `Cook`'s count to zero; output `Cook`, which then unlocks `Eat`.
+The result is `[Shop, Cook, Eat]`. Adding `Eat -> Shop` would leave every task
+waiting forever and correctly reveal a cycle.
+
 **Why it stays correct:** The queue contains exactly the tasks whose prerequisites are all
 finished. A task is added to the output only after its remaining prerequisite
 count reaches zero.
 
 **Failure signal:** If the queue becomes empty before every task is processed,
-the remaining tasks form a dependency loop, such as `A` needing `B` while `B`
-also needs `A`. No valid order exists.
+the graph of unprocessed tasks contains a dependency cycle, such as `A`
+needing `B` while `B` also needs `A`. Some other unprocessed tasks may not be
+part of that cycle; they can simply be waiting on a task that is. No valid
+order exists.
 
 An alternative uses DFS with the three states described above. After all
 outgoing dependencies of a vertex are finished, append that vertex to a
 postorder list; reverse the list for a topological order. Kahn's indegree method
 is often simpler when the problem also needs layer-by-layer processing or an
-explicit count of unfinished prerequisites. Both forms take `O(V + E)` time
-and `O(V)` extra memory with adjacency lists.
+explicit count of unfinished prerequisites.
+
+**Work and memory:** Both forms take `O(V + E)` time and `O(V)` extra memory
+with adjacency lists, not counting the stored graph itself.
+
+**Reject it when:** The relationships do not represent prerequisites, the
+graph may be undirected, or the problem asks for shortest routes rather than a
+valid dependency order.
 
 ##### Dijkstra shortest paths
 
@@ -1905,15 +2127,21 @@ others. Use a priority queue that removes the route with the smallest cost
 first. When traveling through the current location gives a neighbor a cheaper
 route, store that new cost and add the route to the queue.
 
+**Worked example:** Let `A -> B` cost `4`, `A -> C` cost `1`, and `C -> B`
+cost `2`. Starting at `A` discovers `B = 4` and `C = 1`. The queue processes
+`C` first because `1` is cheaper, then improves `B` to `1 + 2 = 3`. Processing
+`B` finalizes cost `3`; the older queued entry with cost `4` is stale and is
+ignored.
+
 **Why a processed cost is final:** Suppose the queue removes a route costing
 `5`, and `5` is still the cheapest known cost for that location. Every untried
 route already costs at least `5` before taking another connection. Because a
 connection cannot subtract cost, none can produce a route below `5`.
 
-With adjacency lists and a binary heap, the usual implementation takes
-`O((V + E) log V)` time and `O(V + E)` storage including the graph. If decrease
-key is not implemented, push improved entries and discard a popped entry whose
-cost no longer equals the stored best cost.
+**Work and memory:** With adjacency lists and a binary heap, the usual
+implementation takes `O((V + E) log V)` time and `O(V + E)` storage including
+the graph. If decrease-key is not implemented, push improved entries and
+discard a popped entry whose cost no longer equals the stored best cost.
 
 **Reject it when:** Any connection may have a negative cost. If every connection
 has the same cost, breadth-first search is simpler.
@@ -1992,6 +2220,12 @@ closer to that leader so later searches take fewer steps. This is called
 larger group so the chains stay short; this is called **union by size**. Both
 changes improve speed without changing which items belong together.
 
+**Work and memory:** With both improvements, a long sequence of operations is
+almost constant time per operation in practice. Spread across the whole
+sequence, which is what **amortized** means here, the formal bound is
+`O(alpha(n))`. The function `alpha` grows so slowly that it is at most a tiny
+constant for realistic inputs. The parent and size arrays use `O(n)` memory.
+
 **Reject it when:** You need the actual route, the order in which items were
 visited, or the shortest path. Knowing only each item's group does not preserve
 that information.
@@ -2006,13 +2240,21 @@ Do not confuse a minimum spanning tree with shortest paths. A spanning tree
 minimizes the total cost of the selected network; paths from a particular start
 inside that tree need not be the cheapest possible paths in the original graph.
 
+**Worked example:** Three offices have cable costs `A-B = 1`, `B-C = 2`, and
+`A-C = 5`. Kruskal accepts `A-B`, then `B-C`; all offices are connected for
+total cost `3`. It rejects `A-C` because that expensive edge would create a
+cycle. The result uses exactly two edges, which is `V - 1` for three offices.
+
 **Kruskal's algorithm:** Sort edges by weight. Scan from cheapest to most
 expensive and accept an edge exactly when its endpoints are currently in
 different disjoint-set components. The invariant is that the accepted edges
-form a forest that can still be extended to some minimum spanning tree. The cut
-property makes the cheapest edge crossing between components safe. Sorting
-dominates the work at `O(E log E)`; disjoint-set operations are nearly constant
-amortized time with path compression and union by size.
+form a forest that can still be extended to some minimum spanning tree. The
+**cut property** says that if the vertices are split into two groups, a
+cheapest edge crossing between those groups can be included in some minimum
+spanning tree. That is why Kruskal can safely accept the next cheapest edge
+that joins two current components. Sorting dominates the work at `O(E log E)`;
+disjoint-set operations are nearly constant amortized time with path
+compression and union by size.
 
 **Prim's algorithm:** Begin from any vertex and keep the cheapest edge leaving
 the connected portion in a min-heap. Repeatedly take the cheapest edge reaching
@@ -2020,9 +2262,19 @@ an unseen vertex. With adjacency lists and a binary heap, this takes
 `O(E log V)` time. Ignore stale heap entries whose destination has already been
 added.
 
-**Failure signal:** If fewer than `V - 1` edges can be accepted, the graph is
-disconnected. The algorithms then produce a minimum spanning forest unless the
-problem requires reporting that no spanning tree exists.
+**Work and memory:** Kruskal takes `O(E log E)` time and `O(V + E)` storage
+including its edge list and disjoint-set data. Prim with adjacency lists and a
+binary heap takes `O(E log V)` time and `O(V + E)` storage including the graph.
+
+**Failure signal:** If fewer than `V - 1` edges can connect all vertices, the
+graph is disconnected and no single spanning tree exists. Kruskal naturally
+produces a minimum spanning forest. Prim as described above covers only the
+component containing its starting vertex; restart it from every still-unseen
+vertex to produce a minimum spanning forest for the whole graph.
+
+**Reject it when:** The goal is the cheapest route from one starting vertex,
+not the cheapest total network, or when the directed edges do not represent an
+undirected connection problem.
 
 ##### Heap or priority queue
 
@@ -2037,14 +2289,20 @@ queue that exposes the smallest stored item. To retain the three largest values
 seen so far, keep three values in a min-heap; when a larger value arrives,
 remove the smallest retained value and insert the new one.
 
+**Worked example:** Process job priorities `5`, `2`, and `8` with a min-heap.
+Although `2` arrived second, it is removed first because it is smallest. The
+next removal returns `5`, then `8`. The heap promises only which item is at the
+top; its internal slice does not need to be globally sorted.
+
 **Why it stays correct:** The heap contains exactly the items still under consideration.
 The item exposed at the top is always the next smallest or largest item the
 algorithm needs.
 
-Building a heap from `n` existing items can be done in `O(n)` time. Adding or
-removing the top takes `O(log n)`, and inspecting the top takes `O(1)`. A heap
-does not provide constant-time search or removal for an arbitrary value unless
-an additional index map is maintained and repaired after every swap.
+**Work and memory:** Building a heap from `n` existing items can be done in
+`O(n)` time and uses `O(n)` storage. Adding or removing the top takes
+`O(log n)`, and inspecting the top takes `O(1)`. A heap does not provide
+constant-time search or removal for an arbitrary value unless an additional
+index map is maintained and repaired after every swap.
 
 For `k` sorted inputs containing `N` total items, put the first item from each
 non-empty input into a min-heap. Whenever one is removed, add the next item from
@@ -2073,9 +2331,18 @@ stored values increase or decrease from bottom to top. While the new value
 answers the question for the top item, remove that item and record its answer.
 Then add the new item, whose own answer is still unknown.
 
-**Why it stays correct:** Every stored item is still waiting for an answer, and the stored
-values remain sorted in one direction. An item is removed only when the current
-value is the first later value that answers its question.
+**Worked example:** Find the next greater value in `[2, 1, 4]`. Store position
+`0` for value `2`, then position `1` for value `1`; both still await a larger
+value. When `4` arrives, it resolves `1 -> 4` and then `2 -> 4`, so both
+positions are popped. Store `4`; it has no next greater value by the end.
+
+**Why it stays correct:** Every stored item is still waiting for an answer, and
+the stored values remain sorted in one direction. An item is removed only when
+the current value is the first later value that answers its question.
+
+**Work and memory:** Each position is added once and removed at most once, so
+the whole scan takes `O(n)` time even though one step may remove several items.
+The stack can hold `O(n)` positions.
 
 **Reject it when:** The answer depends on any earlier value, not specifically
 the nearest one that meets the condition, or when removing an item would lose
@@ -2095,17 +2362,26 @@ to back:
    new value is both newer and no smaller, so the old one can never win again.
 3. Add the new position. The front now identifies the maximum.
 
+**Worked example:** For `[1, 3, 2, 5]` with window size `3`, reading `3`
+removes `1` from the back because `1` is older and smaller. After reading `2`,
+the deque represents values `[3, 2]`, so the first window's maximum is `3`.
+Reading `5` removes both `2` and `3`; the next window's maximum is `5`.
+
 **Why it stays correct:** Positions remain in increasing time order, values
 remain monotonic, and every removed position is either expired or dominated by
 a later candidate that will remain available for at least as long.
 
-Each position enters and leaves the deque at most once, so all windows are
-processed in `O(n)` time with `O(window size)` memory. Store positions rather
-than values when expiration depends on location or duplicate values exist.
+**Work and memory:** Each position enters and leaves the deque at most once, so
+all windows are processed in `O(n)` time with `O(window size)` memory. Store
+positions rather than values when expiration depends on location or duplicate
+values exist.
 
 Use a heap when priorities change independently or arbitrary items remain
 eligible; use a monotonic deque when eligibility expires in sequence order and
 new values permanently dominate older ones.
+
+**Reject it when:** Candidates do not expire in input order, or a newer value
+cannot be proved to make an older value permanently irrelevant.
 
 ##### Intervals
 
@@ -2119,6 +2395,11 @@ overlapping ranges or report the gaps between covered regions.
 start with the current end using the problem's rule for touching endpoints. If
 they overlap, extend the current end when necessary. If a gap separates them,
 save the current interval and begin a new one.
+
+**Worked example:** Sort `[5, 7]`, `[1, 3]`, and `[2, 6]` into start order.
+Begin with `[1, 3]`; `[2, 6]` overlaps, so extend the current interval to
+`[1, 6]`. `[5, 7]` also overlaps, producing the single merged interval
+`[1, 7]`.
 
 **Why saving an interval is safe:** Once a gap appears, every remaining
 interval starts even later because the input is sorted. None can overlap the
@@ -2140,6 +2421,14 @@ Different interval objectives require different rules:
 - To count simultaneous intervals or required rooms, sort start/end events or
   keep current ending times in a min-heap. The endpoint convention decides
   whether an end at time `t` frees a resource before a start at `t`.
+
+**Work and memory:** Sorting `n` intervals takes `O(n log n)` time, and the
+following scan takes `O(n)`. Sorting in place uses no separate interval copy,
+but the merged or selected result can contain `O(n)` intervals.
+
+**Reject it when:** The ranges change online and each change must be queried
+immediately, or when the problem is really about individual points rather than
+relationships between ranges.
 
 ##### Sweep line
 
@@ -2167,6 +2456,14 @@ equals the number of ranges active immediately after that position.
 ending at `4` frees its room before another starts at `4`, process the ending
 before the new start.
 
+**Work and memory:** Creating and sorting two events per range takes
+`O(n log n)` time and `O(n)` event storage. The sweep itself is linear after
+sorting.
+
+**Reject it when:** Values change continuously between event positions, or
+events arrive online and must be answered before they can be collected and
+sorted.
+
 ##### Fast and slow pointers
 
 **Mental model:** Move two positions through the same linked list. Their speeds
@@ -2186,8 +2483,17 @@ remain. Before following the link to the next node, check that the current node
 exists. For a fixed distance, move the leading position ahead first and then
 move both one node at a time.
 
-**Why it stays correct:** After setup, the pointers keep the same speed relationship or
-the same fixed gap after every move.
+**Worked example:** In `1 -> 2 -> 3 -> 4 -> nil`, move `slow` one link and
+`fast` two links. After the first move they are at `2` and `3`; after the next,
+`slow` is at `3` while `fast` has reached the end. The slow position is the
+second middle under this stopping rule. State the desired middle for even
+lengths because a different loop condition can return node `2` instead.
+
+**Why it stays correct:** After setup, the pointers keep the same speed
+relationship or the same fixed gap after every move.
+
+**Work and memory:** Each pointer makes at most a linear number of moves, so the
+method takes `O(n)` time and `O(1)` extra memory.
 
 **Reject it when:** You need to jump directly to any chosen position, remember
 the full history, or return the actual visited path. Two moving positions do not
@@ -2207,12 +2513,23 @@ complete word ends there. To insert a word, follow or create one step for each
 character. To look up a word, follow the same steps and check the end marker
 after the last character.
 
+**Worked example:** Insert `car` and `cat`. Both words share the steps `c -> a`
+and then branch to `r` or `t`. A prefix query for `ca` succeeds at the shared
+step. A full-word query for `ca` fails unless that step has its own end marker;
+being a valid prefix is not the same as being a stored word.
+
 Use a fixed child array for a small fixed alphabet and a map for a sparse or
 large alphabet. A wildcard search branches over every existing child at that
 position, so its worst case can be exponential in the number of wildcards even
 though ordinary exact lookup is `O(word length)`. During a board search, carry
 the trie node reached by the current path so a prefix missing from the trie can
 stop that branch immediately.
+
+**Work and memory:** Inserting or looking up a word of length `L` takes `O(L)`
+time. An insertion may create `O(L)` nodes; across all words, storage is
+proportional to the number of distinct prefix nodes. Wildcards can require
+exploring many branches and may take exponential time in the number of
+wildcards.
 
 **Why it stays correct:** The characters followed from the starting point always spell the
 beginning represented by the current step. A word exists only if the last step
@@ -2399,7 +2716,8 @@ package dynamicprogramming
 
 // CountOrderedOneOrTwoStepWays returns the number of ordered sequences of
 // one-step and two-step moves that sum to steps. Negative totals have no valid
-// sequence; the empty sequence is the single way to make a total of zero.
+// sequence; the empty sequence is the single way to make a total of zero. The
+// result must fit in an int.
 func CountOrderedOneOrTwoStepWays(steps int) int {
 	if steps < 0 {
 		return 0
@@ -2428,7 +2746,8 @@ steps, and several points where a new answer is built from earlier answers.
 package hashmap
 
 // PairSumIndices returns indices of two distinct values whose sum is target.
-// The boolean is false when no pair exists.
+// The boolean is false when no pair exists. Subtracting each value from target
+// must fit in an int.
 func PairSumIndices(values []int, target int) (int, int, bool) {
 	// Map every previously visited value to one of its earlier indices.
 	indexByValue := make(map[int]int)
@@ -2632,12 +2951,17 @@ package directionalscan
 
 // SumWithSmallerLeftValuesSubtracted applies a local signed-sum rule: a value
 // is subtracted when it is smaller than its immediate right neighbor and added
-// otherwise.
+// otherwise. The running total must fit in an int.
 func SumWithSmallerLeftValuesSubtracted(values []int) int {
-	total := 0
-	rightValue := 0
+	if len(values) == 0 {
+		return 0
+	}
 
-	for index := len(values) - 1; index >= 0; index-- {
+	last := len(values) - 1
+	total := values[last]
+	rightValue := values[last]
+
+	for index := last - 1; index >= 0; index-- {
 		value := values[index]
 		if value < rightValue {
 			total -= value
