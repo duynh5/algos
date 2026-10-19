@@ -59,7 +59,7 @@ therefore incorporates only repeated, transferable signals:
   number of edits, streaming input, a value-distance restriction, or a demand
   for lower memory.
 - Be able to move from a direct solution to a better one and explain what
-  repeated work, monotonic relationship, or data-structure operation made the
+  repeated work, one-direction ordering, or data-structure operation made the
   improvement possible.
 - Practice constructing a graph from relationships, converting a rooted tree
   into an undirected graph when movement may go upward, and recognizing when a
@@ -204,7 +204,7 @@ Useful identities for an integer `x` include:
 | `x &^ (1 << k)` | Clear bit `k` in Go. |
 | `x ^ (1 << k)` | Toggle bit `k`. |
 | `x & (x - 1)` | Clear the lowest set bit. |
-| `x & -x` | Isolate the lowest set bit when using two's-complement integers. |
+| `x & -x` | Isolate the lowest set bit in Go's signed-integer representation. |
 | `a ^ a` | Produce `0`; equal values cancel under XOR. |
 | `a ^ 0` | Preserve `a`. |
 
@@ -219,60 +219,141 @@ included. Enumerating all masks from `0` through `(1 << n) - 1` visits all
 exponential work. For DP over subsets, a state such as `dp[mask]` stores the
 answer for exactly the chosen items in `mask`.
 
-In Go, use an unsigned type when logical right shifts or an exact bit width
-matter. Shifting a signed negative value preserves language-specific signed
-semantics, and converting between `int`, `uint32`, and `uint64` changes the
-available width. Parenthesize masks, check that the shift count is valid, and
-remember that `^x` is bitwise complement in Go while `x ^ y` is XOR.
+In Go, use an unsigned type when a right shift must add zero bits on the left
+or when an exact bit width matters. Right-shifting a signed negative value adds
+one bits on the left instead. Converting between `int`, `uint32`, and `uint64`
+also changes the available width. Parenthesize masks, check that the shift count
+is valid, and remember that `^x` flips every bit while `x ^ y` compares two
+values with XOR.
 
 Counting set bits with `x &= x - 1` takes one pass per set bit. Scanning a fixed
 32- or 64-bit word takes constant time with respect to ordinary input length,
 but state the width rather than calling the work universally free.
 
-### Arithmetic normalization and exactness
+### Keeping arithmetic values exact and consistent
 
-Interview problems involving ratios, coordinates, divisibility, or repeated
-multiplication often fail because mathematically equal values receive different
-machine representations.
+Two arithmetic mistakes appear often in interview solutions:
 
-- Reduce a fraction `(numerator, denominator)` by their greatest common divisor
-  and keep the sign in one agreed place. This gives equal ratios the same map
-  key and avoids floating-point rounding for slopes.
-- Use Euclid's rule `gcd(a, b) = gcd(b, a % b)` until the second value is zero.
-  Normalize negative inputs first. `lcm(a, b)` can be calculated as
-  `a / gcd(a, b) * b`; dividing before multiplying reduces overflow risk.
-  Handle zero explicitly so `(0, 0)` never causes division by zero.
-- In Go, `%` keeps the sign of the dividend. When a non-negative remainder is
-  required for a positive modulus `m`, normalize with `((x % m) + m) % m`.
-- Integer division truncates toward zero. That is not the same as mathematical
-  floor division for negative values, so define the rounding rule explicitly.
-- Avoid comparing calculated floating-point values for exact equality. Prefer
-  normalized integer pairs when the inputs are integral and exact equality is
-  required.
+1. Two equal values are stored differently. For example, `1/2`, `2/4`, and
+   `-1/-2` all mean the same number, but their numerator and denominator pairs
+   are different.
+2. A calculation loses information. For example, a decimal approximation of
+   a fraction may be slightly above or below its exact value.
 
-For geometric slopes, normalize `(deltaY, deltaX)` by their GCD, choose one
-sign convention, and use single canonical forms for vertical and horizontal
-lines. Duplicate points have `(0, 0)` and must be counted separately rather
-than treated as an ordinary slope.
+The general fix is to choose one exact way to store each value. Converting all
+equal values to that agreed form is called **normalization**. It makes exact
+comparison possible without relying on rounded decimal values.
 
-For factor-counting questions, count the required prime factors instead of
-constructing an enormous product. The number of trailing decimal zeroes in
-`n!`, for example, is the number of factor pairs `2 * 5`; twos are plentiful,
-so sum `n/5 + n/25 + n/125 + ...` to count every factor of five. Trial division
-only needs possible factors through the square root of the remaining number;
-when primality information is needed for many values up to one bound, a sieve
-precomputes it more efficiently than repeating trial division.
+**ELI5:** Imagine that one person writes a half as `1/2` and another writes it
+as `2/4`. Before filing the values, rewrite both labels as `1/2`. Then equal
+amounts always go into the same drawer.
 
-When an integer is too large for a machine type, process its digits as a
-stream. To test divisibility by positive `m`, update
-`remainder = (remainder*10 + digit) % m` for each digit. The remainder after
-every prefix equals that prefix modulo `m`, so the full value never needs to be
-constructed. The same idea supports modular addition and multiplication of
-large numeric strings; validate the sign and digit grammar separately.
+#### Fractions and ratios
 
-These rules support problems such as grouping equal slopes, detecting repeated
-remainders, counting factors, and implementing rational graph weights without
-silently merging or separating the wrong states.
+For a fraction stored as `(numerator, denominator)`:
+
+1. Find the greatest common divisor (GCD), which is the largest positive
+   integer that divides both values.
+2. Divide both values by the GCD.
+3. Keep any negative sign on the numerator, so the denominator is positive.
+
+For example, `(6, -8)` becomes `(-3, 4)`: the GCD of `6` and `8` is `2`, and
+the sign moves to the numerator. The equal fractions `2/4`, `3/6`, and
+`-1/-2` all become `(1, 2)`. These pairs can safely be used as map keys because
+equal fractions now produce equal keys.
+
+Euclid's algorithm finds the GCD by repeatedly replacing `(a, b)` with
+`(b, a % b)` until `b` is zero. For `gcd(18, 12)`, the pairs are `(18, 12)`,
+`(12, 6)`, and `(6, 0)`, so the answer is `6`. Work with non-negative
+magnitudes and handle zero deliberately. In particular, `(0, 0)` is not a
+valid fraction and must not reach a division step. Any zero denominator is
+invalid. A zero numerator with a non-zero denominator should become `(0, 1)`.
+
+For non-negative `a` and `b`, first return zero if either value is zero.
+Otherwise, calculate the least common multiple (LCM) with
+`a / gcd(a, b) * b`. Divide before multiplying to reduce the chance of integer
+overflow. This only reduces the risk; the final result can still be too large
+for the chosen integer type.
+
+#### Slopes without rounding
+
+For points with integer coordinates, store a slope as the pair
+`(change in y, change in x)` instead of as a floating-point number. Reduce the
+pair like a fraction and use one sign rule. For example, `(2, -4)` becomes
+`(-1, 2)`.
+
+Choose one fixed pair for every vertical line and another for every horizontal
+line, such as `(1, 0)` and `(0, 1)`. Two identical points produce `(0, 0)`;
+count them separately because they do not define a slope. This representation
+lets a map group equal slopes without decimal rounding. Calculate the two
+coordinate differences in a type large enough to hold them before reducing the
+pair.
+
+#### Remainders and division with negative values
+
+In Go, `%` keeps the sign of the number on its left. Therefore `-1 % 5` is
+`-1`, not `4`. When a problem requires a result from `0` through `m-1` for a
+positive `m`, adjust a negative remainder once:
+
+```go
+remainder := x % m
+if remainder < 0 {
+	remainder += m
+}
+```
+
+The addition moves a negative result into the desired range. A non-negative
+result already lies in that range and needs no change.
+
+Go integer division drops the fractional part toward zero. Thus `-7 / 3` is
+`-2`. Mathematical floor division would return `-3` because it rounds down.
+Read the problem's rounding rule before using integer division with negative
+values.
+
+#### Counting factors without building a huge number
+
+Sometimes the question asks about the factors of a product, not the product
+itself. Count those factors directly instead of constructing a number that may
+overflow.
+
+For example, each trailing zero in `n!` needs one factor pair `2 * 5`. A
+factorial contains more twos than fives, so the number of trailing zeroes is:
+
+```text
+n/5 + n/25 + n/125 + ...
+```
+
+For `25!`, this is `25/5 + 25/25 = 5 + 1 = 6`. The second term counts the
+extra factor of five contributed by `25`.
+
+To test one number for factors, trial division only needs candidates up to its
+square root. If a larger factor existed without a matching smaller factor, the
+two factors would multiply to more than the number. When many questions ask
+which values up to the same limit are prime, a **sieve** is usually faster: it
+marks multiples of each prime once instead of repeating trial division for
+every value.
+
+#### Processing a number that does not fit in an integer type
+
+Keep a huge integer as text and process one digit at a time. To find its
+remainder after division by a positive integer `m`, start with remainder zero
+and update:
+
+```go
+remainder = (remainder*10 + digit) % m
+```
+
+For the text `"1234"` with `m = 7`, the remainder after each digit is `1`,
+`5`, `4`, and `2`. The answer is therefore `2`, and the program never needs to
+store the integer `1234` as one value. The same method works even when the text
+contains thousands of digits. Validate the optional sign and every digit
+separately before doing the arithmetic. The working integer type must be able
+to hold `10*(m-1)+9`; otherwise, use a wider type or an overflow-safe modular
+calculation.
+
+The shared rule is simple: decide what values count as equal, choose one exact
+representation for them, and check that each intermediate calculation fits in
+its integer type.
 
 ### Combinatorics and output size
 
@@ -505,15 +586,17 @@ for head := 0; head < len(queue); head++ {
 }
 ```
 
-This gives constant amortized work per addition and removal during one bounded
-traversal. A long-lived queue should occasionally compact its unread portion or
-use a circular buffer, because retaining `queue[head:]` can keep the entire old
+Across the whole traversal, this gives constant average work per addition and
+removal even though an occasional append may need to copy the slice. This way
+of averaging the cost over a sequence is called **amortized analysis**. A
+long-lived queue should occasionally compact its unread portion or use a
+circular buffer, because retaining `queue[head:]` can keep the entire old
 backing array alive. Clear removed positions when they contain pointers that
 should become collectable.
 
-A queue built from two stacks illustrates **amortized analysis**. New items go
-onto an input stack. Removal uses an output stack; only when that stack is empty
-are all input items moved to it. One removal can cost `O(n)`, but each item moves
+A queue built from two stacks illustrates the same idea. New items go onto an
+input stack. Removal uses an output stack; only when that stack is empty are all
+input items moved to it. One removal can cost `O(n)`, but each item moves
 between stacks at most once, so a sequence of operations costs `O(1)` amortized
 time per operation.
 
@@ -1132,9 +1215,10 @@ the desired output itself must be ordered.
 
 **Start here:** Decide what the comparison means and whether the original
 indices or input order must be retained. For records, define tie-breaking
-explicitly; a comparator must be consistent and transitive. If equal items
-must keep their previous order, use a stable sort or include the original
-position as a tie-breaker.
+explicitly. A comparator must be consistent: if `a` comes before `b` and `b`
+comes before `c`, then `a` must come before `c`. If equal items must keep their
+previous order, use a stable sort or include the original position as a
+tie-breaker.
 
 **Worked example:** To detect duplicates in `[4, 1, 4, 2]`, sort it into
 `[1, 2, 4, 4]`, then compare neighbors. The two `4`s become adjacent, so one
@@ -1416,17 +1500,18 @@ Common state families recur across interview problems:
 | --- | --- | --- |
 | Prefix or position | `dp[i]` answers for the first `i` items. | Process smaller prefixes before larger ones. |
 | Take or skip | `dp[i]` is the best result ending at or through item `i`. | Retain exactly the earlier states each choice can follow. |
-| Capacity or amount | `dp[c]` answers for capacity or total `c`. | For zero-one use, scan capacity backward so an item is not reused; for unlimited use, forward scanning may intentionally reuse it. |
-| Grid | `dp[row][col]` answers for a cell or rectangle boundary. | Visit every predecessor direction before the cell. |
-| Two sequences | `dp[i][j]` answers for prefixes of lengths `i` and `j`. | Fill by increasing prefix length or memoize the pair. |
+| Capacity or amount | `dp[c]` answers for capacity or total `c`. | When each item may be used once, scan capacity backward so it is not reused. Scan forward only when reuse is allowed. |
+| Grid | `dp[row][col]` answers for a cell or rectangle boundary. | Visit every cell that can lead into this cell first. |
+| Two sequences | `dp[i][j]` answers for prefixes of lengths `i` and `j`. | Fill by increasing prefix length or save each pair during recursive calls. |
 | Interval | `dp[left][right]` answers inside one range. | Process shorter ranges before longer ranges. |
 | Finite state machine | `dp[i][state]` records a small mode such as holding stock or transaction count. | Every transition must represent one legal action. |
 
 State compression is safe only when overwritten values can never be needed
 again. In a two-dimensional table, keeping one row may require scanning columns
 in a particular direction. Explain the dependency before reducing memory;
-blindly changing `O(nm)` storage to `O(m)` often turns a zero-one choice into an
-unlimited one or mixes the current row with the previous row.
+blindly changing `O(nm)` storage to `O(m)` can mix the current row with the
+previous row and accidentally let the same item be reused when it should be
+available only once.
 
 Sometimes the useful stored meaning changes during optimization. For longest
 increasing subsequence, `tails[length]` can store the smallest possible ending
@@ -1486,7 +1571,7 @@ For merge sort, each call sorts two halves, then merges them by repeatedly
 taking the smaller unread value. The invariant during merging is that the
 output prefix is sorted and contains exactly the smallest values consumed from
 both halves. The recurrence `T(n) = 2T(n/2) + O(n)` gives `O(n log n)` time.
-Ordinary slice-based merging needs `O(n)` auxiliary storage in addition to
+Ordinary slice-based merging needs `O(n)` extra storage in addition to
 `O(log n)` recursive stack depth for balanced splits.
 
 Exponentiation by squaring uses the same idea without two recursive calls. If
@@ -2103,9 +2188,9 @@ order exists.
 
 An alternative uses DFS with the three states described above. After all
 outgoing dependencies of a vertex are finished, append that vertex to a
-postorder list; reverse the list for a topological order. Kahn's indegree method
-is often simpler when the problem also needs layer-by-layer processing or an
-explicit count of unfinished prerequisites.
+postorder list; reverse the list for a topological order. The queue-based method
+above is often simpler when the problem also needs layer-by-layer processing or
+an explicit count of unfinished prerequisites.
 
 **Work and memory:** Both forms take `O(V + E)` time and `O(V)` extra memory
 with adjacency lists, not counting the stored graph itself.
@@ -2307,7 +2392,7 @@ index map is maintained and repaired after every swap.
 For `k` sorted inputs containing `N` total items, put the first item from each
 non-empty input into a min-heap. Whenever one is removed, add the next item from
 that same input. The heap contains at most `k` candidates and its top is the
-smallest unread item overall, giving `O(N log k)` time and `O(k)` auxiliary
+smallest unread item overall, giving `O(N log k)` time and `O(k)` extra
 space. If output must be unique, compare against the last emitted value; do not
 drop duplicates before they have advanced their source input.
 
