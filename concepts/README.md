@@ -453,22 +453,113 @@ its integer type.
 
 ### Combinatorics and output size
 
-Before generating choices, estimate how many answers can exist. A set of `n`
-distinct items has `2^n` subsets, `n!` permutations, and
-`n! / (k!(n-k)!)` size-`k` combinations. An algorithm that returns every answer
-must spend at least proportional time and output space, even if its internal
-bookkeeping is optimal.
+**Combinatorics** is the study of counting choices. Before writing an algorithm
+that generates choices, first estimate how many answers it may have to return.
+Even a perfect algorithm cannot return one million answers without creating
+and processing those one million answers.
 
-Avoid calculating large factorials merely to divide them later. A binomial
-coefficient can be built multiplicatively while dividing at each step, or with
-Pascal's recurrence `C(n, k) = C(n-1, k-1) + C(n-1, k)`. Use
-`k = min(k, n-k)` to exploit symmetry and check whether the result fits the
-chosen integer type.
+For the three distinct values `[A, B, C]`:
 
-When input values repeat, "choose positions" and "choose distinct value
-multisets" are different outputs. Sort and skip equal sibling choices when
-duplicate result collections must be removed; do not skip a repeated value
-that appears deeper in the same chosen path when multiple copies are allowed.
+- A **subset** chooses any number of values, and order does not matter. The
+  eight subsets are `[]`, `[A]`, `[B]`, `[C]`, `[A,B]`, `[A,C]`, `[B,C]`, and
+  `[A,B,C]`. Each of the `n` values has two choices--included or excluded--so
+  `n` distinct values have `2^n` subsets.
+- A **permutation** arranges all the values, so order matters. The six
+  permutations are `ABC`, `ACB`, `BAC`, `BCA`, `CAB`, and `CBA`. There are `n!`
+  permutations, where `n!` means `n * (n-1) * ... * 1`.
+- A **size-`k` combination** chooses exactly `k` values, and order does not
+  matter. Choosing two values gives `[A,B]`, `[A,C]`, and `[B,C]`; `[B,A]` is
+  not another answer. The number of answers is written `C(n, k)`, read as
+  "`n` choose `k`."
+
+**ELI5:** If the question asks for every possible group, the number of groups
+is part of the cost. There is no shortcut that lets a program print a group
+without spending time on it.
+
+For example, generating all subsets takes at least `O(2^n)` time because there
+are `2^n` answers. If every answer is copied into its own slice, also count the
+values inside those slices. Each input value appears in exactly half of the
+subsets, so for `n > 0`, all subsets together contain `n * 2^(n-1)` values.
+Similarly, there are `C(n, k)` size-`k` combinations and each contains `k`
+values, so storing all of them takes `O(k * C(n, k))` output space. "Extra
+space" may still be smaller because it normally excludes the required returned
+output.
+
+#### Counting combinations without large factorials
+
+The mathematical formula is:
+
+```text
+C(n, k) = n! / (k! * (n-k)!)
+```
+
+For example, choosing two values from five gives:
+
+```text
+C(5, 2) = 5! / (2! * 3!) = 120 / (2 * 6) = 10
+```
+
+This formula is a poor direct implementation for large inputs. The factorials
+can overflow the integer type even when the final answer would fit. For valid
+inputs with `0 <= k <= n`, build the answer a step at a time instead:
+
+```go
+k = min(k, n-k)
+result := 1
+for i := 1; i <= k; i++ {
+	result = result * (n - k + i) / i
+}
+```
+
+For `C(5, 2)`, the loop does:
+
+```text
+i = 1: result = 1 * 4 / 1 = 4
+i = 2: result = 4 * 5 / 2 = 10
+```
+
+The division is exact after each complete step. The assignment
+`k = min(k, n-k)` uses the fact that choosing the two values to keep is the
+same counting problem as choosing the three values to leave out:
+`C(5, 2) = C(5, 3)`. Using the smaller side means fewer loop iterations.
+
+Another option is **Pascal's recurrence**:
+
+```text
+C(n, k) = C(n-1, k-1) + C(n-1, k)
+```
+
+Pick one particular value. Every valid group either includes it or does not:
+
+- If the group includes it, choose the remaining `k-1` values from the other
+  `n-1` values: `C(n-1, k-1)` possibilities.
+- If the group excludes it, choose all `k` values from the other `n-1` values:
+  `C(n-1, k)` possibilities.
+
+For example, `C(5, 2) = C(4, 1) + C(4, 2) = 4 + 6 = 10`. This rule is the
+source of Pascal's triangle and is useful when dynamic programming needs many
+combination counts, not just one.
+
+Both methods can still overflow. In the loop, even `result * nextFactor` can
+overflow before the following division reduces it. Check multiplication and
+addition against the integer type's limit. If the final answer must exceed the
+ordinary integer range, Go's `big.Int` type from the `math/big` package can
+store integers that grow as needed. Another implementation can cancel common
+factors in the numerator and denominator before multiplying, but that is an
+additional optimization rather than part of the basic counting idea.
+
+#### Repeated input values
+
+When values repeat, clarify what counts as a different answer. For the labeled
+positions `[1a, 1b, 2]`, choosing two positions gives three choices:
+`[1a,1b]`, `[1a,2]`, and `[1b,2]`. If answers contain only values, however,
+the last two both become `[1,2]`, so the distinct value combinations are only
+`[1,1]` and `[1,2]`.
+
+To generate each value combination once, a common backtracking technique is to
+sort the input and skip equal values considered as alternatives at the same
+decision depth. Do not skip the same value at a deeper depth: after choosing
+the first `1`, the second `1` must remain available so `[1,1]` can be formed.
 
 ### Integer Digit Processing
 
@@ -560,18 +651,38 @@ underlying array; changes through the returned slice then no longer affect
 `base`.
 
 Arrays also provide an addressable position for every value. When values are
-guaranteed to lie in a small range, a frequency slice can replace a hash map.
-When values are guaranteed to encode valid positions and mutation is allowed,
-the array itself can sometimes record visited or counted state. State this
-contract explicitly: using values as indices is unsafe with negative,
-out-of-range, or duplicate values unless the encoding handles them.
+guaranteed to lie in a small range, the position can represent the value and
+the stored number can represent its count. This is called a **frequency
+slice**. For `[2, 1, 2]`, a three-position frequency slice becomes `[0, 1, 2]`:
+value `0` appears zero times, value `1` once, and value `2` twice. This is often
+simpler than a map, but it is safe only when every value is a valid slice
+position. Negative or unexpectedly large values would cause an invalid access.
 
-Common in-place techniques include separate read and write positions,
-partitioning values into regions, and reversing ranges. Rotating an array right
-by `k` can be done by normalizing `k %= n`, reversing the whole array, then
-reversing the first `k` and remaining values. A three-way partition maintains
-regions smaller than, equal to, and greater than a pivot; every swap must grow
-one proven region without skipping the unclassified value moved into place.
+#### Moving values in place
+
+An algorithm works **in place** when it rearranges the input's existing
+storage instead of creating another collection of similar size. Common forms
+use one position to read values and another to write retained values, divide
+the input into regions, or reverse a range.
+
+For example, rotate `[1, 2, 3, 4, 5]` two positions to the right:
+
+```text
+reverse everything:       [5, 4, 3, 2, 1]
+reverse the first 2:      [4, 5, 3, 2, 1]
+reverse the remaining 3:  [4, 5, 1, 2, 3]
+```
+
+When `k` may exceed the length, `k %= n` replaces it with an equivalent
+smaller rotation: rotating five items by seven positions is the same as
+rotating by two. Handle an empty slice before taking `k % n`, because division
+by zero is invalid.
+
+A **three-way partition** chooses a comparison value called a **pivot** and
+maintains three regions: values smaller than the pivot, values equal to it, and
+values greater than it. A fourth region contains values not yet classified.
+After every swap, one classified region must grow and the unclassified region
+must shrink; otherwise an item may be skipped or processed forever.
 
 ### Linked Lists
 
@@ -707,36 +818,52 @@ matter; equal values do not make two nodes the same node.
 branches to children, and never find a branch that loops back to where it
 started. A binary tree merely limits each node to at most two children.
 
-**Worked example:** In a binary-search tree with root `8`, left child `3`, and
-right child `10`, searching for `10` compares with `8`, goes right because
-`10 > 8`, and finds it. Searching for `4` goes left at `8`, then right at `3`.
-If that link is `nil`, the value is absent. Each comparison rules out one whole
-subtree only because the ordering rule holds for every descendant.
+A **binary-search tree (BST)** adds an ordering rule. Under the usual rule for
+distinct values, everything in a node's left subtree is smaller than the node,
+and everything in its right subtree is larger. A **subtree** is simply one node
+together with every node below it.
+
+**Worked search example:** In a BST with root `8`, left child `3`, and right
+child `10`, searching for `10` compares with `8`, goes right because `10 > 8`,
+and finds it. Searching for `4` goes left at `8`, then right at `3`. If that
+link is `nil`, the value is absent. Each comparison rules out one whole subtree
+only because the ordering rule applies to every descendant, not just the
+direct children.
 
 The common depth-first traversal orders differ only in when the current node is
 handled:
 
 | Order | Visit current node | Common use |
 | --- | --- | --- |
-| Preorder | Before both children | Serialize or copy a tree; pass state downward. |
+| Preorder | Before both children | Copy the tree's shape or pass information from a parent to its children. |
 | Inorder | Between left and right | Read a BST in sorted order. |
-| Postorder | After both children | Calculate height, balance, diameter, or another subtree result. |
-| Level order | By increasing depth | Use BFS for views, levels, and minimum unweighted depth. |
+| Postorder | After both children | Calculate a parent result from results already returned by its children. |
+| Level order | By increasing depth | Visit every node one edge away before nodes two edges away. |
+
+For this tree:
+
+```text
+    2
+   / \
+  1   3
+```
+
+preorder produces `[2, 1, 3]`, inorder produces `[1, 2, 3]`, postorder produces
+`[1, 3, 2]`, and level order produces `[2, 1, 3]`. The names describe when the
+current node is visited relative to its children.
 
 For recursive tree problems, define exactly what one call returns. A height
-function returns information about one subtree to its parent; a path-sum search
-may instead carry the remaining target down to children. Do not mix a value
-that may continue through the parent with a complete answer that may join both
-children. For example, a maximum path returned upward can use at most one child,
-while the best complete path seen at a node may use both.
+function, for example, can return `1 + max(leftHeight, rightHeight)` to its
+parent. The return value follows only one side because a path continuing upward
+cannot split into both children. A separate best answer stored for the whole
+tree may combine both sides at the current node. State these two meanings
+separately instead of using one variable for both.
 
-A **binary-search tree (BST)** has an ordering invariant. Under the usual
-distinct-key rule, every value in a node's left subtree is smaller and every
-value in its right subtree is larger. Validating only a node against its direct
-children is insufficient: every descendant must remain inside bounds inherited
-from all ancestors. An inorder traversal of a valid distinct-key BST is strictly
-increasing. If duplicates are allowed, the problem must specify which side may
-contain equality.
+Validating only a BST node against its direct children is insufficient. A
+smaller value hidden anywhere in a right subtree still breaks the rule. Pass
+down the allowed lower and upper bounds from every ancestor, or verify that an
+inorder traversal is strictly increasing. If duplicate values are allowed, the
+problem must state whether equality belongs on the left, the right, or neither.
 
 Search, insertion, and deletion take `O(h)` time for tree height `h`. A balanced
 BST has `h = O(log n)`; an unrestricted BST can become a chain with `h = O(n)`.
@@ -761,6 +888,9 @@ a parent and child. The conversion and search both take `O(n)` time and space.
 
 A graph stores vertices and connections. Decide these properties before
 choosing an algorithm:
+
+In complexity descriptions below, `V` means the number of vertices and `E`
+means the number of edges.
 
 **ELI5:** A graph is a map of things and the allowed moves between them. The
 things are called vertices or nodes; the connections are called edges. Cities
@@ -810,7 +940,17 @@ whether duplicate edges would corrupt indegrees or other counts.
 
 Matrix problems often test boundary discipline more than a new data structure.
 Treat `rows` and `cols` separately; a matrix need not be square, and Go permits
-jagged slices unless the problem promises a rectangle.
+**jagged slices**, whose rows have different lengths, unless the problem
+promises a rectangle.
+
+**Plain-language picture:** A matrix is a grid addressed by two positions:
+`matrix[row][column]`. Moving vertically changes the row; moving horizontally
+changes the column. Check both positions before reading a neighbor.
+
+**Worked boundary example:** A `2`-by-`3` matrix has rows `0..1` and columns
+`0..2`. From cell `(0, 2)`, moving down to `(1, 2)` is valid, but moving right
+to `(0, 3)` is not. Checking both coordinates against `len(matrix)` would be
+wrong because the number of rows and columns differ.
 
 - **Boundary traversal:** For spiral order, keep inclusive `top`, `bottom`,
   `left`, and `right` boundaries. After traversing one side, move its boundary
@@ -818,19 +958,28 @@ jagged slices unless the problem promises a rectangle.
   traversing the bottom or left side.
 - **Layer transformations:** A square rotation can be expressed as a transpose
   followed by reversing each row, or as four-way swaps around each layer.
-  State which coordinates map to which before mutating them.
+  A transpose swaps rows with columns, so position `(row, col)` moves to
+  `(col, row)`. State every coordinate mapping before mutating the values.
 - **First-row or first-column markers:** When rows and columns must be marked
   without extra arrays, reuse the first row and column as marker storage and
   keep separate flags for whether those marker areas originally required a
   change. Apply markers only after the discovery pass.
-- **Current and next state together:** For simultaneous updates such as a cellular
-  automaton, encode both the original and future state in each cell or record
-  changes separately. Neighbor decisions must read only the original state;
-  immediately overwriting it makes later cells observe a different generation.
+- **Current and next state together:** For simultaneous updates, such as a grid
+  in which every cell changes once per round, encode both the original and
+  future state in each cell or record changes separately. Neighbor decisions
+  must read only the original state; immediately overwriting it makes later
+  cells observe a different round.
 
 The shared invariant is that every read during a logical phase sees the same
 version of the matrix. If an encoding is used, document how to recover both
 versions and ensure input values leave enough unused states for the encoding.
+
+For example, suppose `0` means a dead cell and `1` means a live cell. Writing a
+future `0` or `1` immediately would erase the old state needed by neighboring
+cells. One safe encoding could temporarily use `2` for "was dead, becomes
+live" and `3` for "was live, becomes dead." Neighbor checks read whether the
+cell was originally live; a final pass converts the temporary states to `0` or
+`1`.
 
 ### Composing data structures
 
@@ -838,13 +987,29 @@ Design questions often require several operations to be fast at the same time.
 No single structure may provide all of them, so combine structures whose
 invariants repair one another's weakness:
 
+**ELI5:** Think of an address book paired with a waiting line. The address book
+finds a person quickly but does not say who arrived first; the line preserves
+arrival order but is slow to search. Keeping them synchronized provides both
+abilities.
+
+In the table, **expected `O(1)`** means constant time under the usual behavior
+of hashing or random choices; it does not promise that every individual
+operation always takes exactly that long.
+
 | Required operations | Composition and invariant |
 | --- | --- |
 | Stack minimum in `O(1)` | Store each value with the minimum at or below it, or keep a parallel stack of minima. |
 | Insert, delete, random item in expected `O(1)` | A slice gives random indexing; a map gives each value's slice index. Delete by swapping in the last value and repairing its map entry. |
-| LRU cache `get` and `put` in `O(1)` | A map finds an entry; a doubly linked list orders entries from most to least recently used. Every access moves exactly one node. |
+| Least-recently-used (LRU) cache `get` and `put` in `O(1)` | A map finds an entry; a doubly linked list orders entries from most to least recently used. Every access moves exactly one node. |
 | Streaming median | A max-heap stores the lower half and a min-heap the upper half. Their sizes differ by at most one, and every lower value is no greater than every upper value. |
 | Timestamped lookup | Store a sorted history per key and binary-search the last timestamp not greater than the query. |
+
+**Worked deletion example:** Suppose a randomized set stores values
+`[10, 20, 30]` and the map stores `10 -> 0`, `20 -> 1`, and `30 -> 2`. To
+delete `20` without shifting later values, copy the final value `30` into
+position `1`, update its map entry to `30 -> 1`, shorten the slice to
+`[10, 30]`, and remove `20` from the map. The map and slice agree again after
+every step.
 
 Write the cross-structure invariant before implementing operations. For a
 randomized set, every slice position and map index must agree after a swap. For
@@ -858,7 +1023,14 @@ insertion and removal do not need separate empty-list or end-of-list cases.
 
 An **online** algorithm must update its answer as values arrive, without
 assuming the complete input is available. Define what the stored state means
-after every prefix and whether old data may be discarded.
+after every **prefix**, meaning all items received so far, and whether old data
+may be discarded.
+
+**Worked example:** Report the first non-repeating letter after each arrival in
+the stream `a, b, a`. After the first `a`, its count is one and the answer is
+`a`. After `b`, the candidate queue is `[a, b]`, so the answer remains `a`.
+After the second `a`, its count becomes two; remove it from the queue front and
+report `b`. The algorithm never needs to scan the entire received stream again.
 
 - To report the first non-repeating item after each arrival, keep a frequency
   map and a queue of candidates. Increment the frequency, enqueue a first
@@ -2837,6 +3009,12 @@ These snippets show the ideas above as small Go programs. They are examples to
 read and adapt, not packages built by this repository. The note after each
 snippet lists the cases that its former tests checked.
 
+Read a snippet in three passes: first read the function comment to learn its
+contract, then trace one ordinary input through the changing variables, and
+finally check how it handles the listed boundary cases. The matching pattern
+card above explains why the code is correct; the snippet shows how that idea is
+expressed in Go.
+
 ### Binary search bounds
 
 ```go
@@ -3192,33 +3370,85 @@ one position cannot be used twice, a missing pair, and empty input.
 
 ## Go techniques
 
-Convert the judge's text or JSON input into problem-specific Go types before
-the algorithm begins, and convert the result back only after it finishes. This
-keeps parsing details out of the algorithm. Put examples and edge cases in a
-table so the same test logic can run against each one.
+These are Go-specific details that commonly affect otherwise correct
+algorithms. Each rule below states the behavior that motivates it.
 
-Use `sort.Slice` with a comparison that clearly states the required order, and
-copy input first when mutation is forbidden. A Go map read returns the value
-type's zero value for a missing key, so use `value, found := entries[key]` when
-zero is meaningful. A set is conventionally `map[T]struct{}`. Map iteration
-order is unspecified and must not determine a judge result.
+#### Keep input conversion outside the algorithm
 
-Use `container/heap` when the program repeatedly needs the next highest- or
-lowest-priority item. Its interface is a min-heap according to `Less`; reverse
-the comparison for a max-heap. Dijkstra and similar algorithms commonly push a
-new entry instead of updating one already inside the heap, then discard a
-popped entry whose stored distance is stale.
+An online judge often supplies text or JSON, while the algorithm should work
+with types such as `[]int`, `string`, or `*Node`. Convert the external input to
+those problem-specific types before the algorithm starts, and convert the
+result back only after it finishes. This separation lets the algorithm express
+the actual problem instead of mixing parsing with its main loop.
 
-When text may contain general Unicode, range over the string to decode runes or
-convert to `[]rune`; byte indexing is appropriate only when the contract is in
-bytes or a restricted alphabet. Use type parameters when a data structure
-behaves the same way regardless of the type of value it stores.
+Put examples and edge cases in a table so the same test logic runs against
+each one. If parsing fails, report that boundary error rather than passing a
+partly initialized value into the algorithm.
 
-When replacing recursion with a loop, save exactly what each unfinished call
-would have remembered. With slices, remember that appending may create a new
-underlying array, two slices may refer to the same array, and a small slice can
-keep a much larger array in memory. Clear removed pointer-bearing positions in
-long-lived stacks, queues, and heaps so they do not retain objects accidentally.
+#### Sorting and maps
+
+Go sorting functions rearrange the supplied slice. This is called **mutating**
+the input. If the caller expects the original order to remain unchanged, copy
+the slice before sorting it. With `sort.Slice`, write a comparison that states
+the intended order and any tie-breaking rule explicitly.
+
+Reading a missing map key returns the value type's **zero value**: `0` for an
+integer, `false` for a boolean, and `nil` for a pointer or slice. When zero could
+also be a real stored value, read both results:
+
+```go
+value, found := entries[key]
+```
+
+`found` distinguishes a stored zero from a missing key. A set, which records
+only whether keys exist, is conventionally written `map[T]struct{}`. Iterating
+over a Go map does not promise any order, so sort the keys separately when the
+output order matters.
+
+#### Priority queues
+
+Use `container/heap` when the program repeatedly needs the next smallest,
+largest, or most urgent item. By default, the item for which `Less` reports the
+smallest priority rises to the top. Reverse that comparison when the largest
+item should come out first.
+
+Some algorithms discover a better priority for an item already in the heap.
+Dijkstra's algorithm can avoid searching for and editing the old entry: push a
+new entry with the improved distance. When an older entry later reaches the
+top, compare it with the currently stored best distance and discard it if they
+differ. Such an outdated entry is called **stale**.
+
+#### Bytes, runes, and visible characters
+
+A Go string is stored as bytes. ASCII characters use one byte, but many
+Unicode characters use several. For example, the Go string literal `"\u00e9"`
+represents one rune but has length `2` bytes in UTF-8. Use byte indexing when
+the problem explicitly uses bytes or a restricted alphabet. Range over the
+string or convert it to `[]rune` when Unicode code points are the intended
+units. A user-visible symbol can contain multiple runes, so text-editor rules
+may need Unicode grapheme handling beyond `[]rune`.
+
+A **type parameter** lets one implementation work with several value types.
+For example, `Stack[T]` can store `int`, `string`, or another type while keeping
+the same push and pop behavior. Use type parameters when the operations truly
+do not depend on one concrete type.
+
+#### Recursion and retained memory
+
+When replacing recursion with a loop, explicitly store what each unfinished
+call would have remembered: usually the current item, which choice comes next,
+and any partial result needed after returning.
+
+Two slices may share one underlying array, and `append` may either reuse that
+array or allocate a new one. Therefore a change through one slice may or may
+not appear through another depending on whether an allocation occurred. A
+small surviving slice can also keep a much larger backing array in memory.
+Copy the small portion when it must live much longer than the large input.
+
+Long-lived stacks, queues, and heaps should clear removed positions when those
+positions contain pointers. Shortening a slice changes its visible length but
+may leave the old pointer in the backing array, which can keep an otherwise
+unreachable object from being reclaimed.
 
 ## Further-study checklist
 
@@ -3227,5 +3457,6 @@ problem set and contemporary general interview-preparation lists. Lower-priority
 extensions for specialized interviews include strongly connected components,
 all-pairs shortest paths, maximum flow, suffix arrays and suffix automata,
 computational geometry beyond normalized slopes, and randomized balanced search
-trees. Learn these when a target role, contest, or interview loop calls for
-them; they are not prerequisites for the core patterns above.
+trees. These names are pointers for later study, not concepts assumed by this
+guide. Learn them when a target role, contest, or interview loop calls for them;
+they are not prerequisites for the core patterns above.
