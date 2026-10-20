@@ -336,9 +336,9 @@ list. Valid statuses are `Not started`, `In progress`, `Blocked`, and
 | 2 | 1 | Foundations A.1-A.8 | Complete |
 | 3 | 2 | Data structures B.1-B.9 | Complete |
 | 4 | 3 | Method selection and all 33 pattern cards in C | Complete |
-| 5 | 4 | All nine Go techniques in E | Not started |
-| 6 | 5 | All nine Go reference implementations in D | Not started |
-| 7 | 6 | Final organization, further study, navigation, and link preservation | Not started |
+| 5 | 4 | All nine Go techniques in E | Complete |
+| 6 | 5 | All nine Go reference implementations in D | Complete |
+| 7 | 6 | Final organization, further study, navigation, and link preservation | Complete |
 | 8 | 7 | Beginner-language and technical review of the complete guide | Not started |
 | 9 | 8 | Repository-wide documentation and test validation | Not started |
 
@@ -1050,13 +1050,185 @@ detection, path compression, Kruskal and Prim, multiway heap merging, weighted
 interval scheduling, and trie wildcard behavior. Representative problem links
 and all staged external and local links were retained.
 
+### Phase 5: Go techniques
+
+**Status:** Complete
+
+**Starting headings:** `E. Go techniques`; `E.1 Keep input conversion outside
+the algorithm`; `E.2 Table-driven tests`; `E.3 Sorting without unexpected
+mutation`; `E.4 Distinguish missing keys from stored values (map presence and
+sets)`; `E.5 Priority queues`; `E.6 Bytes, runes, and visible characters`;
+`E.7 Type parameters`; `E.8 Replacing recursion with a loop`; and `E.9 Slice
+storage and retained memory`. The completed E.4 pilot is reviewed only for
+cross-link consistency. Its explicit `e4-map-presence-and-sets` anchor must
+remain stable.
+
+**Changed headings and anchors:** No entry heading changed. All generated
+fragments therefore remain stable, and the explicit
+`e4-map-presence-and-sets` pilot anchor remains in place. E.4's links to the
+hash-map card, D.3 reference implementation, and invariant owner still resolve.
+
+**Ownership decisions:** E.1 owns decoding, boundary validation, and result
+encoding; E.2 owns named table-test behavior; E.3 owns copy-before-sort and Go
+sorting mutation; E.4 remains the map-presence, set, and iteration-order owner;
+E.5 owns `heap.Interface` mechanics and stale entries; E.6 owns byte, rune, and
+visible-symbol distinctions; E.7 owns type parameters and constraints; E.8
+owns explicit-stack conversion; and E.9 owns backing-array lifetime and
+pointer-slot clearing. Algorithm entries continue to own selection and
+correctness reasoning and link to these Go-specific owners.
+
+**Validation results:** All phase-5 checks passed on 2026-10-20:
+
+- The common `check-non-ascii.py`, `git diff --check HEAD`, and full heading
+  scan pass. Each of the nine E entries has all 11 required fields in order;
+  every E matrix row has 18 columns and all content fields marked `C`.
+- The guide has 178 balanced fence markers and no Markdown table lines in
+  section E. All current local paths and fragments resolve.
+- The eight changed Go blocks were copied into a temporary package, formatted,
+  compiled, and exercised against their ordinary and boundary examples with
+  `go test ./.tmp_phase5_examples`; both ordered checkpoint runs passed. The
+  temporary package was removed after validation.
+- `go test ./...` passed for `internal/testrunner` and `workbench`.
+
+**QA findings resolved:** The first phase-wide ASCII check found literal
+`U+00E9` characters in E.6; the examples now use Go's `\u00e9` escape while
+retaining the same UTF-8 behavior. The per-entry language review also defined
+code points, stable sorting, and interface values at first use and replaced an
+unnecessary binary-size abbreviation.
+
+**Diff audit:** All pre-phase Go-technique material remains: typed boundary
+conversion and JSON context; shared table-test logic and parsing failures;
+copy-before-sort, mutation, and tie rules; the completed map pilot; heap `Less`
+ordering and stale Dijkstra entries; byte, rune, and visible-symbol choices;
+generic stacks and `any`; explicit recursion frames and right-before-left
+preorder; shared slice storage, conditional append allocation, retained
+backing arrays, and cleared pointer slots. Each former concise example now
+appears in a replayable trace or cross-link, and no section outside E was
+rewritten.
+
+### Phase 6: Go reference implementations
+
+**Status:** Complete
+
+**Starting headings:** `D. Go reference implementations`; `D.1 Binary search
+bounds`; `D.2 Rolling dynamic programming`; `D.3 Hash-map complement lookup`;
+`D.4 Generic singly linked list`; `D.5 Generic stack`; `D.6 Overflow-safe
+integer reversal`; `D.7 Common-prefix scan`; `D.8 Directional scan`; and `D.9
+Sorted two-pointer pair search`.
+
+**Changed headings and anchors:** No entry heading changed, so every generated
+D-section fragment remains stable. The guide's 10 explicit legacy anchors are
+unchanged, and the reference entries link to the stable pattern-card anchors
+for common-prefix scan, directional scan, hash maps, binary search, two
+pointers, dynamic programming, and stacks.
+
+**Ownership decisions:** D.1-D.9 own their complete Go implementations,
+contracts, required input conditions, variable-level traces, implementation
+costs, and concrete cases to test. Their linked A, B, C, and E entries remain
+the owners for foundation rules, data-structure behavior, method selection,
+and Go-specific behavior. The D introduction now states this boundary instead
+of repeating the teaching entries.
+
+**Validation results:** All phase-6 checks passed on 2026-10-20:
+
+- The common `check-non-ascii.py`, `git diff --check HEAD`, and heading scan
+  pass. D.1-D.9 contain exactly 99 required field headings, 11 per entry; all
+  nine matrix rows have 18 columns and all content fields marked `C`.
+- The guide has 178 balanced fence markers, section D contains no Markdown
+  tables, and every current local path and fragment resolves.
+- A comparison with the pre-phase staged document confirms that all nine Go
+  implementations remain exact, excluding blank fence padding. The copied
+  implementations and their ordinary and boundary examples were formatted and
+  exercised together in a temporary package with
+  `GOCACHE=/tmp/algos-phase6-go-build go test ./.tmp_phase6_examples`.
+- `GOCACHE=/tmp/algos-phase6-go-build go test ./...` passed for the temporary
+  examples, `internal/testrunner`, and `workbench`. The temporary package was
+  removed after validation.
+
+**QA findings resolved:** The technical pass corrected the lower-bound proof
+so it treats `len(values)` as a sentinel rather than an in-range value. It also
+corrected the Palindrome Number cross-link to claim the shared digit-extraction
+invariant, not overflow guarding that the linked narrower-range solution does
+not perform. An initial test attempt could not write the default Go build cache
+under sandboxing; redirecting `GOCACHE` to `/tmp` resolved the environment
+failure without changing code.
+
+**Diff audit:** Every original contract, implementation, and listed case is
+retained. Each former case list now appears as executable test data, a full
+trace, or a concrete edge-case warning. No D heading, source, or pre-existing
+link was removed, no section outside D was rewritten, and the pre-phase staged
+state was restored after validation tooling attempted to stage the phase edits.
+
+### Phase 7: Final organization and navigation
+
+**Status:** Complete
+
+**Starting headings:** `How to use this guide`; `A. Foundations`; `B. Data
+structures`; `C. Problem-Solving Patterns`; `D. Go reference implementations`
+with entries D.1-D.9; `E. Go techniques` with entries E.1-E.9; and `F.
+Further-study checklist`. The table of contents lists reference implementations
+before Go techniques. All generated D and E fragments, the explicit
+`e4-map-presence-and-sets` anchor, the 10 existing explicit legacy anchors,
+and every repository link into `concepts/README.md` must remain valid.
+
+**Changed headings:** B is now `B. Ways to store and organize information`, C
+is now `C. Ways to solve problems`, and F is now `F. Further study`. The former
+E Go-technique section and entries are now D and appear before the former D
+reference section and entries, which are now E. The contents use the new order,
+names, and canonical fragments; its C.1.1 label now matches the completed entry
+heading.
+
+**Preserved anchors:** Explicit anchors preserve the five renamed top-level
+section fragments and all 18 former D/E entry fragments. The existing
+`e4-map-presence-and-sets` anchor remains, and the new short
+`d4-map-presence-and-sets` anchor keeps guide links readable. All earlier
+explicit anchors remain unchanged. Guide-owned links use current fragments,
+while repository links using the old fragments continue to resolve.
+
+**Ownership decisions:** D.1-D.9 retain ownership of the Go-specific behavior
+established when those entries were in section E. E.1-E.9 retain ownership of
+the complete reference implementations established when those entries were in
+section D. The coverage matrix now uses current D/E entry numbers while its
+original-heading column records the pre-move names. Section F remains a
+next-step list rather than an eleven-field teaching entry; each advanced topic
+now has a plain-language description and links to its closest prerequisite.
+
+**Validation results:** All phase-7 checks passed on 2026-10-20:
+
+- `check-non-ascii.py`, `git diff --check HEAD`, and the complete heading scan
+  pass. The guide retains 1,132 headings and 178 fence markers forming 89
+  balanced blocks.
+- A temporary link audit verified every local file, every current fragment,
+  every repository link into the guide, and all phase-7 legacy fragments. The
+  audit script was removed after validation.
+- The pre-phase and current documents both contain 11 external links. A
+  unique-line diff accounts for every removed line as a renamed heading,
+  renumbered in-guide D/E link, or prose replaced by the expanded further-study
+  list. No code block, source, teaching entry, or useful example was lost.
+- `GOCACHE=/tmp/algos-phase7-go-build go test ./...` passed for
+  `internal/testrunner` and `workbench`.
+
+**QA findings resolved:** The first navigation audit found that the mechanical
+D/E link swap had changed the stable pattern fragments `dynamic-programming`
+and `directional-scan`; both were restored before completion. The audit also
+confirmed that the initial remaining reports were parser false positives from
+Go syntax and trailing prose punctuation, not broken links. Editing tooling
+temporarily staged the phase changes, so the two Git index entries were restored
+to their exact pre-phase blob IDs; phase-7 work remains unstaged and the user's
+existing staged work is preserved.
+
+**Diff audit:** Go techniques now precede reference implementations without
+changing their teaching prose or code. All D/E cross-references were renumbered
+to their current owners, and legacy anchors cover the old public fragments.
+The former one-paragraph advanced-topic list is now six concise descriptions
+with prerequisite links. No foundation, data-structure, pattern-card,
+Go-technique, or reference-implementation content was otherwise rewritten.
+
 ### Deferred work
 
 - The external interview-evidence claims and URLs are time-sensitive. Preserve
   them through content phases, then reverify them during the final review and
   validation phases rather than changing them in phase 0.
-- Section C's complete Go blocks were compiled in phase 4. Phases 5 and 6 own
-  refactoring and compiling the remaining Go-technique and reference sections.
 
 ## Coverage matrix
 
@@ -1106,7 +1278,7 @@ eleven-field teaching entries.
 | B.9 | Store information / selection guide | B.9 Choosing a structure | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; comparison only, with owner links |
 | C.1.1 | Solve problems / quick selection | C.1.1 Quick decision tree | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Selection guide, not method owner |
 | C.1.2 | Solve problems / derive a direction | C.1.2 Derive a direction before naming a pattern | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Selection guide, not method owner |
-| C.1.3.1 | Solve problems / common-prefix scan | C.1.3.1 Common-prefix scan; `common-prefix-scan` | 1 | C | C | C | C | C | C | C | C | C | C | C | - | - | Pilot complete; D.7 owns full code; inbound and former generated anchors preserved |
+| C.1.3.1 | Solve problems / common-prefix scan | C.1.3.1 Common-prefix scan; `common-prefix-scan` | 1 | C | C | C | C | C | C | C | C | C | C | C | - | - | Pilot complete; E.7 owns full code; inbound and former generated anchors preserved |
 | C.1.3.2 | Solve problems / directional scan | C.1.3.2 Directional scan; `directional-scan` | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Legacy anchor is inbound |
 | C.1.3.3 | Solve problems / simulation | C.1.3.3 Simulation | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
 | C.1.3.4 | Solve problems / hash map or set | C.1.3.4 Hash map or set; `hash-map-or-set` | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Legacy anchor is inbound |
@@ -1143,21 +1315,21 @@ eleven-field teaching entries.
 | C.1.4 | Solve problems / method comparisons | C.1.4 Choosing among overlapping methods | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Owns cross-method comparisons |
 | C.1.5 | Solve problems / constraint filtering | C.1.5 Let constraints eliminate bad choices | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Selection guide |
 | C.1.6 | Solve problems / commitment checklist | C.1.6 Before committing to a method | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Selection guide |
-| D.1 | Reference implementations / binary search bounds | D.1 Binary search bounds | 6 | U | U | U | U | U | U | U | U | U | U | U | - | - | Teaching owner C.1.3.6 |
-| D.2 | Reference implementations / rolling DP | D.2 Rolling dynamic programming | 6 | U | U | U | U | U | U | U | U | U | U | U | - | - | Teaching owner C.1.3.10 |
-| D.3 | Reference implementations / complement lookup | D.3 Hash-map complement lookup | 6 | U | U | U | U | U | U | U | U | U | U | U | - | - | Teaching owner C.1.3.4 |
-| D.4 | Reference implementations / linked list | D.4 Generic singly linked list | 6 | U | U | U | U | U | U | U | U | U | U | U | - | - | Teaching owner B.2; generics owner E.7 |
-| D.5 | Reference implementations / stack | D.5 Generic stack | 6 | U | U | U | U | U | U | U | U | U | U | U | - | - | Teaching owner C.1.3.13; generics owner E.7 |
-| D.6 | Reference implementations / integer reversal | D.6 Overflow-safe integer reversal | 6 | U | U | U | U | U | U | U | U | U | U | U | - | - | Teaching owners A.4 and A.8 |
-| D.7 | Reference implementations / prefix scan | D.7 Common-prefix scan | 6 | U | U | U | U | U | U | U | U | U | U | U | - | - | Teaching owner C.1.3.1 |
-| D.8 | Reference implementations / directional scan | D.8 Directional scan | 6 | U | U | U | U | U | U | U | U | U | U | U | - | - | Teaching owner C.1.3.2 |
-| D.9 | Reference implementations / sorted pair scan | D.9 Sorted two-pointer pair search | 6 | U | U | U | U | U | U | U | U | U | U | U | - | - | Teaching owner C.1.3.9 |
-| E.1 | Go-specific techniques / boundary conversion | E.1 Keep input conversion outside the algorithm | 5 | U | U | U | U | U | U | U | U | U | U | U | - | - | Owns boundary-conversion behavior |
-| E.2 | Go-specific techniques / table tests | E.2 Table-driven tests | 5 | U | U | U | U | U | U | U | U | U | U | U | - | - | Owns table-test behavior |
-| E.3 | Go-specific techniques / sorting mutation | E.3 Sorting without unexpected mutation | 5 | U | U | U | U | U | U | U | U | U | U | U | - | - | Owns Go sorting mutation behavior |
-| E.4 | Go-specific techniques / maps and sets | E.4 Map presence and sets | 1 | C | C | C | C | C | C | C | C | C | C | C | - | - | Pilot complete; owns Go map presence, set representation, and iteration-order behavior |
-| E.5 | Go-specific techniques / priority queues | E.5 Priority queues | 5 | U | U | U | U | U | U | U | U | U | U | U | - | - | Owns `heap.Interface` behavior |
-| E.6 | Go-specific techniques / string encoding | E.6 Bytes, runes, and visible characters | 5 | U | U | U | U | U | U | U | U | U | U | U | - | - | Owns Go text representation |
-| E.7 | Go-specific techniques / type parameters | E.7 Type parameters | 5 | U | U | U | U | U | U | U | U | U | U | U | - | - | Owns generic type behavior |
-| E.8 | Go-specific techniques / iterative recursion | E.8 Replacing recursion with a loop | 5 | U | U | U | U | U | U | U | U | U | U | U | - | - | Owns explicit-stack Go technique |
-| E.9 | Go-specific techniques / slice retention | E.9 Slice storage and retained memory | 5 | U | U | U | U | U | U | U | U | U | U | U | - | - | Owns slice backing-array behavior |
+| D.1 | Go-specific techniques / boundary conversion | E.1 Keep input conversion outside the algorithm | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.1 in phase 7; owns decoding, boundary validation, and result encoding |
+| D.2 | Go-specific techniques / table tests | E.2 Table-driven tests | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.2 in phase 7; owns table-test and named-subtest behavior |
+| D.3 | Go-specific techniques / sorting mutation | E.3 Sorting without unexpected mutation | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.3 in phase 7; owns Go sorting mutation and copy-before-sort behavior |
+| D.4 | Go-specific techniques / maps and sets | E.4 Map presence and sets | 1 | C | C | C | C | C | C | C | C | C | C | C | - | - | Pilot complete; moved to D.4 in phase 7; owns Go map presence, set representation, and iteration-order behavior |
+| D.5 | Go-specific techniques / priority queues | E.5 Priority queues | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.5 in phase 7; owns `heap.Interface`, root access, and stale-entry behavior |
+| D.6 | Go-specific techniques / string encoding | E.6 Bytes, runes, and visible characters | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.6 in phase 7; owns byte, rune, and visible-symbol distinctions |
+| D.7 | Go-specific techniques / type parameters | E.7 Type parameters | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.7 in phase 7; owns generic type parameters and constraints |
+| D.8 | Go-specific techniques / iterative recursion | E.8 Replacing recursion with a loop | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.8 in phase 7; owns explicit-stack Go technique |
+| D.9 | Go-specific techniques / slice retention | E.9 Slice storage and retained memory | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.9 in phase 7; owns slice backing-array lifetime and pointer-slot clearing |
+| E.1 | Reference implementations / binary search bounds | D.1 Binary search bounds | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.1 in phase 7; implementation owner, teaching owner C.1.3.6 |
+| E.2 | Reference implementations / rolling DP | D.2 Rolling dynamic programming | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.2 in phase 7; implementation owner, teaching owner C.1.3.10 |
+| E.3 | Reference implementations / complement lookup | D.3 Hash-map complement lookup | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.3 in phase 7; implementation owner, teaching owner C.1.3.4 |
+| E.4 | Reference implementations / linked list | D.4 Generic singly linked list | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.4 in phase 7; implementation owner, teaching owner B.2; generics owner D.7 |
+| E.5 | Reference implementations / stack | D.5 Generic stack | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.5 in phase 7; implementation owner, teaching owner C.1.3.13; generics owner D.7 |
+| E.6 | Reference implementations / integer reversal | D.6 Overflow-safe integer reversal | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.6 in phase 7; implementation owner, teaching owners A.4 and A.8 |
+| E.7 | Reference implementations / prefix scan | D.7 Common-prefix scan | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.7 in phase 7; implementation owner, teaching owner C.1.3.1 |
+| E.8 | Reference implementations / directional scan | D.8 Directional scan | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.8 in phase 7; implementation owner, teaching owner C.1.3.2 |
+| E.9 | Reference implementations / sorted pair scan | D.9 Sorted two-pointer pair search | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.9 in phase 7; implementation owner, teaching owner C.1.3.9 |

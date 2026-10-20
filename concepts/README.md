@@ -20,7 +20,7 @@ guide teaches the reusable ideas behind those solutions.
     consistent](#a6-keeping-arithmetic-values-exact-and-consistent)
   - [A.7 Combinatorics and output size](#a7-combinatorics-and-output-size)
   - [A.8 Integer digit processing](#a8-integer-digit-processing)
-- [B. Data structures](#b-data-structures)
+- [B. Ways to store and organize information](#b-ways-to-store-and-organize-information)
   - [B.1 Arrays, slices, and strings](#b1-arrays-slices-and-strings)
   - [B.2 Linked lists](#b2-linked-lists)
   - [B.3 Queues and deques](#b3-queues-and-deques)
@@ -30,38 +30,39 @@ guide teaches the reusable ideas behind those solutions.
   - [B.7 Composing data structures](#b7-composing-data-structures)
   - [B.8 Streaming and online processing](#b8-streaming-and-online-processing)
   - [B.9 Choosing a structure](#b9-choosing-a-structure)
-- [C. Problem-solving patterns](#c-problem-solving-patterns)
+- [C. Ways to solve problems](#c-ways-to-solve-problems)
   - [C.1 Problem-solving method selection guide](#c1-problem-solving-method-selection-guide)
-    - [C.1.1 Quick decision tree](#c11-quick-decision-tree)
+    - [C.1.1 Ask what the input and output allow (quick decision
+      tree)](#c11-ask-what-the-input-and-output-allow-quick-decision-tree)
     - [C.1.2 Derive a direction before naming a
       pattern](#c12-derive-a-direction-before-naming-a-pattern)
     - [C.1.3 Pattern cards](#c13-pattern-cards)
     - [C.1.4 Choosing among overlapping methods](#c14-choosing-among-overlapping-methods)
     - [C.1.5 Let constraints eliminate bad choices](#c15-let-constraints-eliminate-bad-choices)
     - [C.1.6 Before committing to a method](#c16-before-committing-to-a-method)
-- [D. Go reference implementations](#d-go-reference-implementations)
-  - [D.1 Binary search bounds](#d1-binary-search-bounds)
-  - [D.2 Rolling dynamic programming](#d2-rolling-dynamic-programming)
-  - [D.3 Hash-map complement lookup](#d3-hash-map-complement-lookup)
-  - [D.4 Generic singly linked list](#d4-generic-singly-linked-list)
-  - [D.5 Generic stack](#d5-generic-stack)
-  - [D.6 Overflow-safe integer reversal](#d6-overflow-safe-integer-reversal)
-  - [D.7 Common-prefix scan](#d7-common-prefix-scan)
-  - [D.8 Directional scan](#d8-directional-scan)
-  - [D.9 Sorted two-pointer pair search](#d9-sorted-two-pointer-pair-search)
-- [E. Go techniques](#e-go-techniques)
-  - [E.1 Keep input conversion outside the
-    algorithm](#e1-keep-input-conversion-outside-the-algorithm)
-  - [E.2 Table-driven tests](#e2-table-driven-tests)
-  - [E.3 Sorting without unexpected mutation](#e3-sorting-without-unexpected-mutation)
-  - [E.4 Distinguish missing keys from stored values (map presence and
-    sets)](#e4-map-presence-and-sets)
-  - [E.5 Priority queues](#e5-priority-queues)
-  - [E.6 Bytes, runes, and visible characters](#e6-bytes-runes-and-visible-characters)
-  - [E.7 Type parameters](#e7-type-parameters)
-  - [E.8 Replacing recursion with a loop](#e8-replacing-recursion-with-a-loop)
-  - [E.9 Slice storage and retained memory](#e9-slice-storage-and-retained-memory)
-- [F. Further-study checklist](#f-further-study-checklist)
+- [D. Go techniques](#d-go-techniques)
+  - [D.1 Keep input conversion outside the
+    algorithm](#d1-keep-input-conversion-outside-the-algorithm)
+  - [D.2 Table-driven tests](#d2-table-driven-tests)
+  - [D.3 Sorting without unexpected mutation](#d3-sorting-without-unexpected-mutation)
+  - [D.4 Distinguish missing keys from stored values (map presence and
+    sets)](#d4-map-presence-and-sets)
+  - [D.5 Priority queues](#d5-priority-queues)
+  - [D.6 Bytes, runes, and visible characters](#d6-bytes-runes-and-visible-characters)
+  - [D.7 Type parameters](#d7-type-parameters)
+  - [D.8 Replacing recursion with a loop](#d8-replacing-recursion-with-a-loop)
+  - [D.9 Slice storage and retained memory](#d9-slice-storage-and-retained-memory)
+- [E. Go reference implementations](#e-go-reference-implementations)
+  - [E.1 Binary search bounds](#e1-binary-search-bounds)
+  - [E.2 Rolling dynamic programming](#e2-rolling-dynamic-programming)
+  - [E.3 Hash-map complement lookup](#e3-hash-map-complement-lookup)
+  - [E.4 Generic singly linked list](#e4-generic-singly-linked-list)
+  - [E.5 Generic stack](#e5-generic-stack)
+  - [E.6 Overflow-safe integer reversal](#e6-overflow-safe-integer-reversal)
+  - [E.7 Common-prefix scan](#e7-common-prefix-scan)
+  - [E.8 Directional scan](#e8-directional-scan)
+  - [E.9 Sorted two-pointer pair search](#e9-sorted-two-pointer-pair-search)
+- [F. Further study](#f-further-study)
 
 ## How to use this guide
 
@@ -331,7 +332,7 @@ cell count.
   accounting.
 - [A.7 Combinatorics and output size](#a7-combinatorics-and-output-size) shows
   why required output can dominate every other cost.
-- [D.1 Binary search bounds](#d1-binary-search-bounds) provides the complete
+- [E.1 Binary search bounds](#e1-binary-search-bounds) provides the complete
   halving-search implementation used in the comparison.
 
 ### A.2 Correctness and invariants
@@ -603,7 +604,7 @@ replace a one-branch recurrence with a loop.
   defines auxiliary-space accounting.
 - [C.1.3.11 Divide and conquer](#c1311-divide-and-conquer) uses several
   smaller independent calls.
-- [E.8 Replacing recursion with a loop](#e8-replacing-recursion-with-a-loop)
+- [D.8 Replacing recursion with a loop](#d8-replacing-recursion-with-a-loop)
   shows how to store pending work explicitly.
 
 ### A.4 Integer limits and bits
@@ -714,7 +715,7 @@ The width of `int` depends on the target architecture. Use `int32`, `int64`,
   processes large decimal input without converting it wholesale.
 - [A.8 Integer Digit Processing](#integer-digit-processing) applies the
   precheck while reversing digits.
-- [D.6 Overflow-safe integer reversal](#d6-overflow-safe-integer-reversal)
+- [E.6 Overflow-safe integer reversal](#e6-overflow-safe-integer-reversal)
   owns the complete `int64` reversal implementation.
 
 ### A.5 Bit manipulation
@@ -1214,7 +1215,7 @@ smallest signed integer under an explicit wider or unsigned-magnitude policy.
   proves the reduction step.
 - [A.6.3 Exact slopes without rounding](#a63-exact-slopes-without-rounding)
   adds direction-specific duplicate and axis cases.
-- [E.4 Map presence and sets](#e4-map-presence-and-sets) explains how normalized
+- [D.4 Map presence and sets](#d4-map-presence-and-sets) explains how normalized
   comparable pairs behave as Go map keys.
 
 #### A.6.3 Exact slopes without rounding
@@ -2247,7 +2248,7 @@ Test all-equal input, `k=0`, `k=n`, and invalid `k`.
 - [A.7 Combinatorics and output size](#a7-combinatorics-and-output-size) owns
   output-size accounting.
 - [C.1.3.19 Backtracking](#c1319-backtracking) owns choose, recurse, and undo.
-- [E.3 Sorting without unexpected mutation](#e3-sorting-without-unexpected-mutation)
+- [D.3 Sorting without unexpected mutation](#d3-sorting-without-unexpected-mutation)
   explains the copy-before-sort boundary.
 
 <a id="integer-digit-processing"></a>
@@ -2324,7 +2325,7 @@ append remains representable.
 #### Go example
 
 The complete implementation is owned by
-[D.6 Overflow-safe integer reversal](#d6-overflow-safe-integer-reversal). Its
+[E.6 Overflow-safe integer reversal](#e6-overflow-safe-integer-reversal). Its
 variables `value`, `digit`, and `reversed` match the trace, it accepts zero, and
 it rejects negative or overflowing inputs.
 
@@ -2368,12 +2369,14 @@ same, and the smallest signed integer cannot be made positive in the same type.
   decimal-append check.
 - [A.6.7 Numbers too large for an integer type](#a67-numbers-too-large-for-an-integer-type)
   handles digit text that cannot first become an integer.
-- [D.6 Overflow-safe integer reversal](#d6-overflow-safe-integer-reversal)
+- [E.6 Overflow-safe integer reversal](#e6-overflow-safe-integer-reversal)
   owns the complete Go implementation.
 - [Palindrome Number](../problems/solved_easy_leetcode_0009_palindrome_number.go)
   compares full reversal with reversing only half the digits.
 
-## B. Data structures
+<a id="b-data-structures"></a>
+
+## B. Ways to store and organize information
 
 ### B.1 Arrays, slices, and strings
 
@@ -2510,11 +2513,11 @@ slice for range size `r` uses `O(r)` memory and counting `n` values takes
 
 - [Moving values in place](#b11-moving-values-in-place) changes existing slice
   storage deliberately.
-- [Slice storage and retained memory](#e9-slice-storage-and-retained-memory)
+- [Slice storage and retained memory](#d9-slice-storage-and-retained-memory)
   owns the detailed Go allocation discussion.
-- [Bytes, runes, and visible characters](#e6-bytes-runes-and-visible-characters)
+- [Bytes, runes, and visible characters](#d6-bytes-runes-and-visible-characters)
   explains text indexing units.
-- [Map presence and sets](#e4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
+- [Map presence and sets](#d4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
   contrasts dense indexed counts with sparse keys.
 
 #### B.1.1 Moving values in place
@@ -2643,7 +2646,7 @@ swap value use `O(1)` auxiliary space. The input itself holds the result.
   and storage-sharing rules used here.
 - [Two pointers](#two-pointers) owns read/write positions and inward
   movement as a problem-solving method.
-- [Sorting without unexpected mutation](#e3-sorting-without-unexpected-mutation)
+- [Sorting without unexpected mutation](#d3-sorting-without-unexpected-mutation)
   explains when to copy before an in-place library operation.
 
 <a id="linked-lists"></a>
@@ -2721,7 +2724,7 @@ no nodes remain outside `previous`, making `previous` the new head.
 
 #### Go example
 
-The [generic singly linked list reference](#d4-generic-singly-linked-list)
+The [generic singly linked list reference](#e4-generic-singly-linked-list)
 owns complete `FromSlice`, `ToSlice`, and `Reverse` implementations. Its
 `Reverse` method uses the same `previous`, `current`, and `next` state as the
 trace above.
@@ -2765,7 +2768,7 @@ slice uses `O(n)` time and `O(n)` result space. A recursive walk can also retain
 
 #### Related material
 
-- [Generic singly linked list](#d4-generic-singly-linked-list) owns the complete
+- [Generic singly linked list](#e4-generic-singly-linked-list) owns the complete
   reusable Go implementation.
 - [Fast and slow pointers](#c1332-fast-and-slow-pointers) uses different speeds
   to detect a cycle or locate a middle node.
@@ -2902,7 +2905,7 @@ operation, although one removal can take `O(n)`. A graph traversal also spends
   candidates from opposite ends.
 - [Stack](#c1313-stack) provides the most-recent-first component of the
   two-stack queue.
-- [Slice storage and retained memory](#e9-slice-storage-and-retained-memory)
+- [Slice storage and retained memory](#d9-slice-storage-and-retained-memory)
   explains why advancing a head does not necessarily release storage.
 
 ### B.4 Trees and binary-search trees
@@ -3493,7 +3496,7 @@ inorder instead makes worst-case time `O(n^2)`.
 ##### Related material
 
 - [Traversal order](#b42-traversal-order) defines preorder and inorder.
-- [Map presence and sets](#e4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
+- [Map presence and sets](#d4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
   explains checked lookups for untrusted values.
 - [Construct Binary Tree from Preorder and Inorder Traversal](../problems/medium_leetcode_0105_construct_binary_tree_from_preorder_and_inorder_traversal.go)
   is the representative exercise.
@@ -4467,7 +4470,7 @@ uses `O(n)` map and list storage. Two heaps use `O(n)` total storage and
 
 #### Related material
 
-- [Map presence and sets](#e4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
+- [Map presence and sets](#d4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
   owns Go map lookup behavior.
 - [Heap or priority queue](#c1327-heap-or-priority-queue) owns heap operations.
 - [LRU Cache](../problems/medium_leetcode_0146_lru_cache.go) combines a map and
@@ -4678,7 +4681,7 @@ supports that needed comparison and replacement.
 This comparison entry deliberately has no second copy of each implementation.
 Use the Go examples owned by [arrays and slices](#b1-arrays-slices-and-strings),
 [linked lists](#b2-linked-lists), [queues and deques](#b3-queues-and-deques),
-[map presence and sets](#e4-distinguish-missing-keys-from-stored-values-map-presence-and-sets),
+[map presence and sets](#d4-distinguish-missing-keys-from-stored-values-map-presence-and-sets),
 and [heap or priority queue](#c1327-heap-or-priority-queue).
 
 #### Work and memory
@@ -4728,7 +4731,9 @@ are `O(log n)`. A size-`k` top-items heap processes `n` values in
   [disjoint-set union](#c1325-disjoint-set-union) own their problem-solving
   patterns.
 
-## C. Problem-Solving Patterns
+<a id="c-problem-solving-patterns"></a>
+
+## C. Ways to solve problems
 
 This section turns observations about an input into a justified solution plan.
 A pattern name is only a label; the deciding evidence is the condition that
@@ -4849,9 +4854,9 @@ the direct method is the correct outcome.
 
 Selection produces a plan rather than reusable code. After the example above,
 the complete Go implementation belongs to
-[D.9 Sorted two-pointer pair search](#d9-sorted-two-pointer-pair-search); an
+[E.9 Sorted two-pointer pair search](#e9-sorted-two-pointer-pair-search); an
 index-preserving version would instead use the map behavior in
-[E.4 Map presence and sets](#e4-map-presence-and-sets).
+[D.4 Map presence and sets](#d4-map-presence-and-sets).
 
 ##### Work and memory
 
@@ -5114,7 +5119,7 @@ string itself ends there.
 ###### Go example
 
 The complete implementation is owned by
-[D.7 Common-prefix scan](#d7-common-prefix-scan). Its variables `column`,
+[E.7 Common-prefix scan](#e7-common-prefix-scan). Its variables `column`,
 `row`, and `expected` match the trace above, and its contract states that it
 compares byte prefixes and returns `""` for empty input.
 
@@ -5159,9 +5164,9 @@ only after an ordering argument, not for arbitrary input order.
 
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants) explains the
   proof structure used by the proven prefix.
-- [D.7 Common-prefix scan](#d7-common-prefix-scan) owns the complete Go
+- [E.7 Common-prefix scan](#e7-common-prefix-scan) owns the complete Go
   implementation.
-- [E.6 Bytes, runes, and visible characters](#e6-bytes-runes-and-visible-characters)
+- [D.6 Bytes, runes, and visible characters](#d6-bytes-runes-and-visible-characters)
   explains how to choose the unit of text comparison.
 - [Longest Common Prefix](../problems/solved_easy_leetcode_0014_longest_common_prefix.go)
   applies this method to a judge problem.
@@ -5210,7 +5215,7 @@ the scan finishes.
 ###### Go example
 
 The complete implementation is owned by
-[D.8 Directional scan](#d8-directional-scan), whose right-to-left variables
+[E.8 Directional scan](#e8-directional-scan), whose right-to-left variables
 match this trace.
 
 ###### Work and memory
@@ -5236,7 +5241,7 @@ the problem rather than assuming every smaller-left value should subtract.
 
 ###### Related material
 
-- [D.8 Directional scan](#d8-directional-scan) owns the Go implementation.
+- [E.8 Directional scan](#e8-directional-scan) owns the Go implementation.
 - [Roman to Integer](../problems/solved_easy_leetcode_0013_roman_to_integer.go)
   is the representative problem.
 - [C.1.3.3 Simulation](#c133-simulation) handles rules needing more state.
@@ -5419,7 +5424,7 @@ in both directions so two source characters cannot collapse into one target.
 
 ###### Related material
 
-- [E.4 Map presence and sets](#e4-map-presence-and-sets) owns Go map behavior.
+- [D.4 Map presence and sets](#d4-map-presence-and-sets) owns Go map behavior.
 - [Two Sum](../problems/solved_easy_leetcode_0001_two_sum.go) is the
   representative problem.
 - [C.1.3.33 Trie](#c1333-trie) supports shared-prefix lookup.
@@ -5512,7 +5517,7 @@ range makes counting storage impractical.
 
 ###### Related material
 
-- [E.3 Sorting without unexpected mutation](#e3-sorting-without-unexpected-mutation)
+- [D.3 Sorting without unexpected mutation](#d3-sorting-without-unexpected-mutation)
   owns Go mutation details.
 - [C.1.3.27 Heap or priority queue](#c1327-heap-or-priority-queue) compares
   streaming top-`k` work.
@@ -5579,7 +5584,7 @@ unique downhill direction.
 
 ###### Go example
 
-The complete lower-bound implementation is owned by [D.1 Binary search bounds](#d1-binary-search-bounds); its `left`, `right`, and `middle` variables match this trace.
+The complete lower-bound implementation is owned by [E.1 Binary search bounds](#e1-binary-search-bounds); its `left`, `right`, and `middle` variables match this trace.
 
 ###### Work and memory
 
@@ -5606,7 +5611,7 @@ sorted input; wrapped input needs the separate sorted-side rule.
 
 ###### Related material
 
-- [D.1 Binary search bounds](#d1-binary-search-bounds) owns the Go implementation.
+- [E.1 Binary search bounds](#e1-binary-search-bounds) owns the Go implementation.
 - [Search Insert Position](../problems/solved_easy_leetcode_0035_search_insert_position.go) and [Search in Rotated Sorted Array](../problems/solved_medium_leetcode_0033_search_in_rotated_sorted_array.go) are representative problems.
 
 [Search Insert Position](../problems/solved_easy_leetcode_0035_search_insert_position.go)
@@ -5719,7 +5724,7 @@ linear-library search in every interview.
 
 ###### Related material
 
-- [E.6 Bytes, runes, and visible characters](#e6-bytes-runes-and-visible-characters) explains byte versus text positions.
+- [D.6 Bytes, runes, and visible characters](#d6-bytes-runes-and-visible-characters) explains byte versus text positions.
 - [C.1.3.1 Common-prefix scan](#c131-common-prefix-scan) compares aligned starts rather than searching every start.
 
 <a id="c138-parsing-and-state-machines"></a>
@@ -5910,7 +5915,7 @@ palindrome (`aca` or `aba`).
 
 ###### Go example
 
-The complete implementation is owned by [D.9 Sorted two-pointer pair search](#d9-sorted-two-pointer-pair-search). Its boundary checks and movements match this trace.
+The complete implementation is owned by [E.9 Sorted two-pointer pair search](#e9-sorted-two-pointer-pair-search). Its boundary checks and movements match this trace.
 
 ###### Work and memory
 
@@ -5942,7 +5947,7 @@ centers for palindromes.
 
 ###### Related material
 
-- [D.9 Sorted two-pointer pair search](#d9-sorted-two-pointer-pair-search) owns the Go implementation.
+- [E.9 Sorted two-pointer pair search](#e9-sorted-two-pointer-pair-search) owns the Go implementation.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants) traces read/write compaction.
 - [Palindrome Number](../problems/solved_easy_leetcode_0009_palindrome_number.go), [Longest Palindromic Substring](../problems/solved_medium_leetcode_0005_longest_palindromic_substring.go), [Remove Duplicates from Sorted Array](../problems/solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go), and [Remove Element](../problems/solved_easy_leetcode_0027_remove_element.go) are representative problems.
 
@@ -6000,7 +6005,7 @@ groups cover every allowed final move and do not overlap.
 
 ###### Go example
 
-The rolling Go implementation is owned by [D.2 Rolling dynamic programming](#d2-rolling-dynamic-programming). It retains only the two earlier states used by the recurrence.
+The rolling Go implementation is owned by [E.2 Rolling dynamic programming](#e2-rolling-dynamic-programming). It retains only the two earlier states used by the recurrence.
 
 ###### Work and memory
 
@@ -6098,7 +6103,7 @@ integer type.
 
 ###### Related material
 
-- [D.2 Rolling dynamic programming](#d2-rolling-dynamic-programming) owns the Go implementation.
+- [E.2 Rolling dynamic programming](#e2-rolling-dynamic-programming) owns the Go implementation.
 - [C.1.3.10.1 Preserve order with compact ranks](#c13101-coordinate-compression) owns coordinate compression.
 - [Climbing Stairs](../problems/solved_easy_leetcode_0070_climbing_stairs.go) is the representative problem.
 
@@ -6482,7 +6487,7 @@ constant number of times.
 
 ###### Go example
 
-The complete generic implementation is owned by [D.5 Generic stack](#d5-generic-stack). A bracket validator may use a byte slice directly and must check length before reading or removing the top.
+The complete generic implementation is owned by [E.5 Generic stack](#e5-generic-stack). A bracket validator may use a byte slice directly and must check length before reading or removing the top.
 
 ###### Work and memory
 
@@ -6512,7 +6517,7 @@ direct control is needed.
 
 ###### Related material
 
-- [D.5 Generic stack](#d5-generic-stack) owns the Go implementation.
+- [E.5 Generic stack](#e5-generic-stack) owns the Go implementation.
 - [C.1.3.20 Depth-first search](#c1320-depth-first-search) can replace recursive calls with an explicit stack.
 - [Valid Parentheses](../problems/solved_easy_leetcode_0020_valid_parentheses.go) is the representative problem.
 
@@ -7630,7 +7635,7 @@ Check empty and minimum inputs, duplicates, limits, and every boundary update.
 
 - [C.1.3.21 Breadth-first search](#c1321-breadth-first-search) is simpler for equal costs.
 - [C.1.3.24 Bellman-Ford](#c1324-bellman-ford-shortest-paths) permits negative edges.
-- [E.5 Priority queues](#e5-priority-queues) owns Go heap behavior.
+- [D.5 Priority queues](#d5-priority-queues) owns Go heap behavior.
 
 <a id="c1324-bellman-ford-shortest-paths"></a>
 
@@ -8036,7 +8041,7 @@ algorithm needs.
 
 ###### Go example
 
-[E.5 Priority queues](#e5-priority-queues) owns Go's `heap.Interface` mechanics. For top `k`, keep at most `k` items and replace the root only when a new candidate belongs in the retained set.
+[D.5 Priority queues](#d5-priority-queues) owns Go's `heap.Interface` mechanics. For top `k`, keep at most `k` items and replace the root only when a new candidate belongs in the retained set.
 
 ###### Work and memory
 
@@ -8073,7 +8078,7 @@ Check empty and minimum inputs, duplicates, limits, and every boundary update.
 
 ###### Related material
 
-- [E.5 Priority queues](#e5-priority-queues) owns the Go implementation pattern.
+- [D.5 Priority queues](#d5-priority-queues) owns the Go implementation pattern.
 - [C.1.3.5 Sorting and selection](#c135-sorting-and-selection) is simpler when every item must be ordered once.
 - [C.1.3.29 Monotonic deque](#c1329-monotonic-deque) is linear when candidates expire in sequence order.
 
@@ -8679,7 +8684,7 @@ Check empty and minimum inputs, duplicates, limits, and every boundary update.
 ###### Related material
 
 - [C.1.3.4 Hash map or set](#c134-hash-map-or-set) is simpler for exact whole-word membership.
-- [E.6 Bytes, runes, and visible characters](#e6-bytes-runes-and-visible-characters) determines what one trie step represents.
+- [D.6 Bytes, runes, and visible characters](#d6-bytes-runes-and-visible-characters) determines what one trie step represents.
 - [B.4 Trees and binary-search trees](#b4-trees-and-binary-search-trees) defines tree paths.
 
 #### C.1.4 Choosing among overlapping methods
@@ -8916,7 +8921,7 @@ feasibility argument must establish.
 ##### Go example
 
 Translate each sentence into a nearby name, condition, or assertion. For the
-trace, [D.1 Binary search bounds](#d1-binary-search-bounds) uses the same
+trace, [E.1 Binary search bounds](#e1-binary-search-bounds) uses the same
 `left`, `right`, and half-open range contract.
 
 ##### Work and memory
@@ -8953,437 +8958,422 @@ the required path or indices.
   supplies the resource screen.
 - [C.1.3 Pattern cards](#c13-pattern-cards) provides method-specific checks.
 
-## D. Go reference implementations
+<a id="e-go-techniques"></a>
 
-These snippets show the ideas above as small Go programs. They are examples to
-read and adapt, not packages built by this repository. The note after each
-snippet lists important boundary cases to test.
-
-Read a snippet in three passes: first read the function comment to learn its
-contract, then trace one ordinary input through the changing variables, and
-finally check how it handles the listed boundary cases. The matching pattern
-card above explains why the code is correct; the snippet shows how that idea is
-expressed in Go.
-
-Some snippets use a type parameter written as `T`. Treat `T` as a placeholder
-for the value type chosen by the caller, such as `int` or `string`; the
-[type-parameter note](#e7-type-parameters) explains why this is useful.
-
-### D.1 Binary search bounds
-
-```go
-
-package binarysearch
-
-// LowerBound returns the first index whose value is greater than or equal to
-// target. It returns len(values) when no such index exists.
-func LowerBound(values []int, target int) int {
-	left, right := 0, len(values)
-	for left < right {
-		middle := left + (right-left)/2
-		if values[middle] < target {
-			left = middle + 1
-		} else {
-			right = middle
-		}
-	}
-	return left
-}
-
-// UpperBound returns the first index whose value is greater than target. It
-// returns len(values) when no such index exists.
-func UpperBound(values []int, target int) int {
-	left, right := 0, len(values)
-	for left < right {
-		middle := left + (right-left)/2
-		if values[middle] <= target {
-			left = middle + 1
-		} else {
-			right = middle
-		}
-	}
-	return left
-}
-
-// Search returns the index of target in a sorted slice, or -1 when target is
-// absent. When duplicates exist, it returns the first matching index.
-func Search(values []int, target int) int {
-	index := LowerBound(values, target)
-	if index == len(values) || values[index] != target {
-		return -1
-	}
-	return index
-}
-
-```
-
-**Cases to test:** Empty input, targets before and after the data,
-duplicate ranges, values between entries, first-match lookup, and absent
-targets.
-
-### D.2 Rolling dynamic programming
-
-```go
-
-package dynamicprogramming
-
-// CountOrderedOneOrTwoStepWays returns the number of ordered sequences of
-// one-step and two-step moves that sum to steps. Negative totals have no valid
-// sequence; the empty sequence is the single way to make a total of zero. The
-// result must fit in an int.
-func CountOrderedOneOrTwoStepWays(steps int) int {
-	if steps < 0 {
-		return 0
-	}
-	if steps < 2 {
-		return 1
-	}
-
-	twoBack, oneBack := 1, 1
-	for current := 2; current <= steps; current++ {
-		twoBack, oneBack = oneBack, twoBack+oneBack
-	}
-	return oneBack
-}
-
-```
-
-**Cases to test:** Negative totals, the empty sequence, one and two
-steps, and several points where a new answer is built from earlier answers.
-
-### D.3 Hash-map complement lookup
-
-```go
-
-// Package hashmap demonstrates lookup-based uses of Go maps.
-package hashmap
-
-// PairSumIndices returns indices of two distinct values whose sum is target.
-// The boolean is false when no pair exists. Subtracting each value from target
-// must fit in an int.
-func PairSumIndices(values []int, target int) (int, int, bool) {
-	indexByValue := make(map[int]int)
-	for index, value := range values {
-		complement := target - value
-		earlierIndex, found := indexByValue[complement]
-		if found {
-			return earlierIndex, index, true
-		}
-		// Insert after lookup so an index cannot match itself.
-		indexByValue[value] = index
-	}
-
-	return 0, 0, false
-}
-
-```
-
-**Cases to test:** A previously seen matching value, equal values at
-distinct indices, and inputs with no pair.
-
-### D.4 Generic singly linked list
-
-```go
-
-package linkedlist
-
-// Node stores one value and a link to the next node.
-type Node[T any] struct {
-	Value T
-	Next  *Node[T]
-}
-
-// FromSlice returns a list containing values in their slice order.
-func FromSlice[T any](values []T) *Node[T] {
-	dummy := &Node[T]{}
-	tail := dummy
-	for _, value := range values {
-		tail.Next = &Node[T]{Value: value}
-		tail = tail.Next
-	}
-	return dummy.Next
-}
-
-// ToSlice returns the values encountered from head to nil.
-func ToSlice[T any](head *Node[T]) []T {
-	values := make([]T, 0)
-	for node := head; node != nil; node = node.Next {
-		values = append(values, node.Value)
-	}
-	return values
-}
-
-// Reverse reverses a list in place and returns its new head.
-func Reverse[T any](head *Node[T]) *Node[T] {
-	var previous *Node[T]
-	for current := head; current != nil; {
-		next := current.Next
-		current.Next = previous
-		previous = current
-		current = next
-	}
-	return previous
-}
-
-```
-
-**Cases to test:** Slice round trips, reversal, and empty-list
-construction, conversion, and reversal.
-
-### D.5 Generic stack
-
-```go
-
-package stack
-
-// Stack stores values in last-in, first-out order.
-// The zero value is ready to use.
-type Stack[T any] struct {
-	items []T
-}
-
-// Push places value on top of the stack.
-func (s *Stack[T]) Push(value T) {
-	s.items = append(s.items, value)
-}
-
-// Pop removes and returns the top value. The boolean is false when the stack
-// is empty.
-func (s *Stack[T]) Pop() (T, bool) {
-	if len(s.items) == 0 {
-		var zero T
-		return zero, false
-	}
-
-	last := len(s.items) - 1
-	value := s.items[last]
-	var zero T
-	s.items[last] = zero
-	s.items = s.items[:last]
-	return value, true
-}
-
-// Peek returns the top value without removing it. The boolean is false when
-// the stack is empty.
-func (s *Stack[T]) Peek() (T, bool) {
-	if len(s.items) == 0 {
-		var zero T
-		return zero, false
-	}
-
-	return s.items[len(s.items)-1], true
-}
-
-// Len returns the number of values in the stack.
-func (s *Stack[T]) Len() int {
-	return len(s.items)
-}
-
-// IsEmpty reports whether the stack contains no values.
-func (s *Stack[T]) IsEmpty() bool {
-	return len(s.items) == 0
-}
-
-```
-
-**Cases to test:** Last-in-first-out ordering, top inspection, length
-tracking, complete removal, and empty operations.
-
-### D.6 Overflow-safe integer reversal
-
-```go
-
-package integerdigits
-
-import "math"
-
-// ReverseNonNegative reverses a nonnegative decimal integer. ok is false when
-// value is negative or when its reversal would exceed int64.
-func ReverseNonNegative(value int64) (reversed int64, ok bool) {
-	if value < 0 {
-		return 0, false
-	}
-
-	for value > 0 {
-		digit := value % 10
-		if reversed > (math.MaxInt64-digit)/10 {
-			return 0, false
-		}
-		reversed = reversed*10 + digit
-		value /= 10
-	}
-	return reversed, true
-}
-
-```
-
-**Cases to test:** Zero, palindromes, trailing zeroes, negative
-rejection, and a reversal that would overflow `int64`.
-
-### D.7 Common-prefix scan
-
-```go
-
-package commonprefixscan
-
-// LongestCommonPrefix returns the longest byte prefix shared by all strings.
-// It returns an empty string when strs is empty.
-func LongestCommonPrefix(strs []string) string {
-	if len(strs) == 0 {
-		return ""
-	}
-
-	for column := 0; column < len(strs[0]); column++ {
-		expected := strs[0][column]
-		for row := 1; row < len(strs); row++ {
-			if column >= len(strs[row]) || strs[row][column] != expected {
-				return strs[0][:column]
-			}
-		}
-	}
-	return strs[0]
-}
-
-```
-
-**Cases to test:** Shared and missing prefixes, an early shortest
-string, identical strings, a single string, and empty inputs.
-
-### D.8 Directional scan
-
-```go
-
-package directionalscan
-
-// SumWithSmallerLeftValuesSubtracted applies a local signed-sum rule: a value
-// is subtracted when it is smaller than its immediate right neighbor and added
-// otherwise. The running total must fit in an int.
-func SumWithSmallerLeftValuesSubtracted(values []int) int {
-	if len(values) == 0 {
-		return 0
-	}
-
-	last := len(values) - 1
-	total := values[last]
-	rightValue := values[last]
-
-	for index := last - 1; index >= 0; index-- {
-		value := values[index]
-		if value < rightValue {
-			total -= value
-		} else {
-			total += value
-		}
-		rightValue = value
-	}
-
-	return total
-}
-
-```
-
-**Cases to test:** Empty and single inputs, descending values that are
-all added, one subtractive pair, and a mix of additions and subtractions.
-
-### D.9 Sorted two-pointer pair search
-
-```go
-
-package twopointers
-
-// PairSumSorted returns indices of two values whose sum equals target. Values
-// must be sorted in ascending order, and relevant sums must fit in an int.
-func PairSumSorted(values []int, target int) (left int, right int, ok bool) {
-	left, right = 0, len(values)-1
-	for left < right {
-		sum := values[left] + values[right]
-		switch {
-		case sum < target:
-			left++
-		case sum > target:
-			right--
-		default:
-			return left, right, true
-		}
-	}
-
-	return 0, 0, false
-}
-
-```
-
-**Cases to test:** A matching pair, negative values, the rule that
-one position cannot be used twice, a missing pair, and empty input.
-
-## E. Go techniques
+## D. Go techniques
 
 These are Go-specific details that commonly affect otherwise correct
 algorithms. Each rule below states the behavior that motivates it.
 
-### E.1 Keep input conversion outside the algorithm
+<a id="e1-keep-input-conversion-outside-the-algorithm"></a>
 
-An **online judge**, meaning the automated system that runs and checks a
-solution, often supplies text or JSON (JavaScript Object Notation) data. The
-algorithm itself should work with problem types such as `[]int`, `string`, or
-`*Node`. Convert the external input to those types before the algorithm starts,
-and convert the result back only after it finishes. This separation lets the
-algorithm express the actual problem instead of mixing parsing with its main
-loop.
+### D.1 Keep input conversion outside the algorithm
 
-For example, a boundary adapter can turn JSON text `"[2,7,11,15]"` into
-`[]int{2, 7, 11, 15}`, call `PairSumIndices(values, 9)`, then encode returned
-indices `0, 1` as JSON. `PairSumIndices` receives only integers and never needs
-to know whether the caller used JSON, command-line text, or an in-memory test.
+#### The problem it solves
 
-### E.2 Table-driven tests
+An automated judge, command-line program, or web handler often receives text,
+while an algorithm needs values such as `[]int`, `string`, or `*Node`. Mixing
+text decoding, input checks, algorithm steps, and output encoding in one
+function makes failures harder to locate and the algorithm harder to reuse.
 
-A table-driven test stores named rows containing an input and expected result,
-then runs the same checking loop over every row. Put ordinary examples and edge
-cases in that table so they cannot accidentally use different test logic. If
-parsing fails, report that boundary error rather than passing a partly
-initialized value into the algorithm.
+#### The idea in simple terms
 
-Inside a test function:
+Treat the program boundary like a reception desk. The desk translates an
+outside request into the program's own types, rejects invalid requests, and
+translates the answer back. This small translation layer is called a
+**boundary adapter**. The algorithm behind it receives only problem values and
+does not need to know whether they came from JSON, a command line, or a test.
+
+#### How it works
+
+1. Decode the outside representation into a problem-specific Go type.
+2. Validate rules that belong to the input contract, such as required fields
+   or legal ranges. Return a useful error before calling the algorithm when the
+   request is invalid.
+3. Pass the typed fields to an algorithm whose parameters and return values
+   describe the problem itself.
+4. Convert the algorithm's result into the outside representation.
+
+JSON means JavaScript Object Notation, a text format built from objects,
+arrays, strings, numbers, booleans, and `null`. Go's `encoding/json` package
+performs the JSON-specific work in the example below.
+
+#### Step-by-step examples
+
+Decode `raw = {"values":[2,7,11,15],"target":9}`. The expected result is
+`pairInput{Values: []int{2, 7, 11, 15}, Target: 9}`.
+
+1. **Step: Decode the JSON object**
+   - **Before:** `input` has zero values: `Values=nil`, `Target=0`.
+   - **Decision:** The JSON has the expected field names and value types, so
+     `json.Unmarshal` can assign both fields.
+   - **After:** `input.Values=[2,7,11,15]`, `input.Target=9`, and `err=nil`.
+   - **Known correct:** The adapter now holds the same four values and target
+     represented by `raw`.
+2. **Step: Validate the typed request**
+   - **Before:** `len(input.Values)=4`.
+   - **Decision:** Four values satisfy this adapter's requirement of at least
+     two values.
+   - **After:** The adapter returns `input` unchanged.
+   - **Known correct:** A called pair-search algorithm receives a valid typed
+     request and no JSON concerns.
+
+For a failure case, use `raw = {"values":[2,7],"target":"nine"}`. The expected
+result is a decoding error and no usable `pairInput`.
+
+1. **Step: Decode the malformed target**
+   - **Before:** `input` contains only zero values.
+   - **Decision:** A JSON string cannot be assigned to the Go `int` field
+     `Target`, so `json.Unmarshal` returns an error.
+   - **After:** `parsePairInput` returns a wrapped error instead of continuing
+     to validation or an algorithm call.
+   - **Known correct:** No partly decoded request crosses the boundary.
+
+#### Why it works
+
+After a successful parse, every field has the Go type promised to the
+algorithm. Validation then establishes any additional input rules before the
+algorithm runs. If either step fails, returning immediately prevents partial
+state from being mistaken for valid input. Encoding happens only after a typed
+result exists, so representation failures remain separate from algorithm
+failures.
+
+#### Go example
 
 ```go
-tests := []struct {
-	name   string
-	values []int
-	target int
-	wantOK bool
-}{
-	{name: "match", values: []int{1, 2, 7}, target: 9, wantOK: true},
-	{name: "one value cannot be reused", values: []int{4}, target: 8, wantOK: false},
+type pairInput struct {
+	Values []int `json:"values"`
+	Target int   `json:"target"`
 }
 
-for _, test := range tests {
-	_, _, gotOK := PairSumSorted(test.values, test.target)
-	if gotOK != test.wantOK {
-		t.Errorf("%s: got match=%v, want %v", test.name, gotOK, test.wantOK)
+func parsePairInput(raw []byte) (pairInput, error) {
+	var input pairInput
+	if err := json.Unmarshal(raw, &input); err != nil {
+		return pairInput{}, fmt.Errorf("decode pair input: %w", err)
+	}
+	if len(input.Values) < 2 {
+		return pairInput{}, fmt.Errorf("pair input needs at least two values")
+	}
+	return input, nil
+}
+
+func formatPairOutput(left, right int) ([]byte, error) {
+	return json.Marshal([2]int{left, right})
+}
+```
+
+The struct tags such as ``json:"values"`` connect JSON field names to Go
+fields. Returning `%w` in the error keeps the original decoding error available
+to callers while adding boundary context.
+
+#### Work and memory
+
+For `b` input bytes containing `n` numbers, decoding examines the input and
+builds the `Values` slice, so it takes `O(b)` work and `O(n)` additional memory.
+Validation here takes constant work. Formatting two indices takes constant
+work and a small output allocation. These boundary costs are separate from the
+called algorithm's own work and memory.
+
+#### When to use it
+
+Use a boundary adapter when stored or transmitted data differs from the types
+that make the algorithm easiest to state, when several callers should share
+one algorithm, or when malformed input needs a clear boundary error.
+
+#### When not to use it
+
+Do not add serialization to a function whose caller already supplies the
+correct typed values. Do not put problem reasoning in a generic decoder; keep
+problem-specific validation beside the problem adapter.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Ignoring a decode error can pass zero values into the algorithm.
+> For `{"target":"nine"}`, using `input.Target` after a failed unmarshal may
+> incorrectly search for target `0`; return the error immediately.
+
+An absent JSON field also leaves its Go field at the zero value. If zero is
+valid but omission is not, use a pointer field or a custom presence check to
+distinguish them. Decide whether `null`, an empty array, and unknown fields are
+allowed instead of accepting them accidentally.
+
+#### Related material
+
+- [E.3 Hash-map complement lookup](#e3-hash-map-complement-lookup) owns the
+  complete pair-search implementation.
+- [D.2 Table-driven tests](#d2-table-driven-tests) keeps valid and invalid
+  boundary cases under the same test logic.
+- [D.4 Map presence and sets](#d4-map-presence-and-sets) explains the related
+  problem of distinguishing absence from a stored zero value.
+
+<a id="e2-table-driven-tests"></a>
+
+### D.2 Table-driven tests
+
+#### The problem it solves
+
+One function usually needs several examples, boundary cases, and failure
+cases. Hand-writing separate test logic for each case invites small differences
+that can hide bugs or make failures difficult to identify.
+
+#### The idea in simple terms
+
+Write the checking recipe once and feed it a list of named examples. In Go,
+this is called a **table-driven test**: the table is a slice of test-case
+structs, and each row contains the input and expected result for one run.
+
+#### How it works
+
+1. Define a struct whose fields hold one case's name, inputs, and expected
+   outputs.
+2. Build a slice containing ordinary, boundary, and adversarial rows.
+3. Loop over the slice and call `t.Run` so each row is reported by name.
+4. Inside every subtest, call the same behavior and compare every promised
+   result with that row's expectation.
+5. Stop a row immediately with `t.Fatal` or `t.Fatalf` when setup fails and
+   later checks would be meaningless.
+
+#### Step-by-step examples
+
+Run rows `{name:"positive even", value:4, want:true}` and
+`{name:"negative odd", value:-3, want:false}`. The expected outcome is two
+passing subtests.
+
+1. **Row: `positive even`**
+   - **Before:** `test.value=4`, `test.want=true`.
+   - **Decision:** `isEven(4)` returns `true`, which equals `test.want`.
+   - **After:** The row records no error.
+   - **Known correct:** The ordinary even case used the shared assertion.
+2. **Row: `negative odd`**
+   - **Before:** `test.value=-3`, `test.want=false`.
+   - **Decision:** In Go, `-3%2` is `-1`, so the result is `false` and matches
+     `test.want`.
+   - **After:** The row records no error.
+   - **Known correct:** A negative value used exactly the same call and check.
+
+For a boundary row, use `{name:"zero", value:0, want:true}`. The expected
+outcome is a passing subtest because `0%2 == 0`.
+
+1. **Row: `zero`**
+   - **Before:** `test.value=0`, `test.want=true`.
+   - **Decision:** `isEven(0)` returns `true`.
+   - **After:** The comparison passes without special-case test logic.
+   - **Known correct:** The boundary value is covered by the same contract as
+     every other row.
+
+#### Why it works
+
+Every row reaches the same call and comparison, so differences in results come
+from the case data rather than from different test code. Naming each subtest
+ties a failure to its input. The loop is finite because the table is finite;
+after all rows pass, the tested contract holds for every listed case. This is
+evidence for those cases, not proof for every possible input.
+
+#### Go example
+
+```go
+func isEven(value int) bool {
+	return value%2 == 0
+}
+
+func TestIsEven(t *testing.T) {
+	tests := []struct {
+		name  string
+		value int
+		want  bool
+	}{
+		{name: "positive even", value: 4, want: true},
+		{name: "negative odd", value: -3, want: false},
+		{name: "zero", value: 0, want: true},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := isEven(test.value); got != test.want {
+				t.Errorf("isEven(%d) = %v, want %v", test.value, got, test.want)
+			}
+		})
 	}
 }
 ```
 
-Both rows exercise the same call and comparison; only their data and expected
-result differ.
+The outer test reports the group; `t.Run` creates a named subtest for each row.
+Use `t.Helper` in extracted assertion helpers so failures point to the calling
+row rather than the helper body.
 
-### E.3 Sorting without unexpected mutation
+#### Work and memory
 
-Go sorting functions rearrange the supplied slice. This is called **mutating**
-the input. If the caller expects the original order to remain unchanged, copy
-the slice before sorting it. With `sort.Slice`, write a comparison that states
-the intended order and any tie-breaking rule explicitly.
+With `r` rows and per-row behavior costing `T`, the loop does `O(r * T)` work.
+The table itself stores `O(r)` case data. Sequential subtests add only bounded
+runner state beyond the current row, although individual inputs and outputs
+may allocate their own memory.
+
+#### When to use it
+
+Use table-driven tests when many inputs share one contract and assertion shape,
+especially for boundary values, malformed input, duplicates, and regression
+cases that should remain named.
+
+#### When not to use it
+
+Do not force unrelated behaviors with different setup or assertions into one
+wide table. Separate focused tests are clearer for long stateful workflows;
+randomized or generated-input testing is a better companion when a property
+must be checked across many automatically produced inputs.
+
+#### Common mistakes and edge cases
+
+> **Warning:** An empty table executes zero assertions and still passes. A test
+> with `tests := []caseType{}` proves nothing; keep at least one ordinary row
+> and the relevant boundary rows.
+
+When a row owns a slice, map, or pointer that the tested function mutates,
+freshly construct or clone that value per row so another row cannot inherit
+changed state. If setup returns an error, call `t.Fatalf` before reading the
+partly initialized result.
+
+#### Related material
+
+- [A.2 Correctness and invariants](#a2-correctness-and-invariants) separates
+  test evidence from a general correctness argument.
+- [D.1 Keep input conversion outside the algorithm](#d1-keep-input-conversion-outside-the-algorithm)
+  identifies parsing failures that should become explicit rows.
+- [E.9 Sorted two-pointer pair search](#e9-sorted-two-pointer-pair-search) lists
+  representative cases for a reference implementation.
+
+<a id="e3-sorting-without-unexpected-mutation"></a>
+
+### D.3 Sorting without unexpected mutation
+
+#### The problem it solves
+
+Go's sorting functions rearrange the slice they receive. A caller that still
+needs the original order can therefore observe surprising changes after a
+helper sorts its input.
+
+#### The idea in simple terms
+
+Make a separate row of cards before arranging them. Changing a value that the
+caller can observe is called **mutation**. A shallow slice copy creates a new
+backing array for the slice elements, so sorting the copy does not reorder the
+caller's slice.
+
+#### How it works
+
+1. Decide whether the function's contract allows it to reorder the input.
+2. If not, clone the slice before sorting. A **clone** here means a new slice
+   with the same element values.
+3. Sort the clone with `sort.Ints`, `sort.Strings`, or an explicit comparison
+   for structured values.
+4. Return or use the sorted clone, leaving the input order unchanged.
+
+The copy is shallow: pointer, slice, or map elements still refer to the same
+nested values. It protects the outer ordering, not mutations inside an element.
+
+#### Step-by-step examples
+
+Call `sortedCopy(values)` with `values = [3,1,2]`. The expected result is
+`sorted = [1,2,3]` while `values` remains `[3,1,2]`.
+
+1. **Step: Clone the slice**
+   - **Before:** `values` refers to one backing array containing `[3,1,2]`.
+   - **Decision:** The contract promises not to reorder `values`, so
+     `slices.Clone` creates a separate backing array for `sorted`.
+   - **After:** Both slices contain `[3,1,2]`, but changing one array's elements
+     cannot change the other array's elements.
+   - **Known correct:** The caller's order is isolated before sorting starts.
+2. **Step: Sort the clone**
+   - **Before:** `sorted=[3,1,2]`, `values=[3,1,2]`.
+   - **Decision:** `sort.Ints` rearranges only `sorted` into ascending order.
+   - **After:** `sorted=[1,2,3]`, `values=[3,1,2]`.
+   - **Known correct:** The result is ordered and the promised input state is
+     preserved.
+
+For the adversarial version, assign `sorted := values` instead of cloning. The
+expected observation after `sort.Ints(sorted)` is that both variables show
+`[1,2,3]`.
+
+1. **Step: Copy only the slice descriptor**
+   - **Before:** `values=[3,1,2]`.
+   - **Decision:** Assignment copies the pointer, length, and capacity, not the
+     backing array.
+   - **After:** `sorted` and `values` view the same elements.
+2. **Step: Sort through the alias**
+   - **Before:** Both slices view `[3,1,2]`.
+   - **Decision:** Sorting writes into the shared backing array.
+   - **After:** Both show `[1,2,3]`; the no-mutation contract is broken.
+
+#### Why it works
+
+Before sorting begins, the clone holds the same element values in an
+independent outer array. Sorting permutes only that array, so the returned
+values are ordered while every position in the caller's array keeps its
+original value. The sorting call finishes after a bounded number of
+comparisons and swaps, and the independent arrays preserve the two promised
+observations.
+
+#### Go example
 
 ```go
-values := []int{3, 1, 2}
-sorted := append([]int(nil), values...)
-sort.Ints(sorted)
-// values is [3, 1, 2]; sorted is [1, 2, 3].
+func sortedCopy(values []int) []int {
+	sorted := slices.Clone(values)
+	sort.Ints(sorted)
+	return sorted
+}
 ```
+
+`slices.Clone(nil)` returns `nil`; a non-nil input returns a slice with copied
+elements. For records sorted with `sort.Slice` or `slices.SortFunc`, state the
+primary order and every required tie-break rule in the comparison.
+
+#### Work and memory
+
+For `n` integers, cloning copies `n` values in `O(n)` time and allocates `O(n)`
+additional memory. Comparison sorting takes `O(n log n)` time; the standard
+integer sort does not allocate another result slice. The combined bounds are
+`O(n log n)` time and `O(n)` additional memory because the clone is retained as
+the output.
+
+#### When to use it
+
+Clone before sorting when the function promises to preserve input order, when
+the caller may reuse the input, or when tests compare the input before and
+after the call.
+
+#### When not to use it
+
+Do not pay for a clone when the contract explicitly allows in-place reordering
+and the caller no longer needs the old order. A shallow clone is also
+insufficient when sorting code mutates fields through pointer-like elements;
+copy those nested values when isolation requires it.
+
+#### Common mistakes and edge cases
+
+> **Warning:** `sorted := values` does not copy slice elements. With
+> `values=[3,1,2]`, sorting `sorted` also changes `values` to `[1,2,3]`; use
+> `slices.Clone` when the old order must survive.
+
+Duplicates require a tie rule only when the relative order of equal primary
+keys matters; choose a **stable sort**, which preserves the earlier order of
+equal keys, for that contract. Nil and empty slices are already sorted. Tests
+should cover both allowed in-place behavior and promised non-mutation
+explicitly.
+
+#### Related material
+
+- [B.1 Arrays, slices, and strings](#b1-arrays-slices-and-strings) owns slice
+  descriptors, backing arrays, capacity, and append behavior.
+- [C.1.3.5 Put related values together (sorting and selection)](#c135-sorting-and-selection)
+  owns the algorithm-selection reasons for sorting.
+- [D.9 Slice storage and retained memory](#d9-slice-storage-and-retained-memory)
+  explains how sharing an array also affects memory lifetime.
 
 <a id="e4-map-presence-and-sets"></a>
 
-### E.4 Distinguish missing keys from stored values (map presence and sets)
+<a id="e4-distinguish-missing-keys-from-stored-values-map-presence-and-sets"></a>
+<a id="d4-map-presence-and-sets"></a>
+
+### D.4 Distinguish missing keys from stored values (map presence and sets)
 
 #### The problem it solves
 
@@ -9526,90 +9516,2029 @@ order.
 
 - [C.1.3.4 Hash map or set](#c134-hash-map-or-set) owns the algorithm-selection
   clues and invariants for lookup-based methods.
-- [D.3 Hash-map complement lookup](#d3-hash-map-complement-lookup) shows map
+- [E.3 Hash-map complement lookup](#e3-hash-map-complement-lookup) shows map
   presence in a complete reference algorithm.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants) explains how
   the `seen` and `result` relationship proves duplicate removal correct.
 
-### E.5 Priority queues
+<a id="e5-priority-queues"></a>
 
-Use `container/heap` when the program repeatedly needs the next smallest,
-largest, or most urgent item. The heap interface asks the program to provide a
-comparison method named `Less`. By default, the item that `Less` considers
-smallest rises to the top; reverse the comparison when the largest item should
-come out first.
+### D.5 Priority queues
 
-Some algorithms discover a better priority for an item already in the heap.
-Dijkstra's algorithm can avoid searching for and editing the old entry: push a
-new entry with the improved distance. When an older entry later reaches the
-top, compare it with the currently stored best distance and discard it if they
-differ. Such an outdated entry is called **stale**.
+#### The problem it solves
 
-In the [Dijkstra example](#c1323-dijkstra-shortest-paths), the heap first holds
-route `B = 4`. Going through `C` improves the stored distance to `B = 3` and
-pushes a second entry. When `B = 4` later reaches the top, `4 != 3` proves that
-entry is stale, so the algorithm skips it.
+A program may keep receiving items but repeatedly need only the smallest,
+largest, or most urgent remaining one. Sorting the whole collection after each
+insertion repeats work, while scanning every item for each removal is slow.
 
-### E.6 Bytes, runes, and visible characters
+#### The idea in simple terms
 
-A Go string is stored as bytes. Basic Latin characters such as `A` use one
-byte, but many Unicode characters use several bytes under UTF-8, Go's standard
-text encoding. For example, the Go string literal `"\u00e9"` represents one
-**rune**, Go's name for one Unicode code point, but has length `2` bytes. Use
-byte indexing when the problem explicitly uses bytes or a restricted alphabet.
-Range over the string or convert it to `[]rune` when Unicode code points are
-the intended units. One user-visible symbol can contain multiple code points;
-text-editor rules may therefore need a Unicode library that groups them as
-visible characters rather than plain `[]rune` indexing.
+Keep the next item near the front while allowing the rest to be only partly
+ordered. A **priority queue** removes items by priority rather than arrival
+time. Go's `container/heap` package implements one with a **heap**, an array
+whose parent-child ordering makes the highest-priority item available at index
+zero.
 
-### E.7 Type parameters
+#### How it works
 
-A **type parameter** lets one implementation work with several value types.
-For example, `Stack[T]` can store `int`, `string`, or another type while keeping
-the same push and pop behavior. In `Stack[T any]`, `any` means that callers may
-choose any value type for `T`. Use type parameters when the operations truly do
-not depend on one concrete type.
+1. Define `Len`, `Less`, and `Swap` on a slice type. `Less(i, j)` must report
+   whether item `i` should come out before item `j`.
+2. Define pointer-receiver `Push` and `Pop` methods so the package can grow and
+   shrink the slice.
+3. Call `heap.Init` when starting from existing values.
+4. Use `heap.Push` and `heap.Pop`--not the methods directly--so the package
+   repairs the parent-child ordering after each change.
+5. Check `Len` before reading index zero or removing an item.
 
-### E.8 Replacing recursion with a loop
+If `Less` uses `<`, the smallest item comes out first; reversing the comparison
+creates a largest-first queue.
 
-When replacing recursion with a loop, explicitly store what each unfinished
-call would have remembered: usually the current item, which choice comes next,
-and any partial result needed after returning.
+#### Step-by-step examples
 
-For preorder traversal of the tree in [B.4](#b4-trees-and-binary-search-trees),
-start with stack `[8]`. Pop and visit `8`, then push right child `12` before
-left child `4`, producing `[12, 4]` with the top on the right. Popping `4` next
-matches the recursive rule that finishes the left subtree before the right.
+Push `4`, `1`, and `3` into an empty smallest-first queue, then remove one
+item. The expected removed value is `1` and the remaining heap array is
+`[3,4]`.
 
-### E.9 Slice storage and retained memory
+1. **Operation: Push `4`**
+   - **Before:** `h=[]`.
+   - **Decision:** Append `4`; it has no parent to compare with.
+   - **After:** `h=[4]`.
+   - **Known correct:** Index zero contains the only and therefore smallest
+     item.
+2. **Operation: Push `1`**
+   - **Before:** `h=[4]`.
+   - **Decision:** Append `1`, then swap it with parent `4` because `1 < 4`.
+   - **After:** `h=[1,4]`.
+   - **Known correct:** Every child is at least its parent, so `1` is at the
+     root.
+3. **Operation: Push `3`**
+   - **Before:** `h=[1,4]`.
+   - **Decision:** Append `3`. Its parent is `1`, so no swap is needed.
+   - **After:** `h=[1,4,3]`.
+   - **Known correct:** The root is still the smallest item.
+4. **Operation: Pop**
+   - **Before:** `h=[1,4,3]`.
+   - **Decision:** The package moves root `1` to the end, repairs the remaining
+     heap, and asks the type's `Pop` method to shorten the slice.
+   - **After:** Returned value `1`; `h=[3,4]`.
+   - **Known correct:** `1` was no larger than any queued item, and `3` is now
+     the smallest remaining item.
 
-Two slices may share one underlying array, and `append` may either reuse that
-array or allocate a new one. The [slice-capacity trace](#b1-arrays-slices-and-strings)
-shows both outcomes. A small surviving slice can also keep a much larger
-backing array in memory. Copy the small portion when it must live much longer
-than the large input.
+Some algorithms push a newer record instead of editing an older queued record.
+For the boundary example, Dijkstra's algorithm first queues route `B=4`, later
+finds `B=3`, and queues that too. The expected behavior is to use `B=3` and
+eventually skip `B=4`.
 
-Long-lived stacks, queues, and heaps should clear removed positions when those
-positions contain pointers. Shortening a slice changes its visible length but
-may leave the old pointer in the backing array, which can keep an otherwise
-unreachable object from being reclaimed.
+1. **Record: `B=3` reaches the root**
+   - **Before:** Stored best distance for `B` is `3`.
+   - **Decision:** The queued distance matches the stored best distance.
+   - **After:** Process `B=3`.
+   - **Known correct:** The record represents the current best known route.
+2. **Record: `B=4` reaches the root**
+   - **Before:** Stored best distance for `B` remains `3`.
+   - **Decision:** `4 != 3`, so the old record is **stale**, meaning a newer
+     record has replaced it.
+   - **After:** Discard `B=4` without processing its outgoing edges.
+   - **Known correct:** Skipping an outdated record cannot discard the stored
+     shorter route.
+
+#### Why it works
+
+The fact that remains true is that every parent has at least as much priority
+as its children. Push repairs that fact while moving the new item toward the
+root; pop repairs it while moving the replacement root downward. Consequently,
+no descendant can outrank index zero, so removing the root returns the required
+item. Each repair moves through a finite number of array levels.
+
+#### Go example
 
 ```go
-last := len(items) - 1
-items[last] = nil
-items = items[:last]
+type intMinHeap []int
+
+func (h intMinHeap) Len() int           { return len(h) }
+func (h intMinHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h intMinHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+
+func (h *intMinHeap) Push(value any) {
+	*h = append(*h, value.(int))
+}
+
+func (h *intMinHeap) Pop() any {
+	old := *h
+	last := len(old) - 1
+	value := old[last]
+	*h = old[:last]
+	return value
+}
+
+func popAscending(values []int) []int {
+	h := intMinHeap(slices.Clone(values))
+	heap.Init(&h)
+
+	result := make([]int, 0, len(values))
+	for h.Len() > 0 {
+		result = append(result, heap.Pop(&h).(int))
+	}
+	return result
+}
 ```
 
-The assignment to `nil` removes the backing array's reference before the slice
-becomes shorter.
+The package moves the root to the final slot before it calls the type's `Pop`
+method, so that method removes the last element. The type assertion `value.(int)`
+is safe here because this queue's callers push only integers.
 
-## F. Further-study checklist
+#### Work and memory
+
+For `n` initial items, `heap.Init` takes `O(n)` time. Reading the root takes
+`O(1)` time. Each push or pop repairs at most the heap height, so it takes
+`O(log n)` time. The heap stores `O(n)` items. `popAscending` also clones the
+input and constructs an `n`-element output, so its total additional memory is
+`O(n)` and its total work is `O(n log n)`.
+
+#### When to use it
+
+Use a priority queue when items arrive or change over time and each step needs
+the current smallest, largest, earliest, cheapest, or otherwise most urgent
+item without fully ordering everything.
+
+#### When not to use it
+
+Do not use a heap when one final sorted order is the only goal; sorting once is
+simpler. A heap is also the wrong tool when arbitrary items must be found or
+removed quickly unless another structure tracks their positions.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Calling `h.Pop()` directly skips the package's root swap and
+> repair. With `h=[1,4,3]`, the method removes `3` rather than minimum `1`; call
+> `heap.Pop(&h)`.
+
+Popping or reading `h[0]` when `Len()==0` panics. Reversing `Less` changes
+smallest-first to largest-first. For queues of pointers, clear the removed final
+slot before shortening the slice so the backing array does not retain it; see
+[D.9](#d9-slice-storage-and-retained-memory).
+
+#### Related material
+
+- [C.1.3.27 Remove the next most urgent item quickly](#c1327-heap-or-priority-queue)
+  owns heap selection, correctness, and algorithmic variants.
+- [C.1.3.23 Dijkstra shortest paths](#c1323-dijkstra-shortest-paths) explains
+  why skipping stale shortest-path entries is safe.
+- [D.9 Slice storage and retained memory](#d9-slice-storage-and-retained-memory)
+  owns clearing pointer elements removed from long-lived heaps.
+
+<a id="e6-bytes-runes-and-visible-characters"></a>
+
+### D.6 Bytes, runes, and visible characters
+
+#### The problem it solves
+
+An algorithm that says "character" can mean a stored byte, a Unicode code
+point, or one symbol a reader sees. Treating those units as interchangeable
+causes wrong lengths, broken slices, and incorrect indexes.
+
+#### The idea in simple terms
+
+Text has layers. A Go string stores bytes. Unicode assigns a number called a
+**code point** to each textual unit, and UTF-8 is the encoding that maps that
+number to one or more bytes. Go calls one code point a **rune**. A user-visible
+symbol can contain several runes, such as a letter followed by a combining
+accent, so even a rune is not always a complete visible character.
+
+#### How it works
+
+1. Read the problem's definition of one unit before choosing an operation.
+2. Use `len(text)` and byte indexes for bytes or a stated one-byte alphabet.
+3. Use `for index, value := range text` to decode runes while keeping each
+   rune's starting byte index.
+4. Convert with `[]rune(text)` when the algorithm needs rune positions or
+   reverse indexing.
+5. Use a Unicode text-segmentation library when the contract requires
+   user-visible symbols rather than code points.
+
+#### Step-by-step examples
+
+Use `text = "A\u00e9"`. The expected byte length is `3`, and the expected rune
+sequence is `['A','\u00e9']`.
+
+1. **Step: Inspect stored bytes**
+   - **Before:** UTF-8 encodes `A` as byte `0x41` and `\u00e9` as bytes
+     `0xC3 0xA9`.
+   - **Decision:** `len` reports stored bytes, not runes.
+   - **After:** `byteCount=3`.
+   - **Known correct:** All three encoded bytes are counted once.
+2. **Step: Range over runes**
+   - **Before:** Decoding begins at byte index `0`.
+   - **Decision:** The first byte is the complete rune `A`.
+   - **After:** The first pair is `index=0, value='A'`; decoding continues at
+     byte index `1`.
+3. **Step: Decode the multibyte rune**
+   - **Before:** Bytes `0xC3 0xA9` begin at index `1`.
+   - **Decision:** UTF-8 combines them into rune `\u00e9`.
+   - **After:** The second pair is `index=1, value='\u00e9'`; the rune sequence
+     has length `2`.
+   - **Known correct:** Byte positions and rune values both refer to the same
+     original string without pretending that every rune is one byte.
+
+For the boundary case, use `text = "e\u0301"`: `e` followed by a combining
+acute accent. The expected rune count is `2` even though many displays show one
+accented symbol.
+
+1. **Step: Decode code points**
+   - **Before:** The string contains the code points `U+0065` and `U+0301`.
+   - **Decision:** `[]rune` preserves both code points separately.
+   - **After:** `runes=['e','\u0301']` and `len(runes)=2`.
+   - **Known correct:** Rune processing answers a code-point question, not a
+     visible-symbol question.
+
+#### Why it works
+
+UTF-8 defines exactly how the stored bytes decode into code points. `range`
+advances by the width of each decoded rune, so each valid code point is visited
+once and its reported index is its true starting byte position. Converting to
+`[]rune` records those decoded values in order. Visible-symbol grouping follows
+additional Unicode rules, so a code-point loop cannot promise that grouping by
+itself.
+
+#### Go example
+
+```go
+type textUnits struct {
+	ByteCount int
+	Runes     []rune
+}
+
+func describeText(text string) textUnits {
+	return textUnits{
+		ByteCount: len(text),
+		Runes:     []rune(text),
+	}
+}
+```
+
+For `"A\u00e9"` this returns byte count `3` and two runes. A `range` loop is
+often better when the algorithm can stream through runes without allocating a
+slice.
+
+#### Work and memory
+
+`len(text)` reads the stored byte length in `O(1)` time. Ranging over `b` bytes
+takes `O(b)` time and constant auxiliary memory. Building `[]rune(text)` also
+takes `O(b)` time and allocates `O(r)` rune storage, where `r` is the decoded
+rune count. Visible-symbol segmentation has its own library-specific state and
+costs.
+
+#### When to use it
+
+Use bytes for binary data, ASCII-only contracts, or protocols defined in
+bytes. Use runes when comparisons, positions, or counts are defined by Unicode
+code points. Use visible-symbol segmentation for cursor movement or limits that
+must match what a reader sees.
+
+#### When not to use it
+
+Do not convert every string to runes when the contract guarantees a one-byte
+alphabet or the algorithm only copies bytes. Do not use rune indexes as byte
+slice boundaries without converting them back to byte positions.
+
+#### Common mistakes and edge cases
+
+> **Warning:** `text[1:]` can begin inside a multibyte rune. With
+> `text="\u00e9"`, byte index `1` starts at `0xA9` and the result is not valid
+> UTF-8; slice only at known byte boundaries.
+
+Invalid UTF-8 causes `range` to produce `utf8.RuneError` for invalid encoding
+units. An empty string has zero bytes and zero runes. Normalized-looking text
+may have different code-point sequences, as `"\u00e9"` and `"e\u0301"`
+demonstrate, so equality rules must match the problem contract.
+
+#### Related material
+
+- [B.1 Arrays, slices, and strings](#b1-arrays-slices-and-strings) owns string
+  immutability and basic sequence storage.
+- [C.1.3.7 Reuse a partial match](#c137-string-matching) explains how the
+  chosen text unit affects string-matching positions.
+- [C.1.3.33 Share stored word beginnings](#c1333-trie) shows a byte-based trie
+  whose alphabet contract must be explicit.
+
+<a id="e7-type-parameters"></a>
+
+### D.7 Type parameters
+
+#### The problem it solves
+
+Several Go types may need the same operation, yet copying the implementation
+for `int`, `string`, and every other type creates repeated code that can drift.
+Using `any` everywhere removes useful compile-time information and requires
+callers to recover concrete types.
+
+#### The idea in simple terms
+
+Write one recipe with a labeled blank for the value type, then let each caller
+fill in that blank. The label is a **type parameter**. Code using type
+parameters is often called **generic** because one checked implementation works
+with a group of concrete types.
+
+#### How it works
+
+1. Declare a type parameter in brackets, such as `T any`.
+2. Use `T` in parameters, results, fields, or local values.
+3. Give `T` a **constraint**, which states which types and operations are
+   allowed. `any` permits every type; `comparable` permits `==` and `!=`.
+4. Let the compiler infer `T` from arguments when possible, or write it
+   explicitly, as in `first[string](values)`.
+5. Return typed values so callers do not need type assertions.
+
+#### Step-by-step examples
+
+Call `first([]int{8,13})` and `first([]string{"go","rust"})`. The expected
+results are `(8,true)` and `("go",true)`.
+
+1. **Call: integer slice**
+   - **Before:** The argument type is `[]int`.
+   - **Decision:** The compiler infers `T=int`; `len(values)>0`.
+   - **After:** The function returns the typed integer `8` and `true`.
+   - **Known correct:** No string or other type can appear in this call's
+     result.
+2. **Call: string slice**
+   - **Before:** The argument type is `[]string`.
+   - **Decision:** The compiler infers `T=string`; `len(values)>0`.
+   - **After:** The function returns the typed string `"go"` and `true`.
+   - **Known correct:** The same control flow is checked for a different value
+     type.
+
+For the boundary case, call `first([]int{})`. The expected result is
+`(0,false)`.
+
+1. **Call: empty integer slice**
+   - **Before:** `T=int` and `len(values)=0`.
+   - **Decision:** There is no first element, so declare `var zero T`.
+   - **After:** Go gives `zero` the integer zero value `0` and the function
+     returns `0,false`.
+   - **Known correct:** The boolean distinguishes "no value" from a stored
+     first value that happens to be zero.
+
+#### Why it works
+
+Each call chooses one concrete type that satisfies the declared constraint.
+The compiler checks the generic body using only operations promised by that
+constraint, then checks callers with their chosen type. Therefore the returned
+`T` matches the input element type, and the absence boolean safely separates an
+empty input from the type's zero value.
+
+#### Go example
+
+```go
+func first[T any](values []T) (T, bool) {
+	if len(values) == 0 {
+		var zero T
+		return zero, false
+	}
+	return values[0], true
+}
+```
+
+`any` is an alias for `interface{}`, but `T` remains one specific type for each
+call. Use a narrower constraint when the implementation needs comparison,
+ordering, arithmetic, or methods.
+
+#### Work and memory
+
+`first` checks the length and reads at most one element, so every call takes
+`O(1)` time and `O(1)` additional memory. Type parameters do not make this
+operation scan or copy the slice.
+
+#### When to use it
+
+Use type parameters when the same data-structure or function behavior applies
+to multiple types and its required operations can be expressed by a small,
+clear constraint.
+
+#### When not to use it
+
+Do not add a type parameter when only one concrete type is meaningful or when
+different types require different behavior. Use an **interface value**, which
+can hold any concrete type that provides the required methods, when a runtime
+collection must mix such types.
+
+#### Common mistakes and edge cases
+
+> **Warning:** `left == right` does not compile when `T` is constrained by
+> `any` because slices, maps, and functions are not comparable. Use
+> `T comparable` only when equality is required.
+
+An empty input needs a second result or another explicit absence convention
+because every `T` has a zero value. Avoid constraints that expose operations
+the function never uses; they reject valid callers without improving safety.
+
+#### Related material
+
+- [E.4 Generic singly linked list](#e4-generic-singly-linked-list) applies a
+  type parameter to nodes.
+- [E.5 Generic stack](#e5-generic-stack) applies one to a reusable container.
+- [D.4 Map presence and sets](#d4-map-presence-and-sets) explains why generic
+  map keys need the `comparable` constraint.
+
+<a id="e8-replacing-recursion-with-a-loop"></a>
+
+### D.8 Replacing recursion with a loop
+
+#### The problem it solves
+
+A recursive function relies on Go's call stack to remember unfinished work.
+Very deep input can exhaust that stack, and some workflows need to pause,
+inspect, or control the pending work directly.
+
+#### The idea in simple terms
+
+Replace the hidden pile of unfinished calls with a slice the program manages.
+That slice is an **explicit stack**. Each stored item must contain everything a
+recursive call would need when its turn resumes: the current value, the next
+choice, and any partial result used after a child finishes.
+
+#### How it works
+
+For preorder tree traversal, where a node is visited before its children:
+
+1. Return an empty result for a nil root; otherwise push the root.
+2. Pop the final stack item and append its value to the result.
+3. Push its right child first, then its left child.
+4. Repeat until the stack is empty.
+
+Right is pushed first because a stack removes the newest item first, so the
+left child will be processed next. More complicated recursion needs a frame
+struct that also records which child or choice comes next.
+
+#### Step-by-step examples
+
+Traverse a tree with root `8`, left child `4`, and right child `12`. Write the
+stack with its top on the right. The expected preorder result is `[8,4,12]`.
+
+1. **Step: Start**
+   - **Before:** `stack=[]`, `result=[]`.
+   - **Decision:** The root is non-nil, so push `8`.
+   - **After:** `stack=[8]`, `result=[]`.
+   - **Known correct:** Every unvisited reachable node is either the root on the
+     stack or below it.
+2. **Step: Visit `8`**
+   - **Before:** `stack=[8]`, `result=[]`.
+   - **Decision:** Pop and append `8`; push right `12` before left `4`.
+   - **After:** `stack=[12,4]`, `result=[8]`.
+   - **Known correct:** `8` is the required first value, and `4` is next.
+3. **Step: Visit `4`**
+   - **Before:** `stack=[12,4]`, `result=[8]`.
+   - **Decision:** Pop and append leaf `4`; it has no children to push.
+   - **After:** `stack=[12]`, `result=[8,4]`.
+   - **Known correct:** The root and complete left subtree are in preorder.
+4. **Step: Visit `12`**
+   - **Before:** `stack=[12]`, `result=[8,4]`.
+   - **Decision:** Pop and append leaf `12`.
+   - **After:** `stack=[]`, `result=[8,4,12]`.
+   - **Known correct:** No pending node remains, and the full preorder is
+     complete.
+
+For the boundary case, use `root=nil`. The expected result is an empty slice.
+
+1. **Step: Check the root**
+   - **Before:** `root=nil`, `stack=[]`, `result=[]`.
+   - **Decision:** There is no call frame to simulate, so return immediately.
+   - **After:** `result=[]`.
+   - **Known correct:** An empty tree contains no node to visit.
+
+#### Why it works
+
+Before each loop, the stack contains exactly the roots of subtrees that the
+recursive version has not yet visited, in reverse visit order. Popping visits
+the same node the next recursive call would visit. Pushing right before left
+preserves the left-before-right order. Each node is pushed and popped once, so
+the finite stack eventually empties and the result matches recursive preorder.
+
+#### Go example
+
+```go
+type traversalNode struct {
+	Value int
+	Left  *traversalNode
+	Right *traversalNode
+}
+
+func preorderIterative(root *traversalNode) []int {
+	if root == nil {
+		return []int{}
+	}
+
+	stack := []*traversalNode{root}
+	result := make([]int, 0)
+	for len(stack) > 0 {
+		last := len(stack) - 1
+		node := stack[last]
+		stack = stack[:last]
+
+		result = append(result, node.Value)
+		if node.Right != nil {
+			stack = append(stack, node.Right)
+		}
+		if node.Left != nil {
+			stack = append(stack, node.Left)
+		}
+	}
+	return result
+}
+```
+
+This frame needs only a node pointer because preorder performs all work for a
+node before scheduling its children. Postorder or backtracking may need a frame
+with a next-step field and partial results.
+
+#### Work and memory
+
+For `n` nodes, each node is pushed, popped, and appended once, so traversal
+takes `O(n)` time. The result uses `O(n)` output memory. The explicit stack uses
+`O(h)` auxiliary memory for this binary-tree traversal, where `h` is the tree
+height; in the worst case `h=n`. The recursive form uses a call stack with the
+same asymptotic height bound.
+
+#### When to use it
+
+Use an explicit stack when depth may be too large for safe recursion, when the
+pending work must be paused or inspected, or when an iterative interface is
+required.
+
+#### When not to use it
+
+Do not replace short, naturally bounded recursion when the manual frames make
+the invariant harder to see. A simple node-only stack is not enough when work
+must happen after a child returns; encode that return state explicitly.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Pushing left before right reverses preorder. For root `8` with
+> left child `4` and right child `12`, it produces `[8,12,4]`; push right first
+> so left is popped first.
+
+Handle a nil root before pushing it, or dereferencing the popped nil pointer
+will panic. For graph traversal, track visited nodes separately or a cycle can
+keep adding work forever.
+
+#### Related material
+
+- [A.3 Recursion and saved work](#a3-recursion-and-saved-work) owns recursive
+  call frames and stack-memory accounting.
+- [B.4.2 Traversal order](#b42-traversal-order) owns preorder, inorder, and
+  postorder meaning.
+- [C.1.3.20 Depth-first search](#c1320-depth-first-search) explains the broader
+  search method that can use either call stack.
+
+<a id="e9-slice-storage-and-retained-memory"></a>
+
+### D.9 Slice storage and retained memory
+
+#### The problem it solves
+
+A short slice can keep a much larger backing array reachable, and a shortened
+pointer slice can leave removed objects referenced in unused slots. The visible
+length looks small even while memory associated with old data remains live.
+
+#### The idea in simple terms
+
+A slice is a window onto an array, not the array itself. Narrowing the window
+does not cut away the room behind it. When a small window must live much longer
+than its source, copy it into a right-sized array. When removing a pointer from
+a long-lived array, erase the old slot before hiding it beyond the slice length.
+
+#### How it works
+
+1. Remember that a slice stores a pointer to an array, a length, and a capacity.
+2. Reslicing changes length and perhaps capacity but can keep the same array.
+3. To detach a small surviving portion, allocate exactly its length and use
+   `copy`.
+4. To remove the last pointer from a reusable slice, save the value, assign
+   `nil` to that slot, and then shorten the slice.
+5. Treat `append` as conditional: it may reuse shared capacity or allocate a
+   new array.
+
+#### Step-by-step examples
+
+Suppose `large` refers to a 1,048,576-byte array and `header := large[:16]`
+must be kept in a cache after `large` is no longer needed. The expected compact
+result contains the same 16 bytes without retaining the large array through
+`header`.
+
+1. **Step: Take a small view**
+   - **Before:** `large` reaches the 1,048,576-byte backing array.
+   - **Decision:** `large[:16]` changes the visible length but shares the array.
+   - **After:** `header` shows 16 bytes and still points into the large array.
+   - **Known correct:** The byte values are right, but storage is not detached.
+2. **Step: Copy the surviving bytes**
+   - **Before:** `header` shares the 1,048,576-byte array.
+   - **Decision:** Allocate `len(header)=16` bytes and copy the visible data.
+   - **After:** `compact` has the same 16 bytes in an independent array with
+     length and capacity `16`.
+   - **Known correct:** Keeping `compact` no longer requires the old large array
+     through this slice.
+
+For a pointer-removal example, let `items=[A,B,C]` and pop `C`. The expected
+visible result is `[A,B]`, and the old final array slot should be `nil`.
+
+1. **Step: Save the removed pointer**
+   - **Before:** `last=2` and the backing-array slot holds `C`.
+   - **Decision:** Save `items[2]` so it can be returned.
+   - **After:** `value=C`; the slice and backing array are otherwise unchanged.
+2. **Step: Clear and shorten**
+   - **Before:** The final slot still references `C`.
+   - **Decision:** Assign `nil` to `items[2]`, then reslice to `items[:2]`.
+   - **After:** Visible `items=[A,B]`; the reusable final slot is nil.
+   - **Known correct:** The returned value is preserved, while the backing array
+     no longer retains `C` through the removed slot.
+
+#### Why it works
+
+`copy` writes each visible element into a separately allocated array, so the
+new slice cannot keep the source array reachable. Clearing a removed pointer
+replaces the backing array's reference before reslicing hides the slot. The
+visible sequence remains correct because copying preserves order and popping
+returns the saved final value.
+
+#### Go example
+
+```go
+func compactBytes(view []byte) []byte {
+	compact := make([]byte, len(view))
+	copy(compact, view)
+	return compact
+}
+
+func popPointer[T any](items []*T) ([]*T, *T, bool) {
+	if len(items) == 0 {
+		return items, nil, false
+	}
+
+	last := len(items) - 1
+	value := items[last]
+	items[last] = nil
+	return items[:last], value, true
+}
+```
+
+`make` gives `compact` exactly the requested length and capacity here.
+`popPointer` returns the shortened slice because changing a local slice
+descriptor does not change the caller's descriptor.
+
+#### Work and memory
+
+Copying a `k`-element view takes `O(k)` time and allocates `O(k)` memory. Popping
+and clearing the final pointer takes `O(1)` time and no new slice storage. The
+copy deliberately trades a small allocation now for allowing a much larger
+array to become unreachable sooner.
+
+#### When to use it
+
+Compact a slice when a small portion will outlive a much larger input. Clear
+removed pointer-bearing slots in long-lived stacks, queues, heaps, buffers, or
+pools whose backing arrays remain reachable.
+
+#### When not to use it
+
+Do not copy every short-lived subslice; the allocation can cost more than brief
+retention. Clearing scalar slots such as integers usually does not affect
+object reachability, though it may still be required by a data-structure
+invariant.
+
+#### Common mistakes and edge cases
+
+> **Warning:** `items = items[:last]` hides but does not overwrite the removed
+> pointer. With backing storage `[A,B,C]`, the unused slot can still retain `C`;
+> assign `items[last] = nil` first.
+
+A copied outer slice still shares objects reached through pointer-like
+elements. Appending to one of two shared slices may mutate the common array
+when capacity remains and may detach when it does not, so correctness must not
+depend on guessing which outcome occurs. Empty and nil slices require no
+compaction; `popPointer` reports `false` instead of indexing them.
+
+#### Related material
+
+- [B.1 Arrays, slices, and strings](#b1-arrays-slices-and-strings) owns slice
+  length, capacity, shared arrays, and append behavior.
+- [D.3 Sorting without unexpected mutation](#d3-sorting-without-unexpected-mutation)
+  uses cloning to protect observable order.
+- [D.5 Priority queues](#d5-priority-queues) is one long-lived slice-backed
+  structure that may hold pointers.
+
+<a id="d-go-reference-implementations"></a>
+
+## E. Go reference implementations
+
+These snippets are complete, small implementations of ideas taught elsewhere
+in the guide. Each entry states its contract and required input conditions,
+traces the variables used by the code, and gives concrete cases to test. The
+linked owner explains how to recognize and choose the method; this section
+keeps the implementation details beside runnable Go code.
+
+Some snippets use a type parameter written as `T`. Treat `T` as a placeholder
+for the value type chosen by the caller, such as `int` or `string`; the
+[type-parameter note](#d7-type-parameters) explains why this is useful.
+
+<a id="d1-binary-search-bounds"></a>
+
+### E.1 Binary search bounds
+
+#### The problem it solves
+
+Given values sorted in ascending order, find where a target begins, where it
+ends, or whether it occurs at all. Equal values make an ordinary "find any
+match" search insufficient when the caller needs exact range boundaries.
+
+#### The idea in simple terms
+
+Keep a half-open candidate range: `left` is included and `right` is excluded.
+Inspect its middle value and discard the half that cannot contain the first
+valid boundary. This is **binary search**; a **lower bound** is the first value
+greater than or equal to the target, while an **upper bound** is the first
+value strictly greater than it.
+
+#### How it works
+
+The input must be sorted in ascending order.
+
+1. Start with `[left,right) = [0,len(values))`.
+2. For a lower bound, move `left` past `middle` when
+   `values[middle] < target`; otherwise keep `middle` by moving `right` to it.
+3. For an upper bound, use `values[middle] <= target` as the condition for
+   moving `left` past `middle`.
+4. When `left == right`, return that insertion position. For exact search,
+   confirm that the lower-bound position exists and contains the target.
+
+#### Step-by-step examples
+
+For `values=[1,2,2,2,5]` and `target=2`, `LowerBound` should return `1`.
+
+1. **Step: Inspect index 2**
+   - **Before:** `left=0`, `right=5`, `middle=2`, value `2`.
+   - **Decision:** `2` is not smaller than the target, so index 2 might be the
+     first match; set `right=2`.
+   - **After:** The candidate range is `[0,2)`.
+   - **Known correct:** No index from 2 onward can be earlier than a valid
+     boundary still in the range.
+2. **Step: Inspect index 1**
+   - **Before:** `left=0`, `right=2`, `middle=1`, value `2`.
+   - **Decision:** Keep this possible first match by setting `right=1`.
+   - **After:** The candidate range is `[0,1)`.
+   - **Known correct:** Any lower bound must be at index 0 or 1.
+3. **Step: Inspect index 0**
+   - **Before:** `left=0`, `right=1`, `middle=0`, value `1`.
+   - **Decision:** `1 < 2`, so index 0 cannot qualify; set `left=1`.
+   - **After:** `left=right=1`; return `1`.
+   - **Known correct:** Index 0 is too small and index 1 is the first value at
+     least 2.
+
+For the boundary case `values=[1,2,2,2,5]`, `target=6`, `LowerBound` returns
+`5`. Every inspected value is smaller than 6, so `left` advances to
+`len(values)`; `Search` checks that position before indexing and returns `-1`.
+
+#### Why it works
+
+For a lower bound, every index before `left` is known to contain a value
+smaller than the target, and every in-range index at or after `right` is known
+to contain a value at least as large as the target. Those facts remain true
+after either update because the values are sorted. Each step makes the
+candidate range shorter, so the loop finishes. At `left == right`, no earlier
+index qualifies; that index is the first qualifying position, or it equals
+`len(values)` when none exists. The upper-bound proof is identical with
+"smaller than or equal to" as the discarded-left condition.
+
+#### Go example
+
+```go
+package binarysearch
+
+// LowerBound returns the first index whose value is greater than or equal to
+// target. It returns len(values) when no such index exists.
+func LowerBound(values []int, target int) int {
+	left, right := 0, len(values)
+	for left < right {
+		middle := left + (right-left)/2
+		if values[middle] < target {
+			left = middle + 1
+		} else {
+			right = middle
+		}
+	}
+	return left
+}
+
+// UpperBound returns the first index whose value is greater than target. It
+// returns len(values) when no such index exists.
+func UpperBound(values []int, target int) int {
+	left, right := 0, len(values)
+	for left < right {
+		middle := left + (right-left)/2
+		if values[middle] <= target {
+			left = middle + 1
+		} else {
+			right = middle
+		}
+	}
+	return left
+}
+
+// Search returns the index of target in a sorted slice, or -1 when target is
+// absent. When duplicates exist, it returns the first matching index.
+func Search(values []int, target int) int {
+	index := LowerBound(values, target)
+	if index == len(values) || values[index] != target {
+		return -1
+	}
+	return index
+}
+```
+
+Concrete cases to test include empty input; targets before, within, between,
+and after the data; `values=[1,2,2,2,5], target=2` producing lower bound `1`,
+upper bound `4`, and search result `1`; and an absent target producing `-1`.
+
+#### Work and memory
+
+Each update removes at least half of the remaining candidate positions, so a
+nonempty input takes `O(log n)` time and an empty input takes `O(1)`. `Search`
+adds one constant-time check after `LowerBound`. The functions keep only index
+variables and use `O(1)` auxiliary memory without allocations.
+
+#### When to use it
+
+Use these functions when values are already sorted and the caller needs an
+insertion point, an exact first match, a duplicate range, or a count such as
+`UpperBound(values,x)-LowerBound(values,x)`.
+
+#### When not to use it
+
+Do not use the comparisons on unsorted input: for `values=[3,1,2]`, discarding
+one side says nothing about values on that side. A map or linear scan is often
+better for repeated exact lookups when sorting is unavailable or forbidden.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Changing the range to inclusive bounds without changing the
+> updates can skip an index or loop forever. With this half-open contract,
+> initialize `right=len(values)` and never read `values[right]`.
+
+Check `index == len(values)` before reading `values[index]`. Keep the lower-
+and upper-bound equality rules distinct, especially for duplicates. Computing
+`middle` as `left+(right-left)/2` also avoids overflowing `left+right` in
+integer types where very large indexes are possible.
+
+#### Related material
+
+- [C.1.3.6 Find a changing boundary (binary search)](#binary-search)
+  owns method selection and the boundary invariant.
+- [A.2 Correctness and invariants](#a2-correctness-and-invariants) explains
+  how the maintained facts prove the result.
+- [Find First and Last Position of Element in Sorted Array](../problems/solved_medium_leetcode_0034_find_first_and_last_position_of_element_in_sorted_array.go)
+  uses both bounds around a duplicate range.
+
+<a id="d2-rolling-dynamic-programming"></a>
+
+### E.2 Rolling dynamic programming
+
+#### The problem it solves
+
+Count ordered sequences of one-step and two-step moves that reach an exact
+nonnegative total. Recomputing every smaller total recursively repeats the
+same work, while storing every answer uses more memory than this recurrence
+needs.
+
+#### The idea in simple terms
+
+Every final sequence reaches `current` from either `current-1` or
+`current-2`. Add those two already known counts, then keep only the newest two
+counts for the next total. Reusing answers to smaller problems is **dynamic
+programming**; retaining only the recent states is a **rolling** form of it.
+
+#### How it works
+
+The result must fit in `int`.
+
+1. Return zero for a negative total because no sequence of positive moves can
+   reach it.
+2. Return one for totals zero and one: the empty sequence reaches zero, and
+   one one-step move reaches one.
+3. Let `twoBack` and `oneBack` hold the counts for totals `current-2` and
+   `current-1`.
+4. Set the new count to their sum and roll both variables forward until
+   `current == steps`.
+
+#### Step-by-step examples
+
+For `steps=4`, the expected answer is `5`.
+
+1. **Step: Establish totals 0 and 1**
+   - **Before:** No loop iteration has run.
+   - **Decision:** There is one way to make 0 and one way to make 1.
+   - **After:** `twoBack=1`, `oneBack=1`.
+   - **Known correct:** The two base totals have exact counts.
+2. **Step: Build total 2**
+   - **Before:** `current=2`, counts are `1` and `1`.
+   - **Decision:** Append a two-step move to the total-0 sequences or a
+     one-step move to the total-1 sequences.
+   - **After:** `twoBack=1`, `oneBack=2`.
+   - **Known correct:** The two sequences are `[2]` and `[1,1]`.
+3. **Step: Build total 3**
+   - **Before:** `current=3`, counts for totals 1 and 2 are `1` and `2`.
+   - **Decision:** Add them.
+   - **After:** `twoBack=2`, `oneBack=3`.
+   - **Known correct:** All sequences reaching 3 end in exactly one of the two
+     allowed move sizes.
+4. **Step: Build total 4**
+   - **Before:** `current=4`, counts are `2` and `3`.
+   - **Decision:** Add them and roll forward.
+   - **After:** `twoBack=3`, `oneBack=5`; return `5`.
+   - **Known correct:** All five ordered sequences are counted once.
+
+For boundary inputs, `steps=-1` returns `0` and `steps=0` returns `1` without
+entering the loop. The second result counts the one empty sequence, not one
+physical move.
+
+#### Why it works
+
+Before each iteration, `twoBack` equals the answer for `current-2` and
+`oneBack` equals the answer for `current-1`. Every sequence reaching
+`current` has a unique final move of size one or two; removing that move puts
+it in exactly one of those two groups. Their sum is therefore the new exact
+count. The assignment restores the same fact for the next total, and
+`current` increases until it reaches `steps`.
+
+#### Go example
+
+```go
+package dynamicprogramming
+
+// CountOrderedOneOrTwoStepWays returns the number of ordered sequences of
+// one-step and two-step moves that sum to steps. Negative totals have no valid
+// sequence; the empty sequence is the single way to make a total of zero. The
+// result must fit in an int.
+func CountOrderedOneOrTwoStepWays(steps int) int {
+	if steps < 0 {
+		return 0
+	}
+	if steps < 2 {
+		return 1
+	}
+
+	twoBack, oneBack := 1, 1
+	for current := 2; current <= steps; current++ {
+		twoBack, oneBack = oneBack, twoBack+oneBack
+	}
+	return oneBack
+}
+```
+
+Concrete cases to test are `-1 -> 0`, `0 -> 1`, `1 -> 1`, `2 -> 2`, and
+`4 -> 5`, plus the largest accepted `steps` whose answer still fits in `int`.
+
+#### Work and memory
+
+Negative, zero, and one return in `O(1)` time. For larger `steps`, the loop
+runs `steps-1` times, so time is `O(steps)`. Two counts and one loop index use
+`O(1)` auxiliary memory, and the function makes no allocations. This removes
+the `O(steps)` table allocation but not the time needed to build each answer.
+
+#### When to use it
+
+Use rolling state when a recurrence proceeds in one direction, the output is
+only the final value, and each new answer depends on a fixed number of recent
+answers.
+
+#### When not to use it
+
+Keep a full table when reconstruction or later queries need older states. Do
+not use this two-state recurrence when allowed move sizes or other state make
+the next answer depend on more information.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Treating total zero as having zero ways breaks later answers:
+> `steps=2` would miss the sequence `[2]`. The empty sequence is the base way
+> to make a zero total.
+
+State the overflow limit; Go integer addition does not report overflow. In a
+multiple assignment, right-hand expressions use the old values, so
+`twoBack, oneBack = oneBack, twoBack+oneBack` performs the intended roll.
+
+#### Related material
+
+- [C.1.3.10 Reuse answers to repeated smaller problems (dynamic programming)](#dynamic-programming)
+  owns recurrence design and state selection.
+- [A.3 Recursion and saved work](#a3-recursion-and-saved-work) compares saved
+  answers with repeated recursive calls.
+- [Climbing Stairs](../problems/solved_easy_leetcode_0070_climbing_stairs.go)
+  uses this recurrence.
+
+<a id="d3-hash-map-complement-lookup"></a>
+
+### E.3 Hash-map complement lookup
+
+#### The problem it solves
+
+Find two distinct positions whose integer values add to a target without
+checking every pair. The returned positions must refer to values already in
+the input, and one position cannot be used twice.
+
+#### The idea in simple terms
+
+For each value, calculate the partner it still needs. Ask a map whether that
+partner appeared earlier, then remember the current value for later items. The
+needed partner is the **complement**, `target-value`; a Go map provides the
+value-to-earlier-index lookup.
+
+#### How it works
+
+Every subtraction `target-value` must fit in `int`.
+
+1. Start with an empty `indexByValue` map.
+2. For each `index,value`, calculate `complement`.
+3. Look up `complement`. If present, return its earlier index and the current
+   index.
+4. Otherwise store the current value and index. Insert only after the lookup
+   so the current position cannot match itself.
+5. Return `false` after the scan when no pair exists.
+
+#### Step-by-step examples
+
+For `values=[2,7,11,15]` and `target=9`, the expected result is `(0,1,true)`.
+
+1. **Step: Visit index 0**
+   - **Before:** `indexByValue={}`, `value=2`.
+   - **Decision:** `complement=7` is absent, so no earlier partner exists.
+   - **After:** `indexByValue={2:0}`.
+   - **Known correct:** No pair ending at index 0 exists.
+2. **Step: Visit index 1**
+   - **Before:** `indexByValue={2:0}`, `value=7`.
+   - **Decision:** `complement=2` is present at index 0.
+   - **After:** Return `(0,1,true)` without further mutation.
+   - **Known correct:** The positions are distinct and `2+7=9`.
+
+For the duplicate case `values=[3,3]`, `target=6`, index 0 is stored before
+index 1 looks up its complement. The result is `(0,1,true)`; looking up before
+inserting is what prevents index 0 from matching itself on its first visit.
+
+#### Why it works
+
+Before visiting `index`, the map contains indexes from earlier positions only.
+If the complement is present, its value plus the current value equals the
+target and its index is necessarily distinct. If it is absent, no earlier
+position can pair with the current value, so remembering the current value is
+safe. The finite scan either returns a valid pair or proves that no pair has a
+later endpoint in the input.
+
+#### Go example
+
+```go
+// Package hashmap demonstrates lookup-based uses of Go maps.
+package hashmap
+
+// PairSumIndices returns indices of two distinct values whose sum is target.
+// The boolean is false when no pair exists. Subtracting each value from target
+// must fit in an int.
+func PairSumIndices(values []int, target int) (int, int, bool) {
+	indexByValue := make(map[int]int)
+	for index, value := range values {
+		complement := target - value
+		earlierIndex, found := indexByValue[complement]
+		if found {
+			return earlierIndex, index, true
+		}
+		// Insert after lookup so an index cannot match itself.
+		indexByValue[value] = index
+	}
+
+	return 0, 0, false
+}
+```
+
+Concrete cases to test include `[2,7,11,15],9 -> (0,1,true)`,
+`[3,3],6 -> (0,1,true)`, and `[1,2,4],8 -> false`. For the false result, the
+two returned integers are placeholders and must not be used.
+
+#### Work and memory
+
+With ordinary Go map behavior, each lookup and insertion takes constant time
+on average, so the scan takes `O(n)` average time and can take `O(n^2)` in the
+map's pathological worst case. The map stores at most `n` entries and uses
+`O(n)` additional memory. A successful early pair can reduce actual work but
+does not change the worst-case bound.
+
+#### When to use it
+
+Use complement lookup when original indices matter, one pass is useful, and
+`O(n)` extra map memory is acceptable.
+
+#### When not to use it
+
+Use the sorted two-pointer implementation in [E.9](#e9-sorted-two-pointer-pair-search)
+when the input is already sorted or may be reordered and constant auxiliary
+memory matters. A frequency map is needed instead when the task asks for all
+pairs or counts rather than one pair.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Inserting before lookup lets `values=[3]`, `target=6` return the
+> same index twice. Perform the lookup first.
+
+Use the map's boolean presence result rather than treating index zero as
+absence. Decide whether any valid pair is acceptable because repeated values
+can produce several answers. Widen or validate arithmetic when
+`target-value` may overflow `int`.
+
+#### Related material
+
+- [C.1.3.4 Remember facts by key (hash map or set)](#hash-map-or-set)
+  owns the lookup method.
+- [D.4 Distinguish missing keys from stored values (map presence and sets)](#d4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
+  explains the two-result lookup used here.
+- [Two Sum](../problems/solved_easy_leetcode_0001_two_sum.go) is the
+  representative problem.
+
+<a id="d4-generic-singly-linked-list"></a>
+
+### E.4 Generic singly linked list
+
+#### The problem it solves
+
+Build a one-way linked list from ordinary values, convert it back for
+inspection, and reverse its links without allocating replacement nodes. The
+same operations should work for different stored value types.
+
+#### The idea in simple terms
+
+Each node is a card holding a value and a pointer to the next card. A
+**singly linked list** follows only those forward links. A type parameter `T`
+lets the node store a caller-chosen type, and reversing the list turns each
+link around while preserving the remaining path before it is overwritten.
+
+#### How it works
+
+1. `FromSlice` starts with a temporary `dummy` node and appends one new node
+   after `tail` for every slice value; `dummy.Next` is the real head.
+2. `ToSlice` follows `node.Next` until `nil`, appending each `node.Value`.
+3. `Reverse` keeps `previous`, `current`, and `next`. Save `current.Next` in
+   `next`, point `current.Next` backward, then advance both moving pointers.
+4. A `nil` head represents an empty list and is valid for conversion and
+   reversal.
+
+#### Step-by-step examples
+
+Build and reverse `values=[10,20,30]`; the expected final slice is
+`[30,20,10]`.
+
+1. **Step: Build the list**
+   - **Before:** `dummy.Next=nil`, `tail=dummy`.
+   - **Decision:** Append nodes 10, 20, and 30 after the current `tail`, moving
+     `tail` to each new node.
+   - **After:** `dummy -> 10 -> 20 -> 30 -> nil`; return `dummy.Next`.
+   - **Known correct:** The links preserve the input slice order.
+2. **Step: Reverse node 10**
+   - **Before:** `previous=nil`, `current=10 -> 20`, `next` not yet saved.
+   - **Decision:** Save node 20, then set `10.Next=nil`.
+   - **After:** `previous=10 -> nil`, `current=20 -> 30`.
+   - **Known correct:** Node 10 forms the complete reversed prefix, and node
+     20 still reaches every unprocessed node.
+3. **Step: Reverse node 20**
+   - **Before:** `previous=10`, `current=20`, `next=30` after saving.
+   - **Decision:** Set `20.Next=10` and advance.
+   - **After:** `previous=20 -> 10`, `current=30`.
+   - **Known correct:** The first two original nodes are reversed without
+     losing node 30.
+4. **Step: Reverse node 30 and convert**
+   - **Before:** `previous=20 -> 10`, `current=30`.
+   - **Decision:** Save `nil`, point 30 to 20, and advance to `nil`.
+   - **After:** Return `previous=30 -> 20 -> 10`; `ToSlice` returns
+     `[30,20,10]`.
+   - **Known correct:** Every original node appears once in reverse order.
+
+For an empty `values=[]`, `FromSlice` returns `nil`, `Reverse(nil)` returns
+`nil`, and `ToSlice(nil)` returns an empty slice without entering either loop.
+
+#### Why it works
+
+During construction, the list after `dummy` contains exactly the values
+already visited, in their slice order, and `tail` is its last node. During
+reversal, `previous` heads the fully reversed processed prefix while `current`
+heads the untouched suffix. Saving `next` before changing the link preserves
+the suffix; redirecting one link extends the reversed prefix. Each iteration
+processes one node, so the loop ends at `nil` with all nodes reversed.
+
+#### Go example
+
+```go
+package linkedlist
+
+// Node stores one value and a link to the next node.
+type Node[T any] struct {
+	Value T
+	Next  *Node[T]
+}
+
+// FromSlice returns a list containing values in their slice order.
+func FromSlice[T any](values []T) *Node[T] {
+	dummy := &Node[T]{}
+	tail := dummy
+	for _, value := range values {
+		tail.Next = &Node[T]{Value: value}
+		tail = tail.Next
+	}
+	return dummy.Next
+}
+
+// ToSlice returns the values encountered from head to nil.
+func ToSlice[T any](head *Node[T]) []T {
+	values := make([]T, 0)
+	for node := head; node != nil; node = node.Next {
+		values = append(values, node.Value)
+	}
+	return values
+}
+
+// Reverse reverses a list in place and returns its new head.
+func Reverse[T any](head *Node[T]) *Node[T] {
+	var previous *Node[T]
+	for current := head; current != nil; {
+		next := current.Next
+		current.Next = previous
+		previous = current
+		current = next
+	}
+	return previous
+}
+```
+
+Concrete cases to test are the `[10,20,30]` round trip and reversal, one node
+remaining unchanged, repeated values retaining their separate nodes, and all
+three operations on an empty list.
+
+#### Work and memory
+
+For `n` values, `FromSlice` takes `O(n)` time and allocates `n` result nodes;
+the temporary dummy may remain on the stack or be optimized by the compiler.
+`ToSlice` takes `O(n)` time and `O(n)` result memory for the returned slice.
+`Reverse` takes `O(n)` time and `O(1)` auxiliary memory and allocates no nodes.
+
+#### When to use it
+
+Use this reference when a problem supplies singly linked nodes, needs constant-
+time link changes after a known node, or teaches pointer rewiring. The slice
+adapters are useful at test and input boundaries.
+
+#### When not to use it
+
+Prefer a slice when indexed access, cache-friendly traversal, or compact
+storage matters. This node type has no backward link, so do not use it when
+frequent movement toward previous nodes is required.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Setting `current.Next=previous` before saving the old next link
+> loses the unprocessed suffix. For `10 -> 20 -> 30`, node 20 becomes
+> unreachable after the first rewrite.
+
+Return `dummy.Next`, not `dummy`. Treat `nil` as a valid empty list. A cycle
+violates `ToSlice` and `Reverse` contracts because their loops would not reach
+`nil`; detect cycles separately when input is not guaranteed acyclic.
+
+#### Related material
+
+- [B.2 Linked lists](#linked-lists) owns node operations and reversal
+  reasoning.
+- [D.7 Type parameters](#d7-type-parameters) explains `T` and `any`.
+- [D.9 Slice storage and retained memory](#d9-slice-storage-and-retained-memory)
+  contrasts contiguous slice storage with separately allocated nodes.
+
+<a id="d5-generic-stack"></a>
+
+### E.5 Generic stack
+
+#### The problem it solves
+
+Store values so that the most recently added value is the first one removed,
+while allowing callers to inspect the top, count items, and handle an empty
+stack without a panic.
+
+#### The idea in simple terms
+
+Use the end of a slice as the top of a stack of trays. Adding and removing at
+that one end implements **last in, first out**, often shortened to LIFO. A
+generic `Stack[T]` gives the same operations to any chosen value type.
+
+#### How it works
+
+1. `Push` appends the value to `items`.
+2. `Peek` reads `items[len(items)-1]` only after checking that the slice is not
+   empty.
+3. `Pop` saves the last value, clears that slot to the zero value of `T`,
+   shortens the slice by one, and returns the saved value with `true`.
+4. Empty `Pop` and `Peek` return the zero value with `false`. `Len` and
+   `IsEmpty` derive their answers from `len(items)`.
+
+#### Step-by-step examples
+
+Starting with the zero value `var stack Stack[string]`, push `"a"`, push
+`"b"`, peek, then pop. The expected peek and pop value is `"b"`.
+
+1. **Step: Push `"a"`**
+   - **Before:** `items=nil`, length 0.
+   - **Decision:** Append at the slice end.
+   - **After:** `items=["a"]`, length 1.
+   - **Known correct:** `"a"` is the newest and top value.
+2. **Step: Push `"b"`**
+   - **Before:** `items=["a"]`.
+   - **Decision:** Append without disturbing the earlier item.
+   - **After:** `items=["a","b"]`, length 2.
+   - **Known correct:** `"b"` is now the top.
+3. **Step: Peek**
+   - **Before:** Last index is 1.
+   - **Decision:** Read that slot without slicing it away.
+   - **After:** Return `"b",true`; `items` remains `["a","b"]`.
+   - **Known correct:** Inspection did not change stack order or length.
+4. **Step: Pop**
+   - **Before:** `last=1`, `value="b"`.
+   - **Decision:** Clear slot 1, then shorten the visible slice.
+   - **After:** Return `"b",true`; `items=["a"]`.
+   - **Known correct:** The newest value was removed first.
+
+For an empty stack, both `Pop` and `Peek` return `"",false` for
+`Stack[string]`; the boolean distinguishes failure from a successfully stored
+empty string.
+
+#### Why it works
+
+The slice order is the insertion order and the final element is always the
+most recent unremoved value. `Push` adds exactly there, while `Peek` reads and
+`Pop` removes exactly there, so no older value can leave first. Clearing a
+removed slot does not change the logical order; it only stops that hidden
+array position from retaining a reference. All operations finish after a
+bounded number of slice and index operations, except for occasional append
+growth.
+
+#### Go example
+
+```go
+package stack
+
+// Stack stores values in last-in, first-out order.
+// The zero value is ready to use.
+type Stack[T any] struct {
+	items []T
+}
+
+// Push places value on top of the stack.
+func (s *Stack[T]) Push(value T) {
+	s.items = append(s.items, value)
+}
+
+// Pop removes and returns the top value. The boolean is false when the stack
+// is empty.
+func (s *Stack[T]) Pop() (T, bool) {
+	if len(s.items) == 0 {
+		var zero T
+		return zero, false
+	}
+
+	last := len(s.items) - 1
+	value := s.items[last]
+	var zero T
+	s.items[last] = zero
+	s.items = s.items[:last]
+	return value, true
+}
+
+// Peek returns the top value without removing it. The boolean is false when
+// the stack is empty.
+func (s *Stack[T]) Peek() (T, bool) {
+	if len(s.items) == 0 {
+		var zero T
+		return zero, false
+	}
+
+	return s.items[len(s.items)-1], true
+}
+
+// Len returns the number of values in the stack.
+func (s *Stack[T]) Len() int {
+	return len(s.items)
+}
+
+// IsEmpty reports whether the stack contains no values.
+func (s *Stack[T]) IsEmpty() bool {
+	return len(s.items) == 0
+}
+```
+
+Concrete cases to test include the string sequence above, integer zero stored
+successfully versus an empty result, length changes after every push and pop,
+complete removal, and repeated empty operations on the zero-value stack.
+
+#### Work and memory
+
+`Peek`, `Pop`, `Len`, and `IsEmpty` take `O(1)` time. `Push` takes `O(1)`
+amortized time: most appends are constant work, while an occasional capacity
+growth copies `O(n)` items. Storing `n` values uses `O(n)` memory. The methods
+use `O(1)` auxiliary memory beyond the slice storage.
+
+#### When to use it
+
+Use a stack when work must resume in reverse discovery order, such as nested
+delimiter parsing, undo behavior, depth-first traversal, or replacing
+recursion with explicit frames.
+
+#### When not to use it
+
+Use a queue when the oldest item must leave first. Use a priority queue when a
+comparison, rather than insertion time, determines the next item. Do not expose
+the backing slice when callers must not bypass stack ordering.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Returning only the zero value for an empty pop is ambiguous.
+> An integer stack can validly contain `0`; check the boolean result.
+
+Check for emptiness before using `len(items)-1`. Clear removed pointer-bearing
+values before reslicing so the backing array does not retain them. Do not
+assume every `Push` is worst-case constant time because slice growth can copy
+the stored items.
+
+#### Related material
+
+- [C.1.3.13 Finish the newest open item first (stack)](#stack)
+  owns stack-method selection.
+- [D.7 Type parameters](#d7-type-parameters) explains the generic type.
+- [D.9 Slice storage and retained memory](#d9-slice-storage-and-retained-memory)
+  explains why `Pop` clears the removed slot.
+
+<a id="d6-overflow-safe-integer-reversal"></a>
+
+### E.6 Overflow-safe integer reversal
+
+#### The problem it solves
+
+Reverse the decimal digits of a nonnegative `int64` without first producing a
+value outside the type's range. Checking only after multiplication is too late
+because overflowing signed integer arithmetic has already lost the intended
+value.
+
+#### The idea in simple terms
+
+Take the last digit from the input and append it to the result, one digit at a
+time. Before shifting the result left by one decimal place, ask whether the
+shift and addition would still fit. This is a **precondition overflow check**:
+it proves the next arithmetic operation is safe before executing it.
+
+#### How it works
+
+The function accepts only nonnegative input and reports failure when the
+reversed value cannot fit in `int64`.
+
+1. Reject a negative `value`.
+2. Extract `digit=value%10`.
+3. Before calculating `reversed*10+digit`, require
+   `reversed <= (math.MaxInt64-digit)/10`.
+4. Append the digit and remove it from `value` with `value/=10`.
+5. Return the result when no digits remain. Zero naturally returns zero.
+
+#### Step-by-step examples
+
+For `value=120`, the expected result is `(21,true)`.
+
+1. **Step: Move digit 0**
+   - **Before:** `value=120`, `reversed=0`, `digit=0`.
+   - **Decision:** The guard passes, so append 0.
+   - **After:** `value=12`, `reversed=0`.
+   - **Known correct:** The processed suffix `0` is represented as integer 0;
+     its leading zero need not be retained.
+2. **Step: Move digit 2**
+   - **Before:** `value=12`, `reversed=0`, `digit=2`.
+   - **Decision:** The guarded expression fits.
+   - **After:** `value=1`, `reversed=2`.
+   - **Known correct:** The processed suffix `20` is reversed to `2`.
+3. **Step: Move digit 1**
+   - **Before:** `value=1`, `reversed=2`, `digit=1`.
+   - **Decision:** Append the final digit.
+   - **After:** `value=0`, `reversed=21`; return `(21,true)`.
+   - **Known correct:** Every input digit has moved to its reversed decimal
+     position.
+
+For the overflow case `value=8085774586302733229`, the digits processed
+before the final leading `8` produce `reversed=922337203685477580`. The guard
+compares this with `(math.MaxInt64-8)/10 = 922337203685477579`, rejects the
+append, and returns `(0,false)` without overflowing.
+
+#### Why it works
+
+Before each iteration, `reversed` is exactly the reverse of the digits already
+removed from the original value, with insignificant leading zeroes omitted.
+The remainder operator selects the next digit and division removes that same
+digit. Because `digit` is between 0 and 9, subtracting it from `MaxInt64` is
+safe; the guard is algebraically equivalent to
+`reversed*10+digit <= MaxInt64` but does not perform the risky multiplication.
+Each division removes one decimal digit, so the loop finishes.
+
+#### Go example
+
+```go
+package integerdigits
+
+import "math"
+
+// ReverseNonNegative reverses a nonnegative decimal integer. ok is false when
+// value is negative or when its reversal would exceed int64.
+func ReverseNonNegative(value int64) (reversed int64, ok bool) {
+	if value < 0 {
+		return 0, false
+	}
+
+	for value > 0 {
+		digit := value % 10
+		if reversed > (math.MaxInt64-digit)/10 {
+			return 0, false
+		}
+		reversed = reversed*10 + digit
+		value /= 10
+	}
+	return reversed, true
+}
+```
+
+Concrete cases to test are `0 -> (0,true)`, `121 -> (121,true)`,
+`120 -> (21,true)`, `-1 -> false`, and
+`8085774586302733229 -> false` because its reversal is one greater than
+`math.MaxInt64`.
+
+#### Work and memory
+
+If `d` is the number of decimal digits, the loop takes `O(d)` time, which is
+`O(log value)` for positive input. Zero and rejected negative input take
+`O(1)` time. The function stores a fixed number of integers and uses `O(1)`
+auxiliary memory without allocations.
+
+#### When to use it
+
+Use this implementation when decimal digits must be processed numerically,
+negative input is outside the contract, and overflow must be reported rather
+than wrapped or clamped.
+
+#### When not to use it
+
+Use text reversal or arbitrary-precision arithmetic when every input digit
+must be preserved beyond `int64`, including leading zeroes from textual input.
+Derive a separate sign rule when negative values should be reversed rather
+than rejected.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Calculating `candidate := reversed*10+digit` and then comparing
+> `candidate` with `MaxInt64` cannot detect the intended mathematical overflow:
+> the `int64` operation has already wrapped before the comparison.
+
+Zero skips the loop and is a successful result. Trailing input zeroes become
+leading zeroes in the reversed digit sequence and disappear from its integer
+representation. Keep the guard's subtraction before division; comparing only
+`reversed > MaxInt64/10` misses the last-digit tie case.
+
+#### Related material
+
+- [A.8 Integer digit processing](#integer-digit-processing) owns digit
+  extraction and the reversal invariant.
+- [A.4 Integer limits and bits](#a4-integer-limits-and-bits) explains why
+  range checks must precede unsafe arithmetic.
+- [Palindrome Number](../problems/solved_easy_leetcode_0009_palindrome_number.go)
+  uses the same digit-extraction invariant under a narrower input range.
+
+<a id="d7-common-prefix-scan"></a>
+
+### E.7 Common-prefix scan
+
+#### The problem it solves
+
+Find the longest starting byte sequence shared by every string. The scan must
+stop safely when a shorter string ends and must define what empty input means.
+
+#### The idea in simple terms
+
+Read the strings as aligned rows and compare one column at a time. The first
+unequal or missing byte ends the answer because a prefix cannot skip a column.
+This is a **common-prefix scan**; this implementation deliberately compares
+bytes rather than Unicode code points or user-visible symbols.
+
+#### How it works
+
+1. Return `""` when `strs` is empty.
+2. Use each byte position in `strs[0]` as a candidate `column`.
+3. Compare `strs[row][column]` with the first string's `expected` byte, first
+   checking that the row is long enough.
+4. On a missing or unequal byte, return `strs[0][:column]`.
+5. If every byte in the first string matches, return that whole string.
+
+#### Step-by-step examples
+
+For `strs=["flower","flow","flight"]`, the expected result is `"fl"`.
+
+1. **Step: Compare column 0**
+   - **Before:** `column=0`, `expected='f'`.
+   - **Decision:** Rows 1 and 2 both contain `'f'` at byte 0.
+   - **After:** Continue to column 1.
+   - **Known correct:** Every string shares prefix `"f"`.
+2. **Step: Compare column 1**
+   - **Before:** `column=1`, `expected='l'`.
+   - **Decision:** Both other rows also contain `'l'`.
+   - **After:** Continue to column 2.
+   - **Known correct:** Every string shares prefix `"fl"`.
+3. **Step: Compare column 2**
+   - **Before:** `column=2`, `expected='o'`; row 1 contains `'o'`, row 2
+     contains `'i'`.
+   - **Decision:** The mismatch means no common prefix can include column 2.
+   - **After:** Return `strs[0][:2]`, which is `"fl"`.
+   - **Known correct:** The first two bytes match everywhere and the third
+     does not.
+
+For `strs=["","abc"]`, the outer loop has no columns and returns `""`.
+For `strs=[]`, the explicit guard returns `""` before reading `strs[0]`.
+
+#### Why it works
+
+Before each new column, every earlier byte has matched in every string, so the
+slice before `column` is known to be common. A short row or mismatch proves
+that no longer common prefix is possible. Otherwise the newly checked byte can
+be added to the known prefix. The scan ends at the first failure or after all
+bytes of the first string, which is itself the maximum possible answer length.
+
+#### Go example
+
+```go
+package commonprefixscan
+
+// LongestCommonPrefix returns the longest byte prefix shared by all strings.
+// It returns an empty string when strs is empty.
+func LongestCommonPrefix(strs []string) string {
+	if len(strs) == 0 {
+		return ""
+	}
+
+	for column := 0; column < len(strs[0]); column++ {
+		expected := strs[0][column]
+		for row := 1; row < len(strs); row++ {
+			if column >= len(strs[row]) || strs[row][column] != expected {
+				return strs[0][:column]
+			}
+		}
+	}
+	return strs[0]
+}
+```
+
+Concrete cases to test include the `"flower"` example; `["dog","racecar"]`
+producing `""`; `["ab","a"]` producing `"a"`; identical strings; one
+string; an empty first or later string; and no strings.
+
+#### Work and memory
+
+If the first string has `m` bytes and there are `n` strings, the worst case
+does `O(n*m)` byte comparisons. A mismatch can return earlier, including in
+constant time at the first column. The function uses `O(1)` auxiliary memory.
+The returned substring reuses the first string's bytes rather than allocating
+a copied result.
+
+#### When to use it
+
+Use this implementation when byte-prefix equality is the contract, all strings
+must participate, and returning a substring of the first input is acceptable.
+
+#### When not to use it
+
+Do not use byte columns when the task defines positions as Unicode code points
+or visible symbols; use the representation described in [D.6](#d6-bytes-runes-and-visible-characters).
+A trie may be more useful when many changing queries share a large stored
+dictionary.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Reading `strs[row][column]` before checking
+> `column < len(strs[row])` panics for `["ab","a"]` at column 1.
+
+Guard empty input before reading `strs[0]`. The first string may be the shortest
+without being specially selected. Byte slicing can split a multi-byte UTF-8
+encoding if a different string disagrees inside that encoding, which is why
+the byte contract must be explicit.
+
+#### Related material
+
+- [C.1.3.1 Compare from the left (common-prefix scan)](#common-prefix-scan)
+  owns the method and its invariant.
+- [D.6 Bytes, runes, and visible characters](#d6-bytes-runes-and-visible-characters)
+  explains how to choose the unit of comparison.
+- [Longest Common Prefix](../problems/solved_easy_leetcode_0014_longest_common_prefix.go)
+  is the representative problem.
+
+<a id="d8-directional-scan"></a>
+
+### E.8 Directional scan
+
+#### The problem it solves
+
+Apply a local signed-sum rule in which each value is subtracted when it is
+smaller than its immediate right neighbor and added otherwise. Each decision
+needs only one neighbor, but that neighbor must remain the original adjacent
+value rather than the running total.
+
+#### The idea in simple terms
+
+Start at the right edge, whose value is always added, and carry that original
+value one position left at a time. A pass whose direction makes needed context
+available is a **directional scan**. Here `rightValue` holds exactly the
+neighbor needed for the next comparison.
+
+#### How it works
+
+The running total must fit in `int`.
+
+1. Return zero for empty input.
+2. Initialize `total` and `rightValue` from the final value.
+3. Move `index` from the next-to-last position toward zero.
+4. Subtract `value` when `value < rightValue`; otherwise add it.
+5. Set `rightValue=value` so the next iteration sees its immediate original
+   neighbor.
+
+#### Step-by-step examples
+
+For `values=[3,4,2]`, the expected result is `3` because the signed expression
+is `-3+4+2`.
+
+1. **Step: Establish the right edge**
+   - **Before:** `last=2`, no total yet.
+   - **Decision:** The last value has no right neighbor, so add it.
+   - **After:** `total=2`, `rightValue=2`.
+   - **Known correct:** Index 2 has its final contribution.
+2. **Step: Visit index 1**
+   - **Before:** `value=4`, `rightValue=2`, `total=2`.
+   - **Decision:** `4` is not smaller than 2, so add it.
+   - **After:** `total=6`, `rightValue=4`.
+   - **Known correct:** Indices 1 and 2 have their final contributions, and
+     `rightValue` is the original value at index 1.
+3. **Step: Visit index 0**
+   - **Before:** `value=3`, `rightValue=4`, `total=6`.
+   - **Decision:** `3 < 4`, so subtract it.
+   - **After:** `total=3`, `rightValue=3`; return `3`.
+   - **Known correct:** Every index was classified against its immediate
+     original right neighbor.
+
+For empty input, the result is zero. For `values=[7]`, initialization produces
+`total=7`, the loop performs no iterations, and the result is 7.
+
+#### Why it works
+
+Before each loop iteration, `total` contains the final signed contributions of
+all positions to the right of `index`, and `rightValue` is exactly the original
+value at `index+1`. The comparison therefore applies the required local rule
+to the current position. Assigning `rightValue=value` establishes the same
+fact one position farther left. The index decreases to zero, so all positions
+are processed once and the final sum follows the rule.
+
+#### Go example
+
+```go
+package directionalscan
+
+// SumWithSmallerLeftValuesSubtracted applies a local signed-sum rule: a value
+// is subtracted when it is smaller than its immediate right neighbor and added
+// otherwise. The running total must fit in an int.
+func SumWithSmallerLeftValuesSubtracted(values []int) int {
+	if len(values) == 0 {
+		return 0
+	}
+
+	last := len(values) - 1
+	total := values[last]
+	rightValue := values[last]
+
+	for index := last - 1; index >= 0; index-- {
+		value := values[index]
+		if value < rightValue {
+			total -= value
+		} else {
+			total += value
+		}
+		rightValue = value
+	}
+
+	return total
+}
+```
+
+Concrete cases to test are `[] -> 0`, `[7] -> 7`, `[5,4,3] -> 12`,
+`[3,4] -> 1`, and `[3,4,2] -> 3`, plus values near the accepted integer
+limits to enforce the no-overflow contract.
+
+#### Work and memory
+
+The function visits each of `n` values once, so it takes `O(n)` time; empty and
+single inputs are still within that bound. It stores a fixed number of
+integers, uses `O(1)` auxiliary memory, and makes no allocations.
+
+#### When to use it
+
+Use a directional scan when each decision depends on a fixed nearby value that
+can be carried from one position to the next and the output can be accumulated
+without retaining all intermediate states.
+
+#### When not to use it
+
+Do not use this exact local rule for encodings whose subtraction decision
+depends on a larger token or on a reduced value to the right. Use explicit
+parsing state when several prior symbols determine one unit.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Assigning `rightValue=total` compares the next value with an
+> accumulated sum instead of its neighbor. For `[3,4,2]`, that mistake can
+> classify index 0 against 6 rather than 4.
+
+Handle empty input before calculating `len(values)-1`. State what happens at
+the last item. Check equality explicitly through the contract: equal adjacent
+values are added because only a strictly smaller left value is subtracted.
+
+#### Related material
+
+- [C.1.3.2 Process the needed neighbor first (directional scan)](#directional-scan)
+  owns method selection and direction choice.
+- [A.2 Correctness and invariants](#a2-correctness-and-invariants) explains
+  the maintained `rightValue` fact.
+- [Roman to Integer](../problems/solved_easy_leetcode_0013_roman_to_integer.go)
+  uses a related right-neighbor decision under Roman-numeral input rules.
+
+<a id="d9-sorted-two-pointer-pair-search"></a>
+
+### E.9 Sorted two-pointer pair search
+
+#### The problem it solves
+
+Find two distinct positions in an ascending sorted integer slice whose values
+sum to a target, using no map. A full pair-by-pair search does quadratic work
+even though the ordering can rule out many pairs at once.
+
+#### The idea in simple terms
+
+Place one pointer at each end. If their sum is too small, only a larger left
+value can help; if it is too large, only a smaller right value can help. Moving
+the two boundary positions inward is the **two-pointer** method for this sorted
+pair search.
+
+#### How it works
+
+The values must be sorted in ascending order, and every evaluated sum must fit
+in `int`.
+
+1. Set `left=0` and `right=len(values)-1`.
+2. While `left < right`, compare `values[left]+values[right]` with `target`.
+3. Increment `left` when the sum is too small; decrement `right` when it is too
+   large.
+4. Return both indexes on equality. If the pointers meet without equality,
+   return `false`.
+
+#### Step-by-step examples
+
+For `values=[-3,1,2,5,8]` and `target=7`, the expected result is
+`(2,3,true)`.
+
+1. **Step: Check indexes 0 and 4**
+   - **Before:** `left=0`, `right=4`, sum `-3+8=5`.
+   - **Decision:** The sum is too small, so increment `left`.
+   - **After:** Candidate range is indexes 1 through 4.
+   - **Known correct:** Index 0 cannot pair with any remaining value because 8
+     was already its largest possible partner.
+2. **Step: Check indexes 1 and 4**
+   - **Before:** Sum `1+8=9`.
+   - **Decision:** The sum is too large, so decrement `right`.
+   - **After:** Candidate range is indexes 1 through 3.
+   - **Known correct:** Index 4 cannot pair with any remaining value because 1
+     was already its smallest possible partner.
+3. **Step: Check indexes 1 and 3**
+   - **Before:** Sum `1+5=6`.
+   - **Decision:** The sum is too small; increment `left`.
+   - **After:** `left=2`, `right=3`.
+   - **Known correct:** Index 1 has no valid remaining partner.
+4. **Step: Check indexes 2 and 3**
+   - **Before:** Sum `2+5=7`.
+   - **Decision:** The sum equals the target.
+   - **After:** Return `(2,3,true)`.
+   - **Known correct:** The positions are distinct and their values sum to 7.
+
+For `values=[4]`, `target=8`, `left=0` and `right=0`, so the loop never runs
+and returns `false`; one position cannot be used twice. Empty input also
+returns `false` without indexing the slice.
+
+#### Why it works
+
+If the current sum is too small, pairing `values[left]` with any index below
+`right` can only make the sum no larger, so discarding `left` cannot remove a
+solution. The symmetric argument safely discards `right` when the sum is too
+large. Thus every move preserves any possible solution inside the remaining
+range. One pointer moves on every unsuccessful iteration, so they eventually
+meet or a valid pair is returned.
+
+#### Go example
+
+```go
+package twopointers
+
+// PairSumSorted returns indices of two values whose sum equals target. Values
+// must be sorted in ascending order, and relevant sums must fit in an int.
+func PairSumSorted(values []int, target int) (left int, right int, ok bool) {
+	left, right = 0, len(values)-1
+	for left < right {
+		sum := values[left] + values[right]
+		switch {
+		case sum < target:
+			left++
+		case sum > target:
+			right--
+		default:
+			return left, right, true
+		}
+	}
+
+	return 0, 0, false
+}
+```
+
+Concrete cases to test include the negative-value trace above;
+`[1,2,4,6],8 -> (1,3,true)`; `[4],8 -> false`; `[1,2,3],7 -> false`; duplicate
+values such as `[3,3],6`; and empty input.
+
+#### Work and memory
+
+Each unsuccessful iteration moves one pointer inward, so there are at most
+`n-1` iterations and `O(n)` time. An early match may take `O(1)` actual time.
+The function uses `O(1)` auxiliary memory and makes no allocations. Sorting an
+unsorted input first would add the sorting time and any copy required to
+preserve caller order.
+
+#### When to use it
+
+Use this implementation when the values are already sorted, one matching pair
+is enough, and constant auxiliary memory or ordered elimination is preferable
+to a map.
+
+#### When not to use it
+
+Do not apply it directly to unsorted values. Sorting may also be wrong when
+the original indices must be returned and are not carried through the sort;
+the map implementation in [E.3](#e3-hash-map-complement-lookup) preserves
+those indexes in one pass.
+
+#### Common mistakes and edge cases
+
+> **Warning:** Using `left <= right` allows one position to pair with itself.
+> For `[4]`, target 8 would incorrectly succeed; require `left < right`.
+
+The ordering proof fails if the slice is descending or unsorted. Include
+duplicates, negative values, empty input, and missing pairs in tests. Widen or
+validate addition when two accepted `int` values might overflow.
+
+#### Related material
+
+- [C.1.3.9 Move coordinated positions (two pointers)](#two-pointers)
+  owns the elimination proof and related forms.
+- [E.3 Hash-map complement lookup](#e3-hash-map-complement-lookup) is the
+  unsorted one-pass alternative.
+- [D.3 Sorting without unexpected mutation](#d3-sorting-without-unexpected-mutation)
+  explains the cost of preparing an unsorted input without reordering it.
+
+<a id="f-further-study-checklist"></a>
+
+## F. Further study
 
 The material above covers the reusable concepts emphasized by the repository's
-problem set and contemporary general interview-preparation lists. Lower-priority
-extensions for specialized interviews include strongly connected components,
-all-pairs shortest paths, maximum flow, suffix arrays and suffix automata,
-computational geometry beyond normalized slopes, and randomized balanced search
-trees. These names are pointers for later study, not concepts assumed by this
-guide. Learn them when a target role, contest, or interview loop calls for them;
-they are not prerequisites for the core patterns above.
+problem set and contemporary general interview-preparation lists. The topics
+below are later extensions, not prerequisites for the core methods in this
+guide. Study one when a target role, contest, or interview loop calls for it:
+
+- **Strongly connected components** divide a directed graph into largest
+  groups in which every node can reach every other node. Start with
+  [depth-first search](#c1320-depth-first-search) and graph direction in
+  [graphs and grids](#b5-graphs-and-grids).
+- **All-pairs shortest paths** find the cheapest route for every start-and-end
+  pair, instead of routes from one start. Compare repeated
+  [Dijkstra searches](#c1323-dijkstra-shortest-paths) with reusing smaller
+  answers through [dynamic programming](#c1310-dynamic-programming).
+- **Maximum flow** asks how much material can travel from a source to a
+  destination when every directed connection has a capacity. Its starting
+  point is the adjacency representation in
+  [graphs and grids](#b5-graphs-and-grids).
+- **Suffix arrays and suffix automata** organize all endings of a string, or
+  remembered text states, so repeated substring questions can be answered
+  quickly. Begin with [string matching](#c137-string-matching) and
+  [parsing state](#c138-parsing-and-state-machines).
+- **Computational geometry beyond normalized slopes** uses exact orientation,
+  intersection, and boundary tests to reason about points and shapes. The
+  prerequisite is [exact slopes without rounding](#a63-exact-slopes-without-rounding).
+- **Randomized balanced search trees** keep ordered values while random
+  priorities make long one-sided shapes unlikely, giving expected logarithmic
+  search and update work. Compare [binary-search-tree ordering](#b41-terminology-and-search)
+  with [heap priorities](#c1327-heap-or-priority-queue).
