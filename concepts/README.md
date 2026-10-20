@@ -5,11 +5,71 @@ in Go. It explains what each idea is, when it helps, why it works, and what it
 costs to run. The problem archives contain complete judge solutions; this guide
 teaches the ideas that those solutions reuse.
 
+## Contents
+
+- [Contemporary interview evidence](#contemporary-interview-evidence)
+- [A. Foundations](#a-foundations)
+  - [A.1 Complexity and resource accounting](#a1-complexity-and-resource-accounting)
+  - [A.2 Correctness and invariants](#a2-correctness-and-invariants)
+  - [A.3 Recursion and saved work](#a3-recursion-and-saved-work)
+  - [A.4 Integer limits and bits](#a4-integer-limits-and-bits)
+  - [A.5 Bit manipulation](#a5-bit-manipulation)
+  - [A.6 Keeping arithmetic values exact and
+    consistent](#a6-keeping-arithmetic-values-exact-and-consistent)
+  - [A.7 Combinatorics and output size](#a7-combinatorics-and-output-size)
+  - [A.8 Integer digit processing](#a8-integer-digit-processing)
+- [B. Data structures](#b-data-structures)
+  - [B.1 Arrays, slices, and strings](#b1-arrays-slices-and-strings)
+  - [B.2 Linked lists](#b2-linked-lists)
+  - [B.3 Queues and deques](#b3-queues-and-deques)
+  - [B.4 Trees and binary-search trees](#b4-trees-and-binary-search-trees)
+  - [B.5 Graphs and grids](#b5-graphs-and-grids)
+  - [B.6 Matrix traversal and in-place state](#b6-matrix-traversal-and-in-place-state)
+  - [B.7 Composing data structures](#b7-composing-data-structures)
+  - [B.8 Streaming and online processing](#b8-streaming-and-online-processing)
+  - [B.9 Choosing a structure](#b9-choosing-a-structure)
+- [C. Problem-solving patterns](#c-problem-solving-patterns)
+  - [C.1 Problem-solving method selection guide](#c1-problem-solving-method-selection-guide)
+    - [C.1.1 Quick decision tree](#c11-quick-decision-tree)
+    - [C.1.2 Derive a direction before naming a
+      pattern](#c12-derive-a-direction-before-naming-a-pattern)
+    - [C.1.3 Pattern cards](#c13-pattern-cards)
+    - [C.1.4 Choosing among overlapping methods](#c14-choosing-among-overlapping-methods)
+    - [C.1.5 Let constraints eliminate bad choices](#c15-let-constraints-eliminate-bad-choices)
+    - [C.1.6 Before committing to a method](#c16-before-committing-to-a-method)
+- [D. Go reference implementations](#d-go-reference-implementations)
+  - [D.1 Binary search bounds](#d1-binary-search-bounds)
+  - [D.2 Rolling dynamic programming](#d2-rolling-dynamic-programming)
+  - [D.3 Hash-map complement lookup](#d3-hash-map-complement-lookup)
+  - [D.4 Generic singly linked list](#d4-generic-singly-linked-list)
+  - [D.5 Generic stack](#d5-generic-stack)
+  - [D.6 Overflow-safe integer reversal](#d6-overflow-safe-integer-reversal)
+  - [D.7 Common-prefix scan](#d7-common-prefix-scan)
+  - [D.8 Directional scan](#d8-directional-scan)
+  - [D.9 Sorted two-pointer pair search](#d9-sorted-two-pointer-pair-search)
+- [E. Go techniques](#e-go-techniques)
+  - [E.1 Keep input conversion outside the
+    algorithm](#e1-keep-input-conversion-outside-the-algorithm)
+  - [E.2 Table-driven tests](#e2-table-driven-tests)
+  - [E.3 Sorting without unexpected mutation](#e3-sorting-without-unexpected-mutation)
+  - [E.4 Map presence and sets](#e4-map-presence-and-sets)
+  - [E.5 Priority queues](#e5-priority-queues)
+  - [E.6 Bytes, runes, and visible characters](#e6-bytes-runes-and-visible-characters)
+  - [E.7 Type parameters](#e7-type-parameters)
+  - [E.8 Replacing recursion with a loop](#e8-replacing-recursion-with-a-loop)
+  - [E.9 Slice storage and retained memory](#e9-slice-storage-and-retained-memory)
+- [F. Further-study checklist](#f-further-study-checklist)
+
 Use the book in two directions:
 
-- When starting a problem, begin with [method selection](#problem-solving-method-selection-guide).
+- When starting a problem, begin with
+  [method selection](#c1-problem-solving-method-selection-guide).
 - When studying, read foundations first, then data structures, patterns, and
   the preserved Go reference implementations.
+
+Main parts use letters, and nested sections add numbers. For example, `C`
+identifies Problem-Solving Patterns, `C.1` identifies its method-selection
+guide, and `C.1.3` identifies the pattern-card collection within that guide.
 
 Technical names such as **binary search** and **dynamic programming** are kept
 because they are the names used in problems, documentation, and interviews.
@@ -73,19 +133,9 @@ therefore incorporates only repeated, transferable signals:
 Exact company question banks change and are often confidential. Use company
 tags to choose practice inputs, not as a substitute for the concepts below.
 
-## Contents
+## A. Foundations
 
-- [Contemporary interview evidence](#contemporary-interview-evidence)
-- [Foundations](#foundations)
-- [Data structures](#data-structures)
-- [Problem-solving patterns](#problem-solving-patterns)
-- [Go reference implementations](#go-reference-implementations)
-- [Go techniques](#go-techniques)
-- [Further-study checklist](#further-study-checklist)
-
-## Foundations
-
-### Complexity and resource accounting
+### A.1 Complexity and resource accounting
 
 Let `n` mean the amount of input, such as the number of values in a slice.
 **Time complexity** describes how quickly the work grows when `n` grows.
@@ -123,7 +173,7 @@ A halving search needs at most about 10 decisions because `2^10 = 1,024`.
 Examining every ordered pair can approach 1,048,576 comparisons. Big-O ignores
 small implementation details so these growth differences remain visible.
 
-### Correctness and invariants
+### A.2 Correctness and invariants
 
 An **invariant** is simply a fact the algorithm keeps true while it runs. For
 example, in a left-to-right scan, "everything before the current position has
@@ -150,7 +200,7 @@ Before every step, `values[:write]` contains exactly the non-zero values already
 seen: first `[]`, then `[5]`, and finally `[5, 2]`. The invariant explains both
 why no non-zero value is lost and why their original order is preserved.
 
-### Recursion and saved work
+### A.3 Recursion and saved work
 
 **Recursion** means that a function calls itself to solve a smaller part of the
 same problem. Every unfinished call must remember its arguments, local values,
@@ -170,7 +220,7 @@ the waiting calls finish in reverse order: `2`, then `6`, then `24`. There are
 four nested calls, so the call stack uses `O(n)` extra memory even though the
 function creates no explicit collection.
 
-### Integer limits and bits
+### A.4 Integer limits and bits
 
 An integer type can store only a limited range of values. **Overflow** happens
 when arithmetic tries to go outside that range. Check before performing a
@@ -179,7 +229,7 @@ the next multiplication and addition would be too large. When working with
 binary digits, first decide whether negative values are allowed and how many
 bits the type stores; shifting and masking use exactly that representation.
 
-### Bit manipulation
+### A.5 Bit manipulation
 
 Bits are useful when each position is an independent yes/no flag, the input is
 defined as a fixed-width binary value, or an arithmetic identity lets many
@@ -230,7 +280,7 @@ Counting set bits with `x &= x - 1` takes one pass per set bit. Scanning a fixed
 32- or 64-bit word takes constant time with respect to ordinary input length,
 but state the width rather than calling the work universally free.
 
-### Keeping arithmetic values exact and consistent
+### A.6 Keeping arithmetic values exact and consistent
 
 Two arithmetic mistakes appear often in interview solutions:
 
@@ -248,7 +298,7 @@ comparison possible without relying on rounded decimal values.
 as `2/4`. Before filing the values, rewrite both labels as `1/2`. Then equal
 amounts always go into the same drawer.
 
-#### Shared divisors and multiples (GCD and LCM)
+#### A.6.1 Shared divisors and multiples (GCD and LCM)
 
 The **greatest common divisor (GCD)** is the largest positive integer that
 divides two values. Euclid's algorithm finds it by repeatedly replacing
@@ -267,7 +317,7 @@ reduces the chance of overflow, but the final result can still be too large for
 the integer type. If either value is zero, return an LCM of zero before using
 the formula. For negative inputs, use their non-negative magnitudes.
 
-#### Fractions and ratios
+#### A.6.2 Fractions and ratios
 
 For a fraction stored as `(numerator, denominator)`:
 
@@ -283,7 +333,7 @@ equal fractions now produce equal keys.
 A zero denominator is invalid and must not reach the division step. A zero
 numerator with a non-zero denominator should become `(0, 1)`.
 
-#### Grouping points on the same line without rounding
+#### A.6.3 Grouping points on the same line without rounding
 
 Pick one point as the starting point. For every other point, calculate the
 horizontal and vertical movement in the usual `(x, y)` order:
@@ -326,7 +376,7 @@ Using reduced integer pairs avoids decimal rounding. More importantly, it
 guarantees that every movement along the same line produces exactly the same
 map key.
 
-#### Remainders and division with negative values
+#### A.6.4 Remainders and division with negative values
 
 In Go, `%` keeps the sign of the number on its left. Therefore `-1 % 5` is
 `-1`, not `4`. When a problem requires a result from `0` through `m-1` for a
@@ -347,7 +397,7 @@ Go integer division drops the fractional part toward zero. Thus `-7 / 3` is
 Read the problem's rounding rule before using integer division with negative
 values.
 
-#### Counting trailing zeroes without calculating a factorial
+#### A.6.5 Counting trailing zeroes without calculating a factorial
 
 `n!`, read as "n factorial," means multiplying every whole number from `1` to
 `n`. For example:
@@ -413,7 +463,7 @@ there are no more to count.
 The loop uses `O(1)` auxiliary space. It takes `O(log n)` time because every
 iteration makes `remaining` five times smaller.
 
-#### Finding factors and primes
+#### A.6.6 Finding factors and primes
 
 When testing whether one number is prime, trial division only needs candidates
 up to its square root. Any factor larger than the square root must be paired
@@ -429,7 +479,7 @@ because it filters out non-prime numbers.
 When many questions ask which values up to the same limit are prime, a sieve is
 usually faster than repeating trial division for every value.
 
-#### Processing a number that does not fit in an integer type
+#### A.6.7 Processing a number that does not fit in an integer type
 
 Keep a huge integer as text and process one digit at a time. To find its
 remainder after division by a positive integer `m`, start with remainder zero
@@ -451,7 +501,7 @@ The shared rule is simple: decide what values count as equal, choose one exact
 representation for them, and check that each intermediate calculation fits in
 its integer type.
 
-### Combinatorics and output size
+### A.7 Combinatorics and output size
 
 **Combinatorics** is the study of counting choices. Before writing an algorithm
 that generates choices, first estimate how many answers it may have to return.
@@ -485,7 +535,7 @@ values, so storing all of them takes `O(k * C(n, k))` output space. "Extra
 space" may still be smaller because it normally excludes the required returned
 output.
 
-#### Counting combinations without large factorials
+#### A.7.1 Counting combinations without large factorials
 
 The mathematical formula is:
 
@@ -523,23 +573,50 @@ The division is exact after each complete step. The assignment
 same counting problem as choosing the three values to leave out:
 `C(5, 2) = C(5, 3)`. Using the smaller side means fewer loop iterations.
 
-Another option is **Pascal's recurrence**:
+Another option is **Pascal's recurrence**, which expresses one combination
+count in terms of two smaller combination counts:
 
 ```text
 C(n, k) = C(n-1, k-1) + C(n-1, k)
 ```
 
-Pick one particular value. Every valid group either includes it or does not:
+To see why it works, mark one particular value among the `n` values. Every
+size-`k` group belongs to exactly one of two non-overlapping cases:
 
-- If the group includes it, choose the remaining `k-1` values from the other
-  `n-1` values: `C(n-1, k-1)` possibilities.
-- If the group excludes it, choose all `k` values from the other `n-1` values:
-  `C(n-1, k)` possibilities.
+- The group **includes** the marked value. That value already fills one place,
+  so choose the remaining `k-1` values from the other `n-1` values. This gives
+  `C(n-1, k-1)` groups.
+- The group **excludes** the marked value. All `k` places must then be chosen
+  from the other `n-1` values. This gives `C(n-1, k)` groups.
 
-For example, `C(5, 2) = C(4, 1) + C(4, 2) = 4 + 6 = 10`. This rule is the
-source of Pascal's triangle and is useful when dynamic programming needs many
-combination counts, not just one. The [dynamic programming](#dynamic-programming)
-card explains that method.
+These cases cover every valid group and cannot overlap, so their counts add.
+For example, choose two values from `[A, B, C, D, E]` and mark `E`:
+
+```text
+includes E: [A,E] [B,E] [C,E] [D,E]       -> C(4, 1) = 4
+excludes E: [A,B] [A,C] [A,D] [B,C] [B,D] [C,D] -> C(4, 2) = 6
+```
+
+Therefore, `C(5, 2) = C(4, 1) + C(4, 2) = 4 + 6 = 10`.
+
+The recurrence stops at the boundary cases `C(n, 0) = 1` and `C(n, n) = 1`:
+there is exactly one way to choose nothing and exactly one way to choose
+everything. Starting with those boundaries, each interior value is the sum of
+the two values above it:
+
+```text
+            1
+          1   1
+        1   2   1
+      1   3   3   1
+    1   4   6   4   1
+```
+
+That construction is Pascal's triangle. It is especially useful with dynamic
+programming when many combination counts are needed, because a row can be
+built from the preceding row instead of recomputing each count independently.
+The [dynamic programming](#c1310-dynamic-programming) card explains that general
+method.
 
 Both methods can still overflow. In the loop, even `result * nextFactor` can
 overflow before the following division reduces it. Check multiplication and
@@ -549,7 +626,7 @@ store integers that grow as needed. Another implementation can cancel common
 factors in the numerator and denominator before multiplying, but that is an
 additional optimization rather than part of the basic counting idea.
 
-#### Repeated input values
+#### A.7.2 Repeated input values
 
 When values repeat, clarify what counts as a different answer. For the labeled
 positions `[1a, 1b, 2]`, choosing two positions gives three choices:
@@ -560,13 +637,15 @@ the last two both become `[1,2]`, so the distinct value combinations are only
 To generate each value combination once, sort the input and build one answer a
 choice at a time. When choosing a value for the same output position, skip an
 equal value already tried there. This is a common
-[backtracking](#backtracking) technique. Do not skip the equal value at the
+[backtracking](#c1319-backtracking) technique. Do not skip the equal value at the
 next output position: after choosing the first `1`, the second `1` must remain
 available so `[1,1]` can be formed.
 
-### Integer Digit Processing
+<a id="integer-digit-processing"></a>
 
-#### Mental model
+### A.8 Integer Digit Processing
+
+#### A.8.1 Mental model
 
 An integer's decimal digits can be removed from right to left without first
 turning the number into text:
@@ -577,7 +656,7 @@ turning the number into text:
 
 For example, `123 % 10` is `3`, and `123 / 10` is `12`.
 
-#### Worked example: reversing digits
+#### A.8.2 Worked example: reversing digits
 
 To move each extracted digit into a new integer:
 
@@ -596,13 +675,13 @@ Starting with `value = 120` and `reversed = 0`:
 
 The result is `21`, not `021`, because an integer does not store leading zeroes.
 
-#### Invariant (fact that remains true)
+#### A.8.3 Invariant (fact that remains true)
 
 After `k` passes, `value` is the original number with its final `k` digits
 removed. `reversed` contains those removed digits in the opposite order. When
 `value` reaches zero, every digit has moved.
 
-#### Preventing integer overflow
+#### A.8.4 Preventing integer overflow
 
 Multiplying by `10` may exceed the largest value the integer type can hold.
 Before calculating `reversed*10 + digit`, check:
@@ -621,21 +700,21 @@ performing the unsafe calculation.
 Negative inputs need an explicit rule because the minus sign is not a digit.
 `ReverseNonNegative` rejects them and accepts zero.
 
-#### Work and memory
+#### A.8.5 Work and memory
 
 For a number with `d` digits, the loop performs `d` passes, so it uses `O(d)`
 work. It stores only the current digit and two integers, so it uses `O(1)` extra
 memory.
 
-#### Related problems
+#### A.8.6 Related problems
 
 - [LeetCode 9: Palindrome Number](../problems/solved_easy_leetcode_0009_palindrome_number.go)
   compares a full reversal with the original number and also shows how reversing
   only half of the digits can prove the same result.
 
-## Data structures
+## B. Data structures
 
-### Arrays, slices, and strings
+### B.1 Arrays, slices, and strings
 
 An array stores a fixed number of values. A slice gives access to some or all
 of an array.
@@ -662,7 +741,7 @@ longer needed.
 
 A Go string is a read-only sequence of bytes. Reading `text[i]` returns one
 byte, which is not always a complete Unicode character. The
-[bytes, runes, and visible characters](#bytes-runes-and-visible-characters)
+[bytes, runes, and visible characters](#e6-bytes-runes-and-visible-characters)
 section explains how to choose the intended text unit.
 
 Arrays also provide an addressable position for every value. When values are
@@ -673,7 +752,7 @@ value `0` appears zero times, value `1` once, and value `2` twice. This is often
 simpler than a map, but it is safe only when every value is a valid slice
 position. Negative or unexpectedly large values would cause an invalid access.
 
-#### Moving values in place
+#### B.1.1 Moving values in place
 
 An algorithm works **in place** when it rearranges the input's existing
 storage instead of creating another collection of similar size. Common forms
@@ -699,9 +778,11 @@ values greater than it. A fourth region contains values not yet classified.
 After every swap, one classified region must grow and the unclassified region
 must shrink; otherwise an item may be skipped or processed forever.
 
-### Linked Lists
+<a id="linked-lists"></a>
 
-#### Mental model
+### B.2 Linked Lists
+
+#### B.2.1 Mental model
 
 A singly linked list is a chain of nodes. Each node stores one value and a link
 to the next node. The first node is the **head**; a `nil` next link marks the
@@ -711,14 +792,14 @@ Unlike an array, a linked list cannot jump directly to position `i`. Reaching a
 position requires following links from the head. In exchange, code can reconnect
 known nodes without shifting every later value.
 
-#### Core operations
+#### B.2.2 Core operations
 
 - `FromSlice` builds a list in the slice's order.
 - `ToSlice` follows links from the head and collects the values.
 - `Reverse` changes every next link so the chain points in the opposite
   direction.
 
-#### Worked example: reversing a list
+#### B.2.3 Worked example: reversing a list
 
 Reverse `1 -> 2 -> 3 -> nil` while keeping three positions:
 
@@ -734,7 +815,7 @@ Reverse `1 -> 2 -> 3 -> nil` while keeping three positions:
 Saving the next node before changing the link is essential; otherwise the
 unvisited remainder of the list is lost.
 
-#### Invariants (facts that remain true)
+#### B.2.4 Invariants (facts that remain true)
 
 - Following `Next` from the head visits nodes in list order and eventually
   reaches `nil` when the list contains no loop.
@@ -743,20 +824,23 @@ unvisited remainder of the list is lost.
 - During reversal, `previous` is the already reversed portion and `current` is
   the first node not yet reversed.
 
-#### Common techniques
+#### B.2.5 Common techniques
 
 - A **dummy head** is a temporary node placed before the real first node. It
   avoids separate code for inserting or replacing the head.
 - Two positions can advance independently when input lists have different
   lengths.
-- [Fast and slow positions](#fast-and-slow-pointers) can detect a loop or
+- [Fast and slow positions](#c1332-fast-and-slow-pointers) can detect a loop or
   locate the middle by moving one position one link per step and the other two.
-- For numbers stored with the lowest digit first, add matching nodes and carry
-  `sum / 10` to the next position; the current output digit is `sum % 10`.
-  For example, adding digit nodes `8` and `7` produces output digit `5` and
-  carry `1` because `15 % 10 = 5` and `15 / 10 = 1`.
+- When each node stores one decimal digit and the ones digit comes first, the
+  head nodes represent the ones place, the next nodes represent the tens place,
+  and so on. At each place, add both digits and any carry from the previous
+  place. Append `sum % 10` as the result digit, then carry `sum / 10` to the
+  next place. For example, `8 + 7 = 15`, so append `5` in the current place and
+  carry `1` into the next place. After both lists end, append any remaining
+  carry.
 
-#### Work and memory
+#### B.2.6 Work and memory
 
 | Operation | Work | Extra memory |
 | --- | --- | --- |
@@ -769,7 +853,7 @@ These memory amounts do not count nodes required for a returned result. A
 version that uses nested function calls can also keep as many as `n` unfinished
 calls in memory.
 
-#### Common mistakes
+#### B.2.7 Common mistakes
 
 - Save `node.Next` before replacing it during reversal.
 - Make loop conditions handle an empty list and a one-node list.
@@ -779,12 +863,12 @@ calls in memory.
   node.
 - Prefer a loop when a list may be too long for deeply nested function calls.
 
-#### Related problems
+#### B.2.8 Related problems
 
 - [LeetCode 2: Add Two Numbers](../problems/solved_easy_leetcode_0002_add_two_numbers.go)
 - [LeetCode 21: Merge Two Sorted Lists](../problems/solved_easy_leetcode_0021_merge_two_sorted_lists.go)
 
-### Queues and deques
+### B.3 Queues and deques
 
 A **queue** processes the oldest waiting item first: add at the back and remove
 from the front. This first-in, first-out order is what makes breadth-first
@@ -811,23 +895,63 @@ for head := 0; head < len(queue); head++ {
 }
 ```
 
-Across the whole traversal, this gives constant average work per addition and
-removal even though an occasional append may need to copy the slice. This way
-of averaging the cost over a sequence is called **amortized analysis**. A
-long-lived queue should occasionally compact its unread portion or use a
-**circular buffer**, which reuses positions by wrapping from the end of a fixed
-slice back to its beginning. Retaining `queue[head:]` can otherwise keep the
-entire old backing array alive. Clear removed positions when they contain
-pointers so Go's automatic memory manager, called the **garbage collector**,
-can reclaim objects no longer in use.
+Keeping a `head` index makes removal cheap: move the index forward instead of
+moving every remaining item. Adding an item is also usually cheap. Sometimes
+the slice runs out of room, so Go must make a larger storage area and copy the
+existing items into it. That one addition takes longer, but the new storage has
+room for many more cheap additions before another copy is needed.
 
-A queue built from two stacks illustrates the same idea. New items go onto an
-input stack. Removal uses an output stack; only when that stack is empty are all
-input items moved to it. One removal can cost `O(n)`, but each item moves
-between stacks at most once, so a sequence of operations costs `O(1)` amortized
-time per operation.
+**Amortized analysis** is a way to spread the cost of a rare expensive step
+across the many cheap steps around it.
 
-### Trees and binary-search trees
+**ELI5:** Imagine putting one coin in a jar every time an operation is cheap.
+When an expensive operation happens, the saved coins pay for it. If the jar
+always has enough coins, the expensive operation cannot be happening too
+often. The cost stays small when the whole series of operations is considered.
+
+A queue made from two stacks gives a concrete example. In the table, the
+rightmost value is at the top of its stack and would be removed first:
+
+| Action | Input stack afterward | Output stack afterward | Returned value |
+| --- | --- | --- | --- |
+| Add `A` | `[A]` | `[]` | - |
+| Add `B` | `[A, B]` | `[]` | - |
+| Add `C` | `[A, B, C]` | `[]` | - |
+| Remove | `[]` | `[C, B]` | `A` |
+| Add `D` | `[D]` | `[C, B]` | - |
+| Remove | `[D]` | `[C]` | `B` |
+| Remove | `[D]` | `[]` | `C` |
+| Remove | `[]` | `[]` | `D` |
+
+The first removal finds the output stack empty. It moves `C`, `B`, and `A`
+there, then removes `A`. This is the expensive step. Adding `D` afterward only
+puts `D` into the input stack; it does not move `C` and `B` back. Those older
+items leave the output stack first. Only when the final removal finds the
+output stack empty does it move `D` across.
+
+The complete rule is simple: add only to the input stack, remove only from the
+output stack, and move items from input to output only when a removal finds the
+output stack empty. Items never move in the other direction.
+
+The important fact is that each item is added once, moved between stacks at
+most once, and removed once. No item keeps moving back and forth. Even if the
+queue handles millions of items, each item causes only this small amount of
+work.
+
+This is why the queue takes **`O(1)` amortized time per operation**: the total
+work grows at the same rate as the number of operations. It does **not** mean
+that every individual operation is fast. The removal that moves all `n` items
+still takes `O(n)` time by itself. Amortized analysis promises that such slow
+operations cannot happen often enough to make the whole series slow; it is not
+a guess about what usually happens.
+
+Time and memory are separate concerns. Moving `head` forward does not
+immediately free the slice's old storage. A queue kept for a long time should
+occasionally copy its unread items into a fresh slice or use a **circular
+buffer**, which reuses old positions. When the slice contains pointers, clear
+removed positions so Go can free objects that are no longer used.
+
+### B.4 Trees and binary-search trees
 
 A tree is a collection of nodes joined by links with no loop and exactly one
 route between any two nodes. A **rooted** tree chooses one node as its starting
@@ -907,13 +1031,13 @@ uniqueness rule because repeated values can describe more than one tree.
 A rooted tree may need to be traversed in directions the node type does not
 store. For a question such as all nodes at distance `k` from a target, first
 walk the tree once to map every child to its parent. Then run
-[breadth-first search (BFS)](#breadth-first-search) from the target using left
+[breadth-first search (BFS)](#c1321-breadth-first-search) from the target using left
 child, right child, and parent as two-way neighbors. BFS visits nodes one link
 away, then two links away, and so on. Mark node identities reached when adding
 them to the queue so the search cannot bounce between a parent and child. The
 conversion and search both take `O(n)` time and space.
 
-### Graphs and grids
+### B.5 Graphs and grids
 
 A graph stores vertices and connections.
 
@@ -936,7 +1060,7 @@ Before choosing an algorithm, decide these properties:
 - **Directed or undirected:** an undirected edge must normally appear in both
   adjacency lists; a directed edge has one direction and contributes to the
   destination's **indegree**, meaning its number of incoming edges.
-- **Weighted or unweighted:** [breadth-first search (BFS)](#breadth-first-search)
+- **Weighted or unweighted:** [breadth-first search (BFS)](#c1321-breadth-first-search)
   minimizes the number of edges used, not an arbitrary total of differing edge
   costs.
 - **Cyclic or acyclic:** a general graph needs reached-state tracking; a rooted
@@ -951,7 +1075,7 @@ edge. An **adjacency matrix** instead uses a `V`-by-`V` table: cell
 `matrix[a][b]` records whether the edge `a -> b` exists. It uses `O(V^2)` space
 but checks one specific edge in constant time. An **edge list** stores entries
 such as `(from, to, cost)` and is convenient when an algorithm repeatedly scans
-every edge, as [Bellman-Ford](#bellman-ford-shortest-paths) does.
+every edge, as [Bellman-Ford](#c1324-bellman-ford-shortest-paths) does.
 
 Mark a vertex reached when it is scheduled, not later when it is removed from a
 stack or queue. Otherwise several neighbors may schedule the same vertex and
@@ -962,7 +1086,7 @@ A matrix often represents an **implicit graph**: each cell is a vertex, and its
 neighbors are calculated from direction offsets such as up, down, left, and
 right. Check row and column bounds independently. Decide whether the input may
 be mutated to record visited cells; if not, allocate separate state. For
-[backtracking](#backtracking) on a word grid, mark a cell only for the current
+[backtracking](#c1319-backtracking) on a word grid, mark a cell only for the current
 path and restore it afterward. For ordinary reachability, the visited mark is
 permanent.
 
@@ -972,7 +1096,7 @@ as one device reaching another or one symbol preceding another. State whether
 building those edges costs `O(n^2)` pair checks, whether direction matters, and
 whether duplicate edges would corrupt indegrees or other counts.
 
-### Matrix traversal and in-place state
+### B.6 Matrix traversal and in-place state
 
 **Plain-language picture:** A matrix is a grid addressed by two positions:
 `matrix[row][column]`. Moving vertically changes the row; moving horizontally
@@ -1023,7 +1147,7 @@ live" and `3` for "was live, becomes dead." Neighbor checks read whether the
 cell was originally live; a final pass converts the temporary states to `0` or
 `1`.
 
-### Composing data structures
+### B.7 Composing data structures
 
 Design questions often require several operations to be fast at the same time.
 No single structure may provide all of them, so combine structures whose
@@ -1043,8 +1167,8 @@ operation always takes exactly that long.
 | Stack minimum in `O(1)` | Store each value with the minimum at or below it, or keep a parallel stack of minima. |
 | Insert, delete, random item in expected `O(1)` | A slice gives random indexing; a map gives each value's slice index. Delete by swapping in the last value and repairing its map entry. |
 | Least-recently-used (LRU) cache `get` and `put` in `O(1)` | A map finds an entry; a doubly linked list, whose nodes link both forward and backward, orders entries from most to least recently used. Every access moves exactly one node. |
-| Streaming median | A [max-heap and min-heap](#heap-or-priority-queue) keep the lower and upper halves. Their sizes differ by at most one, and every lower value is no greater than every upper value. |
-| Timestamped lookup | Store a sorted history per key and [binary-search](#binary-search) the last timestamp not greater than the query. |
+| Streaming median | A [max-heap and min-heap](#c1327-heap-or-priority-queue) keep the lower and upper halves. Their sizes differ by at most one, and every lower value is no greater than every upper value. |
+| Timestamped lookup | Store a sorted history per key and [binary-search](#c136-binary-search) the last timestamp not greater than the query. |
 
 **Worked deletion example:** Suppose a set that also supports random retrieval
 stores values `[10, 20, 30]` and the map stores `10 -> 0`, `20 -> 1`, and
@@ -1061,7 +1185,7 @@ only one representation or mishandling the first or last node. Permanent dummy
 nodes called **sentinels** can stand just before and after the real entries, so
 insertion and removal do not need separate empty-list or end-of-list cases.
 
-### Streaming and online processing
+### B.8 Streaming and online processing
 
 An **online** algorithm must update its answer as values arrive, without
 assuming the complete input is available. Define what the stored state means
@@ -1081,7 +1205,7 @@ report `b`. The algorithm never needs to scan the entire received stream again.
 - For a fixed recent window, pair counts or another summary with a queue or
   circular buffer, which wraps around and reuses fixed storage, so the item
   leaving the window can undo its contribution.
-- For a running median, maintain the two-[heap](#heap-or-priority-queue)
+- For a running median, maintain the two-[heap](#c1327-heap-or-priority-queue)
   invariant described above. For streaming top `k`, keep only `k` candidates
   in a heap.
 - For sorted streams, keep only the next unread item from each stream in a
@@ -1094,32 +1218,32 @@ even if it produces the same final answer. Amortized analysis is often the
 right measure because one arrival may remove several candidates that are no
 longer valid while every candidate is still added and removed only once.
 
-### Choosing a structure
+### B.9 Choosing a structure
 
-- Use a [hash map or set](#hash-map-or-set) for exact-key lookup.
-- Use a [stack](#stack) for most-recent-first processing and a
-  [queue](#queues-and-deques) for oldest-first processing.
-- Use a [deque](#queues-and-deques) when candidates can expire from the front
+- Use a [hash map or set](#c134-hash-map-or-set) for exact-key lookup.
+- Use a [stack](#c1313-stack) for most-recent-first processing and a
+  [queue](#b3-queues-and-deques) for oldest-first processing.
+- Use a [deque](#b3-queues-and-deques) when candidates can expire from the front
   while a better and newer candidate makes items at the back permanently
   unnecessary.
-- Use a [binary-search tree](#trees-and-binary-search-trees) when keys must stay
+- Use a [binary-search tree](#b4-trees-and-binary-search-trees) when keys must stay
   ordered under updates and the environment already supplies a balanced
   implementation.
-- Use a [heap](#heap-or-priority-queue) when only the next smallest, largest,
+- Use a [heap](#c1327-heap-or-priority-queue) when only the next smallest, largest,
   or highest-priority item must be exposed.
-- Use a [trie](#trie) for repeated prefix lookup.
-- Use [disjoint-set union](#disjoint-set-union) for connectivity under
+- Use a [trie](#c1333-trie) for repeated prefix lookup.
+- Use [disjoint-set union](#c1325-disjoint-set-union) for connectivity under
   incremental unions.
 - Use linked nodes when reconnecting known positions matters more than random
   access.
 
-## Problem-Solving Patterns
+## C. Problem-Solving Patterns
 
 Pattern cards explain how to recognize a useful method and why it does not miss
 an answer. Each card names the fact that must remain true while the algorithm
 runs. Computer science calls that fact an **invariant**.
 
-### Problem-solving method selection guide
+### C.1 Problem-solving method selection guide
 
 Treat the signs listed here as clues, not keyword matches. An array does not
 automatically require two pointers, and the word "minimum" does not
@@ -1132,7 +1256,7 @@ unsure how to begin, then try the card's first steps before reading a solution
 explanation. This file owns the complete pattern guide; no separate concept
 page is required.
 
-#### Quick decision tree
+#### C.1.1 Quick decision tree
 
 Before choosing a branch, answer three basic questions:
 
@@ -1150,159 +1274,159 @@ Dijkstra's algorithm usually uses a heap.
 
 - **Are you working with connections between items?**
   * Need to arrange tasks so every prerequisite comes first? Use
-    **[topological sort](#topological-sort)**.
+    **[topological sort](#c1322-topological-sort)**.
     **Example:** If course `C` requires both `A` and `B`, return an order with
     `A` and `B` before `C`.
   * Need the shortest or cheapest route from one starting point?
     **Example:** Find the cheapest route from town `A` to every other town on a
     road map.
     + Every move costs the same? Use
-      **[breadth-first search](#breadth-first-search)**.
+      **[breadth-first search](#c1321-breadth-first-search)**.
       **Example:** In a maze, each step to an adjacent open cell costs one move.
     + Costs vary, but none are negative? Use
-      **[Dijkstra's algorithm](#dijkstra-shortest-paths)**.
+      **[Dijkstra's algorithm](#c1323-dijkstra-shortest-paths)**.
       **Example:** Roads have travel times such as `2`, `5`, and `9` minutes.
     + Some costs are negative? Use
-      **[Bellman-Ford](#bellman-ford-shortest-paths)**.
+      **[Bellman-Ford](#c1324-bellman-ford-shortest-paths)**.
       **Example:** A route can include a `-3` rebate, so a later path may make
       an earlier distance cheaper.
   * Are connections added one at a time while you repeatedly ask whether two
-    items are connected? Use **[disjoint-set union](#disjoint-set-union)**.
+    items are connected? Use **[disjoint-set union](#c1325-disjoint-set-union)**.
     **Example:** Add roads one by one and, after each road, ask whether towns
     `1` and `5` are now connected.
   * Need to connect every item with the least total connection cost? Use a
-    **[minimum spanning tree](#minimum-spanning-tree)**.
+    **[minimum spanning tree](#c1326-minimum-spanning-tree)**.
     **Example:** Connect every office while minimizing total cable length.
   * Need to completely explore one path, region, or subtree before the next?
-    Use **[depth-first search](#depth-first-search)**.
+    Use **[depth-first search](#c1320-depth-first-search)**.
     **Example:** Calculate a directory's total size by finishing every child
     directory before returning its size to the parent.
 
 - **Are you building an answer by choosing among alternatives?**
   * Can you prove that one choice now will not worsen the best final result?
-    Use **[greedy](#greedy)**.
+    Use **[greedy](#c1318-greedy)**.
     **Example:** To attend the most meetings, always choose the compatible
     meeting that finishes earliest.
   * Do many choice sequences reach the same remaining situation, and you need
     only its best value, number of solutions, or yes/no result? Use
-    **[dynamic programming](#dynamic-programming)**.
+    **[dynamic programming](#c1310-dynamic-programming)**.
     **Example:** Different coin choices can leave the same remaining amount;
     calculate the minimum coins for that amount once.
   * Must you try a choice, explore it, undo it, and try another? Use
-    **[backtracking](#backtracking)**.
+    **[backtracking](#c1319-backtracking)**.
     **Example:** Place a queen in one column, remove it if a later row cannot be
     completed, and try the next column.
 
 - **Do you need fast repeated lookups?**
   * Looking up an exact value, frequency, matching partner, or group? Use a
-    **[hash map or set](#hash-map-or-set)**.
+    **[hash map or set](#c134-hash-map-or-set)**.
     **Example:** While looking for a pair totaling `9`, ask whether `9 - x` has
     already appeared for each number `x`.
-  * Looking up words by a shared beginning? Use a **[trie](#trie)**.
+  * Looking up words by a shared beginning? Use a **[trie](#c1333-trie)**.
     **Example:** For autocomplete after `ca`, keep `car`, `cart`, and `cat`
     available without scanning every word.
   * Need several different operations to be fast together? Consider
-    **[composing data structures](#composing-data-structures)**.
+    **[composing data structures](#b7-composing-data-structures)**.
     **Example:** Combine a map and doubly linked list for an LRU cache.
 
 - **Does the problem revolve around ranges?**
-  * Need to merge overlaps or find gaps? Use **[intervals](#intervals)**.
+  * Need to merge overlaps or find gaps? Use **[intervals](#c1330-intervals)**.
     **Example:** Merge reservations `[1, 4]` and `[3, 6]` into `[1, 6]`.
   * Need to know how many ranges are active as positions or times change? Use a
-    **[sweep line](#sweep-line)**.
+    **[sweep line](#c1331-sweep-line)**.
     **Example:** Process booking start and end times to find the maximum number
     of rooms occupied together.
   * Need to answer many sum or count queries over ranges? Use
-    **[prefix sums](#prefix-sums)**.
+    **[prefix sums](#c1315-prefix-sums)**.
     **Example:** Precompute totals once, then answer many questions such as the
     sum from index `20` through index `80`.
   * Need to apply many range additions and calculate the final values only
-    once? Use a **[difference array](#difference-arrays)**.
+    once? Use a **[difference array](#c1316-difference-arrays)**.
     **Example:** Apply hundreds of passenger-count changes across stop ranges,
     then reconstruct the count at every stop once.
   * Need interleaved updates and range queries? Use a
-    **[Fenwick or segment tree](#fenwick-and-segment-trees)**.
+    **[Fenwick or segment tree](#c1317-fenwick-and-segment-trees)**.
     **Example:** Update one score and repeatedly query the sum or maximum over
     a range without rebuilding every prefix.
 
 - **Does the problem revolve around positions in a sequence?**
   * Would rearranging values make duplicates, intervals, or compatible choices
-    adjacent? Use **[sorting and selection](#sorting-and-selection)**.
+    adjacent? Use **[sorting and selection](#c135-sorting-and-selection)**.
     **Example:** Sort intervals by start so every overlap appears beside the
     interval it may extend.
   * Comparing several sequences to find the beginning shared by all of them?
-    Use a **[common-prefix scan](#common-prefix-scan)**.
+    Use a **[common-prefix scan](#c131-common-prefix-scan)**.
     **Example:** Compare `"flower"`, `"flow"`, and `"flight"` one column at a
     time until the first mismatch.
   * Does an item's meaning depend on an adjacent item? Use a
-    **[directional scan](#directional-scan)** that processes the needed neighbor
+    **[directional scan](#c132-directional-scan)** that processes the needed neighbor
     first.
     **Example:** Scan a Roman numeral from right to left so the symbol to the
     right is already known.
   * Does the statement prescribe a sequence of state changes or formatting
-    rules? Use **[simulation](#simulation)**.
+    rules? Use **[simulation](#c133-simulation)**.
     **Example:** Traverse matrix boundaries one side at a time, shrinking the
     remaining rectangle after each side.
   * Need the best consecutive section, and can update the tracked information
-    when either end moves? Use a **[sliding window](#sliding-window)**.
+    when either end moves? Use a **[sliding window](#c1314-sliding-window)**.
     **Example:** Find the longest consecutive part of `"abca"` without a
     repeated character by growing and shrinking one window.
   * Searching sorted values, or the first point where a yes/no test changes?
-    Use **[binary search](#binary-search)**.
+    Use **[binary search](#c136-binary-search)**.
     **Example:** In `[1, 3, 3, 5]`, find the first position whose value is at
     least `3`.
   * Can two positions move through the sequence while each move safely rules
-    out possibilities? Use **[two pointers](#two-pointers)**.
+    out possibilities? Use **[two pointers](#c139-two-pointers)**.
     **Example:** In a sorted array, move the left or right position according
     to whether their sum is too small or too large.
   * Working with a linked structure and need a cycle, midpoint, or fixed gap?
-    Use **[fast and slow pointers](#fast-and-slow-pointers)**.
+    Use **[fast and slow pointers](#c1332-fast-and-slow-pointers)**.
     **Example:** Move one linked-list pointer one step and another two steps;
     they meet if the list contains a cycle.
   * Need the next or nearest greater or smaller value? Use a
-    **[monotonic stack](#monotonic-stack)**.
+    **[monotonic stack](#c1328-monotonic-stack)**.
     **Example:** For each daily temperature, find the next later day with a
     higher temperature.
   * Need the best sum of one consecutive section? Use
-    **[Kadane's algorithm](#kadanes-algorithm-best-subarray-scan)**.
+    **[Kadane's algorithm](#c1312-kadanes-algorithm-best-subarray-scan)**.
     **Example:** At each value, decide whether the best section ending here
     should extend the previous section or begin here.
   * Searching for the same exact pattern inside a larger string? Use
-    **[string matching](#string-matching)** when restarting comparisons would
+    **[string matching](#c137-string-matching)** when restarting comparisons would
     repeat substantial work.
     **Example:** Reuse the known border of a partially matched pattern after a
     mismatch instead of restarting from its first character.
   * Does each character's meaning depend on what has already been parsed? Use
-    **[parsing and state machines](#parsing-and-state-machines)**.
+    **[parsing and state machines](#c138-parsing-and-state-machines)**.
     **Example:** A sign is allowed before digits but not after the numeric part
     has begun.
 
 - **Does the order of waiting items determine what happens next?**
   * Must the most recently opened or unfinished item be handled first? Use a
-    **[stack](#stack)**.
+    **[stack](#c1313-stack)**.
     **Example:** When checking `([])`, the closing bracket must match the most
     recent unmatched opening bracket.
   * Must you repeatedly remove the smallest or largest item while the stored
     items keep changing? Use a
-    **[heap or priority queue](#heap-or-priority-queue)**.
+    **[heap or priority queue](#c1327-heap-or-priority-queue)**.
     **Example:** As jobs arrive, repeatedly run the waiting job with the highest
     priority.
   * Need the minimum or maximum of every moving window? Use a
-    **[monotonic deque](#monotonic-deque)**.
+    **[monotonic deque](#c1329-monotonic-deque)**.
     **Example:** Remove expired positions from the front and values dominated
     by a new arrival from the back.
 
 - **Does the problem naturally split into independent smaller parts?**
   * If each part can be solved separately and their results combined without
     representing the same state repeatedly, use
-    **[divide and conquer](#divide-and-conquer)**.
+    **[divide and conquer](#c1311-divide-and-conquer)**.
     **Example:** Sort each half, then merge the two sorted results.
 
 If nothing fits, return to the simplest correct solution and ask what work it
 repeats. The problem may need a method outside this guide; do not force a
 match.
 
-#### Derive a direction before naming a pattern
+#### C.1.2 Derive a direction before naming a pattern
 
 Do not begin by guessing an algorithm name. First work through a tiny example
 by hand and describe the simplest correct method, even if it tries every
@@ -1325,7 +1449,7 @@ Use this hint ladder during practice:
 5. **At 25 to 30 minutes:** read a full explanation if still blocked, close it,
    and implement the idea without copying its code.
 
-#### Pattern cards
+#### C.1.3 Pattern cards
 
 Each card is the complete conceptual reference for its method: what to picture,
 when it fits, how to begin, why it is safe, and when to reject it. The cards are
@@ -1334,34 +1458,36 @@ first attempt without revealing a judge solution.
 
 Jump directly to a card:
 
-- Sequence and range methods: [common-prefix scan](#common-prefix-scan),
-  [directional scan](#directional-scan), [simulation](#simulation),
-  [two pointers](#two-pointers),
-  [sorting and selection](#sorting-and-selection),
-  [binary search](#binary-search), [string matching](#string-matching),
-  [parsing and state machines](#parsing-and-state-machines),
-  [sliding window](#sliding-window),
-  [prefix sums](#prefix-sums), [difference arrays](#difference-arrays),
-  [Fenwick and segment trees](#fenwick-and-segment-trees),
-  [fast and slow pointers](#fast-and-slow-pointers),
-  [Kadane's algorithm](#kadanes-algorithm-best-subarray-scan),
-  [monotonic stack](#monotonic-stack), [monotonic deque](#monotonic-deque),
-  [intervals](#intervals), and [sweep line](#sweep-line).
-- Lookup and processing-order methods: [hash map or set](#hash-map-or-set),
-  [trie](#trie), [stack](#stack), and
-  [heap or priority queue](#heap-or-priority-queue).
-- Choice methods: [dynamic programming](#dynamic-programming),
-  [greedy](#greedy), [backtracking](#backtracking), and
-  [divide and conquer](#divide-and-conquer).
-- Relationship methods: [depth-first search](#depth-first-search),
-  [breadth-first search](#breadth-first-search),
-  [topological sort](#topological-sort),
-  [Dijkstra](#dijkstra-shortest-paths),
-  [Bellman-Ford](#bellman-ford-shortest-paths),
-  [disjoint-set union](#disjoint-set-union), and
-  [minimum spanning tree](#minimum-spanning-tree).
+- Sequence and range methods: [common-prefix scan](#c131-common-prefix-scan),
+  [directional scan](#c132-directional-scan), [simulation](#c133-simulation),
+  [two pointers](#c139-two-pointers),
+  [sorting and selection](#c135-sorting-and-selection),
+  [binary search](#c136-binary-search), [string matching](#c137-string-matching),
+  [parsing and state machines](#c138-parsing-and-state-machines),
+  [sliding window](#c1314-sliding-window),
+  [prefix sums](#c1315-prefix-sums), [difference arrays](#c1316-difference-arrays),
+  [Fenwick and segment trees](#c1317-fenwick-and-segment-trees),
+  [fast and slow pointers](#c1332-fast-and-slow-pointers),
+  [Kadane's algorithm](#c1312-kadanes-algorithm-best-subarray-scan),
+  [monotonic stack](#c1328-monotonic-stack), [monotonic deque](#c1329-monotonic-deque),
+  [intervals](#c1330-intervals), and [sweep line](#c1331-sweep-line).
+- Lookup and processing-order methods: [hash map or set](#c134-hash-map-or-set),
+  [trie](#c1333-trie), [stack](#c1313-stack), and
+  [heap or priority queue](#c1327-heap-or-priority-queue).
+- Choice methods: [dynamic programming](#c1310-dynamic-programming),
+  [greedy](#c1318-greedy), [backtracking](#c1319-backtracking), and
+  [divide and conquer](#c1311-divide-and-conquer).
+- Relationship methods: [depth-first search](#c1320-depth-first-search),
+  [breadth-first search](#c1321-breadth-first-search),
+  [topological sort](#c1322-topological-sort),
+  [Dijkstra](#c1323-dijkstra-shortest-paths),
+  [Bellman-Ford](#c1324-bellman-ford-shortest-paths),
+  [disjoint-set union](#c1325-disjoint-set-union), and
+  [minimum spanning tree](#c1326-minimum-spanning-tree).
 
-##### Common-prefix scan
+<a id="common-prefix-scan"></a>
+
+##### C.1.3.1 Common-prefix scan
 
 **Mental model:** Compare several strings one character position at a time,
 beginning at the left. The answer ends as soon as one string ends or one
@@ -1396,7 +1522,9 @@ positions, or compare reordered items.
 
 **Representative problem:** [Longest Common Prefix](../problems/solved_easy_leetcode_0014_longest_common_prefix.go).
 
-##### Directional scan
+<a id="directional-scan"></a>
+
+##### C.1.3.2 Directional scan
 
 **Mental model:** When an item's meaning depends on a neighboring item, scan in
 the direction that makes that neighbor already known instead of repeatedly
@@ -1432,7 +1560,7 @@ that cannot be made available by choosing one scan direction.
 
 **Representative problem:** [Roman to Integer](../problems/solved_easy_leetcode_0013_roman_to_integer.go).
 
-##### Simulation
+##### C.1.3.3 Simulation
 
 **Mental model:** Translate the problem's rules into an explicit state and a
 transition that advances that state. Simulation is a legitimate algorithm when
@@ -1473,7 +1601,9 @@ process must retain a board, history, or pending events.
 **Reject it when:** The required event count is too large for the constraints
 and the rules allow the state to jump directly to a later time or value.
 
-##### Hash map or set
+<a id="hash-map-or-set"></a>
+
+##### C.1.3.4 Hash map or set
 
 **Mental model:** Store a fact under a key that can be calculated again. A map
 returns associated information; a set records presence only.
@@ -1522,7 +1652,7 @@ search, or another relationship a hash key does not preserve.
 
 **Representative problem:** [Two Sum](../problems/solved_easy_leetcode_0001_two_sum.go).
 
-##### Sorting and selection
+##### C.1.3.5 Sorting and selection
 
 **Mental model:** Pay `O(n log n)` once to place related values next to one
 another or to make later decisions move in only one direction. If only the item
@@ -1574,7 +1704,9 @@ small, too early, or disjoint, later items cannot reverse that fact.
 carried along, linear time is required, or a hash table, counting table, heap,
 or direct selection answers the question without a complete order.
 
-##### Binary search
+<a id="binary-search"></a>
+
+##### C.1.3.6 Binary search
 
 **Mental model:** Test the middle possible answer and discard one half. The
 method is safe only when the possibilities form two consecutive groups, such
@@ -1624,7 +1756,7 @@ or the middle test cannot prove that one entire half is impossible.
 **Representative problems:** [Search Insert Position](../problems/solved_easy_leetcode_0035_search_insert_position.go)
 and [Search in Rotated Sorted Array](../problems/solved_medium_leetcode_0033_search_in_rotated_sorted_array.go).
 
-##### String matching
+##### C.1.3.7 String matching
 
 **Mental model:** Search a text for an exact pattern while remembering how much
 of the pattern is still useful after a mismatch.
@@ -1685,7 +1817,7 @@ linear-library search in every interview.
 or a standard library operation, or when the match permits edits, reordered
 characters, or another relationship that exact string matching does not model.
 
-##### Parsing and state machines
+##### C.1.3.8 Parsing and state machines
 
 **Mental model:** The parser is always in one of a small number of modes, and
 the current input symbol determines the next mode and any action. The mode
@@ -1738,7 +1870,9 @@ token can require `O(n)` memory.
 **Reject it when:** The input has no meaningful grammar or phases, or a
 well-tested standard parser already implements exactly the required language.
 
-##### Two pointers
+<a id="two-pointers"></a>
+
+##### C.1.3.9 Two pointers
 
 **Mental model:** Track two meaningful positions and move them in a coordinated
 way so the scan never needs to restart. Common forms move inward from both
@@ -1799,7 +1933,9 @@ positions or order must remain intact.
 [Remove Duplicates from Sorted Array](../problems/solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go),
 and [Remove Element](../problems/solved_easy_leetcode_0027_remove_element.go).
 
-##### Dynamic programming
+<a id="dynamic-programming"></a>
+
+##### C.1.3.10 Dynamic programming
 
 **Mental model:** Dynamic programming (**DP**) starts with a search that tries
 choices. If different paths keep reaching the same smaller question, answer
@@ -1877,12 +2013,12 @@ The two stored entries prove that a length-two subsequence exists, but `[1, 4]`
 is not itself a subsequence of this input because `1` arrived after `4`.
 Reconstructing the actual values requires each chosen value to link to the
 earlier chosen value before it. For each new value,
-[binary search](#binary-search) finds the first stored ending greater than or
+[binary search](#c136-binary-search) finds the first stored ending greater than or
 equal to it; replacing that ending produces an `O(n log n)` length calculation
 for strictly increasing subsequences. A non-decreasing variant must use a
 different equality rule.
 
-###### Coordinate compression
+###### C.1.3.10.1 Coordinate compression
 
 Coordinate compression replaces each distinct value with its position in
 sorted order. For `[100, -5, 100, 20]`, the sorted distinct values are
@@ -1892,7 +2028,7 @@ comparisons keep the same order as the original values.
 This is useful when a transition asks for the best earlier state in a value
 range such as `value-k <= earlierValue < value`. Store the best DP result at
 each rank, query the permitted rank interval with a
-[segment tree](#fenwick-and-segment-trees), and update the current rank. This
+[segment tree](#c1317-fenwick-and-segment-trees), and update the current rank. This
 can reduce an `O(n^2)` scan of earlier states to `O(n log n)` when only a range
 minimum or maximum is needed. Compression preserves value order, not original
 input positions, so still process the values in their required sequence.
@@ -1915,7 +2051,7 @@ different smaller questions for the input limits.
 
 **Representative problem:** [Climbing Stairs](../problems/solved_easy_leetcode_0070_climbing_stairs.go).
 
-##### Divide and conquer
+##### C.1.3.11 Divide and conquer
 
 **Mental model:** Split one problem into smaller independent parts, solve each
 part by the same rule, and combine their answers.
@@ -1968,7 +2104,7 @@ memory as a loop.
 solve the same smaller questions, or combining their answers costs as much as
 solving the original problem directly.
 
-##### Kadane's algorithm (best subarray scan)
+##### C.1.3.12 Kadane's algorithm (best subarray scan)
 
 **Mental model:** At each position, keep the best consecutive section that must
 end here. It either extends the best section ending one position earlier or
@@ -2011,7 +2147,9 @@ and produce an invalid empty answer, so use the ordinary non-empty result.
 whether to extend needs more information than the best section ending at the
 previous position.
 
-##### Stack
+<a id="stack"></a>
+
+##### C.1.3.13 Stack
 
 **Mental model:** Add and remove only at the top, so the most recently added
 item is the first removed. This is last in, first out.
@@ -2063,7 +2201,9 @@ needs efficient access to arbitrary stored items.
 
 **Representative problem:** [Valid Parentheses](../problems/solved_easy_leetcode_0020_valid_parentheses.go).
 
-##### Sliding window
+<a id="sliding-window"></a>
+
+##### C.1.3.14 Sliding window
 
 **Mental model:** Put a movable fence around one consecutive portion of the
 input. The fence always contains neighboring items with no gaps.
@@ -2105,7 +2245,7 @@ or value counts use memory proportional to the number of distinct values kept.
 condition switch back and forth unpredictably. Mixed positive and negative
 values often cause that problem for sum-based windows.
 
-##### Prefix sums
+##### C.1.3.15 Prefix sums
 
 **Mental model:** Store a summary of everything before each position, and when
 useful a second summary of everything after it, so later answers do not repeat
@@ -2147,7 +2287,7 @@ time when its answer can be recovered from two stored prefixes.
 running summaries. For example, you cannot find a range's smallest value by
 subtracting two previously stored smallest values.
 
-##### Difference arrays
+##### C.1.3.16 Difference arrays
 
 **Mental model:** When many updates affect whole ranges, record where each
 change starts and stops instead of modifying every covered position
@@ -2177,7 +2317,7 @@ takes `O(u + n)` time and `O(n)` extra memory.
 **Reject it when:** You must answer detailed questions after every individual
 update rather than after the updates have been collected.
 
-##### Fenwick and segment trees
+##### C.1.3.17 Fenwick and segment trees
 
 **Mental model:** Store summaries for a hierarchy of ranges so an update or
 query touches only `O(log n)` summaries instead of rescanning the entire input.
@@ -2227,7 +2367,7 @@ updates and queries must be interleaved. They are valuable but lower priority
 than hash tables, ordinary traversal, sorting, and binary search for most
 general interviews.
 
-[Coordinate compression](#coordinate-compression) lets a Fenwick or segment
+[Coordinate compression](#c13101-coordinate-compression) lets a Fenwick or segment
 tree answer value-range queries even when the original values are negative or
 enormous. Include every endpoint that a query may use, and distinguish a
 value's sorted rank from its original input position.
@@ -2241,7 +2381,7 @@ prefix queries and point updates in `O(log n)` time. A segment tree builds in
 one final pass, or the number of operations is small enough that a direct scan
 is clearer and fast enough.
 
-##### Greedy
+##### C.1.3.18 Greedy
 
 **Mental model:** Make one choice now and never undo it because you can prove
 that it does not reduce the best result still possible.
@@ -2390,7 +2530,7 @@ reaching that value.
 later, and you cannot prove that the replacement described above is harmless.
 Keep multiple possibilities with dynamic programming or search instead.
 
-##### Backtracking
+##### C.1.3.19 Backtracking
 
 **Mental model:** Walk through a tree of decisions while carrying one partial
 answer. At each branch, make a choice, explore what it can lead to, and undo the
@@ -2457,13 +2597,13 @@ caller had before trying that branch.
 - Use **dynamic programming** when many choice sequences reach the same
   remaining situation and only its best value, count, or yes/no result matters.
   Save that result instead of rebuilding the same search tree.
-- Use ordinary **[depth-first search (DFS)](#depth-first-search)** when
+- Use ordinary **[depth-first search (DFS)](#c1320-depth-first-search)** when
   traversing an existing graph or tree without constructing and undoing a
   candidate answer.
 - Avoid exhaustive backtracking when there are too many possibilities and no
   useful early-stopping rule or repeated smaller question exists.
 
-##### Depth-first search
+##### C.1.3.20 Depth-first search
 
 **Mental model:** Depth-first search (**DFS**) follows one route as far as
 possible. When that route ends, return to the most recent place that had
@@ -2505,7 +2645,7 @@ current vertex's parent and treat another visited neighbor as a cycle.
 instead. Also avoid recursive DFS when a valid path can be too deep for the
 call stack unless the environment guarantees enough stack space.
 
-##### Breadth-first search
+##### C.1.3.21 Breadth-first search
 
 **Mental model:** Breadth-first search (**BFS**) explores outward in layers:
 first everything one move away, then everything two moves away, and so on.
@@ -2545,7 +2685,7 @@ and `O(V)` extra memory for its queue, distances, and reached state.
 may then cost more than a longer route; use Dijkstra's algorithm when all costs
 are zero or greater.
 
-##### Topological sort
+##### C.1.3.22 Topological sort
 
 **Mental model:** Repeatedly perform tasks whose prerequisites are already
 satisfied.
@@ -2587,7 +2727,7 @@ with adjacency lists, not counting the stored graph itself.
 graph may be undirected, or the problem asks for shortest routes rather than a
 valid dependency order.
 
-##### Dijkstra shortest paths
+##### C.1.3.23 Dijkstra shortest paths
 
 **Mental model:** On a map with travel costs, always process the unvisited
 location with the cheapest known route from the starting location.
@@ -2622,7 +2762,7 @@ equals the stored best cost.
 **Reject it when:** Any connection may have a negative cost. If every connection
 has the same cost, breadth-first search is simpler.
 
-##### Bellman-Ford shortest paths
+##### C.1.3.24 Bellman-Ford shortest paths
 
 **Mental model:** Let cheaper route costs ripple through every connection,
 repeating until an improvement can cross even the longest useful route.
@@ -2666,7 +2806,7 @@ that Dijkstra's better running time matters. If a reachable negative cycle may
 exist, do not report ordinary finite shortest costs for locations affected by
 that cycle.
 
-##### Disjoint-set union
+##### C.1.3.25 Disjoint-set union
 
 **Mental model:** Imagine that every connected group has one shared group
 leader. To check whether two items are connected, find each item's leader and
@@ -2708,7 +2848,7 @@ input. The parent and size arrays use `O(n)` memory.
 visited, or the shortest path. Knowing only each item's group does not preserve
 that information.
 
-##### Minimum spanning tree
+##### C.1.3.26 Minimum spanning tree
 
 **Mental model:** Choose enough weighted edges to connect every vertex without
 forming a cycle, while minimizing their total cost. The result spans all
@@ -2755,7 +2895,7 @@ kind of forest for the whole graph.
 not the cheapest total network, or when the directed edges do not represent an
 undirected connection problem.
 
-##### Heap or priority queue
+##### C.1.3.27 Heap or priority queue
 
 **Mental model:** Keep the next item you need (the smallest, largest, or most
 urgent) easy to remove without fully sorting everything after each change.
@@ -2795,7 +2935,7 @@ items; sorting is usually simpler. A heap also does not make it fast to find any
 item other than the smallest, largest, or highest-priority one it was designed
 to expose.
 
-##### Monotonic stack
+##### C.1.3.28 Monotonic stack
 
 **Mental model:** Keep earlier values whose answer is still unknown, ordered in
 only one direction: always increasing or always decreasing. That one-direction
@@ -2827,7 +2967,7 @@ The stack can hold `O(n)` positions.
 the nearest one that meets the condition, or when removing an item would lose
 information that a later value still needs.
 
-##### Monotonic deque
+##### C.1.3.29 Monotonic deque
 
 **Mental model:** Keep only candidates that could still become the minimum or
 maximum of a current or future window. The front is the answer for the current
@@ -2862,7 +3002,7 @@ new values permanently dominate older ones.
 **Reject it when:** Candidates do not expire in input order, or a newer value
 cannot be proved to make an older value permanently irrelevant.
 
-##### Intervals
+##### C.1.3.30 Intervals
 
 **Mental model:** Each interval covers everything between a start and an end.
 Sort intervals by start so overlaps appear next to one another.
@@ -2909,7 +3049,7 @@ but the merged or selected result can contain `O(n)` intervals.
 immediately, or when the problem is really about individual points rather than
 relationships between ranges.
 
-##### Sweep line
+##### C.1.3.31 Sweep line
 
 **Mental model:** Move from left to right across a timeline or number line.
 Record only the positions where something starts or ends, because nothing
@@ -2943,7 +3083,7 @@ sorting.
 events arrive online and must be answered before they can be collected and
 sorted.
 
-##### Fast and slow pointers
+##### C.1.3.32 Fast and slow pointers
 
 **Mental model:** Move two positions through the same linked list. Their speeds
 or the distance between them reveals a loop, the middle, or a node near the end.
@@ -2978,7 +3118,7 @@ method takes `O(n)` time and `O(1)` extra memory.
 the full history, or return the actual visited path. Two moving positions do not
 retain those details.
 
-##### Trie
+##### C.1.3.33 Trie
 
 **Mental model:** Store words one character at a time. Words with the same
 beginning reuse the same initial steps.
@@ -3017,7 +3157,7 @@ is marked as the end of a complete word.
 **Reject it when:** You only need to know whether a complete word exists. A hash
 set is usually simpler and may use less memory.
 
-#### Choosing among overlapping methods
+#### C.1.4 Choosing among overlapping methods
 
 - Sliding window versus prefix sums: use a window when moving its left or right
   boundary changes the tracked condition predictably, so an earlier starting
@@ -3079,7 +3219,7 @@ set is usually simpler and may use less memory.
   a moving window, removing expired items from the front and dominated items
   from the back.
 
-#### Let constraints eliminate bad choices
+#### C.1.5 Let constraints eliminate bad choices
 
 Let `n` mean the number of input items. The notation describes how quickly the
 work grows: `O(n)` is roughly one pass, `O(n^2)` examines pairs, and `O(n^3)`
@@ -3099,7 +3239,7 @@ Also count the work required to produce the output. If the problem asks for all
 `2^n` subsets or all `n!` orderings, merely writing those results already takes
 that much work; generating them in a different order cannot remove it.
 
-#### Before committing to a method
+#### C.1.6 Before committing to a method
 
 Write one sentence for each item:
 
@@ -3129,7 +3269,7 @@ otherwise familiar problem:
 
 If one sentence cannot be made precise, the method is still only a guess.
 
-## Go reference implementations
+## D. Go reference implementations
 
 These snippets show the ideas above as small Go programs. They are examples to
 read and adapt, not packages built by this repository. The note after each
@@ -3143,9 +3283,9 @@ expressed in Go.
 
 Some snippets use a type parameter written as `T`. Treat `T` as a placeholder
 for the value type chosen by the caller, such as `int` or `string`; the
-[type-parameter note](#type-parameters) explains why this is useful.
+[type-parameter note](#e7-type-parameters) explains why this is useful.
 
-### Binary search bounds
+### D.1 Binary search bounds
 
 ```go
 
@@ -3197,7 +3337,7 @@ func Search(values []int, target int) int {
 duplicate ranges, values between entries, first-match lookup, and absent
 targets.
 
-### Rolling dynamic programming
+### D.2 Rolling dynamic programming
 
 ```go
 
@@ -3227,7 +3367,7 @@ func CountOrderedOneOrTwoStepWays(steps int) int {
 **Cases to test:** Negative totals, the empty sequence, one and two
 steps, and several points where a new answer is built from earlier answers.
 
-### Hash-map complement lookup
+### D.3 Hash-map complement lookup
 
 ```go
 
@@ -3264,7 +3404,7 @@ func PairSumIndices(values []int, target int) (int, int, bool) {
 **Cases to test:** A previously seen matching value, equal values at
 distinct indices, and inputs with no pair.
 
-### Generic singly linked list
+### D.4 Generic singly linked list
 
 ```go
 
@@ -3313,7 +3453,7 @@ func Reverse[T any](head *Node[T]) *Node[T] {
 **Cases to test:** Slice round trips, reversal, and empty-list
 construction, conversion, and reversal.
 
-### Generic stack
+### D.5 Generic stack
 
 ```go
 
@@ -3372,7 +3512,7 @@ func (s *Stack[T]) IsEmpty() bool {
 **Cases to test:** Last-in-first-out ordering, top inspection, length
 tracking, complete removal, and empty operations.
 
-### Overflow-safe integer reversal
+### D.6 Overflow-safe integer reversal
 
 ```go
 
@@ -3403,7 +3543,7 @@ func ReverseNonNegative(value int64) (reversed int64, ok bool) {
 **Cases to test:** Zero, palindromes, trailing zeroes, negative
 rejection, and a reversal that would overflow `int64`.
 
-### Common-prefix scan
+### D.7 Common-prefix scan
 
 ```go
 
@@ -3432,7 +3572,7 @@ func LongestCommonPrefix(strs []string) string {
 **Cases to test:** Shared and missing prefixes, an early shortest
 string, identical strings, a single string, and empty inputs.
 
-### Directional scan
+### D.8 Directional scan
 
 ```go
 
@@ -3468,7 +3608,7 @@ func SumWithSmallerLeftValuesSubtracted(values []int) int {
 **Cases to test:** Empty and single inputs, descending values that are
 all added, one subtractive pair, and a mix of additions and subtractions.
 
-### Sorted two-pointer pair search
+### D.9 Sorted two-pointer pair search
 
 ```go
 
@@ -3498,12 +3638,12 @@ func PairSumSorted(values []int, target int) (left int, right int, ok bool) {
 **Cases to test:** A matching pair, negative values, the rule that
 one position cannot be used twice, a missing pair, and empty input.
 
-## Go techniques
+## E. Go techniques
 
 These are Go-specific details that commonly affect otherwise correct
 algorithms. Each rule below states the behavior that motivates it.
 
-#### Keep input conversion outside the algorithm
+### E.1 Keep input conversion outside the algorithm
 
 An **online judge**, meaning the automated system that runs and checks a
 solution, often supplies text or JSON (JavaScript Object Notation) data. The
@@ -3513,7 +3653,7 @@ and convert the result back only after it finishes. This separation lets the
 algorithm express the actual problem instead of mixing parsing with its main
 loop.
 
-#### Table-driven tests
+### E.2 Table-driven tests
 
 A table-driven test stores named rows containing an input and expected result,
 then runs the same checking loop over every row. Put ordinary examples and edge
@@ -3521,14 +3661,14 @@ cases in that table so they cannot accidentally use different test logic. If
 parsing fails, report that boundary error rather than passing a partly
 initialized value into the algorithm.
 
-#### Sorting without unexpected mutation
+### E.3 Sorting without unexpected mutation
 
 Go sorting functions rearrange the supplied slice. This is called **mutating**
 the input. If the caller expects the original order to remain unchanged, copy
 the slice before sorting it. With `sort.Slice`, write a comparison that states
 the intended order and any tie-breaking rule explicitly.
 
-#### Map presence and sets
+### E.4 Map presence and sets
 
 Reading a missing map key returns the value type's **zero value**: `0` for an
 integer, `false` for a boolean, and `nil` for a pointer or slice. When zero could
@@ -3544,7 +3684,7 @@ struct uses no per-value data because only the key matters. Iterating over a Go
 map does not promise any order, so sort the keys separately when output order
 matters.
 
-#### Priority queues
+### E.5 Priority queues
 
 Use `container/heap` when the program repeatedly needs the next smallest,
 largest, or most urgent item. The heap interface asks the program to provide a
@@ -3558,7 +3698,7 @@ new entry with the improved distance. When an older entry later reaches the
 top, compare it with the currently stored best distance and discard it if they
 differ. Such an outdated entry is called **stale**.
 
-#### Bytes, runes, and visible characters
+### E.6 Bytes, runes, and visible characters
 
 A Go string is stored as bytes. Basic Latin characters such as `A` use one
 byte, but many Unicode characters use several bytes under UTF-8, Go's standard
@@ -3570,7 +3710,7 @@ the intended units. One user-visible symbol can contain multiple code points;
 text-editor rules may therefore need a Unicode library that groups them as
 visible characters rather than plain `[]rune` indexing.
 
-#### Type parameters
+### E.7 Type parameters
 
 A **type parameter** lets one implementation work with several value types.
 For example, `Stack[T]` can store `int`, `string`, or another type while keeping
@@ -3578,13 +3718,13 @@ the same push and pop behavior. In `Stack[T any]`, `any` means that callers may
 choose any value type for `T`. Use type parameters when the operations truly do
 not depend on one concrete type.
 
-#### Replacing recursion with a loop
+### E.8 Replacing recursion with a loop
 
 When replacing recursion with a loop, explicitly store what each unfinished
 call would have remembered: usually the current item, which choice comes next,
 and any partial result needed after returning.
 
-#### Slice storage and retained memory
+### E.9 Slice storage and retained memory
 
 Two slices may share one underlying array, and `append` may either reuse that
 array or allocate a new one. Therefore a change through one slice may or may
@@ -3597,7 +3737,7 @@ positions contain pointers. Shortening a slice changes its visible length but
 may leave the old pointer in the backing array, which can keep an otherwise
 unreachable object from being reclaimed.
 
-## Further-study checklist
+## F. Further-study checklist
 
 The material above covers the reusable concepts emphasized by the repository's
 problem set and contemporary general interview-preparation lists. Lower-priority
