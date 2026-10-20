@@ -347,28 +347,87 @@ Go integer division drops the fractional part toward zero. Thus `-7 / 3` is
 Read the problem's rounding rule before using integer division with negative
 values.
 
-#### Counting factors without building a huge number
+#### Counting trailing zeroes without calculating a factorial
 
-Sometimes the question asks about the factors of a product, not the product
-itself. Count those factors directly instead of constructing a number that may
-overflow.
-
-For example, each trailing zero in `n!` needs one factor pair `2 * 5`. A
-factorial contains more twos than fives, so the number of trailing zeroes is:
+`n!`, read as "n factorial," means multiplying every whole number from `1` to
+`n`. For example:
 
 ```text
-n/5 + n/25 + n/125 + ...
+5! = 1 * 2 * 3 * 4 * 5 = 120
 ```
 
-For `25!`, this is `25/5 + 25/25 = 5 + 1 = 6`. The second term counts the
-extra factor of five contributed by `25`.
+Calculating a larger factorial creates an enormous number. If the question only
+asks how many zeroes appear at the end, the full number is not needed.
 
-To test one number for factors, trial division only needs candidates up to its
-square root. If a larger factor existed without a matching smaller factor, the
-two factors would multiply to more than the number. When many questions ask
-which values up to the same limit are prime, a **sieve** is usually faster: it
-marks multiples of each prime once instead of repeating trial division for
-every value.
+Multiplying by `10` adds a zero to the end of a whole number:
+
+```text
+12 * 10 = 120
+```
+
+A `10` can be made by multiplying `2 * 5`. Therefore, each pair containing one
+`2` and one `5` creates one trailing zero. A factorial has plenty of `2`s
+because every second number is even. The `5`s are less common, so the number of
+`5`s determines how many pairs can be made.
+
+Consider `25!`. These are the numbers from `1` through `25` that contain a `5`
+when broken into multiplication:
+
+```text
+5  = 1 * 5       one 5
+10 = 2 * 5       one 5
+15 = 3 * 5       one 5
+20 = 4 * 5       one 5
+25 = 5 * 5       two 5s
+```
+
+There are six `5`s altogether. Each can pair with a `2`, so `25!` ends in six
+zeroes.
+
+Listing the numbers works for `25!`, but not for a very large `n`. Division
+counts them more quickly. Go integer division discards the remainder.
+
+| Calculation | What it counts | Total |
+| --- | --- | ---: |
+| `25 / 5 = 5` | One `5` from each of `5`, `10`, `15`, `20`, and `25` | `5` |
+| `25 / 25 = 1` | The second `5` inside `25` | `6` |
+| `25 / 125 = 0` | Nothing else, so stop | `6` |
+
+The same steps become this loop:
+
+```go
+zeroes := 0
+remaining := n
+
+for remaining >= 5 {
+	remaining /= 5
+	zeroes += remaining
+}
+```
+
+The first division counts numbers containing at least one `5`. Dividing by `5`
+again counts the extra `5` inside each multiple of `25`. Further divisions count
+the extra `5`s inside multiples of `125`, `625`, and so on. The loop stops when
+there are no more to count.
+
+The loop uses `O(1)` auxiliary space. It takes `O(log n)` time because every
+iteration makes `remaining` five times smaller.
+
+#### Finding factors and primes
+
+When testing whether one number is prime, trial division only needs candidates
+up to its square root. Any factor larger than the square root must be paired
+with a smaller factor that has already been checked.
+
+A **sieve** finds every prime number up to a chosen limit by removing numbers
+known not to be prime. For example, to find primes up to `10`, begin with the
+numbers `2` through `10`. Keep `2` and cross out its multiples: `4`, `6`, `8`,
+and `10`. Then keep `3` and cross out its remaining multiple, `9`. The numbers
+left are the primes `2`, `3`, `5`, and `7`. This method is called a sieve
+because it filters out non-prime numbers.
+
+When many questions ask which values up to the same limit are prime, a sieve is
+usually faster than repeating trial division for every value.
 
 #### Processing a number that does not fit in an integer type
 
