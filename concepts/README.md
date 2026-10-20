@@ -538,7 +538,8 @@ Pick one particular value. Every valid group either includes it or does not:
 
 For example, `C(5, 2) = C(4, 1) + C(4, 2) = 4 + 6 = 10`. This rule is the
 source of Pascal's triangle and is useful when dynamic programming needs many
-combination counts, not just one.
+combination counts, not just one. The [dynamic programming](#dynamic-programming)
+card explains that method.
 
 Both methods can still overflow. In the loop, even `result * nextFactor` can
 overflow before the following division reduces it. Check multiplication and
@@ -556,10 +557,12 @@ positions `[1a, 1b, 2]`, choosing two positions gives three choices:
 the last two both become `[1,2]`, so the distinct value combinations are only
 `[1,1]` and `[1,2]`.
 
-To generate each value combination once, a common backtracking technique is to
-sort the input and skip equal values considered as alternatives at the same
-decision depth. Do not skip the same value at a deeper depth: after choosing
-the first `1`, the second `1` must remain available so `[1,1]` can be formed.
+To generate each value combination once, sort the input and build one answer a
+choice at a time. When choosing a value for the same output position, skip an
+equal value already tried there. This is a common
+[backtracking](#backtracking) technique. Do not skip the equal value at the
+next output position: after choosing the first `1`, the second `1` must remain
+available so `[1,1]` can be formed.
 
 ### Integer Digit Processing
 
@@ -608,8 +611,12 @@ Before calculating `reversed*10 + digit`, check:
 reversed > (limit-digit)/10
 ```
 
-If the comparison is true, the next result would exceed `limit`. The reference
-implementation returns `false` instead of performing that unsafe calculation.
+This comparison comes directly from the safe condition
+`reversed*10 + digit <= limit`. Subtract `digit` from both sides and divide by
+positive `10`; the next operation is safe only when
+`reversed <= (limit-digit)/10`. The code tests the opposite condition with
+`>`; when it is true, the reference implementation returns `false` instead of
+performing the unsafe calculation.
 
 Negative inputs need an explicit rule because the minus sign is not a digit.
 `ReverseNonNegative` rejects them and accepts zero.
@@ -630,18 +637,17 @@ memory.
 
 ### Arrays, slices, and strings
 
-An array stores a fixed number of values. A slice gives access to some or all of
-an array. Its **length** is the number of values currently visible; its
-**capacity** is the number it can grow to before Go needs another array.
-Appending may reuse the existing array or create a new one. A small slice can
-keep its much larger underlying array in memory, so copy the small result when
-it will live for a long time and the larger array is no longer needed. A Go
-string is a read-only sequence of bytes. Reading `text[i]` returns one byte,
-which is not always a complete Unicode character.
+An array stores a fixed number of values. A slice gives access to some or all
+of an array.
 
 **Plain-language picture:** An array is a row of numbered lockers. A slice is a
 view through which some consecutive lockers are visible. Two slices can look
 like separate lists while still viewing the same lockers underneath.
+
+A slice's **length** is the number of values currently visible. Its
+**capacity** is the number of positions available from its starting point
+before Go must allocate another array to make it grow. Appending may therefore
+reuse the existing array or create a new one.
 
 **Worked example:** If `base := []int{10, 20, 30, 40}` and
 `middle := base[1:3]`, then `middle` sees `[20, 30]`. Setting `middle[0] = 99`
@@ -649,6 +655,15 @@ also changes `base` to `[10, 99, 30, 40]` because both slices refer to the same
 underlying array. An append that exceeds `middle`'s capacity allocates a new
 underlying array; changes through the returned slice then no longer affect
 `base`.
+
+A small slice can keep its much larger underlying array in memory. Copy the
+small result when it will live for a long time and the larger array is no
+longer needed.
+
+A Go string is a read-only sequence of bytes. Reading `text[i]` returns one
+byte, which is not always a complete Unicode character. The
+[bytes, runes, and visible characters](#bytes-runes-and-visible-characters)
+section explains how to choose the intended text unit.
 
 Arrays also provide an addressable position for every value. When values are
 guaranteed to lie in a small range, the position can represent the value and
@@ -734,9 +749,12 @@ unvisited remainder of the list is lost.
   avoids separate code for inserting or replacing the head.
 - Two positions can advance independently when input lists have different
   lengths.
-- Fast and slow positions can detect a loop or locate the middle.
+- [Fast and slow positions](#fast-and-slow-pointers) can detect a loop or
+  locate the middle by moving one position one link per step and the other two.
 - For numbers stored with the lowest digit first, add matching nodes and carry
   `sum / 10` to the next position; the current output digit is `sum % 10`.
+  For example, adding digit nodes `8` and `7` produces output digit `5` and
+  carry `1` because `15 % 10 = 5` and `15 / 10 = 1`.
 
 #### Work and memory
 
@@ -797,9 +815,11 @@ Across the whole traversal, this gives constant average work per addition and
 removal even though an occasional append may need to copy the slice. This way
 of averaging the cost over a sequence is called **amortized analysis**. A
 long-lived queue should occasionally compact its unread portion or use a
-circular buffer, because retaining `queue[head:]` can keep the entire old
-backing array alive. Clear removed positions when they contain pointers that
-should become collectable.
+**circular buffer**, which reuses positions by wrapping from the end of a fixed
+slice back to its beginning. Retaining `queue[head:]` can otherwise keep the
+entire old backing array alive. Clear removed positions when they contain
+pointers so Go's automatic memory manager, called the **garbage collector**,
+can reclaim objects no longer in use.
 
 A queue built from two stacks illustrates the same idea. New items go onto an
 input stack. Removal uses an output stack; only when that stack is empty are all
@@ -809,10 +829,12 @@ time per operation.
 
 ### Trees and binary-search trees
 
-A tree is a graph with no cycles and exactly one route between any two nodes.
-In a rooted binary tree, every node has at most a left and right child. Be clear
-about whether `nil` children, parent links, duplicate values, or node identity
-matter; equal values do not make two nodes the same node.
+A tree is a collection of nodes joined by links with no loop and exactly one
+route between any two nodes. A **rooted** tree chooses one node as its starting
+point and describes other nodes as its descendants. In a rooted binary tree,
+every node has at most a left and right child. Be clear about whether `nil`
+children, parent links, duplicate values, or node identity matter; equal values
+do not make two nodes the same node.
 
 **ELI5:** Picture a family tree turned upside down. Start at one root, follow
 branches to children, and never find a branch that loops back to where it
@@ -866,57 +888,70 @@ inorder traversal is strictly increasing. If duplicate values are allowed, the
 problem must state whether equality belongs on the left, the right, or neither.
 
 Search, insertion, and deletion take `O(h)` time for tree height `h`. A balanced
-BST has `h = O(log n)`; an unrestricted BST can become a chain with `h = O(n)`.
-Go's standard library does not provide an ordered map, so interview solutions
-usually use sorting, a heap, binary search over a slice, or a problem-specific
-tree rather than implementing a balanced BST from scratch.
+BST keeps its left and right sides from becoming extremely uneven, giving
+`h = O(log n)`. An unrestricted BST can become a one-sided chain with
+`h = O(n)`. Go's standard library does not provide an **ordered map**, which is
+a key-value collection that also keeps keys in sorted order. Interview
+solutions therefore usually use sorting, a heap, binary search over a slice,
+or a problem-specific tree instead of implementing a balanced BST from
+scratch.
 
 When reconstructing a tree from traversals, one traversal usually identifies
 the next root and another identifies the boundary between its left and right
-subtrees. Store value-to-position lookups to avoid rescanning the inorder
-sequence. Reconstruction from values alone requires a uniqueness rule; repeated
-values can make the tree ambiguous.
+subtrees. For example, preorder `[2, 1, 3]` says the root is `2`; finding `2`
+in inorder `[1, 2, 3]` shows that `[1]` belongs to the left subtree and `[3]`
+to the right. Store each value's inorder position to avoid scanning that
+sequence again for every node. Reconstruction from values alone requires a
+uniqueness rule because repeated values can describe more than one tree.
 
 A rooted tree may need to be traversed in directions the node type does not
 store. For a question such as all nodes at distance `k` from a target, first
-walk the tree once to map every child to its parent. Then run BFS from the
-target using left child, right child, and parent as undirected neighbors. Mark
-node identities reached when enqueuing them so the search cannot bounce between
-a parent and child. The conversion and search both take `O(n)` time and space.
+walk the tree once to map every child to its parent. Then run
+[breadth-first search (BFS)](#breadth-first-search) from the target using left
+child, right child, and parent as two-way neighbors. BFS visits nodes one link
+away, then two links away, and so on. Mark node identities reached when adding
+them to the queue so the search cannot bounce between a parent and child. The
+conversion and search both take `O(n)` time and space.
 
 ### Graphs and grids
 
-A graph stores vertices and connections. Decide these properties before
-choosing an algorithm:
-
-In complexity descriptions below, `V` means the number of vertices and `E`
-means the number of edges.
+A graph stores vertices and connections.
 
 **ELI5:** A graph is a map of things and the allowed moves between them. The
 things are called vertices or nodes; the connections are called edges. Cities
 and roads, people and friendships, courses and prerequisites, and grid cells
 and legal moves are all the same basic shape.
 
-**Worked example:** For roads `A-B`, `A-C`, and `C-D`, an adjacency list can be
+In complexity descriptions below, `V` means the number of vertices and `E`
+means the number of edges.
+
+**Worked example:** An **adjacency list** stores each vertex together with its
+neighbors. For roads `A-B`, `A-C`, and `C-D`, it can be
 `A: [B, C]`, `B: [A]`, `C: [A, D]`, `D: [C]`. A search starting at `A` marks
 `A`, schedules `B` and `C`, then reaches `D` through `C`. Marking a town when
 it is scheduled prevents the reverse road from scheduling it again.
 
+Before choosing an algorithm, decide these properties:
+
 - **Directed or undirected:** an undirected edge must normally appear in both
   adjacency lists; a directed edge has one direction and contributes to the
   destination's **indegree**, meaning its number of incoming edges.
-- **Weighted or unweighted:** BFS minimizes edge count, not arbitrary total
-  weight.
+- **Weighted or unweighted:** [breadth-first search (BFS)](#breadth-first-search)
+  minimizes the number of edges used, not an arbitrary total of differing edge
+  costs.
 - **Cyclic or acyclic:** a general graph needs reached-state tracking; a rooted
   tree can usually avoid revisiting only by not returning to its parent.
 - **Connected or disconnected:** one traversal reaches only one component, so
-  an outer loop is needed when every component matters.
+  an outer loop is needed when every component matters. A **component** is one
+  group of vertices that can reach one another.
 
-An adjacency list uses `O(V + E)` space and is the usual representation for a
+The adjacency list uses `O(V + E)` space and is the usual representation for a
 **sparse graph**, where relatively few of the possible vertex pairs have an
-edge. An adjacency matrix uses `O(V^2)` space but answers whether one specific
-edge exists in constant time. An edge list is convenient when an algorithm
-repeatedly scans every edge, as Bellman-Ford does.
+edge. An **adjacency matrix** instead uses a `V`-by-`V` table: cell
+`matrix[a][b]` records whether the edge `a -> b` exists. It uses `O(V^2)` space
+but checks one specific edge in constant time. An **edge list** stores entries
+such as `(from, to, cost)` and is convenient when an algorithm repeatedly scans
+every edge, as [Bellman-Ford](#bellman-ford-shortest-paths) does.
 
 Mark a vertex reached when it is scheduled, not later when it is removed from a
 stack or queue. Otherwise several neighbors may schedule the same vertex and
@@ -927,8 +962,9 @@ A matrix often represents an **implicit graph**: each cell is a vertex, and its
 neighbors are calculated from direction offsets such as up, down, left, and
 right. Check row and column bounds independently. Decide whether the input may
 be mutated to record visited cells; if not, allocate separate state. For
-backtracking on a word grid, mark a cell only for the current path and restore
-it afterward. For ordinary reachability, the visited mark is permanent.
+[backtracking](#backtracking) on a word grid, mark a cell only for the current
+path and restore it afterward. For ordinary reachability, the visited mark is
+permanent.
 
 Sometimes the input does not call itself a graph at all. Create one vertex per
 object and an edge whenever the stated relationship permits a transition, such
@@ -938,14 +974,14 @@ whether duplicate edges would corrupt indegrees or other counts.
 
 ### Matrix traversal and in-place state
 
+**Plain-language picture:** A matrix is a grid addressed by two positions:
+`matrix[row][column]`. Moving vertically changes the row; moving horizontally
+changes the column. Check both positions before reading a neighbor.
+
 Matrix problems often test boundary discipline more than a new data structure.
 Treat `rows` and `cols` separately; a matrix need not be square, and Go permits
 **jagged slices**, whose rows have different lengths, unless the problem
 promises a rectangle.
-
-**Plain-language picture:** A matrix is a grid addressed by two positions:
-`matrix[row][column]`. Moving vertically changes the row; moving horizontally
-changes the column. Check both positions before reading a neighbor.
 
 **Worked boundary example:** A `2`-by-`3` matrix has rows `0..1` and columns
 `0..2`. From cell `(0, 2)`, moving down to `(1, 2)` is valid, but moving right
@@ -955,15 +991,21 @@ wrong because the number of rows and columns differ.
 - **Boundary traversal:** For spiral order, keep inclusive `top`, `bottom`,
   `left`, and `right` boundaries. After traversing one side, move its boundary
   inward and recheck that the opposite boundaries have not crossed before
-  traversing the bottom or left side.
+  traversing the bottom or left side. For the two rows `[1, 2, 3]` and
+  `[4, 5, 6]`, the order is `1, 2, 3, 6, 5, 4`; after reading the top and right
+  sides, only the bottom side remains.
 - **Layer transformations:** A square rotation can be expressed as a transpose
   followed by reversing each row, or as four-way swaps around each layer.
   A transpose swaps rows with columns, so position `(row, col)` moves to
-  `(col, row)`. State every coordinate mapping before mutating the values.
+  `(col, row)`. For `[[1, 2], [3, 4]]`, transposing gives
+  `[[1, 3], [2, 4]]`; reversing each row gives the clockwise rotation
+  `[[3, 1], [4, 2]]`.
 - **First-row or first-column markers:** When rows and columns must be marked
   without extra arrays, reuse the first row and column as marker storage and
   keep separate flags for whether those marker areas originally required a
-  change. Apply markers only after the discovery pass.
+  change. If a zero at `(1, 2)` means row `1` and column `2` must become zero,
+  record those two facts first and apply them only after every original cell
+  has been inspected.
 - **Current and next state together:** For simultaneous updates, such as a grid
   in which every cell changes once per round, encode both the original and
   future state in each cell or record changes separately. Neighbor decisions
@@ -1000,14 +1042,14 @@ operation always takes exactly that long.
 | --- | --- |
 | Stack minimum in `O(1)` | Store each value with the minimum at or below it, or keep a parallel stack of minima. |
 | Insert, delete, random item in expected `O(1)` | A slice gives random indexing; a map gives each value's slice index. Delete by swapping in the last value and repairing its map entry. |
-| Least-recently-used (LRU) cache `get` and `put` in `O(1)` | A map finds an entry; a doubly linked list orders entries from most to least recently used. Every access moves exactly one node. |
-| Streaming median | A max-heap stores the lower half and a min-heap the upper half. Their sizes differ by at most one, and every lower value is no greater than every upper value. |
-| Timestamped lookup | Store a sorted history per key and binary-search the last timestamp not greater than the query. |
+| Least-recently-used (LRU) cache `get` and `put` in `O(1)` | A map finds an entry; a doubly linked list, whose nodes link both forward and backward, orders entries from most to least recently used. Every access moves exactly one node. |
+| Streaming median | A [max-heap and min-heap](#heap-or-priority-queue) keep the lower and upper halves. Their sizes differ by at most one, and every lower value is no greater than every upper value. |
+| Timestamped lookup | Store a sorted history per key and [binary-search](#binary-search) the last timestamp not greater than the query. |
 
-**Worked deletion example:** Suppose a randomized set stores values
-`[10, 20, 30]` and the map stores `10 -> 0`, `20 -> 1`, and `30 -> 2`. To
-delete `20` without shifting later values, copy the final value `30` into
-position `1`, update its map entry to `30 -> 1`, shorten the slice to
+**Worked deletion example:** Suppose a set that also supports random retrieval
+stores values `[10, 20, 30]` and the map stores `10 -> 0`, `20 -> 1`, and
+`30 -> 2`. To delete `20` without shifting later values, copy the final value
+`30` into position `1`, update its map entry to `30 -> 1`, shorten the slice to
 `[10, 30]`, and remove `20` from the map. The map and slice agree again after
 every step.
 
@@ -1037,17 +1079,20 @@ report `b`. The algorithm never needs to scan the entire received stream again.
   occurrence, and remove repeated items from the queue front. The front is the
   earliest item whose current frequency is one.
 - For a fixed recent window, pair counts or another summary with a queue or
-  circular buffer so the item leaving the window can undo its contribution.
-- For a running median, maintain the two-heap invariant described above. For
-  streaming top `k`, keep only `k` candidates in a heap.
+  circular buffer, which wraps around and reuses fixed storage, so the item
+  leaving the window can undo its contribution.
+- For a running median, maintain the two-[heap](#heap-or-priority-queue)
+  invariant described above. For streaming top `k`, keep only `k` candidates
+  in a heap.
 - For sorted streams, keep only the next unread item from each stream in a
   heap; consuming one candidate reveals its successor.
 
 Ask whether arrivals can be late or reordered, whether memory must be bounded,
-and whether an answer is required after every item. A batch solution that sorts
-all input is not online even if it produces the same final answer. Amortized
-analysis is often the right measure because one arrival may evict several stale
-candidates while every candidate is still added and removed only once.
+and whether an answer is required after every item. A **batch** solution waits
+for all input before starting, so one that sorts the entire input is not online
+even if it produces the same final answer. Amortized analysis is often the
+right measure because one arrival may remove several candidates that are no
+longer valid while every candidate is still added and removed only once.
 
 ### Choosing a structure
 
@@ -1055,7 +1100,8 @@ candidates while every candidate is still added and removed only once.
 - Use a [stack](#stack) for most-recent-first processing and a
   [queue](#queues-and-deques) for oldest-first processing.
 - Use a [deque](#queues-and-deques) when candidates can expire from the front
-  while dominated new candidates remove items from the back.
+  while a better and newer candidate makes items at the back permanently
+  unnecessary.
 - Use a [binary-search tree](#trees-and-binary-search-trees) when keys must stay
   ordered under updates and the environment already supplies a balanced
   implementation.
@@ -1454,16 +1500,22 @@ because map operations are usually close to constant time, and it uses up to
 `O(n)` extra memory. A single map operation can occasionally take longer.
 
 **Common traps:** A map does not preserve sorted or insertion order by itself.
-In Go, reading a missing key returns the value type's zero value, so use the
-`value, found := entries[key]` form when zero is meaningful.
+In Go, reading a missing key returns the value type's **zero value**, meaning
+its default such as `0`, `false`, or `nil`. Use the
+`value, found := entries[key]` form when that default could also be stored.
 
 For grouping problems, design a **canonical key**: equal logical objects must
 produce the same key and unequal objects must not collide under the chosen
-representation. Anagrams can use a fixed-size character-count array as a key
-when the alphabet is fixed and the array is comparable; arbitrary text may
-need a sorted representation or encoded counts. Isomorphic mappings require
-consistency in both directions, not merely that each source character keeps one
-destination.
+representation. **Anagrams**, which contain the same character counts in a
+different order, can use a fixed-size count array as a key when the alphabet is
+fixed and the array is comparable. Arbitrary text may need a sorted
+representation or encoded counts.
+
+An **isomorphic mapping** consistently replaces characters while preserving
+which positions are equal. For example, `egg` can map to `add` with `e -> a`
+and `g -> d`, but `ab` cannot map to `cc` because two different source
+characters would collapse into one destination. Checking maps in both
+directions enforces both requirements.
 
 **Reject it when:** The essential operation is ordered traversal, nearest-key
 search, or another relationship a hash key does not preserve.
@@ -1483,10 +1535,10 @@ the desired output itself must be ordered.
 
 **Start here:** Decide what the comparison means and whether the original
 indices or input order must be retained. For records, define tie-breaking
-explicitly. A comparator must be consistent: if `a` comes before `b` and `b`
-comes before `c`, then `a` must come before `c`. If equal items must keep their
-previous order, use a stable sort or include the original position as a
-tie-breaker.
+explicitly. This comparison rule, called a **comparator**, must be consistent:
+if `a` comes before `b` and `b` comes before `c`, then `a` must come before `c`.
+If equal items must keep their previous order, use a stable sort or include the
+original position as a tie-breaker.
 
 **Worked example:** To detect duplicates in `[4, 1, 4, 2]`, sort it into
 `[1, 2, 4, 4]`, then compare neighbors. The two `4`s become adjacent, so one
@@ -1494,11 +1546,12 @@ linear scan finds them. Sorting costs more than a set for this one question,
 but the same ordering may also support later range or pair queries.
 
 **Work and memory:** Standard comparison sorts are usually budgeted as
-`O(n log n)` time, although a poorly implemented quicksort can degrade to
-`O(n^2)`. Extra memory depends on the chosen sorting algorithm; copying the
-input to preserve it uses `O(n)` additional memory. Go's `sort.Ints` and
-`sort.Slice` modify the slice and are not stable; `sort.SliceStable` preserves
-equal elements' order at an additional practical cost.
+`O(n log n)` time. Quicksort divides values around a pivot and sorts the two
+sides; consistently poor pivots can make it degrade to `O(n^2)`. Extra memory
+depends on the chosen sorting algorithm; copying the input to preserve it uses
+`O(n)` additional memory. Go's `sort.Ints` and `sort.Slice` modify the slice
+and are not stable; `sort.SliceStable` preserves equal elements' order at an
+additional practical cost.
 
 When integer keys occupy a small known range of size `k`, counting occurrences
 can sort or group them in `O(n + k)` time and `O(k)` extra memory. This is useful
@@ -1510,7 +1563,7 @@ around a pivot. After partitioning, the pivot is in its final rank, every value
 on one side is no greater, and every value on the other side is no smaller.
 Continue only on the side containing rank `k`. Randomized or careful pivots give
 expected `O(n)` time, but consistently poor pivots give `O(n^2)` worst-case
-time. A heap gives a simpler deterministic `O(n log k)` solution for top-`k`
+time. A heap gives a simpler `O(n log k)` worst-case bound for top-`k`
 streaming data and preserves the selected items without fully sorting all data.
 
 **Why sorting helps:** The sort itself does not solve the problem. It creates a
@@ -1577,38 +1630,56 @@ and [Search in Rotated Sorted Array](../problems/solved_medium_leetcode_0033_sea
 of the pattern is still useful after a mismatch.
 
 **Recognize it:** The same pattern is searched inside a larger string, and a
-naive restart would compare the same text characters many times. For a short
-pattern or one search, the straightforward method may still be best.
+straightforward restart would compare the same text characters many times. For
+a short pattern or one search, that straightforward method may still be best.
 
-**Work and memory:** The naive method tries every possible start and compares
-until a mismatch. For text length `n` and pattern length `m`, its worst case is
-`O(nm)` time and `O(1)` extra memory, such as many repeated `a` characters
-followed by a mismatch. KMP takes `O(n + m)` time and stores an `O(m)` fallback
-table.
+**Start with the direct method:** Try the pattern at every possible starting
+position. At each start, compare from left to right until every character
+matches or one differs.
 
-**Worked example:** Search for `abab` in `ababab`. After matching the first
-four characters, the answer is position `0`. If the pattern were `abac`, the
-comparison would fail after matching `aba`. KMP remembers that the matched text
-ends with `a`, which is also the start of the pattern, so it resumes with one
-character already matched instead of checking that text from scratch.
+**Worked example:** Search for `abab` in `ababab`. Trying position `0` matches
+`a`, `b`, `a`, and `b`, so the answer is `0`. If the pattern is `abac`, the
+comparison at position `0` matches `aba` and then fails on the fourth
+character. A direct search next tries position `1` from the beginning.
 
-**KMP prefix fallback:** Precompute for each pattern prefix the length of its
-longest proper prefix that is also a suffix. After a mismatch, fall back to that
-known matching border instead of moving the text position backward. The
-invariant is that the first `matched` pattern bytes equal the text suffix just
-processed. Each text position advances once and fallback positions only move
-through the precomputed table, giving `O(n + m)` time and `O(m)` memory.
+**Remembering useful matched text:** The Knuth-Morris-Pratt algorithm, usually
+called **KMP**, avoids restarting the pattern from zero after every mismatch.
+A **prefix** begins at the pattern's first character; a **suffix** ends at its
+last character. A **proper prefix** is shorter than the complete string. A
+piece that is both a prefix and suffix is sometimes called a **border**.
 
-**Rolling hash:** Maintain a hash for the current length-`m` window, removing
-the outgoing contribution and adding the incoming one in constant time. Equal
-hashes identify candidates, not proof, unless the hashing scheme is explicitly
-collision-free for the domain. Compare the actual bytes before reporting a
-match, or use a collision policy accepted by the problem.
+For pattern `ababac` and text beginning `ababab`, the first five characters
+`ababa` match before pattern character `c` disagrees with text character `b`.
+The matched text ends with `aba`, which is also the pattern's first three
+characters. KMP keeps those three useful matches and continues instead of
+restarting at zero. A table prepared from the pattern records how many
+characters remain useful after each mismatch.
+
+KMP's invariant is that the first `matched` pattern bytes equal the ending of
+the text processed so far. On mismatch, the table shortens `matched` to the
+next possible border without moving the text position backward. Each text
+position advances once, so a text of length `n` and pattern of length `m` takes
+`O(n + m)` time and the table uses `O(m)` memory.
+
+**Rolling hash:** A hash is a compact numeric fingerprint. Maintain the
+fingerprint for the current length-`m` text window by removing the outgoing
+character's contribution and adding the incoming character's contribution.
+Two different windows can occasionally have the same fingerprint; this is a
+**collision**. Equal hashes therefore identify candidates, not proof. Compare
+the actual bytes before reporting a match unless the problem explicitly
+accepts a collision risk.
+
+**Work and memory:** The direct method can take `O(nm)` time and `O(1)` extra
+memory, such as when many repeated characters match before the final character
+fails. KMP takes `O(n + m)` time and `O(m)` memory. A rolling hash can scan in
+`O(n)` expected time after `O(m)` setup, but correctness still requires the
+collision check described above.
 
 **Common traps:** Define the empty-pattern result. Byte-based matching is
-correct for judge inputs defined in bytes or ASCII but can split UTF-8 encoded
-characters. KMP is valuable when its worst-case guarantee matters; it is not a
-requirement to replace a clear linear-library search in every interview.
+correct for inputs defined as bytes or a one-byte alphabet, but it can split a
+Unicode character encoded with several bytes. KMP is valuable when its
+worst-case guarantee matters; it is not a requirement to replace a clear
+linear-library search in every interview.
 
 **Reject it when:** One short or one-off search is clearer with a direct scan
 or a standard library operation, or when the match permits edits, reordered
@@ -1619,6 +1690,10 @@ characters, or another relationship that exact string matching does not model.
 **Mental model:** The parser is always in one of a small number of modes, and
 the current input symbol determines the next mode and any action. The mode
 summarizes exactly what prefixes are legal so far.
+
+Here, a **grammar** is the set of arrangements the input permits. A **token**
+is one meaningful piece, such as a number, name, or operator. **Tokenization**
+splits characters into those pieces; **evaluation** applies their meaning.
 
 **Recognize it:** Input has a grammar or phased format: optional whitespace,
 an optional sign, digits, perhaps a decimal or exponent, nested delimiters, or
@@ -1643,10 +1718,12 @@ after digits have begun.
 
 For arithmetic expressions, a stack handles nested parentheses, while operator
 precedence can be handled by operator/value stacks or by recursive-descent
-functions for grammar levels such as expression, term, and factor. Decide
-whether unary `+` and `-` are operators on a following value or part of numeric
-tokenization. Do not rely on splitting by spaces when the grammar permits no
-spaces or arbitrary spacing.
+functions: one function handles additions, another multiplications, and
+another individual values or parenthesized expressions. This organization is
+called **recursive descent** because the functions follow the grammar's nested
+levels. Decide whether **unary** `+` and `-`, which apply to one following
+value, are operators or part of numeric tokenization. Do not rely on splitting
+by spaces when the grammar permits no spaces or arbitrary spacing.
 
 **Why it stays correct:** After consuming a prefix, the state describes every
 legal way that prefix may continue and the accumulated values represent exactly
@@ -1724,9 +1801,9 @@ and [Remove Element](../problems/solved_easy_leetcode_0027_remove_element.go).
 
 ##### Dynamic programming
 
-**Mental model:** Start with a search that tries choices. If different paths
-keep reaching the same smaller question, answer that question once and reuse
-the result.
+**Mental model:** Dynamic programming (**DP**) starts with a search that tries
+choices. If different paths keep reaching the same smaller question, answer
+that question once and reuse the result.
 
 **Recognize it:** All three conditions should hold:
 
@@ -1774,33 +1851,56 @@ Common state families recur across interview problems:
 | Interval | `dp[left][right]` answers inside one range. | Process shorter ranges before longer ranges. |
 | Finite state machine | `dp[i][state]` records a small mode such as holding stock or transaction count. | Every transition must represent one legal action. |
 
-State compression is safe only when overwritten values can never be needed
-again. In a two-dimensional table, keeping one row may require scanning columns
-in a particular direction. Explain the dependency before reducing memory;
-blindly changing `O(nm)` storage to `O(m)` can mix the current row with the
-previous row and accidentally let the same item be reused when it should be
-available only once.
+**Reducing table memory:** State compression means retaining only the table
+entries future calculations still need. Suppose a grid calculation uses the
+cell above and the cell to the left. In one row-sized slice scanned left to
+right, `dp[col]` still holds the result from above before it is replaced, while
+`dp[col-1]` already holds the new result from the left. Scanning in the opposite
+direction would change those meanings. Explain this dependency before reducing
+`O(rows * cols)` storage to `O(cols)`; otherwise overwritten values may be
+reused or lost incorrectly.
 
-Sometimes the useful stored meaning changes during optimization. For longest
-increasing subsequence, `tails[length]` can store the smallest possible ending
-value of an increasing subsequence of that length. Binary-searching where each
-new value belongs gives `O(n log n)` time. `tails` is not necessarily an actual
-subsequence; reconstructing one requires predecessor information. Use a lower
-bound for strictly increasing sequences and choose the equality rule carefully
-for non-decreasing sequences.
+**Changing what a state stores:** For longest increasing subsequence, let
+`tails[L]` store the smallest ending value found for any increasing subsequence
+of length `L`, where `L` is that length. For `[3, 5, 2, 4, 1]`, the stored
+endings change as follows:
 
-A transition may ask for the best earlier state whose value lies in a range,
-for example `value-k <= earlierValue < value`. The direct DP scans all earlier
-states. Instead, coordinate-compress the input values, store the best DP value
-at each rank, query the permitted rank interval with a segment tree, and update
-the current rank. This changes an `O(n^2)` transition to `O(n log n)` when the
-range maximum or minimum is the only information needed. Compression preserves
-value order, not original positions; process inputs in their required sequence.
+```text
+3 -> [3]
+5 -> [3, 5]
+2 -> [2, 5]
+4 -> [2, 4]
+1 -> [1, 4]
+```
+
+The two stored entries prove that a length-two subsequence exists, but `[1, 4]`
+is not itself a subsequence of this input because `1` arrived after `4`.
+Reconstructing the actual values requires each chosen value to link to the
+earlier chosen value before it. For each new value,
+[binary search](#binary-search) finds the first stored ending greater than or
+equal to it; replacing that ending produces an `O(n log n)` length calculation
+for strictly increasing subsequences. A non-decreasing variant must use a
+different equality rule.
+
+###### Coordinate compression
+
+Coordinate compression replaces each distinct value with its position in
+sorted order. For `[100, -5, 100, 20]`, the sorted distinct values are
+`[-5, 20, 100]`, so the ranks are `[2, 0, 2, 1]`. The ranks are small, but
+comparisons keep the same order as the original values.
+
+This is useful when a transition asks for the best earlier state in a value
+range such as `value-k <= earlierValue < value`. Store the best DP result at
+each rank, query the permitted rank interval with a
+[segment tree](#fenwick-and-segment-trees), and update the current rank. This
+can reduce an `O(n^2)` scan of earlier states to `O(n log n)` when only a range
+minimum or maximum is needed. Compression preserves value order, not original
+input positions, so still process the values in their required sequence.
 
 Derive complexity from the number of reachable states multiplied by the work
 per transition. A two-dimensional table is not automatically `O(n^2)` if each
-cell loops over many choices, and memoization does not help states that are
-never repeated.
+cell loops over many choices. **Memoization**, meaning saving the result of a
+recursive state for reuse, does not help states that are never repeated.
 
 **Common traps:** Writing the rule alone does not prevent repeated work; the
 answers must also be saved. Do not store facts that cannot affect future
@@ -1839,14 +1939,19 @@ For merge sort, each call sorts two halves, then merges them by repeatedly
 taking the smaller unread value. The invariant during merging is that the
 output prefix is sorted and contains exactly the smallest values consumed from
 both halves. The recurrence `T(n) = 2T(n/2) + O(n)` gives `O(n log n)` time.
-Ordinary slice-based merging needs `O(n)` extra storage in addition to
-`O(log n)` recursive stack depth for balanced splits.
+The reason is concrete: repeatedly halving `n` creates about `log n` levels,
+and all merges on one level process `n` values in total. Multiplying the levels
+by the work per level gives `O(n log n)`. Ordinary slice-based merging needs
+`O(n)` extra storage in addition to `O(log n)` recursive stack depth for
+balanced splits.
 
 Exponentiation by squaring uses the same idea without two recursive calls. If
 `n` is even, `x^n = (x^(n/2))^2`; if odd, multiply by one extra `x`. Repeatedly
-halving the exponent takes `O(log |n|)` multiplications. For negative exponents,
-invert the base and use a wider or unsigned magnitude carefully: negating the
-minimum signed integer overflows its type.
+halving the exponent takes `O(log |n|)` multiplications. For example,
+`x^10 = (x^5)^2`, and `x^5 = x * (x^2)^2`, so the calculation reuses squared
+results instead of multiplying `x` ten times. For negative exponents, use
+`x^(-n) = 1/x^n`. Take care when converting `-n` to a positive magnitude:
+negating the most negative signed integer exceeds that type's positive limit.
 
 **Contrast with dynamic programming:** Divide and conquer is most natural when
 subproblems do not overlap. Dynamic programming is needed when different
@@ -1893,9 +1998,12 @@ return indices, remember the candidate start whenever beginning at the current
 value is better, and save it when the global best improves.
 
 For a circular array, a wrapping maximum equals the total sum minus the minimum
-non-wrapping subarray. Compare that value with ordinary Kadane, except when all
-values are negative: removing the minimum would remove the whole array and
-produce the invalid empty answer.
+non-wrapping subarray because the wrapping answer keeps everything outside one
+consecutive middle section. For `[5, -3, 5]`, the total is `7`; removing the
+minimum section `[-3]` gives wrapping sum `7 - (-3) = 10`, representing the two
+end values joined around the circle. Compare that result with ordinary Kadane.
+When all values are negative, removing the minimum would remove the whole array
+and produce an invalid empty answer, so use the ordinary non-empty result.
 
 **Work and memory:** The scan takes `O(n)` time and `O(1)` extra memory.
 
@@ -1919,7 +2027,8 @@ empty stack is reported.
 In the Go reference implementation, `Push` adds a value, `Pop` removes the
 top, `Peek` inspects it, `Len` reports the count, and `IsEmpty` reports whether
 the stack contains no values. `Pop` and `Peek` return a zero value plus `false`
-when the stack is empty.
+when the stack is empty; the boolean distinguishes that default value from a
+successful removal.
 
 **Worked example:** To validate `([])`, push `(` and then `[`. When `]` arrives,
 pop `[` and verify the match. When `)` arrives, pop `(`. The input is valid
@@ -1932,14 +2041,16 @@ first.
 A stack can also compress adjacent runs. Store `(value, count)` for each run;
 merge a new value with the top when equal, and pop when a rule eliminates the
 completed run. After a pop, recheck the new top because two previously separated
-runs may now touch and combine. This turns repeated rescanning in elimination
-problems into amortized linear work when each item is pushed and popped only a
+runs may now touch and combine. For example, if three equal letters disappear,
+processing `aabbbaa` first removes the run `bbb`; the two stored `aa` runs then
+touch and combine into `aaaa`. Rechecking the top handles that new adjacency.
+This avoids repeated full rescans when each item is pushed and popped only a
 constant number of times.
 
 **Work and memory:** Push, pop, and top inspection take `O(1)` time, aside from
 occasional slice growth when Go uses a slice as the stack. The stack may retain
-`O(n)` items. Clear a removed slice position when it may hold pointers that
-should become collectable.
+`O(n)` items. Clear a removed slice position when it may hold pointers so Go's
+garbage collector can reclaim objects no longer in use.
 
 **Common traps:** Use a queue when the oldest waiting item must be handled
 first. Removing from the front of a Go slice does not model a stack and may
@@ -2083,20 +2194,26 @@ range has sum `11`. Changing `5` to `6` updates its leaf, the right-half sum to
 
 A **Fenwick tree** (binary indexed tree) is compact and especially useful for
 point updates plus prefix sums. With one-based positions, `i & -i` gives the
-size of the range summarized at position `i`. An update repeatedly adds that
-lowest set bit to move to larger containing ranges; a prefix query repeatedly
-removes it to accumulate disjoint ranges. Both operations take `O(log n)` time
-and the structure uses `O(n)` memory. A range sum is the difference of two
-prefix sums.
+size of the range summarized at position `i`. For example, position `6` is
+binary `110`; its lowest set bit has value `2`, so the entry at position `6`
+summarizes two positions, `5..6`. A prefix query at `6` adds that summary, then
+removes the low bit to continue at `4`, whose summary covers `1..4`. An update
+does the reverse: it adds the low bit to move to larger ranges containing the
+changed position. Both operations take `O(log n)` time and the structure uses
+`O(n)` memory. A range sum is the difference of two prefix sums.
 
 A **segment tree** stores one summary for each range in a binary partition of
 the array. It builds in `O(n)` and handles point updates in `O(log n)`. It also
 answers range queries such as sum, minimum, or maximum in `O(log n)` when the
 combining rule is **associative**, meaning that grouping the same values in a
 different way does not change the answer.
+
 Lazy propagation records a pending range update at an internal node and pushes
-it to children only when necessary, supporting many range updates and range
-queries without visiting every element.
+it to children only when necessary. For example, adding `3` to an entire half
+of the array can update that half's stored sum and attach a pending `+3` marker
+without immediately visiting every leaf. A later query that enters the half
+passes the marker to the relevant children before reading them. This supports
+many range updates and range queries without touching every element each time.
 
 The invariant is that every node's stored value correctly summarizes its range
 after accounting for any pending update. Define interval boundaries and the
@@ -2110,11 +2227,10 @@ updates and queries must be interleaved. They are valuable but lower priority
 than hash tables, ordinary traversal, sorting, and binary search for most
 general interviews.
 
-Coordinate compression maps sorted distinct values to dense ranks while
-preserving their order. It lets a Fenwick or segment tree answer value-range
-queries even when the original values are negative or enormous. Include every
-endpoint that a query may use, and distinguish value rank from original input
-position.
+[Coordinate compression](#coordinate-compression) lets a Fenwick or segment
+tree answer value-range queries even when the original values are negative or
+enormous. Include every endpoint that a query may use, and distinguish a
+value's sorted rank from its original input position.
 
 **Work and memory:** Both trees use `O(n)` memory. A Fenwick tree supports
 prefix queries and point updates in `O(log n)` time. A segment tree builds in
@@ -2341,15 +2457,17 @@ caller had before trying that branch.
 - Use **dynamic programming** when many choice sequences reach the same
   remaining situation and only its best value, count, or yes/no result matters.
   Save that result instead of rebuilding the same search tree.
-- Use ordinary **DFS** when traversing an existing graph or tree without
-  constructing and undoing a candidate answer.
+- Use ordinary **[depth-first search (DFS)](#depth-first-search)** when
+  traversing an existing graph or tree without constructing and undoing a
+  candidate answer.
 - Avoid exhaustive backtracking when there are too many possibilities and no
   useful early-stopping rule or repeated smaller question exists.
 
 ##### Depth-first search
 
-**Mental model:** Follow one route as far as possible. When that route ends,
-return to the most recent place that had another route available.
+**Mental model:** Depth-first search (**DFS**) follows one route as far as
+possible. When that route ends, return to the most recent place that had
+another route available.
 
 **Recognize it:** You need to visit an entire connected region, inspect every
 complete path, or calculate a tree result from the results below each node. You
@@ -2389,8 +2507,8 @@ call stack unless the environment guarantees enough stack space.
 
 ##### Breadth-first search
 
-**Mental model:** Explore outward in layers: first everything one move away,
-then everything two moves away, and so on.
+**Mental model:** Breadth-first search (**BFS**) explores outward in layers:
+first everything one move away, then everything two moves away, and so on.
 
 **Recognize it:** You need the fewest moves through a network where every move
 costs the same, the nearest reachable position, or tree nodes grouped by depth.
@@ -2403,8 +2521,9 @@ unseen neighbor, and record its distance as one more than the current distance.
 distance `1`, and their unseen neighbors at distance `2`. The first time the
 exit is added, you have found a route with the fewest moves.
 
-**Why it stays correct:** The queue never processes a position with a greater distance
-before a position with a smaller distance. Each position is added at most once.
+**Why it stays correct:** The queue never processes a position with a greater
+distance before a position with a smaller distance. Each position is added at
+most once.
 
 **Multi-source BFS:** When the question asks for the nearest source for every
 position, add all sources to the queue at distance zero before the search
@@ -2413,10 +2532,11 @@ time a position is reached is its minimum distance to any source. Running a
 separate BFS from every source repeats work and is usually much slower.
 
 **Bidirectional BFS:** When both one start and one target are known and moves
-can be reversed, grow frontiers from both ends until they meet. Expanding the
-smaller frontier can reduce the number of states explored dramatically, though
-the worst-case asymptotic bound may be unchanged. Keep the two visited-distance
-maps separate so the meeting distance can be combined correctly.
+can be reversed, grow a search from both ends until they meet. A **frontier** is
+the outermost layer reached so far. Expanding the smaller frontier can reduce
+the number of states explored dramatically, though the worst-case growth-rate
+bound may be unchanged. Keep the two visited-distance maps separate so the
+meeting distance can be combined correctly.
 
 **Work and memory:** With an adjacency list, ordinary BFS takes `O(V + E)` time
 and `O(V)` extra memory for its queue, distances, and reached state.
@@ -2483,18 +2603,21 @@ route, store that new cost and add the route to the queue.
 **Worked example:** Let `A -> B` cost `4`, `A -> C` cost `1`, and `C -> B`
 cost `2`. Starting at `A` discovers `B = 4` and `C = 1`. The queue processes
 `C` first because `1` is cheaper, then improves `B` to `1 + 2 = 3`. Processing
-`B` finalizes cost `3`; the older queued entry with cost `4` is stale and is
-ignored.
+`B` finalizes cost `3`; the older queued entry with cost `4` is **stale**,
+meaning it no longer equals the stored best cost, so it is ignored.
 
 **Why a processed cost is final:** Suppose the queue removes a route costing
 `5`, and `5` is still the cheapest known cost for that location. Every untried
 route already costs at least `5` before taking another connection. Because a
 connection cannot subtract cost, none can produce a route below `5`.
 
-**Work and memory:** With adjacency lists and a binary heap, the usual
+**Work and memory:** With adjacency lists and a **binary heap**, a priority
+queue organized as a tree with at most two children per position, the usual
 implementation takes `O((V + E) log V)` time and `O(V + E)` storage including
-the graph. If decrease-key is not implemented, push improved entries and
-discard a popped entry whose cost no longer equals the stored best cost.
+the graph. Some priority queues support **decrease-key**, which edits the
+priority of an entry already stored. When that operation is unavailable, push
+a new improved entry and later discard any popped entry whose cost no longer
+equals the stored best cost.
 
 **Reject it when:** Any connection may have a negative cost. If every connection
 has the same cost, breadth-first search is simpler.
@@ -2576,8 +2699,10 @@ changes improve speed without changing which items belong together.
 **Work and memory:** With both improvements, a long sequence of operations is
 almost constant time per operation in practice. Spread across the whole
 sequence, which is what **amortized** means here, the formal bound is
-`O(alpha(n))`. The function `alpha` grows so slowly that it is at most a tiny
-constant for realistic inputs. The parent and size arrays use `O(n)` memory.
+`O(alpha(n))`, where `alpha` is a mathematical function called the inverse
+Ackermann function. You do not need to calculate it for implementation work:
+it grows so slowly that it remains below a tiny constant for any realistic
+input. The parent and size arrays use `O(n)` memory.
 
 **Reject it when:** You need the actual route, the order in which items were
 visited, or the shortest path. Knowing only each item's group does not preserve
@@ -2601,13 +2726,13 @@ cycle. The result uses exactly two edges, which is `V - 1` for three offices.
 **Kruskal's algorithm:** Sort edges by weight. Scan from cheapest to most
 expensive and accept an edge exactly when its endpoints are currently in
 different disjoint-set components. The invariant is that the accepted edges
-form a forest that can still be extended to some minimum spanning tree. The
-**cut property** says that if the vertices are split into two groups, a
-cheapest edge crossing between those groups can be included in some minimum
-spanning tree. That is why Kruskal can safely accept the next cheapest edge
-that joins two current components. Sorting dominates the work at `O(E log E)`;
-disjoint-set operations are nearly constant amortized time with path
-compression and union by size.
+form a **forest**, meaning a collection of separate trees with no cycles, that
+can still be extended to some minimum spanning tree. The **cut property** says
+that if the vertices are split into two groups, a cheapest edge crossing
+between those groups can be included in some minimum spanning tree. That is
+why Kruskal can safely accept the next cheapest edge that joins two current
+components. Sorting dominates the work at `O(E log E)`; disjoint-set operations
+are nearly constant amortized time with path compression and union by size.
 
 **Prim's algorithm:** Begin from any vertex and keep the cheapest edge leaving
 the connected portion in a min-heap. Repeatedly take the cheapest edge reaching
@@ -2621,9 +2746,10 @@ binary heap takes `O(E log V)` time and `O(V + E)` storage including the graph.
 
 **Failure signal:** If fewer than `V - 1` edges can connect all vertices, the
 graph is disconnected and no single spanning tree exists. Kruskal naturally
-produces a minimum spanning forest. Prim as described above covers only the
-component containing its starting vertex; restart it from every still-unseen
-vertex to produce a minimum spanning forest for the whole graph.
+produces a **minimum spanning forest**: one minimum-cost tree for each separate
+connected group. Prim as described above covers only the group containing its
+starting vertex; restart it from every still-unseen vertex to produce the same
+kind of forest for the whole graph.
 
 **Reject it when:** The goal is the cheapest route from one starting vertex,
 not the cheapest total network, or when the directed edges do not represent an
@@ -3007,13 +3133,17 @@ If one sentence cannot be made precise, the method is still only a guess.
 
 These snippets show the ideas above as small Go programs. They are examples to
 read and adapt, not packages built by this repository. The note after each
-snippet lists the cases that its former tests checked.
+snippet lists important boundary cases to test.
 
 Read a snippet in three passes: first read the function comment to learn its
 contract, then trace one ordinary input through the changing variables, and
 finally check how it handles the listed boundary cases. The matching pattern
 card above explains why the code is correct; the snippet shows how that idea is
 expressed in Go.
+
+Some snippets use a type parameter written as `T`. Treat `T` as a placeholder
+for the value type chosen by the caller, such as `int` or `string`; the
+[type-parameter note](#type-parameters) explains why this is useful.
 
 ### Binary search bounds
 
@@ -3063,7 +3193,7 @@ func Search(values []int, target int) int {
 
 ```
 
-**Previously tested cases:** Empty input, targets before and after the data,
+**Cases to test:** Empty input, targets before and after the data,
 duplicate ranges, values between entries, first-match lookup, and absent
 targets.
 
@@ -3094,7 +3224,7 @@ func CountOrderedOneOrTwoStepWays(steps int) int {
 
 ```
 
-**Previously tested cases:** Negative totals, the empty sequence, one and two
+**Cases to test:** Negative totals, the empty sequence, one and two
 steps, and several points where a new answer is built from earlier answers.
 
 ### Hash-map complement lookup
@@ -3131,7 +3261,7 @@ func PairSumIndices(values []int, target int) (int, int, bool) {
 
 ```
 
-**Previously tested cases:** A previously seen matching value, equal values at
+**Cases to test:** A previously seen matching value, equal values at
 distinct indices, and inputs with no pair.
 
 ### Generic singly linked list
@@ -3180,7 +3310,7 @@ func Reverse[T any](head *Node[T]) *Node[T] {
 
 ```
 
-**Previously tested cases:** Slice round trips, reversal, and empty-list
+**Cases to test:** Slice round trips, reversal, and empty-list
 construction, conversion, and reversal.
 
 ### Generic stack
@@ -3239,7 +3369,7 @@ func (s *Stack[T]) IsEmpty() bool {
 
 ```
 
-**Previously tested cases:** Last-in-first-out ordering, top inspection, length
+**Cases to test:** Last-in-first-out ordering, top inspection, length
 tracking, complete removal, and empty operations.
 
 ### Overflow-safe integer reversal
@@ -3270,7 +3400,7 @@ func ReverseNonNegative(value int64) (reversed int64, ok bool) {
 
 ```
 
-**Previously tested cases:** Zero, palindromes, trailing zeroes, negative
+**Cases to test:** Zero, palindromes, trailing zeroes, negative
 rejection, and a reversal that would overflow `int64`.
 
 ### Common-prefix scan
@@ -3299,7 +3429,7 @@ func LongestCommonPrefix(strs []string) string {
 
 ```
 
-**Previously tested cases:** Shared and missing prefixes, an early shortest
+**Cases to test:** Shared and missing prefixes, an early shortest
 string, identical strings, a single string, and empty inputs.
 
 ### Directional scan
@@ -3335,7 +3465,7 @@ func SumWithSmallerLeftValuesSubtracted(values []int) int {
 
 ```
 
-**Previously tested cases:** Empty and single inputs, descending values that are
+**Cases to test:** Empty and single inputs, descending values that are
 all added, one subtractive pair, and a mix of additions and subtractions.
 
 ### Sorted two-pointer pair search
@@ -3365,7 +3495,7 @@ func PairSumSorted(values []int, target int) (left int, right int, ok bool) {
 
 ```
 
-**Previously tested cases:** A matching pair, negative values, the rule that
+**Cases to test:** A matching pair, negative values, the rule that
 one position cannot be used twice, a missing pair, and empty input.
 
 ## Go techniques
@@ -3375,22 +3505,30 @@ algorithms. Each rule below states the behavior that motivates it.
 
 #### Keep input conversion outside the algorithm
 
-An online judge often supplies text or JSON, while the algorithm should work
-with types such as `[]int`, `string`, or `*Node`. Convert the external input to
-those problem-specific types before the algorithm starts, and convert the
-result back only after it finishes. This separation lets the algorithm express
-the actual problem instead of mixing parsing with its main loop.
+An **online judge**, meaning the automated system that runs and checks a
+solution, often supplies text or JSON (JavaScript Object Notation) data. The
+algorithm itself should work with problem types such as `[]int`, `string`, or
+`*Node`. Convert the external input to those types before the algorithm starts,
+and convert the result back only after it finishes. This separation lets the
+algorithm express the actual problem instead of mixing parsing with its main
+loop.
 
-Put examples and edge cases in a table so the same test logic runs against
-each one. If parsing fails, report that boundary error rather than passing a
-partly initialized value into the algorithm.
+#### Table-driven tests
 
-#### Sorting and maps
+A table-driven test stores named rows containing an input and expected result,
+then runs the same checking loop over every row. Put ordinary examples and edge
+cases in that table so they cannot accidentally use different test logic. If
+parsing fails, report that boundary error rather than passing a partly
+initialized value into the algorithm.
+
+#### Sorting without unexpected mutation
 
 Go sorting functions rearrange the supplied slice. This is called **mutating**
 the input. If the caller expects the original order to remain unchanged, copy
 the slice before sorting it. With `sort.Slice`, write a comparison that states
 the intended order and any tie-breaking rule explicitly.
+
+#### Map presence and sets
 
 Reading a missing map key returns the value type's **zero value**: `0` for an
 integer, `false` for a boolean, and `nil` for a pointer or slice. When zero could
@@ -3401,16 +3539,18 @@ value, found := entries[key]
 ```
 
 `found` distinguishes a stored zero from a missing key. A set, which records
-only whether keys exist, is conventionally written `map[T]struct{}`. Iterating
-over a Go map does not promise any order, so sort the keys separately when the
-output order matters.
+only whether keys exist, is conventionally written `map[T]struct{}`; the empty
+struct uses no per-value data because only the key matters. Iterating over a Go
+map does not promise any order, so sort the keys separately when output order
+matters.
 
 #### Priority queues
 
 Use `container/heap` when the program repeatedly needs the next smallest,
-largest, or most urgent item. By default, the item for which `Less` reports the
-smallest priority rises to the top. Reverse that comparison when the largest
-item should come out first.
+largest, or most urgent item. The heap interface asks the program to provide a
+comparison method named `Less`. By default, the item that `Less` considers
+smallest rises to the top; reverse the comparison when the largest item should
+come out first.
 
 Some algorithms discover a better priority for an item already in the heap.
 Dijkstra's algorithm can avoid searching for and editing the old entry: push a
@@ -3420,24 +3560,31 @@ differ. Such an outdated entry is called **stale**.
 
 #### Bytes, runes, and visible characters
 
-A Go string is stored as bytes. ASCII characters use one byte, but many
-Unicode characters use several. For example, the Go string literal `"\u00e9"`
-represents one rune but has length `2` bytes in UTF-8. Use byte indexing when
-the problem explicitly uses bytes or a restricted alphabet. Range over the
-string or convert it to `[]rune` when Unicode code points are the intended
-units. A user-visible symbol can contain multiple runes, so text-editor rules
-may need Unicode grapheme handling beyond `[]rune`.
+A Go string is stored as bytes. Basic Latin characters such as `A` use one
+byte, but many Unicode characters use several bytes under UTF-8, Go's standard
+text encoding. For example, the Go string literal `"\u00e9"` represents one
+**rune**, Go's name for one Unicode code point, but has length `2` bytes. Use
+byte indexing when the problem explicitly uses bytes or a restricted alphabet.
+Range over the string or convert it to `[]rune` when Unicode code points are
+the intended units. One user-visible symbol can contain multiple code points;
+text-editor rules may therefore need a Unicode library that groups them as
+visible characters rather than plain `[]rune` indexing.
+
+#### Type parameters
 
 A **type parameter** lets one implementation work with several value types.
 For example, `Stack[T]` can store `int`, `string`, or another type while keeping
-the same push and pop behavior. Use type parameters when the operations truly
-do not depend on one concrete type.
+the same push and pop behavior. In `Stack[T any]`, `any` means that callers may
+choose any value type for `T`. Use type parameters when the operations truly do
+not depend on one concrete type.
 
-#### Recursion and retained memory
+#### Replacing recursion with a loop
 
 When replacing recursion with a loop, explicitly store what each unfinished
 call would have remembered: usually the current item, which choice comes next,
 and any partial result needed after returning.
+
+#### Slice storage and retained memory
 
 Two slices may share one underlying array, and `append` may either reuse that
 array or allocate a new one. Therefore a change through one slice may or may
