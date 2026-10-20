@@ -1222,15 +1222,17 @@ smallest signed integer under an explicit wider or unsigned-magnitude policy.
 
 ##### The problem it solves
 
-Several points can lie in the same direction from a starting point even though
-their horizontal and vertical changes have different sizes. We need one exact
-map key per direction without dividing into a rounded decimal slope.
+Several points can lie on the same line through a starting point even though
+their horizontal and vertical changes have different sizes or opposite signs.
+We need one exact map key per undirected line orientation without dividing
+into a rounded decimal slope.
 
 ##### The idea in simple terms
 
 Treat movement as an integer arrow `(changeX,changeY)`. Shorten the arrow by
-its greatest shared factor and make it point in one agreed sign direction. The
-shortened pair is an exact **direction key**.
+its greatest shared factor and choose one of the two opposite signs as the
+agreed representation. The shortened pair is an exact **direction key** for
+an undirected line through the starting point.
 
 ##### How it works
 
@@ -1263,7 +1265,7 @@ direction key is `(1,2)`.
    - **Before:** Change `(-1,-2)`
    - **Decision:** GCD is `1`, then reverse both signs because `changeX < 0`.
    - **After:** Key `(1,2)`
-   - **Known correct:** Opposite coordinate differences toward this point still describe the same line through the start.
+   - **Known correct:** The opposite arrow has the same undirected line orientation through the start.
 
 For point `(1,1)`, both changes are zero, so the result is marked duplicate
 instead of inventing a slope. For `(1,5)`, the fixed vertical key is `(0,1)`.
@@ -1328,7 +1330,8 @@ A caller grouping `n` points also pays for its map storage and lookups.
 ##### When to use it
 
 Use reduced direction keys when points must be grouped by exact collinearity
-through one chosen start and coordinates are integers within safe bounds.
+on undirected lines through one chosen start and coordinates are integers
+within safe bounds.
 
 ##### When not to use it
 
@@ -1746,7 +1749,9 @@ never needs to grow with its magnitude.
 
 ##### How it works
 
-For a nonempty string of ASCII digits and positive modulus `m`:
+For a nonempty string containing only the one-byte digit characters `'0'`
+through `'9'` from the American Standard Code for Information Interchange
+(ASCII), and positive modulus `m`:
 
 1. Start `remainder=0`.
 2. Convert the next byte from `'0'..'9'` to its digit value.
@@ -2507,7 +2512,8 @@ slice for range size `r` uses `O(r)` memory and counting `n` values takes
 - `text[0]` reads one byte. For `text := "\u00e9"`, that byte is not the whole
   character; choose bytes, runes, or user-visible characters deliberately.
 - A nil slice and a non-nil empty slice both have length zero but can differ in
-  JSON output and API meaning.
+  JavaScript Object Notation (JSON) output and in an application's public
+  input/output contract, often called its API.
 
 #### Related material
 
@@ -2697,7 +2703,7 @@ Reverse `1 -> 2 -> 3 -> nil`; the expected output is
    - **After:** `previous=1`, `current=2 -> 3`
    - **Known correct:** `1` is a complete reversed prefix
 2. **Step: 2**
-   - **Before:** `previous=2?` No: `previous=1`, `current=2 -> 3`
+   - **Before:** `previous=1`, `current=2 -> 3`
    - **Decision:** Save `3`, then point `2.Next` to `1`
    - **After:** `previous=2 -> 1`, `current=3`
    - **Known correct:** Nodes `1,2` are reversed without losing `3`
@@ -3346,9 +3352,9 @@ func validBST(root *TreeNode) bool {
 ##### Work and memory
 
 Validation visits each node at most once: `O(n)` time. Its recursion uses
-`O(h)` stack space. It can stop early at the first violation, giving best-case
-`O(1)` time when the root fails supplied bounds; ordinary full-tree validation
-is `O(n)`.
+`O(h)` stack space. It can stop near the root at the first violation, giving
+best-case `O(1)` time as `n` grows; a valid tree or a late violation requires
+`O(n)` time.
 
 ##### When to use it
 
@@ -3517,9 +3523,10 @@ parent. A reached set prevents walking back and forth over the same link.
 
 ##### How it works
 
-First traverse from the root and map each child pointer to its parent pointer.
-Then run breadth-first search from the target. Mark node identities when they
-enter the queue. One completed queue layer adds one link of distance.
+Require the target to belong to the tree rooted at `root`. First traverse from
+the root and map each child pointer to its parent pointer. Then run
+breadth-first search from the target. Mark node identities when they enter the
+queue. One completed queue layer adds one link of distance.
 
 ##### Step-by-step examples
 
@@ -3580,6 +3587,9 @@ func nodesAtDistance(root, target *TreeNode, k int) []int {
 	seen := map[*TreeNode]bool{target: true}
 	for distance := 0; distance < k; distance++ {
 		levelSize := len(queue)
+		if levelSize == 0 {
+			break
+		}
 		for i := 0; i < levelSize; i++ {
 			node := queue[0]
 			queue = queue[1:]
@@ -3601,9 +3611,11 @@ func nodesAtDistance(root, target *TreeNode, k int) []int {
 
 ##### Work and memory
 
-Parent mapping and search each visit at most `n` nodes, so total time is `O(n)`.
-The parent map, reached set, queue, and output together use `O(n)` memory; the
-recursive mapping also uses `O(h)` call-stack space within that bound.
+Parent mapping and search each visit at most `n` nodes. The search also stops
+when its frontier becomes empty, so total time is `O(n)`, even when `k` is
+larger than the tree's height. The parent map, reached set, queue, and output
+together use `O(n)` memory; the recursive mapping also uses `O(h)` call-stack
+space within that bound.
 
 ##### When to use it
 
@@ -3623,7 +3635,8 @@ recursive mapping also uses `O(h)` call-stack space within that bound.
 > `8` can queue `4` again, turning the temporary graph into repeated work.
 
 - Map pointers, not values; two distinct nodes may both store `7`.
-- Confirm whether the target is guaranteed to belong to the root's tree.
+- Reject or separately define a target outside the root's tree; this example
+  requires membership.
 - Decide whether negative `k` is invalid or produces an empty result.
 
 ##### Related material
@@ -4372,9 +4385,12 @@ views and defining the rule that keeps them in agreement.
 Choose one structure per required operation, then state a cross-structure fact:
 
 - A slice plus map supports random indexing and value-to-index lookup.
-- A map plus doubly linked list supports direct lookup and recency order. A
-  permanent dummy end node, called a **sentinel**, removes end special cases.
-- A max-heap and min-heap keep lower and upper halves for a streaming median.
+- A map plus doubly linked list supports direct lookup and recency order for a
+  **least-recently-used (LRU) cache**, which evicts the item unused for the
+  longest time. A permanent dummy end node, called a **sentinel**, removes end
+  special cases.
+- A max-heap, which exposes the largest value, and a min-heap, which exposes
+  the smallest, keep lower and upper halves for a streaming median.
 - A map can select one key's sorted history before binary search.
 - A value stack plus minimum stack exposes the current minimum.
 
@@ -4780,12 +4796,14 @@ methods that cannot meet those facts.
 Use these observable clues:
 
 - **Connections:** dependency order suggests [topological sort](#c1322-topological-sort);
-  equal-cost routes suggest [BFS](#c1321-breadth-first-search); non-negative
+  equal-cost routes suggest
+  [breadth-first search (BFS)](#c1321-breadth-first-search); non-negative
   varying costs suggest [Dijkstra](#c1323-dijkstra-shortest-paths); negative
   costs suggest [Bellman-Ford](#c1324-bellman-ford-shortest-paths); added
   connections suggest [disjoint-set union](#c1325-disjoint-set-union); cheapest
   total network suggests a [minimum spanning tree](#c1326-minimum-spanning-tree);
-  and complete branch exploration suggests [DFS](#c1320-depth-first-search).
+  and complete branch exploration suggests
+  [depth-first search (DFS)](#c1320-depth-first-search).
 - **Choices:** a provably permanent choice suggests [greedy](#c1318-greedy);
   repeated smaller questions suggest [dynamic programming](#c1310-dynamic-programming);
   choices that must be tried and undone suggest [backtracking](#c1319-backtracking);
@@ -5292,23 +5310,27 @@ fact. Each step consumes a command, so the process terminates.
 ```go
 type robot struct{ x, y, direction int }
 
-func runRobot(commands []string) robot {
+func runRobot(commands []string) (robot, bool) {
 	r := robot{}
 	for _, command := range commands {
-		if command == "right" {
+		switch command {
+		case "right":
 			r.direction = (r.direction + 1) % 4
-			continue
+		case "move":
+			dx := [...]int{0, 1, 0, -1}
+			dy := [...]int{1, 0, -1, 0}
+			r.x += dx[r.direction]
+			r.y += dy[r.direction]
+		default:
+			return robot{}, false
 		}
-		dx := [...]int{0, 1, 0, -1}
-		dy := [...]int{1, 0, -1, 0}
-		r.x += dx[r.direction]
-		r.y += dy[r.direction]
 	}
-	return r
+	return r, true
 }
 ```
 
-Direction values `0..3` mean north, east, south, and west.
+Direction values `0..3` mean north, east, south, and west. The boolean is
+false when a command is neither `move` nor `right`.
 
 ###### Work and memory
 
@@ -5557,11 +5579,6 @@ For `[1,3,3,5]`, find the first value at least `3`; expect index `1`.
 
 For an empty slice, the same half-open bounds start and finish at `0`, the insertion position.
 
-Additional form: To find the first value at least `3` in `[1, 3, 3, 5]`,
-start with `[0, 4)`. Testing value `3` at position `2` keeps `[0, 2)`; testing
-value `3` at position `1` keeps `[0, 1)`; testing value `1` discards position
-`0`. The empty range meets at position `1`, the first valid position.
-
 ###### Why it works
 
 Before every test, the first acceptable position lies
@@ -5614,9 +5631,6 @@ sorted input; wrapped input needs the separate sorted-side rule.
 - [E.1 Binary search bounds](#e1-binary-search-bounds) owns the Go implementation.
 - [Search Insert Position](../problems/solved_easy_leetcode_0035_search_insert_position.go) and [Search in Rotated Sorted Array](../problems/solved_medium_leetcode_0033_search_in_rotated_sorted_array.go) are representative problems.
 
-[Search Insert Position](../problems/solved_easy_leetcode_0035_search_insert_position.go)
-and [Search in Rotated Sorted Array](../problems/solved_medium_leetcode_0033_search_in_rotated_sorted_array.go).
-
 <a id="c137-string-matching"></a>
 
 ##### C.1.3.7 Reuse a partial match (string matching)
@@ -5632,9 +5646,20 @@ of the pattern is still useful after a mismatch.
 
 ###### How it works
 
-Try the pattern at every possible starting
-position. At each start, compare from left to right until every character
-matches or one differs.
+First decide that positions mean bytes, Unicode code points, or visible
+symbols; the example uses bytes. For a direct search, try every possible start
+and compare left to right until the pattern matches or one byte differs.
+
+For Knuth-Morris-Pratt (KMP), first build a table for the pattern. At each
+pattern position, the table records the length of the longest proper prefix
+that is also a suffix of the pattern ending there. While scanning the text,
+advance `matched` on equality. On a mismatch, use the table to shorten
+`matched` to the next possible reusable prefix without moving the text
+position backward. Define the empty-pattern result before the scan.
+
+For a rolling hash, maintain a numeric fingerprint for each pattern-sized text
+window. Equal fingerprints select candidates, but compare the actual bytes
+before returning because different windows can collide.
 
 ###### Step-by-step examples
 
@@ -5643,11 +5668,6 @@ Search for `abab` in `ababab`; expect index `0`.
 1. **Start `0`.** **Before:** `matched=0`. **Decision:** compare `a`, `b`, `a`, and `b`; all agree. **After:** `matched=4`. **Known correct:** the pattern occurs at index `0`.
 
 For pattern `abac` at start `0`, the first three bytes match and the fourth fails. A direct scan restarts at the next start; KMP instead keeps the longest matched suffix that is also a pattern prefix. An empty pattern needs an explicitly defined result.
-
-Additional form: Search for `abab` in `ababab`. Trying position `0` matches
-`a`, `b`, `a`, and `b`, so the answer is `0`. If the pattern is `abac`, the
-comparison at position `0` matches `aba` and then fails on the fourth
-character. A direct search next tries position `1` from the beginning.
 
 The Knuth-Morris-Pratt algorithm, usually
 called **KMP**, avoids restarting the pattern from zero after every mismatch.
@@ -5681,7 +5701,16 @@ risk.
 
 ###### Why it works
 
-The stated invariant is true before the first step, each update preserves it, and bounded progress makes the method finish with the requested result.
+A direct search checks every legal start, so it cannot miss an occurrence.
+For KMP, the first `matched` pattern bytes always equal the suffix of the text
+processed so far. Its fallback table keeps the longest shorter suffix that
+could still be a prefix, so it discards only alignments already disproved by
+the mismatch. Each step either advances the text position or shortens
+`matched`; total shortening is linear because `matched` can grow only when the
+text advances. The scan therefore finishes in linear time. Reaching the full
+pattern length proves an occurrence. A rolling hash remains correct only when
+an equal fingerprint is followed by the byte comparison that rules out a
+collision.
 
 ###### Go example
 
@@ -5768,12 +5797,6 @@ Parse `"  -42x"` with the rule `space -> optional sign -> digits -> stop`; expec
 
 For `"4-2"`, the `-` is not legal after digits; reject it or stop there according to the stated grammar.
 
-Additional form: Parsing `"  -42x"` begins in `leading space`, moves to
-`optional sign` at `-`, enters `digits` at `4`, builds `42`, and stops at `x`.
-The sign then produces `-42`. By contrast, `"4-2"` is rejected or stopped at
-`-` according to the stated grammar; the sign transition is no longer legal
-after digits have begun.
-
 For arithmetic expressions, a stack handles nested parentheses, while operator
 precedence can be handled by operator/value stacks or by recursive-descent
 functions: one function handles additions, another multiplications, and
@@ -5795,28 +5818,47 @@ parser cannot silently loop on an invalid character.
 ###### Go example
 
 ```go
-func parseSignedPrefix(input string) (int, bool) {
-	i, sign, value := 0, 1, 0
+func parseSignedPrefix(input string) (int64, bool) {
+	i, negative := 0, false
 	for i < len(input) && input[i] == ' ' {
 		i++
 	}
 	if i < len(input) && (input[i] == '+' || input[i] == '-') {
 		if input[i] == '-' {
-			sign = -1
+			negative = true
 		}
 		i++
 	}
+	limit := uint64(math.MaxInt64)
+	if negative {
+		limit++
+	}
 	start := i
+	var magnitude uint64
 	for i < len(input) && input[i] >= '0' && input[i] <= '9' {
-		value = value*10 + int(input[i]-'0')
+		digit := uint64(input[i] - '0')
+		if magnitude > (limit-digit)/10 {
+			return 0, false
+		}
+		magnitude = magnitude*10 + digit
 		i++
 	}
-	return sign * value, i > start
+	if i == start {
+		return 0, false
+	}
+	if negative {
+		if magnitude == uint64(math.MaxInt64)+1 {
+			return math.MinInt64, true
+		}
+		return -int64(magnitude), true
+	}
+	return int64(magnitude), true
 }
 ```
 
-The fragment matches the stated stop-at-first-nondigit grammar. Production
-code must add the bound check from [A.4](#a4-integer-limits-and-bits).
+The fragment requires `import "math"`, matches the stated
+stop-at-first-nondigit grammar, and rejects a magnitude outside the `int64`
+range before multiplying.
 
 ###### Work and memory
 
@@ -5839,7 +5881,12 @@ well-tested standard parser already implements exactly the required language.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Without the pre-operation bound check, parsing
+> `"9223372036854775808"` overflows `int64` before the function can reject it.
+
+An empty string, spaces with no digits, or a sign with no following digit must
+return failure. State whether trailing nondigits stop a valid prefix, as here,
+or make the whole input invalid.
 
 ###### Related material
 
@@ -5864,7 +5911,12 @@ outward from a possible center.
 
 ###### How it works
 
-State the retained information, update it once per step, and prove each discarded possibility cannot contain an answer.
+For the sorted pair-sum form, start one position at each end. If the sum is too
+small, move the left position right; sorted order proves that its old value
+cannot succeed with any remaining partner. If the sum is too large, move the
+right position left by the symmetric argument. Stop on equality or when the
+positions meet. Other two-pointer forms must state their own retained region
+and safe movement rule rather than copying this one.
 
 ###### Step-by-step examples
 
@@ -5875,11 +5927,6 @@ Find a pair totaling `9` in `[1,2,4,7,11]`; expect `[2,7]`.
 3. **Ends `2` and `7`.** **Before:** both positions remain possible. **Decision:** sum is `9`. **After:** return the pair. **Known correct:** the requested pair was found.
 
 An empty or one-item input has no pair and must finish before indexing both ends.
-
-Additional form: Find a pair totaling `9` in `[1, 2, 4, 7, 11]`.
-`1 + 11` is too large, so move the right position left; moving the left one
-would only increase the sum. Then `1 + 7` is too small, so move the left
-position right and find `2 + 7 = 9`.
 
 ###### Why it works
 
@@ -5951,11 +5998,6 @@ centers for palindromes.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants) traces read/write compaction.
 - [Palindrome Number](../problems/solved_easy_leetcode_0009_palindrome_number.go), [Longest Palindromic Substring](../problems/solved_medium_leetcode_0005_longest_palindromic_substring.go), [Remove Duplicates from Sorted Array](../problems/solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go), and [Remove Element](../problems/solved_easy_leetcode_0027_remove_element.go) are representative problems.
 
-[Palindrome Number](../problems/solved_easy_leetcode_0009_palindrome_number.go),
-[Longest Palindromic Substring](../problems/solved_medium_leetcode_0005_longest_palindromic_substring.go),
-[Remove Duplicates from Sorted Array](../problems/solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go),
-and [Remove Element](../problems/solved_easy_leetcode_0027_remove_element.go).
-
 <a id="dynamic-programming"></a>
 
 <a id="c1310-dynamic-programming"></a>
@@ -5990,11 +6032,6 @@ Count ways to climb `4` stairs using steps of one or two; expect `5`.
 3. **Stair `4`.** **Before:** `ways[2]=2`, `ways[3]=3`. **Decision:** compute `ways[4]=3+2`. **After:** return `5`. **Known correct:** every route has been counted once by its final move.
 
 For `n=0`, the base value `1` represents the empty way; a different problem contract may define that boundary differently.
-
-Additional form: If each move climbs one or two stairs, every route to stair
-`4` ends with one step from stair `3` or two steps from stair `2`. Therefore
-`ways[4] = ways[3] + ways[2]`. Starting with `ways[0] = 1` and `ways[1] = 1`
-produces `1, 1, 2, 3, 5` without recalculating earlier stairs.
 
 ###### Why it works
 
@@ -6106,8 +6143,6 @@ integer type.
 - [E.2 Rolling dynamic programming](#e2-rolling-dynamic-programming) owns the Go implementation.
 - [C.1.3.10.1 Preserve order with compact ranks](#c13101-coordinate-compression) owns coordinate compression.
 - [Climbing Stairs](../problems/solved_easy_leetcode_0070_climbing_stairs.go) is the representative problem.
-
-[Climbing Stairs](../problems/solved_easy_leetcode_0070_climbing_stairs.go).
 
 <a id="c1311-divide-and-conquer"></a>
 
@@ -6235,12 +6270,6 @@ Sort `[4,1,3,2]`; expect `[1,2,3,4]`.
 
 An empty or one-value input is already solved and prevents endless splitting.
 
-Additional form: Merge-sort `[4, 1, 3, 2]` by splitting it into `[4, 1]`
-and `[3, 2]`. Those split into one-item lists, which are already sorted. Merge
-them into `[1, 4]` and `[2, 3]`, then compare the two front values repeatedly to
-produce `[1, 2, 3, 4]`. No subproblem needs information from its sibling until
-the final merge.
-
 For merge sort, each call sorts two halves, then merges them by repeatedly
 taking the smaller unread value. The invariant during merging is that the
 output prefix is sorted and contains exactly the smallest values consumed from
@@ -6261,10 +6290,19 @@ negating the most negative signed integer exceeds that type's positive limit.
 
 ###### Why it works
 
-Divide and conquer is most natural when
-subproblems do not overlap. Dynamic programming is needed when different
-branches repeatedly ask for the same state. Memoizing a divide-and-conquer
-recursion because its parts overlap has effectively turned it into DP.
+For merge sort, assume each smaller call returns its half in sorted order.
+During the merge, the output prefix is sorted and contains exactly the values
+already removed from the two halves. Their smaller front value must be the
+smallest value not yet emitted, so appending it preserves that fact. When one
+half empties, the other half is already sorted and every one of its values is
+at least the output's last value. The base case handles fewer than two values,
+and each split makes the ranges smaller, so recursion finishes with a sorted
+permutation of the input.
+
+Divide and conquer is most natural when subproblems do not overlap. Dynamic
+programming is needed when different branches repeatedly ask for the same
+state. Memoizing a divide-and-conquer recursion because its parts overlap has
+effectively turned it into DP.
 
 ###### Go example
 
@@ -6313,7 +6351,13 @@ solving the original problem directly.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** A split that does not make both recursive ranges smaller loops
+> forever. If `[left,right)` is split at `middle`, recurse on `[left,middle)`
+> and `[middle,right)`, not the original range again.
+
+An empty or one-value input is the base case. During merge, copy the remainder
+of either half after the other empties, and preserve a declared tie rule for
+equal values when stable order matters.
 
 ###### Related material
 
@@ -6344,7 +6388,10 @@ bestOverall = max(bestOverall, endingHere)
 
 ###### How it works
 
-State the retained information, update it once per step, and prove each discarded possibility cannot contain an answer.
+Require a nonempty input. Initialize `endingHere` and `bestOverall` from the
+first value. For every later value, set `endingHere` to the larger of the value
+alone and the previous `endingHere` plus that value. Then update
+`bestOverall` with the larger of its old value and the new `endingHere`.
 
 ###### Step-by-step examples
 
@@ -6355,11 +6402,6 @@ For `[-2,3,-1,4,-5]`, expect sum `6` from `[3,-1,4]`.
 3. **Values `-1,4,-5`.** **Before:** best overall is `3`. **Decision:** extend in order, producing ending sums `2,6,1`. **After:** `bestOverall=6`. **Known correct:** every possible ending position was represented.
 
 For `[-4,-2]`, initializing from the first value returns `-2`; initializing to zero would wrongly allow an empty section.
-
-Additional form: For `[-2, 3, -1, 4, -5]`, `endingHere` becomes `-2`, `3`,
-`2`, `6`, and `1`. At `3`, starting fresh beats extending `-2`. At `-1` and
-`4`, extending remains better. `bestOverall` reaches `6`, representing the
-consecutive section `[3, -1, 4]`.
 
 ###### Why it works
 
@@ -6423,7 +6465,12 @@ previous position.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Initializing both sums to zero permits an empty section. For
+> `[-4,-2]`, that mistake returns `0` instead of the required nonempty answer
+> `-2`.
+
+Reject or separately define empty input, and check addition overflow when an
+accepted value range can make `endingHere+value` exceed `int`.
 
 ###### Related material
 
@@ -6465,10 +6512,6 @@ Validate `([])`; expect `true`.
 3. **Close `)`.** **Before:** top is `(`. **Decision:** pop it. **After:** stack is empty. **Known correct:** every closer matched the newest opener.
 
 For `([)]`, `)` does not match top `[`, so reject immediately. Empty input is valid only if the problem defines an empty sequence as balanced.
-
-Additional form: To validate `([])`, push `(` and then `[`. When `]` arrives,
-pop `[` and verify the match. When `)` arrives, pop `(`. The input is valid
-because every closer matched and the stack is empty at the end.
 
 ###### Why it works
 
@@ -6521,8 +6564,6 @@ direct control is needed.
 - [C.1.3.20 Depth-first search](#c1320-depth-first-search) can replace recursive calls with an explicit stack.
 - [Valid Parentheses](../problems/solved_easy_leetcode_0020_valid_parentheses.go) is the representative problem.
 
-[Valid Parentheses](../problems/solved_easy_leetcode_0020_valid_parentheses.go).
-
 <a id="sliding-window"></a>
 
 <a id="c1314-sliding-window"></a>
@@ -6562,19 +6603,15 @@ Find the shortest positive-value range totaling at least `7` in `[2,3,1,2,4,3]`;
 
 Mixed negative values break this shrinking rule because removing a negative value can increase the sum.
 
-Additional form: Find the shortest positive-number range with sum at least
-`7` in `[2, 3, 1, 2, 4, 3]`. Grow the window until `[2, 3, 1, 2]` sums to `8`,
-then remove values from the left while the sum stays large enough. Later the
-window `[4, 3]` reaches `7` with length `2`, which is the best answer. Positive
-values make shrinking safe because adding future values can never reduce the
-sum.
-
 ###### Why it works
 
-Before advancing `left`, explain why no
-future value could make the current starting position part of a better answer.
-For example, when all values are positive and the sum is already too large,
-adding more values can only make it larger.
+Before each new `right`, every earlier ending position has already been handled.
+After adding `values[right]`, positive values make the sum grow. While the sum
+meets the target, recording the length and removing the left value tests every
+valid start for this `right` from longest to shortest; once the sum falls below
+the target, removing more positive values cannot restore validity. Both
+boundaries move only forward, so the scan finishes after considering the
+shortest valid range ending at every position.
 
 ###### Go example
 
@@ -6621,7 +6658,13 @@ values often cause that problem for sum-based windows.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** The inner loop is unsafe for `target <= 0`: with
+> `values=[1]`, it remains true after `left` passes the slice and then indexes
+> outside it. This implementation requires a positive target.
+
+Empty input returns `0`. A single value at least as large as the target gives
+length `1`; mixed negative values require another method because shrinking no
+longer changes the sum predictably.
 
 ###### Related material
 
@@ -6656,9 +6699,6 @@ For `[2,4,1,3]`, query indices `1..3`; expect `8`.
 2. **Query.** **Before:** `prefix[4]=10` includes indices `0..3`. **Decision:** subtract `prefix[1]=2`. **After:** `10-2=8`. **Known correct:** exactly index `0` was removed.
 
 An empty range needs a defined convention; using a leading zero makes a range beginning at index `0` require no special subtraction case.
-
-Additional form: For `[2, 4, 1, 3]`, store `[0, 2, 6, 7, 10]`. The sum from index
-`1` through index `3` is `prefix[4] - prefix[1] = 10 - 2 = 8`.
 
 ###### Why it works
 
@@ -6717,7 +6757,12 @@ subtracting two previously stored smallest values.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Omitting `prefix[0]=0` shifts every boundary. For
+> `values=[2,4]`, the range `0..0` must use `prefix[1]-prefix[0]=2`, not read a
+> position before the slice.
+
+Reject `left > right`, negative indexes, and `right+1 >= len(prefix)`. Use a
+wider sum type or checked addition when valid inputs can overflow `int`.
 
 ###### Related material
 
@@ -6754,11 +6799,6 @@ Start with four zeroes and add `3` to indices `1..3`; expect `[0,3,3,3]`.
 2. **Rebuild.** **Before:** running change is `0`. **Decision:** accumulate positions `0..3`. **After:** `[0,3,3,3]`. **Known correct:** every covered position receives the update once.
 
 The extra sentinel position permits an update ending at the last result index without an out-of-range write.
-
-Additional form: Begin with `[0, 0, 0, 0]` and add `3` to indices `1` through `3`.
-In the five-position bookkeeping array, record `+3` at position `1` and `-3`
-at position `4`. Running totals across the original four positions become
-`[0, 3, 3, 3]`; position `4` merely marks where the update stops.
 
 ###### Why it works
 
@@ -6805,7 +6845,13 @@ update rather than after the updates have been collected.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Allocating only `length` difference positions makes an update
+> ending at `length-1` write `difference[length]` out of bounds. Reserve the
+> extra sentinel position.
+
+Require `length >= 0` and validate every update before writing either marker.
+An empty result accepts no nonempty update, and accumulated deltas must fit the
+chosen integer type.
 
 ###### Related material
 
@@ -6828,7 +6874,13 @@ contain it.
 
 ###### How it works
 
-State the retained information, update it once per step, and prove each discarded possibility cannot contain an answer.
+A segment tree stores one summary per represented range. A point update changes
+the leaf and recomputes only its ancestors; a query splits into disjoint stored
+ranges whose summaries combine to the answer. A Fenwick tree stores selected
+suffixes of prefixes in a one-based array. Adding `i & -i` visits every stored
+range containing a changed position, while subtracting it decomposes a prefix
+into disjoint stored ranges. Public zero-based indexes must be validated before
+converting them to one-based positions.
 
 ###### Step-by-step examples
 
@@ -6839,7 +6891,7 @@ For `[2,1,5,3]`, query indices `1..2`, then change index `2` to `6`; expect quer
 
 For no values, queries must be rejected or return the operation's identity according to the API contract.
 
-Additional form: Use `[2, 1, 5, 3]` throughout this card. Its single values,
+Detailed segment-tree representation for `[2, 1, 5, 3]`: its single values,
 half sums, and whole sum form this hierarchy:
 
 ```text
@@ -6938,7 +6990,13 @@ is clearer and fast enough.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Calling `add(-1, delta)` converts the public index to stored
+> position `0`; because `0 & -0` is zero, the loop never advances. Require
+> `0 <= index < length` before calling the compact method.
+
+Likewise require `0 <= left <= right < length` for `rangeSum`. Choose the
+operation's correct identity, preserve association order for noncommutative
+operations, and account for sum overflow.
 
 ###### Related material
 
@@ -6983,7 +7041,7 @@ Choose the most non-overlapping meetings from `(1,9),(2,4),(5,7),(8,10)`; expect
 
 Coins `[1,3,4]` and target `6` defeat "take the largest": `4+1+1` loses to `3+3`.
 
-Additional form: Suppose one meeting may start when another ends. To attend
+Full exchange argument: suppose one meeting may start when another ends. To attend
 the maximum number of meetings from `(1, 9)`, `(2, 4)`, `(5, 7)`, and `(8, 10)`,
 sort by end time, set `lastEnd` to negative infinity, and accept the next
 compatible meeting:
@@ -7114,7 +7172,7 @@ Generate all subsets of `[a,b]`; expect `[a,b]`, `[a]`, `[b]`, and `[]`.
 
 Saving the path without copying is a boundary error: later undo steps would mutate all saved results.
 
-Additional form: Generate every subset of `[a, b]`. At each position, branch
+Undo sequence in full: generate every subset of `[a, b]`. At each position, branch
 into including the current value or excluding it:
 
 1. Start with `[]`; include `a`, producing `[a]`.
@@ -7197,7 +7255,13 @@ Backtracking is a candidate when all of these are true:
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Saving `path` itself instead of a copy makes all subset rows
+> share one backing array; later undo operations can turn previously saved
+> answers into the final path state. Copy at every completed answer.
+
+Empty input has one completed choice path, the empty subset. Repeated values
+need a stated duplicate-output rule, and the `1<<len(values)` capacity hint
+must be omitted when the shift or allocation is not safely bounded.
 
 ###### Related material
 
@@ -7236,15 +7300,18 @@ Traverse edges `A-B`, `A-C`, and `B-D` from `A`; one valid DFS order is `A,B,D,C
 
 In a directed cycle `A->B->C->A`, an edge to an active vertex proves a cycle; an edge to a finished vertex does not.
 
-Additional form: To calculate each directory's total size, descend through its files
+A tree-shaped use is calculating each directory's total size: descend through its files
 and subdirectories first. Once a subdirectory has been fully explored, return
 its total and add it to its parent directory's size.
 
 ###### Why it works
 
-Every position marked reached has either been fully
-explored or is waiting on the current return path. No position needs to be
-scheduled twice.
+When `visit(vertex)` begins, the vertex is marked and will never be scheduled
+again. The call examines every outgoing edge; each unseen neighbor is explored
+under the same rule before the call returns. By induction over the return path,
+returning from a vertex means every vertex reachable through its outgoing
+edges has been visited. Marking prevents cycles from creating repeated work,
+and the finite graph lets every call eventually finish.
 
 ###### Go example
 
@@ -7336,15 +7403,18 @@ On path `A-B-C-D`, find the distance from `A` to `D`; expect `3`.
 
 With several sources, enqueue all at distance zero before starting. With no source, the queue stays empty and no position is reachable.
 
-Additional form: In a maze, process the start at distance `0`, its open neighbors at
+A grid use is a maze: process the start at distance `0`, its open neighbors at
 distance `1`, and their unseen neighbors at distance `2`. The first time the
 exit is added, you have found a route with the fewest moves.
 
 ###### Why it works
 
-The queue never processes a position with a greater
-distance before a position with a smaller distance. Each position is added at
-most once.
+The queue contains discovered positions in nondecreasing distance order. When
+a vertex at distance `d` is removed, every newly discovered neighbor receives
+distance `d+1`; any undiscovered route to that neighbor must pass through the
+current or a later layer and therefore cannot be shorter. Marking on insertion
+makes that first distance permanent. Each vertex is added at most once, so the
+finite search terminates.
 
 When the question asks for the nearest source for every
 position, add all sources to the queue at distance zero before the search
@@ -7407,7 +7477,12 @@ are zero or greater.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Marking only when a vertex is removed lets two vertices in the
+> same layer enqueue it twice. Mark at insertion so the first, shortest
+> discovery owns the queue entry.
+
+Validate the start and every neighbor index. Empty graphs have no valid start,
+and unreachable vertices retain the declared `-1` distance.
 
 ###### Related material
 
@@ -7444,12 +7519,6 @@ For `Shop -> Cook -> Eat`, expect `[Shop,Cook,Eat]`.
 3. **Release `Eat`.** **Before:** `Cook` is ready. **Decision:** output it and decrement `Eat`. **After:** output becomes `[Shop,Cook,Eat]`. **Known correct:** every dependency is respected.
 
 Adding `Eat -> Shop` leaves no zero-count task; processing fewer than all tasks proves a cycle blocks any valid order.
-
-Additional form: Suppose `Shop` must happen before `Cook`, and `Cook` before
-`Eat`. Initially only `Shop` has zero unfinished prerequisites, so output it.
-That reduces `Cook`'s count to zero; output `Cook`, which then unlocks `Eat`.
-The result is `[Shop, Cook, Eat]`. Adding `Eat -> Shop` would leave every task
-waiting forever and correctly reveal a cycle.
 
 ###### Why it works
 
@@ -7520,7 +7589,13 @@ valid dependency order.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Reversing an edge changes the prerequisite meaning. If `A` must
+> finish before `B`, store `A -> B` and increment `indegree[B]`, not
+> `indegree[A]`.
+
+Validate every destination index. Duplicate stored edges count as duplicate
+prerequisites unless they are deduplicated consistently in both the adjacency
+list and indegree counts. An empty graph has the valid empty order.
 
 ###### Related material
 
@@ -7557,12 +7632,6 @@ Let `A->B=4`, `A->C=1`, and `C->B=2`; from `A`, expect `B=3`.
 3. **Finalize `B`.** **Before:** heap removes `B=3`. **Decision:** accept it and later ignore `B=4`. **After:** `B` is final at `3`. **Known correct:** non-negative edges cannot produce a cheaper later route.
 
 A negative edge invalidates that finalization argument even when this particular trace happens to work.
-
-Additional form: Let `A -> B` cost `4`, `A -> C` cost `1`, and `C -> B`
-cost `2`. Starting at `A` discovers `B = 4` and `C = 1`. The queue processes
-`C` first because `1` is cheaper, then improves `B` to `1 + 2 = 3`. Processing
-`B` finalizes cost `3`; the older queued entry with cost `4` is **stale**,
-meaning it no longer equals the stored best cost, so it is ignored.
 
 ###### Why it works
 
@@ -7629,7 +7698,12 @@ has the same cost, breadth-first search is simpler.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Negative cost invalidates finalization. On edges `A->B=4`,
+> `A->C=7`, and `C->B=-5`, finalizing `B=4` before processing `C` misses the
+> cheaper route of cost `2`.
+
+Validate the start and endpoints, reject negative costs, ignore stale heap
+entries, and guard route-cost addition before evaluating it.
 
 ###### Related material
 
@@ -7668,12 +7742,6 @@ Let `A->B=4`, `A->C=7`, and `C->B=-5`; from `A`, expect `B=2`.
 3. **Extra pass.** **Before:** up to `V-1` passes are complete. **Decision:** scan once more. **After:** no cost falls, so no reachable negative cycle is detected. **Known correct:** every finite simple route was covered.
 
 For `B->C=1` and `C->B=-2`, an extra pass still lowers a cost and proves no finite minimum exists for affected vertices.
-
-Additional form: Suppose `A -> B` costs `4`, `A -> C` costs `7`, and `C -> B` costs
-`-5`. Starting from `A`, checking the first two connections sets `B = 4` and
-`C = 7`. Checking `C -> B` then improves `B` to `7 + (-5) = 2`. Dijkstra
-cannot safely finalize `B = 4` before that later improvement, but Bellman-Ford
-keeps checking every connection.
 
 ###### Why it works
 
@@ -7735,8 +7803,8 @@ func bellmanFord(vertices, start int, edges []directedEdge) ([]int64, bool) {
 ```
 
 This complete fragment requires `import "math"` and the input condition that
-every finite route cost fits `int64`. The boolean is false when a reachable
-negative cycle can still lower a cost.
+every evaluated sum `distance[edge.from]+edge.cost` fits `int64`. The boolean
+is false when a reachable negative cycle can still lower a cost.
 
 ###### Work and memory
 
@@ -7760,7 +7828,13 @@ that cycle.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** The sentinel check does not prevent ordinary addition overflow.
+> If `distance[from]=math.MinInt64` and `cost=-1`, constructing the candidate
+> is invalid; enforce the stated route-sum bound or use checked arithmetic.
+
+Validate `vertices`, `start`, and every endpoint before indexing. An empty
+graph has no valid start. Parallel edges are allowed, but every one is scanned;
+unreachable negative cycles do not invalidate distances from this start.
 
 ###### Related material
 
@@ -7800,15 +7874,16 @@ Connect `1-2`, then `2-3`; expect `1` and `3` to be connected.
 
 Unioning already-connected items changes nothing and can signal that a new undirected edge would form a cycle.
 
-Additional form: Start with `parent[1] = 1`, `parent[2] = 2`, and
-`parent[3] = 3`. After connecting `1` and `2`, make `2` point to `1`. After
-connecting `2` and `3`, follow `2 -> 1` and make `3` point to `1`. Now both
-`find(1)` and `find(3)` reach leader `1`, so the items are connected.
-
 ###### Why it works
 
-Two items are connected exactly when following their parent
-links reaches the same group leader.
+Every parent link stays inside one represented connected group, and every group
+has exactly one leader that points to itself. Initially this is true because
+each item is alone. A union changes only one leader's parent and does so only
+after an added edge connects the two groups, so it merges exactly those groups
+without splitting either one. Therefore two items are connected exactly when
+following their parent links reaches the same leader. Path compression changes
+only intermediate links to that same leader, and union by size changes only
+which leader becomes the parent, so neither optimization changes membership.
 
 While finding a leader, make each visited item point
 closer to that leader so later searches take fewer steps. This is called
@@ -7877,7 +7952,11 @@ that information.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** `find(-1)` or `find(n)` indexes outside the parent slice. Validate
+> every item before calling the compact implementation.
+
+An empty set has no valid item. Unioning an item with itself or two already
+connected items returns `false` and must not increase the recorded group size.
 
 ###### Related material
 
@@ -7904,7 +7983,12 @@ inside that tree need not be the cheapest possible paths in the original graph.
 
 ###### How it works
 
-State the retained information, update it once per step, and prove each discarded possibility cannot contain an answer.
+For Kruskal's algorithm, sort all undirected edges by increasing cost. Start
+with each vertex in a separate disjoint-set group. Scan the edges in order,
+accepting one only when its endpoints have different leaders, and stop after
+accepting `V-1` edges. If the scan ends sooner, report that no spanning tree
+exists. For Prim's algorithm, instead grow one connected region and repeatedly
+remove its cheapest edge to an unseen vertex from a min-heap.
 
 ###### Step-by-step examples
 
@@ -7915,11 +7999,6 @@ For `A-B=1`, `B-C=2`, and `A-C=5`, expect total cost `3`.
 3. **Edge `A-C`.** **Before:** its endpoints already share a component. **Decision:** reject it. **After:** the tree stays unchanged. **Known correct:** accepting it would create a cycle and add cost.
 
 If fewer than `V-1` edges can be accepted, the graph is disconnected and has only a minimum spanning forest.
-
-Additional form: Three offices have cable costs `A-B = 1`, `B-C = 2`, and
-`A-C = 5`. Kruskal accepts `A-B`, then `B-C`; all offices are connected for
-total cost `3`. It rejects `A-C` because that expensive edge would create a
-cycle. The result uses exactly two edges, which is `V - 1` for three offices.
 
 Sort edges by weight. Scan from cheapest to most
 expensive and accept an edge exactly when its endpoints are currently in
@@ -7942,7 +8021,15 @@ stale heap entries whose destination has already been added.
 
 ###### Why it works
 
-The stated invariant is true before the first step, each update preserves it, and bounded progress makes the method finish with the requested result.
+Kruskal's accepted edges always form a forest because an edge whose endpoints
+already share a component is rejected. Consider the cut separating one current
+component from the others. The scanned acceptable edge is a cheapest remaining
+edge across such a cut; the cut property says it can replace the crossing edge
+in some minimum spanning tree without increasing total cost. Thus after every
+acceptance, the forest can still be extended to a minimum spanning tree. Each
+accepted edge reduces the number of components, so `V-1` accepted edges form a
+minimum-cost spanning tree. If the scan cannot reach that count, the input is
+disconnected.
 
 ###### Go example
 
@@ -7956,6 +8043,9 @@ func kruskal(vertices int, edges []mstEdge) (int, bool) {
 		if groups.union(edge.from, edge.to) {
 			total += edge.cost
 			used++
+			if used == vertices-1 {
+				break
+			}
 		}
 	}
 	return total, vertices == 0 || used == vertices-1
@@ -7990,7 +8080,14 @@ undirected connection problem.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Accepting an edge whose endpoints already share a leader creates
+> a cycle. In the triangle `A-B=1`, `B-C=2`, `A-C=5`, the last edge must be
+> rejected even though it appears in the input.
+
+Validate nonnegative vertex count and every endpoint. Copy the edge slice when
+the caller's order must survive, and use checked or wider arithmetic when the
+selected edge costs can overflow `int`. This guide treats an empty graph as
+successfully spanned with cost zero.
 
 ###### Related material
 
@@ -8028,16 +8125,14 @@ Insert job priorities `5`, `2`, and `8` into a min-heap; expect removals `2,5,8`
 
 Peeking or removing an empty heap requires an explicit failure contract.
 
-Additional form: Process job priorities `5`, `2`, and `8` with a min-heap.
-Although `2` arrived second, it is removed first because it is smallest. The
-next removal returns `5`, then `8`. The heap promises only which item is at the
-top; its internal slice does not need to be globally sorted.
-
 ###### Why it works
 
-The heap contains exactly the items still under consideration.
-The item exposed at the top is always the next smallest or largest item the
-algorithm needs.
+The heap contains exactly the items still under consideration, and every
+parent has at least as much priority as its children. Any path from the root
+therefore cannot reach an item that should precede the root. Push and pop repair
+this parent-child rule along one root-to-leaf path, so the root is again the
+required next item after each update. Each repair crosses at most the heap's
+height and therefore terminates.
 
 ###### Go example
 
@@ -8074,7 +8169,12 @@ to expose.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** The heap's backing slice is not globally sorted. After inserting
+> `1,4,3`, only the root `1` is guaranteed; reading the remaining slice as the
+> next output order can incorrectly report `4` before `3`.
+
+Check emptiness before peek or pop. Define tie-breaking when equal priorities
+must be stable, and for a top-`k` heap handle `k=0` before reading its root.
 
 ###### Related material
 
@@ -8112,11 +8212,6 @@ For `[2,1,4]`, find each next greater value; expect `[4,4,none]`.
 3. **End.** **Before:** position `2` remains. **Decision:** assign no answer. **After:** results are `[4,4,none]`. **Known correct:** no later value exists for it.
 
 With equal values, choose `<` or `<=` according to whether "greater" is strict; the wrong rule changes duplicate answers.
-
-Additional form: Find the next greater value in `[2, 1, 4]`. Store position
-`0` for value `2`, then position `1` for value `1`; both still await a larger
-value. When `4` arrives, it resolves `1 -> 4` and then `2 -> 4`, so both
-positions are popped. Store `4`; it has no next greater value by the end.
 
 ###### Why it works
 
@@ -8168,7 +8263,13 @@ information that a later value still needs.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Using `<=` instead of `<` for a strictly greater query pops an
+> equal value too early. For `[2,2,3]`, the first `2` must wait for `3`, not use
+> the second `2` as its answer.
+
+The example uses `-1` for no answer; if `-1` is a valid input value, return
+indexes, booleans, or another unambiguous representation. Empty input returns
+an empty result.
 
 ###### Related material
 
@@ -8199,7 +8300,11 @@ to back:
 
 ###### How it works
 
-State the retained information, update it once per step, and prove each discarded possibility cannot contain an answer.
+Require `1 <= width <= len(values)` and store positions, not just values. For
+each new position, remove expired positions from the front. Then remove back
+positions whose values are no larger than the new value, because the new value
+expires later and is at least as useful. Append the new position. Once a full
+window exists, the front position holds its maximum.
 
 ###### Step-by-step examples
 
@@ -8209,11 +8314,6 @@ For `[1,3,2,5]` with window size `3`, expect maxima `[3,5]`.
 2. **Read `5`.** **Before:** deque holds candidates `3,2`. **Decision:** remove both because newer `5` is no smaller and expires later. **After:** deque is `[5]`. **Known correct:** `5` is the next window maximum.
 
 Store positions, not only values, so duplicates and expiration are distinguishable. Window size zero is invalid and size one returns every input value.
-
-Additional form: For `[1, 3, 2, 5]` with window size `3`, reading `3`
-removes `1` from the back because `1` is older and smaller. After reading `2`,
-the deque represents values `[3, 2]`, so the first window's maximum is `3`.
-Reading `5` removes both `2` and `3`; the next window's maximum is `5`.
 
 ###### Why it works
 
@@ -8269,7 +8369,13 @@ cannot be proved to make an older value permanently irrelevant.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Storing only values cannot identify which duplicate expired.
+> With `[5,5,1]` and width `2`, positions distinguish the old `5` leaving from
+> the newer `5` that still belongs to the window.
+
+Reject width zero, a negative width, or a width larger than the input. Using
+`<=` when pruning equal values keeps the newer duplicate, which is safe because
+it expires later.
 
 ###### Related material
 
@@ -8306,11 +8412,6 @@ Merge `[5,7]`, `[1,3]`, and `[2,6]`; expect `[1,7]`.
 3. **Merge `[5,7]`.** **Before:** current ends at `6`. **Decision:** `5` overlaps, so extend to `7`. **After:** save `[1,7]`. **Known correct:** every input point is represented once in the merged coverage.
 
 Whether `[1,2]` and `[2,3]` overlap depends on whether endpoints are inclusive or half-open; decide before comparing.
-
-Additional form: Sort `[5, 7]`, `[1, 3]`, and `[2, 6]` into start order.
-Begin with `[1, 3]`; `[2, 6]` overlaps, so extend the current interval to
-`[1, 6]`. `[5, 7]` also overlaps, producing the single merged interval
-`[1, 7]`.
 
 ###### Why it works
 
@@ -8416,11 +8517,6 @@ Bookings `[1,4)` and `[3,5)` need at most two rooms.
 
 For `[1,4)` and `[4,5)`, process the end at `4` before the start at `4`; otherwise the sweep wrongly reports two simultaneous rooms.
 
-Additional form: One booking starts at `1` and ends just before `4`; another starts
-at `3` and ends just before `5`. Process `start at 1`, `start at 3`, `end at 4`,
-and `end at 5`. The active counts are `1`, `2`, `1`, and `0`, so the maximum is
-`2`.
-
 ###### Why it works
 
 After processing all events at a position, the running count
@@ -8511,16 +8607,17 @@ For `1->2->3->4->nil`, return the second middle `3`.
 
 For even lengths, a different loop condition can return the first middle. Check both `fast` and the next link before a two-step move; empty input returns no node.
 
-Additional form: In `1 -> 2 -> 3 -> 4 -> nil`, move `slow` one link and
-`fast` two links. After the first move they are at `2` and `3`; after the next,
-`slow` is at `3` while `fast` has reached the end. The slow position is the
-second middle under this stopping rule. State the desired middle for even
-lengths because a different loop condition can return node `2` instead.
-
 ###### Why it works
 
-After setup, the pointers keep the same speed
-relationship or the same fixed gap after every move.
+For the middle-node loop, after `t` iterations `slow` has moved `t` links and
+`fast` has moved `2t`. When `fast` reaches the end, `slow` has covered half the
+list; the loop condition chooses the later middle for even lengths. For a fixed
+gap, moving both pointers together preserves the established distance, so when
+the leader reaches the end the follower has the requested distance from it.
+For cycle detection, once both pointers are inside a finite cycle, their
+relative offset changes by one position per iteration and must eventually
+become zero. Every form moves toward an end or around a finite cycle, so it
+terminates under its stated stopping rule.
 
 ###### Go example
 
@@ -8565,7 +8662,12 @@ retain those details.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Testing only `fast != nil` before `fast.next.next` panics on a
+> one-node suffix. Require both `fast != nil` and `fast.next != nil`.
+
+Empty input returns no node. State whether an even-length list needs the first
+or second middle, and establish a requested fixed gap before moving both
+positions.
 
 ###### Related material
 
@@ -8602,11 +8704,6 @@ Insert `car` and `cat`; expect prefix `ca` to exist but full word `ca` not to ex
 3. **Query `ca`.** **Before:** both edges exist. **Decision:** prefix lookup succeeds, but inspect the end marker for full-word lookup. **After:** prefix is true and word is false. **Known correct:** a stored beginning is not confused with a stored complete word.
 
 Empty-string insertion is represented by the root end marker if the contract allows it. A wildcard may branch to many children and lose linear lookup time.
-
-Additional form: Insert `car` and `cat`. Both words share the steps `c -> a`
-and then branch to `r` or `t`. A prefix query for `ca` succeeds at the shared
-step. A full-word query for `ca` fails unless that step has its own end marker;
-being a valid prefix is not the same as being a stored word.
 
 Use a fixed child array for a small fixed alphabet and a map for a sparse or
 large alphabet. A wildcard search branches over every existing child at that
@@ -8679,7 +8776,13 @@ set is usually simpler and may use less memory.
 
 ###### Common mistakes and edge cases
 
-Check empty and minimum inputs, duplicates, limits, and every boundary update.
+> **Warning:** Treating a reached prefix as a complete word makes `find("ca",
+> true)` succeed after inserting only `"car"`; require the end marker for a
+> whole-word query.
+
+The methods require a non-nil root. Decide whether the empty string is allowed,
+and use runes or visible-symbol segmentation instead of bytes when the input
+contract requires those text units.
 
 ###### Related material
 

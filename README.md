@@ -89,6 +89,10 @@ Examples:
 - **`go test ./...`:** Run every Go package test included in the normal build.
   Standalone problem files begin with `//go:build ignore`, so this command skips
   them; the problem scripts run them separately.
+- **`go run scripts/check-concepts-doc.go`:** Validate the concepts guide's
+  heading hierarchy, ordered teaching-entry fields, fenced blocks, baseline
+  source links, local paths, internal fragments, and repository links into the
+  guide.
 - **`./scripts/test-problem-workflow.sh`:** Test archiving, resetting, filename
   checks, running one problem, and running all completed problems inside a
   temporary copy of the repository. It does not modify the active workbench.
@@ -99,6 +103,7 @@ The usual full validation sequence is:
 ./scripts/workbench.sh
 ./scripts/test-problems.sh
 ./scripts/test-problem-workflow.sh
+go run scripts/check-concepts-doc.go
 go test ./...
 ```
 

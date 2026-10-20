@@ -339,8 +339,8 @@ list. Valid statuses are `Not started`, `In progress`, `Blocked`, and
 | 5 | 4 | All nine Go techniques in E | Complete |
 | 6 | 5 | All nine Go reference implementations in D | Complete |
 | 7 | 6 | Final organization, further study, navigation, and link preservation | Complete |
-| 8 | 7 | Beginner-language and technical review of the complete guide | Not started |
-| 9 | 8 | Repository-wide documentation and test validation | Not started |
+| 8 | 7 | Beginner-language and technical review of the complete guide | Complete |
+| 9 | 8 | Repository-wide documentation and test validation | Complete |
 
 There are exactly ten phases, numbered 0 through 9. The ordered batches inside
 a phase are checkpoints, not additional phases: they do not receive separate
@@ -1224,112 +1224,219 @@ The former one-paragraph advanced-topic list is now six concise descriptions
 with prerequisite links. No foundation, data-structure, pattern-card,
 Go-technique, or reference-implementation content was otherwise rewritten.
 
+### Phase 8: Beginner-language and technical review
+
+**Status:** Complete
+
+**Starting headings:** `A. Foundations`; `B. Ways to store and organize
+information`; `C. Ways to solve problems`; `D. Go-specific techniques`; `E.
+Go reference implementations`; and `F. Further study`. The review covers all
+93 teaching entries in the coverage matrix, in the three ordered batches named
+by the phase definition. Existing heading names and explicit anchors are the
+starting navigation contract.
+
+**Review results:** All three ordered batches received separate
+beginner-language and technical passes. All 93 matrix rows are approved in both
+columns. The review defined first-use terms such as JSON, API, LRU, min-heap,
+max-heap, BFS, and DFS; replaced repeated placeholder explanations with
+method-specific procedures, correctness arguments, and failing examples; and
+removed duplicate or outcome-only prose that repeated a complete trace or
+related-material list.
+
+**Technical findings resolved:** Exact-slope wording now distinguishes an
+undirected line orientation from a directed ray. Parent-link traversal stops
+when its frontier is empty, preserving the stated `O(n)` bound for very large
+distances. Simulation rejects unsupported commands. Signed-prefix parsing
+checks the asymmetric `int64` limits before multiplication. Kruskal stops after
+accepting `V-1` edges. String matching, divide and conquer, prefix structures,
+graph methods, heaps, monotonic structures, pointer methods, and tries now give
+method-specific preservation and termination arguments instead of generic
+claims. Bellman-Ford states its checked-sum precondition explicitly.
+
+**Changed headings and anchors:** None. All existing headings and explicit
+anchors remain the navigation contract. The three batches changed explanatory
+prose and four complete Go examples only; ownership remains with the entries
+already recorded in the matrix.
+
+**Validation results:** `check-non-ascii.py` and `git diff --check HEAD` pass.
+The complete heading scan reports 1,132 headings; each of the eleven required
+entry headings appears 93 times. All 178 fence markers form 89 balanced code
+blocks. A prose-only local-link audit reports 467 links and no unresolved file
+or fragment target. A temporary Go test compiled and exercised the changed
+simulation, parsing, parent-link traversal, and Kruskal examples, including
+failure and boundary cases; the temporary artifact was removed. The external
+interview-evidence links and their nearby claims were rechecked on 2026-10-20;
+no correction was required. `GOCACHE=/tmp/algos-phase8-go-build go test ./...`
+passes for `internal/testrunner` and `workbench`.
+
+**QA and diff audit:** The QA pass found no unresolved correctness, navigation,
+or regression issue after the fixes above. The phase preserves every teaching
+entry, source, heading, explicit anchor, and complete example. It removes only
+redundant trace/link prose and replaces vague text with concrete teaching
+material. At that checkpoint, phase 9 remained not started.
+
+### Phase 9: Repository-wide documentation and test validation
+
+**Status:** Complete
+
+**Starting headings:** The complete phase-8 navigation contract: 1,132
+headings from `Algorithms and Data Structures in Go` through `F. Further
+study`, including all 93 teaching entries and their eleven required field
+headings. The ordered heading inventory is reproducible with
+`rg -n '^#{1,6} ' concepts/README.md`; no heading or anchor change is planned
+unless final validation finds a concrete defect.
+
+**Changed headings and anchors:** None. The final guide retains 1,132 headings
+and all 84 explicit anchors. The only guide-content correction expands ASCII
+at first use; it does not change an entry heading, fragment, example, or
+algorithm.
+
+**Validation tooling:** Added `scripts/check-concepts-doc.go` because earlier
+one-off link scans produced parser false positives. The command ignores fenced
+and inline code, reproduces GitHub-style heading fragments, rejects heading
+level jumps and duplicate targets, verifies the 93 ordered teaching-entry
+contracts, checks balanced fences and the no-table rule, resolves local and
+internal links, verifies repository links into the guide, and requires every
+baseline external source URL. `README.md` now lists the command in the
+repository validation sequence.
+
+**Validation results:** All phase-9 checks passed on 2026-10-20:
+
+- `/Users/nolan/.codex/scripts/check-non-ascii.py REFACTOR_CONCEPTS.md
+  concepts/README.md README.md scripts/check-concepts-doc.go`: passed.
+- `git diff --check HEAD -- REFACTOR_CONCEPTS.md concepts/README.md README.md`
+  and `git diff --no-index --check /dev/null scripts/check-concepts-doc.go`:
+  passed.
+- `go run scripts/check-concepts-doc.go`: reports 1,132 headings, 84 explicit
+  anchors, 89 balanced fenced blocks (78 Go and 11 text), 415 internal links,
+  41 local-file links, all 11 baseline external links, all 20 repository
+  inbound links, and 93 entries with all 11 fields in order.
+- A temporary extractor formatted and compiled all 78 Go examples in isolated
+  packages; the temporary source and generated packages were removed.
+- `go vet scripts/check-concepts-doc.go` and
+  `go test scripts/check-concepts-doc.go` pass.
+- `GOCACHE=/tmp/algos-phase9-go-build go test ./...` passes for
+  `internal/testrunner` and `workbench`.
+
+**Baseline and language audit:** The final inventories meet or exceed the
+recorded baseline while preserving its exact externally owned material: 20
+inbound repository links remain 20, all 11 source URLs remain present, local
+links grew from 15 to 41, internal links grew from 146 to 415, fenced blocks
+grew from 49 to 89, and lines naming examples, traces, or cases grew from 124
+to 275. The coverage matrix still contains all 93 owners. The placeholder and
+abbreviation scan found only contextual uses after expanding ASCII at first
+use; no deferred item affects correctness or navigation.
+
+**QA and diff audit:** The QA pass corrected multi-backtick inline-code
+handling and replaced an insufficient external-link count check with exact
+baseline URL verification. After those fixes, no unresolved correctness,
+navigation, data-loss, or test issue remains. The complete phase notes account
+for every moved section, removed duplicate explanation, retained source,
+example, owner, and link from the recorded baseline.
+
 ### Deferred work
 
-- The external interview-evidence claims and URLs are time-sensitive. Preserve
-  them through content phases, then reverify them during the final review and
-  validation phases rather than changing them in phase 0.
+- None affecting correctness or navigation after phase 9.
 
 ## Coverage matrix
 
 `U` means the baseline material has not yet been judged against that required
-field; `C` will mean the field is complete. Editorial and technical review stay
-`-` until their distinct phase-8 passes. Group headings, the evidence section,
-and the further-study checklist are in the heading inventory but are not
-eleven-field teaching entries.
+field; `C` means the field or review is complete. Group headings, the evidence
+section, and the further-study checklist are in the heading inventory but are
+not eleven-field teaching entries.
 
 | Entry | Destination / primary owner | Original heading or anchor | Phase | Problem | Idea | How | Examples | Why | Go | Work | Use | Avoid | Mistakes | Related | Editorial | Technical | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A.1 | Foundations / complexity | A.1 Complexity and resource accounting | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; resource-accounting owner |
-| A.2 | Foundations / correctness | A.2 Correctness and invariants | 1 | C | C | C | C | C | C | C | C | C | C | C | - | - | Pilot complete; invariant and correctness-argument owner |
-| A.3 | Foundations / recursion | A.3 Recursion and saved work | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; owns call-stack costs |
-| A.4 | Foundations / integer bounds | A.4 Integer limits and bits | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; integer-representation owner |
-| A.5 | Foundations / bit operations | A.5 Bit manipulation | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; bit-operation owner |
-| A.6 | Foundations / exact representation | A.6 Keeping arithmetic values exact and consistent | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; normalization owner |
-| A.6.1 | Foundations / GCD and LCM | A.6.1 Shared divisors and multiples (GCD and LCM) | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; GCD and LCM owner |
-| A.6.2 | Foundations / fractions | A.6.2 Normalized fractions and ratios | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; normalized-fraction owner |
-| A.6.3 | Foundations / slopes | A.6.3 Exact slopes without rounding | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; exact-direction owner |
-| A.6.4 | Foundations / modular arithmetic | A.6.4 Modular arithmetic and negative division | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; negative remainder and floor-division owner |
-| A.6.5 | Foundations / factorial zeroes | A.6.5 Trailing zeroes without calculating a factorial | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; factor-layer counting owner |
-| A.6.6 | Foundations / factors and sieves | A.6.6 Factors and prime sieves | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; trial-division and sieve owner |
-| A.6.7 | Foundations / large integers | A.6.7 Numbers too large for an integer type | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; streaming decimal-remainder owner |
-| A.7 | Foundations / combinatorics | A.7 Combinatorics and output size | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; output-size owner |
-| A.7.1 | Foundations / combinations | A.7.1 Counting combinations without large factorials | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; exact combination-count owner |
-| A.7.2 | Foundations / repeated values | A.7.2 Repeated input values | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; duplicate-choice owner |
-| A.8 | Foundations / digit processing | A.8 Integer Digit Processing; `integer-digit-processing` | 2 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; inbound and former field anchors preserved |
-| B.1 | Store information / arrays, slices, strings | B.1 Arrays, slices, and strings | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; basic sequence-storage owner |
-| B.1.1 | Store information / in-place sequence mutation | B.1.1 Moving values in place | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; in-place sequence-operation owner |
-| B.2 | Store information / linked lists | B.2 Linked Lists; `linked-lists` | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; inbound and former field anchors preserved |
-| B.3 | Store information / queues and deques | B.3 Queues and deques | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; FIFO, deque, and amortized-queue owner |
-| B.4.1 | Store information / tree terms and BST search | B.4.1 Terminology and search | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; tree-term and BST-search owner |
-| B.4.2 | Store information / tree traversal | B.4.2 Traversal order | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; traversal-order owner |
-| B.4.3 | Store information / recursive tree contracts | B.4.3 Recursive return contracts | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; tree-return-contract owner |
-| B.4.4 | Store information / BST validation | B.4.4 BST validation and costs | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; ancestor-bound validation owner |
-| B.4.5 | Store information / tree reconstruction | B.4.5 Reconstruction from traversals | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; traversal-reconstruction owner |
-| B.4.6 | Store information / parent-link traversal | B.4.6 Traversing through parent links | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; parent-link traversal owner |
-| B.5 | Store information / graphs and grids | B.5 Graphs and grids | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; graph-representation owner |
-| B.6 | Store information / matrix state | B.6 Matrix traversal and in-place state | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; matrix-coordinate and shape owner |
-| B.6.1 | Store information / shrinking boundaries | B.6.1 Rows, columns, and shrinking boundaries | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; shrinking-boundary owner |
-| B.6.2 | Store information / layer transforms | B.6.2 Layer transformations | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; square-rotation mapping owner |
-| B.6.3 | Store information / in-place markers | B.6.3 Reusing the first row and column as markers | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; in-place matrix-marker owner |
-| B.6.4 | Store information / encoded matrix state | B.6.4 Keeping current and next state together | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; simultaneous-state encoding owner |
-| B.7 | Store information / composed structures | B.7 Composing data structures | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; cross-structure invariant owner |
-| B.8 | Store information / streaming state | B.8 Streaming and online processing | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; online-processing owner |
-| B.9 | Store information / selection guide | B.9 Choosing a structure | 3 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; comparison only, with owner links |
-| C.1.1 | Solve problems / quick selection | C.1.1 Quick decision tree | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Selection guide, not method owner |
-| C.1.2 | Solve problems / derive a direction | C.1.2 Derive a direction before naming a pattern | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Selection guide, not method owner |
-| C.1.3.1 | Solve problems / common-prefix scan | C.1.3.1 Common-prefix scan; `common-prefix-scan` | 1 | C | C | C | C | C | C | C | C | C | C | C | - | - | Pilot complete; E.7 owns full code; inbound and former generated anchors preserved |
-| C.1.3.2 | Solve problems / directional scan | C.1.3.2 Directional scan; `directional-scan` | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Legacy anchor is inbound |
-| C.1.3.3 | Solve problems / simulation | C.1.3.3 Simulation | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.4 | Solve problems / hash map or set | C.1.3.4 Hash map or set; `hash-map-or-set` | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Legacy anchor is inbound |
-| C.1.3.5 | Solve problems / sorting and selection | C.1.3.5 Sorting and selection | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.6 | Solve problems / binary search | C.1.3.6 Binary search; `binary-search` | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Legacy anchor is inbound |
-| C.1.3.7 | Solve problems / string matching | C.1.3.7 String matching | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.8 | Solve problems / parsing state | C.1.3.8 Parsing and state machines | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.9 | Solve problems / two pointers | C.1.3.9 Two pointers; `two-pointers` | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Legacy anchor is inbound |
-| C.1.3.10 | Solve problems / dynamic programming | C.1.3.10 Dynamic programming; `dynamic-programming` | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Legacy anchor is inbound |
-| C.1.3.10.1 | Solve problems / coordinate compression | C.1.3.10.1 Coordinate compression | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Specialized preprocessing owner |
-| C.1.3.11 | Solve problems / divide and conquer | C.1.3.11 Divide and conquer | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.12 | Solve problems / best subarray scan | C.1.3.12 Kadane's algorithm (best subarray scan) | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.13 | Solve problems / stack method | C.1.3.13 Stack; `stack` | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Legacy anchor is inbound |
-| C.1.3.14 | Solve problems / sliding window | C.1.3.14 Sliding window; `sliding-window` | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Legacy anchor is inbound |
-| C.1.3.15 | Solve problems / prefix sums | C.1.3.15 Prefix sums | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.16 | Solve problems / difference arrays | C.1.3.16 Difference arrays | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.17 | Solve problems / Fenwick and segment trees | C.1.3.17 Fenwick and segment trees | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.18 | Solve problems / greedy | C.1.3.18 Greedy | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.19 | Solve problems / backtracking | C.1.3.19 Backtracking | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.20 | Solve problems / depth-first search | C.1.3.20 Depth-first search | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.21 | Solve problems / breadth-first search | C.1.3.21 Breadth-first search | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.22 | Solve problems / topological sort | C.1.3.22 Topological sort | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.23 | Solve problems / Dijkstra | C.1.3.23 Dijkstra shortest paths | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.24 | Solve problems / Bellman-Ford | C.1.3.24 Bellman-Ford shortest paths | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.25 | Solve problems / disjoint-set union | C.1.3.25 Disjoint-set union | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.26 | Solve problems / minimum spanning tree | C.1.3.26 Minimum spanning tree | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.27 | Solve problems / heap or priority queue | C.1.3.27 Heap or priority queue | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.28 | Solve problems / monotonic stack | C.1.3.28 Monotonic stack | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.29 | Solve problems / monotonic deque | C.1.3.29 Monotonic deque | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.30 | Solve problems / intervals | C.1.3.30 Intervals | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.31 | Solve problems / sweep line | C.1.3.31 Sweep line | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.32 | Solve problems / fast and slow pointers | C.1.3.32 Fast and slow pointers | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.3.33 | Solve problems / trie | C.1.3.33 Trie | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Method owner |
-| C.1.4 | Solve problems / method comparisons | C.1.4 Choosing among overlapping methods | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Owns cross-method comparisons |
-| C.1.5 | Solve problems / constraint filtering | C.1.5 Let constraints eliminate bad choices | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Selection guide |
-| C.1.6 | Solve problems / commitment checklist | C.1.6 Before committing to a method | 4 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; Selection guide |
-| D.1 | Go-specific techniques / boundary conversion | E.1 Keep input conversion outside the algorithm | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.1 in phase 7; owns decoding, boundary validation, and result encoding |
-| D.2 | Go-specific techniques / table tests | E.2 Table-driven tests | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.2 in phase 7; owns table-test and named-subtest behavior |
-| D.3 | Go-specific techniques / sorting mutation | E.3 Sorting without unexpected mutation | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.3 in phase 7; owns Go sorting mutation and copy-before-sort behavior |
-| D.4 | Go-specific techniques / maps and sets | E.4 Map presence and sets | 1 | C | C | C | C | C | C | C | C | C | C | C | - | - | Pilot complete; moved to D.4 in phase 7; owns Go map presence, set representation, and iteration-order behavior |
-| D.5 | Go-specific techniques / priority queues | E.5 Priority queues | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.5 in phase 7; owns `heap.Interface`, root access, and stale-entry behavior |
-| D.6 | Go-specific techniques / string encoding | E.6 Bytes, runes, and visible characters | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.6 in phase 7; owns byte, rune, and visible-symbol distinctions |
-| D.7 | Go-specific techniques / type parameters | E.7 Type parameters | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.7 in phase 7; owns generic type parameters and constraints |
-| D.8 | Go-specific techniques / iterative recursion | E.8 Replacing recursion with a loop | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.8 in phase 7; owns explicit-stack Go technique |
-| D.9 | Go-specific techniques / slice retention | E.9 Slice storage and retained memory | 5 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to D.9 in phase 7; owns slice backing-array lifetime and pointer-slot clearing |
-| E.1 | Reference implementations / binary search bounds | D.1 Binary search bounds | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.1 in phase 7; implementation owner, teaching owner C.1.3.6 |
-| E.2 | Reference implementations / rolling DP | D.2 Rolling dynamic programming | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.2 in phase 7; implementation owner, teaching owner C.1.3.10 |
-| E.3 | Reference implementations / complement lookup | D.3 Hash-map complement lookup | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.3 in phase 7; implementation owner, teaching owner C.1.3.4 |
-| E.4 | Reference implementations / linked list | D.4 Generic singly linked list | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.4 in phase 7; implementation owner, teaching owner B.2; generics owner D.7 |
-| E.5 | Reference implementations / stack | D.5 Generic stack | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.5 in phase 7; implementation owner, teaching owner C.1.3.13; generics owner D.7 |
-| E.6 | Reference implementations / integer reversal | D.6 Overflow-safe integer reversal | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.6 in phase 7; implementation owner, teaching owners A.4 and A.8 |
-| E.7 | Reference implementations / prefix scan | D.7 Common-prefix scan | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.7 in phase 7; implementation owner, teaching owner C.1.3.1 |
-| E.8 | Reference implementations / directional scan | D.8 Directional scan | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.8 in phase 7; implementation owner, teaching owner C.1.3.2 |
-| E.9 | Reference implementations / sorted pair scan | D.9 Sorted two-pointer pair search | 6 | C | C | C | C | C | C | C | C | C | C | C | - | - | Complete; moved to E.9 in phase 7; implementation owner, teaching owner C.1.3.9 |
+| A.1 | Foundations / complexity | A.1 Complexity and resource accounting | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; resource-accounting owner |
+| A.2 | Foundations / correctness | A.2 Correctness and invariants | 1 | C | C | C | C | C | C | C | C | C | C | C | C | C | Pilot complete; invariant and correctness-argument owner |
+| A.3 | Foundations / recursion | A.3 Recursion and saved work | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; owns call-stack costs |
+| A.4 | Foundations / integer bounds | A.4 Integer limits and bits | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; integer-representation owner |
+| A.5 | Foundations / bit operations | A.5 Bit manipulation | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; bit-operation owner |
+| A.6 | Foundations / exact representation | A.6 Keeping arithmetic values exact and consistent | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; normalization owner |
+| A.6.1 | Foundations / GCD and LCM | A.6.1 Shared divisors and multiples (GCD and LCM) | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; GCD and LCM owner |
+| A.6.2 | Foundations / fractions | A.6.2 Normalized fractions and ratios | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; normalized-fraction owner |
+| A.6.3 | Foundations / slopes | A.6.3 Exact slopes without rounding | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; exact-direction owner |
+| A.6.4 | Foundations / modular arithmetic | A.6.4 Modular arithmetic and negative division | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; negative remainder and floor-division owner |
+| A.6.5 | Foundations / factorial zeroes | A.6.5 Trailing zeroes without calculating a factorial | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; factor-layer counting owner |
+| A.6.6 | Foundations / factors and sieves | A.6.6 Factors and prime sieves | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; trial-division and sieve owner |
+| A.6.7 | Foundations / large integers | A.6.7 Numbers too large for an integer type | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; streaming decimal-remainder owner |
+| A.7 | Foundations / combinatorics | A.7 Combinatorics and output size | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; output-size owner |
+| A.7.1 | Foundations / combinations | A.7.1 Counting combinations without large factorials | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; exact combination-count owner |
+| A.7.2 | Foundations / repeated values | A.7.2 Repeated input values | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; duplicate-choice owner |
+| A.8 | Foundations / digit processing | A.8 Integer Digit Processing; `integer-digit-processing` | 2 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; inbound and former field anchors preserved |
+| B.1 | Store information / arrays, slices, strings | B.1 Arrays, slices, and strings | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; basic sequence-storage owner |
+| B.1.1 | Store information / in-place sequence mutation | B.1.1 Moving values in place | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; in-place sequence-operation owner |
+| B.2 | Store information / linked lists | B.2 Linked Lists; `linked-lists` | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; inbound and former field anchors preserved |
+| B.3 | Store information / queues and deques | B.3 Queues and deques | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; FIFO, deque, and amortized-queue owner |
+| B.4.1 | Store information / tree terms and BST search | B.4.1 Terminology and search | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; tree-term and BST-search owner |
+| B.4.2 | Store information / tree traversal | B.4.2 Traversal order | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; traversal-order owner |
+| B.4.3 | Store information / recursive tree contracts | B.4.3 Recursive return contracts | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; tree-return-contract owner |
+| B.4.4 | Store information / BST validation | B.4.4 BST validation and costs | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; ancestor-bound validation owner |
+| B.4.5 | Store information / tree reconstruction | B.4.5 Reconstruction from traversals | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; traversal-reconstruction owner |
+| B.4.6 | Store information / parent-link traversal | B.4.6 Traversing through parent links | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; parent-link traversal owner |
+| B.5 | Store information / graphs and grids | B.5 Graphs and grids | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; graph-representation owner |
+| B.6 | Store information / matrix state | B.6 Matrix traversal and in-place state | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; matrix-coordinate and shape owner |
+| B.6.1 | Store information / shrinking boundaries | B.6.1 Rows, columns, and shrinking boundaries | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; shrinking-boundary owner |
+| B.6.2 | Store information / layer transforms | B.6.2 Layer transformations | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; square-rotation mapping owner |
+| B.6.3 | Store information / in-place markers | B.6.3 Reusing the first row and column as markers | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; in-place matrix-marker owner |
+| B.6.4 | Store information / encoded matrix state | B.6.4 Keeping current and next state together | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; simultaneous-state encoding owner |
+| B.7 | Store information / composed structures | B.7 Composing data structures | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; cross-structure invariant owner |
+| B.8 | Store information / streaming state | B.8 Streaming and online processing | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; online-processing owner |
+| B.9 | Store information / selection guide | B.9 Choosing a structure | 3 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; comparison only, with owner links |
+| C.1.1 | Solve problems / quick selection | C.1.1 Quick decision tree | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Selection guide, not method owner |
+| C.1.2 | Solve problems / derive a direction | C.1.2 Derive a direction before naming a pattern | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Selection guide, not method owner |
+| C.1.3.1 | Solve problems / common-prefix scan | C.1.3.1 Common-prefix scan; `common-prefix-scan` | 1 | C | C | C | C | C | C | C | C | C | C | C | C | C | Pilot complete; E.7 owns full code; inbound and former generated anchors preserved |
+| C.1.3.2 | Solve problems / directional scan | C.1.3.2 Directional scan; `directional-scan` | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Legacy anchor is inbound |
+| C.1.3.3 | Solve problems / simulation | C.1.3.3 Simulation | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.4 | Solve problems / hash map or set | C.1.3.4 Hash map or set; `hash-map-or-set` | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Legacy anchor is inbound |
+| C.1.3.5 | Solve problems / sorting and selection | C.1.3.5 Sorting and selection | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.6 | Solve problems / binary search | C.1.3.6 Binary search; `binary-search` | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Legacy anchor is inbound |
+| C.1.3.7 | Solve problems / string matching | C.1.3.7 String matching | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.8 | Solve problems / parsing state | C.1.3.8 Parsing and state machines | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.9 | Solve problems / two pointers | C.1.3.9 Two pointers; `two-pointers` | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Legacy anchor is inbound |
+| C.1.3.10 | Solve problems / dynamic programming | C.1.3.10 Dynamic programming; `dynamic-programming` | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Legacy anchor is inbound |
+| C.1.3.10.1 | Solve problems / coordinate compression | C.1.3.10.1 Coordinate compression | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Specialized preprocessing owner |
+| C.1.3.11 | Solve problems / divide and conquer | C.1.3.11 Divide and conquer | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.12 | Solve problems / best subarray scan | C.1.3.12 Kadane's algorithm (best subarray scan) | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.13 | Solve problems / stack method | C.1.3.13 Stack; `stack` | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Legacy anchor is inbound |
+| C.1.3.14 | Solve problems / sliding window | C.1.3.14 Sliding window; `sliding-window` | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Legacy anchor is inbound |
+| C.1.3.15 | Solve problems / prefix sums | C.1.3.15 Prefix sums | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.16 | Solve problems / difference arrays | C.1.3.16 Difference arrays | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.17 | Solve problems / Fenwick and segment trees | C.1.3.17 Fenwick and segment trees | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.18 | Solve problems / greedy | C.1.3.18 Greedy | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.19 | Solve problems / backtracking | C.1.3.19 Backtracking | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.20 | Solve problems / depth-first search | C.1.3.20 Depth-first search | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.21 | Solve problems / breadth-first search | C.1.3.21 Breadth-first search | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.22 | Solve problems / topological sort | C.1.3.22 Topological sort | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.23 | Solve problems / Dijkstra | C.1.3.23 Dijkstra shortest paths | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.24 | Solve problems / Bellman-Ford | C.1.3.24 Bellman-Ford shortest paths | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.25 | Solve problems / disjoint-set union | C.1.3.25 Disjoint-set union | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.26 | Solve problems / minimum spanning tree | C.1.3.26 Minimum spanning tree | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.27 | Solve problems / heap or priority queue | C.1.3.27 Heap or priority queue | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.28 | Solve problems / monotonic stack | C.1.3.28 Monotonic stack | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.29 | Solve problems / monotonic deque | C.1.3.29 Monotonic deque | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.30 | Solve problems / intervals | C.1.3.30 Intervals | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.31 | Solve problems / sweep line | C.1.3.31 Sweep line | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.32 | Solve problems / fast and slow pointers | C.1.3.32 Fast and slow pointers | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.3.33 | Solve problems / trie | C.1.3.33 Trie | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Method owner |
+| C.1.4 | Solve problems / method comparisons | C.1.4 Choosing among overlapping methods | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Owns cross-method comparisons |
+| C.1.5 | Solve problems / constraint filtering | C.1.5 Let constraints eliminate bad choices | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Selection guide |
+| C.1.6 | Solve problems / commitment checklist | C.1.6 Before committing to a method | 4 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; Selection guide |
+| D.1 | Go-specific techniques / boundary conversion | E.1 Keep input conversion outside the algorithm | 5 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to D.1 in phase 7; owns decoding, boundary validation, and result encoding |
+| D.2 | Go-specific techniques / table tests | E.2 Table-driven tests | 5 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to D.2 in phase 7; owns table-test and named-subtest behavior |
+| D.3 | Go-specific techniques / sorting mutation | E.3 Sorting without unexpected mutation | 5 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to D.3 in phase 7; owns Go sorting mutation and copy-before-sort behavior |
+| D.4 | Go-specific techniques / maps and sets | E.4 Map presence and sets | 1 | C | C | C | C | C | C | C | C | C | C | C | C | C | Pilot complete; moved to D.4 in phase 7; owns Go map presence, set representation, and iteration-order behavior |
+| D.5 | Go-specific techniques / priority queues | E.5 Priority queues | 5 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to D.5 in phase 7; owns `heap.Interface`, root access, and stale-entry behavior |
+| D.6 | Go-specific techniques / string encoding | E.6 Bytes, runes, and visible characters | 5 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to D.6 in phase 7; owns byte, rune, and visible-symbol distinctions |
+| D.7 | Go-specific techniques / type parameters | E.7 Type parameters | 5 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to D.7 in phase 7; owns generic type parameters and constraints |
+| D.8 | Go-specific techniques / iterative recursion | E.8 Replacing recursion with a loop | 5 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to D.8 in phase 7; owns explicit-stack Go technique |
+| D.9 | Go-specific techniques / slice retention | E.9 Slice storage and retained memory | 5 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to D.9 in phase 7; owns slice backing-array lifetime and pointer-slot clearing |
+| E.1 | Reference implementations / binary search bounds | D.1 Binary search bounds | 6 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to E.1 in phase 7; implementation owner, teaching owner C.1.3.6 |
+| E.2 | Reference implementations / rolling DP | D.2 Rolling dynamic programming | 6 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to E.2 in phase 7; implementation owner, teaching owner C.1.3.10 |
+| E.3 | Reference implementations / complement lookup | D.3 Hash-map complement lookup | 6 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to E.3 in phase 7; implementation owner, teaching owner C.1.3.4 |
+| E.4 | Reference implementations / linked list | D.4 Generic singly linked list | 6 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to E.4 in phase 7; implementation owner, teaching owner B.2; generics owner D.7 |
+| E.5 | Reference implementations / stack | D.5 Generic stack | 6 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to E.5 in phase 7; implementation owner, teaching owner C.1.3.13; generics owner D.7 |
+| E.6 | Reference implementations / integer reversal | D.6 Overflow-safe integer reversal | 6 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to E.6 in phase 7; implementation owner, teaching owners A.4 and A.8 |
+| E.7 | Reference implementations / prefix scan | D.7 Common-prefix scan | 6 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to E.7 in phase 7; implementation owner, teaching owner C.1.3.1 |
+| E.8 | Reference implementations / directional scan | D.8 Directional scan | 6 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to E.8 in phase 7; implementation owner, teaching owner C.1.3.2 |
+| E.9 | Reference implementations / sorted pair scan | D.9 Sorted two-pointer pair search | 6 | C | C | C | C | C | C | C | C | C | C | C | C | C | Complete; moved to E.9 in phase 7; implementation owner, teaching owner C.1.3.9 |
