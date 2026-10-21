@@ -15,20 +15,23 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Path Sum
 
 Source: LeetCode
 Problem ID: 112
 Source URL: https://leetcode.com/problems/path-sum/description/
 
-Given the root of a binary tree and an integer targetSum, return true if the tree has a root-to-leaf path such that adding up all the values along the path equals targetSum.
+Given the root of a binary tree and an integer targetSum, return true
+if the tree has a root-to-leaf path such that adding up all the values
+along the path equals targetSum.
 
 A leaf is a node with no children.
 
 Example 1:
 
-Input: root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum =
+22
 Output: true
 Explanation: The root-to-leaf path with the target sum is shown.
 
@@ -54,16 +57,17 @@ Constraints:
 - -1000 <= Node.val <= 1000
 
 - -1000 <= targetSum <= 1000
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val               int
@@ -76,23 +80,40 @@ func parsePathSumInput(input string) (*TreeNode, int) {
 		panic(fmt.Errorf("parse path-sum input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse path-sum input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse path-sum input: got %d arguments, want "+
+					"2",
+				len(args),
+			),
+		)
 	}
 	root, argumentError0 := decodeTreeNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse path-sum argument root: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse path-sum argument root: %w",
+				argumentError0,
+			),
+		)
 	}
 	var targetSum int
 	argumentError1 := json.Unmarshal(args[1], &targetSum)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse path-sum argument targetSum: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse path-sum argument targetSum: %w",
+				argumentError1,
+			),
+		)
 	}
 	return root, targetSum
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+	if err := json.Unmarshal(raw, &values); err != nil ||
+		len(values) == 0 {
 		return nil, err
 	}
 	if values[0] == nil {
@@ -141,8 +162,9 @@ func formatPathSumOutput(result bool) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -202,8 +224,9 @@ var sampleCases = []testrunner.Case{
 	maximumPathSumCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -212,17 +235,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	root, targetSum := parsePathSumInput(input)
@@ -233,14 +260,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -267,11 +295,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

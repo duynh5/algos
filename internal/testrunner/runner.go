@@ -1,5 +1,5 @@
-// Package testrunner runs text-input/text-output examples against one or more
-// algorithm implementations.
+// Package testrunner runs text-input/text-output examples against one
+// or more algorithm implementations.
 package testrunner
 
 import (
@@ -14,30 +14,41 @@ import (
 
 const caseNumberEnvironmentVariable = "ALGOS_RUN_PROBLEM_CASE_NUMBER"
 
-// DecodeJSONArgs decodes a positional JSON array into the provided destinations.
+// DecodeJSONArgs decodes a positional JSON array into the provided
+// destinations.
 func DecodeJSONArgs(input string, destinations ...any) error {
 	var arguments []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &arguments); err != nil {
 		return fmt.Errorf("decode JSON arguments: %w", err)
 	}
 	if len(arguments) != len(destinations) {
-		return fmt.Errorf("decode JSON arguments: got %d arguments, want %d", len(arguments), len(destinations))
+		return fmt.Errorf("decode JSON arguments: got %d arguments, "+
+			"want %d", len(arguments), len(destinations))
 	}
 
 	for index, argument := range arguments {
-		if err := json.Unmarshal(argument, destinations[index]); err != nil {
-			return fmt.Errorf("decode JSON argument %d: %w", index+1, err)
+		if err := json.Unmarshal(
+			argument,
+			destinations[index],
+		); err != nil {
+			return fmt.Errorf(
+				"decode JSON argument %d: %w",
+				index+1,
+				err,
+			)
 		}
 	}
 	return nil
 }
 
-// FormatJSONOutput serializes a typed algorithm result into the JSON text used
-// by sample cases. Nil slices are emitted as [] to match judge collection
-// output. Problem-specific formatters should wrap this helper when the judge
-// uses ordinary JSON output.
+// FormatJSONOutput serializes a typed algorithm result into the JSON
+// text used by sample cases. Nil slices are emitted as [] to match
+// judge collection output. Problem-specific formatters should wrap
+// this helper when the judge uses ordinary JSON output.
 func FormatJSONOutput(value any) string {
-	output, err := json.Marshal(normalizeJSONOutputValue(reflect.ValueOf(value)))
+	output, err := json.Marshal(
+		normalizeJSONOutputValue(reflect.ValueOf(value)),
+	)
 	if err != nil {
 		panic(fmt.Errorf("format JSON output: %w", err))
 	}
@@ -54,7 +65,8 @@ func normalizeJSONOutputValue(value reflect.Value) any {
 		}
 		return normalizeJSONOutputValue(value.Elem())
 	}
-	if value.Kind() != reflect.Slice && value.Kind() != reflect.Array {
+	if value.Kind() != reflect.Slice &&
+		value.Kind() != reflect.Array {
 		return value.Interface()
 	}
 	if value.Kind() == reflect.Slice && value.IsNil() {
@@ -75,8 +87,8 @@ type Case struct {
 	Want  string
 }
 
-// Solution names one implementation that accepts text input and returns text
-// output.
+// Solution names one implementation that accepts text input and
+// returns text output.
 type Solution struct {
 	Name string
 	Run  func(string) string
@@ -92,10 +104,14 @@ type Result struct {
 	Passed   bool
 }
 
-// Run evaluates every solution against the configured cases and writes a concise report.
-// ALGOS_RUN_PROBLEM_CASE_NUMBER limits execution to one one-based case when set.
+// Run evaluates every solution against the configured cases and
+// writes a concise report. ALGOS_RUN_PROBLEM_CASE_NUMBER limits
+// execution to one one-based case when set.
 func Run(output io.Writer, cases []Case, solutions []Solution) error {
-	selectedCases, err := selectCases(cases, os.Getenv(caseNumberEnvironmentVariable))
+	selectedCases, err := selectCases(
+		cases,
+		os.Getenv(caseNumberEnvironmentVariable),
+	)
 	if err != nil {
 		return err
 	}
@@ -115,12 +131,22 @@ func Run(output io.Writer, cases []Case, solutions []Solution) error {
 	failures := 0
 	for _, result := range Evaluate(cases, solutions) {
 		if result.Passed {
-			fmt.Fprintf(output, "PASS  %s / %s\n", result.Solution, result.Sample)
+			fmt.Fprintf(
+				output,
+				"PASS  %s / %s\n",
+				result.Solution,
+				result.Sample,
+			)
 			continue
 		}
 
 		failures++
-		fmt.Fprintf(output, "FAIL  %s / %s\n", result.Solution, result.Sample)
+		fmt.Fprintf(
+			output,
+			"FAIL  %s / %s\n",
+			result.Solution,
+			result.Sample,
+		)
 		fmt.Fprintf(output, "  input: %q\n", result.Input)
 		fmt.Fprintf(output, "  want:  %q\n", result.Want)
 		fmt.Fprintf(output, "  got:   %q\n", result.Got)
@@ -139,16 +165,25 @@ func selectCases(cases []Case, requestedCase string) ([]Case, error) {
 
 	caseNumber, err := strconv.Atoi(requestedCase)
 	if err != nil || caseNumber < 1 {
-		return nil, fmt.Errorf("%s must be a positive integer, got %q", caseNumberEnvironmentVariable, requestedCase)
+		return nil, fmt.Errorf(
+			"%s must be a positive integer, got %q",
+			caseNumberEnvironmentVariable,
+			requestedCase,
+		)
 	}
 	if caseNumber > len(cases) {
-		return nil, fmt.Errorf("case %d is out of range; %d cases configured", caseNumber, len(cases))
+		return nil, fmt.Errorf(
+			"case %d is out of range; %d cases configured",
+			caseNumber,
+			len(cases),
+		)
 	}
 
 	return cases[caseNumber-1 : caseNumber], nil
 }
 
-// Evaluate returns every solution/case comparison without printing a report.
+// Evaluate returns every solution/case comparison without printing a
+// report.
 func Evaluate(cases []Case, solutions []Solution) []Result {
 	results := make([]Result, 0, len(cases)*len(solutions))
 	for _, solution := range solutions {
@@ -160,7 +195,11 @@ func Evaluate(cases []Case, solutions []Solution) []Result {
 				Input:    sample.Input,
 				Want:     sample.Want,
 				Got:      got,
-				Passed:   normalizeOutput(got) == normalizeOutput(sample.Want),
+				Passed: normalizeOutput(
+					got,
+				) == normalizeOutput(
+					sample.Want,
+				),
 			})
 		}
 	}
@@ -177,13 +216,23 @@ func validate(cases []Case, solutions []Solution) error {
 	names := make(map[string]struct{}, len(solutions))
 	for index, solution := range solutions {
 		if strings.TrimSpace(solution.Name) == "" {
-			return fmt.Errorf("solution %d has an empty name", index+1)
+			return fmt.Errorf(
+				"solution %d has an empty name",
+				index+1,
+			)
 		}
 		if solution.Run == nil {
-			return fmt.Errorf("solution %q has no function", solution.Name)
+			return fmt.Errorf(
+				"solution %q has no function",
+				solution.Name,
+			)
 		}
 		if _, exists := names[solution.Name]; exists {
-			return fmt.Errorf("solution name %q is registered more than once", solution.Name)
+			return fmt.Errorf(
+				"solution name %q is registered more than "+
+					"once",
+				solution.Name,
+			)
 		}
 		names[solution.Name] = struct{}{}
 	}

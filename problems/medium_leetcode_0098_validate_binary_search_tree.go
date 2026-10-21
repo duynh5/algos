@@ -15,20 +15,24 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Validate Binary Search Tree
 
 Source: LeetCode
 Problem ID: 98
-Source URL: https://leetcode.com/problems/validate-binary-search-tree/description/
+Source URL:
+https://leetcode.com/problems/validate-binary-search-tree/description/
 
-Given the root of a binary tree, determine if it is a valid binary search tree (BST).
+Given the root of a binary tree, determine if it is a valid binary
+search tree (BST).
 
 A valid BST is defined as follows:
 
-- The left subtree of a node contains only nodes with keys strictly less than the node's key.
+- The left subtree of a node contains only nodes with keys strictly
+  less than the node's key.
 
-- The right subtree of a node contains only nodes with keys strictly greater than the node's key.
+- The right subtree of a node contains only nodes with keys strictly
+  greater than the node's key.
 
 - Both the left and right subtrees must also be binary search trees.
 
@@ -41,23 +45,25 @@ Example 2:
 
 Input: root = [5,1,4,null,null,3,6]
 Output: false
-Explanation: The root node's value is 5 but its right child's value is 4.
+Explanation: The root node's value is 5 but its right child's value is
+4.
 
 Constraints:
 
 - The number of nodes in the tree is in the range [1, 10^4].
 
 - -2^31 <= Node.val <= 2^31 - 1
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val               int
@@ -67,21 +73,36 @@ type TreeNode struct {
 func parseValidateBinarySearchTreeInput(input string) *TreeNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse validate-binary-search-tree input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse validate-binary-search-tree input: %w",
+				err,
+			),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse validate-binary-search-tree input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse validate-binary-search-tree input: got "+
+					"%d arguments, want 1",
+				len(args),
+			),
+		)
 	}
 	root, argumentError0 := decodeTreeNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse validate-binary-search-tree argument root: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse validate-binary-search-tree argument "+
+				"root: %w", argumentError0),
+		)
 	}
 	return root
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+	if err := json.Unmarshal(raw, &values); err != nil ||
+		len(values) == 0 {
 		return nil, err
 	}
 	if values[0] == nil {
@@ -117,7 +138,8 @@ func maximumValidateBinarySearchTreeCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{values})
 	if err != nil {
-		panic(fmt.Errorf("build maximum validate-binary-search-tree input: %w", err))
+		panic(fmt.Errorf("build maximum validate-binary-search-tree "+
+			"input: %w", err))
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum-node increasing right chain is valid",
@@ -130,8 +152,9 @@ func formatValidateBinarySearchTreeOutput(result bool) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -186,8 +209,9 @@ var sampleCases = []testrunner.Case{
 	maximumValidateBinarySearchTreeCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -196,17 +220,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	root := parseValidateBinarySearchTreeInput(input)
@@ -216,14 +244,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -250,11 +279,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

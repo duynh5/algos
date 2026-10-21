@@ -15,23 +15,31 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 H-Index
 
 Source: LeetCode
 Problem ID: 274
 Source URL: https://leetcode.com/problems/h-index/description/
 
-Given an array of integers citations where citations[i] is the number of citations a researcher received for their i^th paper, return the researcher's h-index.
+Given an array of integers citations where citations[i] is the number
+of citations a researcher received for their i^th paper, return the
+researcher's h-index.
 
-According to the definition of h-index on Wikipedia: The h-index is defined as the maximum value of h such that the given researcher has published at least h papers that have each been cited at least h times.
+According to the definition of h-index on Wikipedia: The h-index is
+defined as the maximum value of h such that the given researcher has
+published at least h papers that have each been cited at least h
+times.
 
 Example 1:
 
 Input: citations = [3,0,6,1,5]
 Output: 3
-Explanation: [3,0,6,1,5] means the researcher has 5 papers in total and each of them had received 3, 0, 6, 1, 5 citations respectively.
-Since the researcher has 3 papers with at least 3 citations each and the remaining two with no more than 3 citations each, their h-index is 3.
+Explanation: [3,0,6,1,5] means the researcher has 5 papers in total
+and each of them had received 3, 0, 6, 1, 5 citations respectively.
+Since the researcher has 3 papers with at least 3 citations each and
+the remaining two with no more than 3 citations each, their h-index is
+3.
 
 Example 2:
 
@@ -45,16 +53,17 @@ Constraints:
 - 1 <= n <= 5000
 
 - 0 <= citations[i] <= 1000
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseHIndexInput(input string) []int {
 	var args []json.RawMessage
@@ -62,12 +71,23 @@ func parseHIndexInput(input string) []int {
 		panic(fmt.Errorf("parse h-index input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse h-index input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse h-index input: got %d arguments, want "+
+					"1",
+				len(args),
+			),
+		)
 	}
 	var citations []int
 	argumentError0 := json.Unmarshal(args[0], &citations)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse h-index argument citations: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse h-index argument citations: %w",
+				argumentError0,
+			),
+		)
 	}
 	return citations
 }
@@ -81,15 +101,20 @@ func maximumHIndexCase() testrunner.Case {
 	if err != nil {
 		panic(fmt.Errorf("build maximum h-index input: %w", err))
 	}
-	return testrunner.Case{Name: "Boundary: Maximum papers and citations", Input: string(input), Want: `1000`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum papers and citations",
+		Input: string(input),
+		Want:  `1000`,
+	}
 }
 
 func formatHIndexOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -139,8 +164,9 @@ var sampleCases = []testrunner.Case{
 	maximumHIndexCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -149,17 +175,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	citations := parseHIndexInput(input)
@@ -169,14 +199,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -203,11 +234,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -15,18 +15,21 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Maximal Square
 
 Source: LeetCode
 Problem ID: 221
 Source URL: https://leetcode.com/problems/maximal-square/description/
 
-Given an m x n binary matrix filled with 0's and 1's, find the largest square containing only 1's and return its area.
+Given an m x n binary matrix filled with 0's and 1's, find the largest
+square containing only 1's and return its area.
 
 Example 1:
 
-Input: matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+Input: matrix =
+[["1","0","1","0","0"],["1","0","1","1","1"],
+["1","1","1","1","1"],["1","0","0","1","0"]]
 Output: 4
 
 Example 2:
@@ -48,16 +51,17 @@ Constraints:
 - 1 <= m, n <= 300
 
 - matrix[i][j] is '0' or '1'.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseMaximalSquareInput(input string) [][]byte {
 	var args []json.RawMessage
@@ -65,11 +69,22 @@ func parseMaximalSquareInput(input string) [][]byte {
 		panic(fmt.Errorf("parse maximal-square input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse maximal-square input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse maximal-square input: got %d arguments,"+
+					" want 1",
+				len(args),
+			),
+		)
 	}
 	matrix, argumentError0 := decodeCharacterMatrix(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse maximal-square argument matrix: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse maximal-square argument matrix: %w",
+				argumentError0,
+			),
+		)
 	}
 	return matrix
 }
@@ -84,7 +99,11 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 		result[row] = make([]byte, len(rows[row]))
 		for column, value := range rows[row] {
 			if len(value) != 1 {
-				return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column)
+				return nil, fmt.Errorf(
+					"cell (%d,%d) is not one character",
+					row,
+					column,
+				)
 			}
 			result[row][column] = value[0]
 		}
@@ -102,22 +121,31 @@ func maximumMaximalSquareCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{matrix})
 	if err != nil {
-		panic(fmt.Errorf("build maximum maximal-square input: %w", err))
+		panic(
+			fmt.Errorf("build maximum maximal-square input: %w", err),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum all-one matrix", Input: string(input), Want: `90000`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum all-one matrix",
+		Input: string(input),
+		Want:  `90000`,
+	}
 }
 
 func formatMaximalSquareOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
-		Name:  "Official example 1",
-		Input: `[[["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]]`,
-		Want:  `4`,
+		Name: "Official example 1",
+		Input: `[[["1","0","1","0","0"],["1","0","1","1",` +
+			`"1"],["1","1","1","1","1"],["1","0","0","1",` +
+			`"0"]]]`,
+		Want: `4`,
 	},
 	{
 		Name:  "Official example 2",
@@ -167,8 +195,9 @@ var sampleCases = []testrunner.Case{
 	maximumMaximalSquareCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -177,17 +206,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	matrix := parseMaximalSquareInput(input)
@@ -197,14 +230,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -231,11 +265,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

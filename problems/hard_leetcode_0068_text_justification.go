@@ -16,32 +16,44 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Text Justification
 
 Source: LeetCode
 Problem ID: 68
-Source URL: https://leetcode.com/problems/text-justification/description/
+Source URL:
+https://leetcode.com/problems/text-justification/description/
 
-Given an array of strings words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and right) justified.
+Given an array of strings words and a width maxWidth, format the text
+such that each line has exactly maxWidth characters and is fully (left
+and right) justified.
 
-You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces ' ' when necessary so that each line has exactly maxWidth characters.
+You should pack your words in a greedy approach; that is, pack as many
+words as you can in each line. Pad extra spaces ' ' when necessary so
+that each line has exactly maxWidth characters.
 
-Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line does not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
+Extra spaces between words should be distributed as evenly as
+possible. If the number of spaces on a line does not divide evenly
+between words, the empty slots on the left will be assigned more
+spaces than the slots on the right.
 
-For the last line of text, it should be left-justified, and no extra space is inserted between words.
+For the last line of text, it should be left-justified, and no extra
+space is inserted between words.
 
 Note:
 
-- A word is defined as a character sequence consisting of non-space characters only.
+- A word is defined as a character sequence consisting of non-space
+  characters only.
 
-- Each word's length is guaranteed to be greater than 0 and not exceed maxWidth.
+- Each word's length is guaranteed to be greater than 0 and not exceed
+  maxWidth.
 
 - The input array words contains at least one word.
 
 Example 1:
 
-Input: words = ["This", "is", "an", "example", "of", "text", "justification."], maxWidth = 16
+Input: words = ["This", "is", "an", "example", "of", "text",
+"justification."], maxWidth = 16
 Output:
 [
 "This is an",
@@ -51,19 +63,27 @@ Output:
 
 Example 2:
 
-Input: words = ["What","must","be","acknowledgment","shall","be"], maxWidth = 16
+Input: words = ["What","must","be","acknowledgment","shall","be"],
+maxWidth = 16
 Output:
 [
 "What must be",
 "acknowledgment ",
 "shall be "
 ]
-Explanation: Note that the last line is "shall be " instead of "shall be", because the last line must be left-justified instead of fully-justified.
-Note that the second line is also left-justified because it contains only one word.
+Explanation: Note that the last line is "shall be " instead of "shall
+be", because the last line must be left-justified instead of
+fully-justified.
+Note that the second line is also left-justified because it contains
+only one word.
 
 Example 3:
 
-Input: words = ["Science","is","what","we","understand","well","enough","to","explain","to","a","computer.","Art","is","everything","else","we","do"], maxWidth = 20
+Input: words =
+["Science","is","what","we","understand","well","enough",
+"to","explain","to","a","computer.","Art","is","everything",
+"else","we","do"],
+maxWidth = 20
 Output:
 [
 "Science is what we",
@@ -85,16 +105,17 @@ Constraints:
 - 1 <= maxWidth <= 100
 
 - words[i].length <= maxWidth
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseTextJustificationInput(input string) ([]string, int) {
 	var args []json.RawMessage
@@ -102,17 +123,26 @@ func parseTextJustificationInput(input string) ([]string, int) {
 		panic(fmt.Errorf("parse text-justification input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse text-justification input: got %d arguments, want 2", len(args)))
+		panic(fmt.Sprintf("parse text-justification input: got %d "+
+			"arguments, want 2", len(args)))
 	}
 	var words []string
 	argumentError0 := json.Unmarshal(args[0], &words)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse text-justification argument words: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse text-justification argument words: %w",
+				argumentError0,
+			),
+		)
 	}
 	var maxWidth int
 	argumentError1 := json.Unmarshal(args[1], &maxWidth)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse text-justification argument maxWidth: %w", argumentError1))
+		panic(
+			fmt.Errorf("parse text-justification argument maxWidth: "+
+				"%w", argumentError1),
+		)
 	}
 	return words, maxWidth
 }
@@ -127,11 +157,29 @@ func makeMaximumTextJustificationCase() testrunner.Case {
 	}
 
 	lines := make([]string, 0, wordCount/4)
-	fullyJustified := word + strings.Repeat(" ", 7) + word + strings.Repeat(" ", 7) + word + strings.Repeat(" ", 6) + word
+	fullyJustified := word + strings.Repeat(
+		" ",
+		7,
+	) + word + strings.Repeat(
+		" ",
+		7,
+	) + word + strings.Repeat(
+		" ",
+		6,
+	) + word
 	for index := 0; index < wordCount-4; index += 4 {
 		lines = append(lines, fullyJustified)
 	}
-	lines = append(lines, strings.Join(words[wordCount-4:], " ")+strings.Repeat(" ", 17))
+	lines = append(
+		lines,
+		strings.Join(
+			words[wordCount-4:],
+			" ",
+		)+strings.Repeat(
+			" ",
+			17,
+		),
+	)
 
 	input, err := json.Marshal([]any{words, width})
 	if err != nil {
@@ -152,12 +200,14 @@ func formatTextJustificationOutput(result []string) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
-		Name:  "Official example 1",
-		Input: `[["This","is","an","example","of","text","justification."],16]`,
+		Name: "Official example 1",
+		Input: `[["This","is","an","example","of","text",` +
+			`"justification."],16]`,
 		Want: `[
 "This is an",
 "example of text",
@@ -174,8 +224,11 @@ var sampleCases = []testrunner.Case{
 ]`,
 	},
 	{
-		Name:  "Official example 3",
-		Input: `[["Science","is","what","we","understand","well","enough","to","explain","to","a","computer.","Art","is","everything","else","we","do"],20]`,
+		Name: "Official example 3",
+		Input: `[["Science","is","what","we","understand",` +
+			`"well","enough","to","explain","to","a",` +
+			`"computer.","Art","is","everything","else",` +
+			`"we","do"],20]`,
 		Want: `[
 "Science is what we",
 "understand well",
@@ -218,8 +271,9 @@ var sampleCases = []testrunner.Case{
 	makeMaximumTextJustificationCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -228,17 +282,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	words, maxWidth := parseTextJustificationInput(input)
@@ -249,14 +307,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -283,11 +342,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

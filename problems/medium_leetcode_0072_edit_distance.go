@@ -16,14 +16,15 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Edit Distance
 
 Source: LeetCode
 Problem ID: 72
 Source URL: https://leetcode.com/problems/edit-distance/description/
 
-Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.
+Given two strings word1 and word2, return the minimum number of
+operations required to convert word1 to word2.
 
 You have the following three operations permitted on a word:
 
@@ -58,16 +59,17 @@ Constraints:
 - 0 <= word1.length, word2.length <= 500
 
 - word1 and word2 consist of lowercase English letters.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseEditDistanceInput(input string) (string, string) {
 	var args []json.RawMessage
@@ -75,17 +77,33 @@ func parseEditDistanceInput(input string) (string, string) {
 		panic(fmt.Errorf("parse edit-distance input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse edit-distance input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse edit-distance input: got %d arguments, "+
+					"want 2",
+				len(args),
+			),
+		)
 	}
 	var word1 string
 	argumentError0 := json.Unmarshal(args[0], &word1)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse edit-distance argument word1: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse edit-distance argument word1: %w",
+				argumentError0,
+			),
+		)
 	}
 	var word2 string
 	argumentError1 := json.Unmarshal(args[1], &word2)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse edit-distance argument word2: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse edit-distance argument word2: %w",
+				argumentError1,
+			),
+		)
 	}
 	return word1, word2
 }
@@ -95,10 +113,13 @@ func maximumEditDistanceCase() testrunner.Case {
 	word2 := strings.Repeat("b", 500)
 	input, err := json.Marshal([]any{word1, word2})
 	if err != nil {
-		panic(fmt.Errorf("build maximum edit-distance input: %w", err))
+		panic(
+			fmt.Errorf("build maximum edit-distance input: %w", err),
+		)
 	}
 	return testrunner.Case{
-		Name:  "Boundary: Maximum-length disjoint words replace every character",
+		Name: "Boundary: Maximum-length disjoint words " +
+			"replace every character",
 		Input: string(input),
 		Want:  `500`,
 	}
@@ -108,8 +129,9 @@ func formatEditDistanceOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -152,7 +174,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `1`,
 	},
 	{
-		Name:  "Adversarial: Transposition requires two permitted operations",
+		Name: "Adversarial: Transposition requires two " +
+			"permitted operations",
 		Input: `["ab","ba"]`,
 		Want:  `2`,
 	},
@@ -162,15 +185,17 @@ var sampleCases = []testrunner.Case{
 		Want:  `1`,
 	},
 	{
-		Name:  "Additional: Long common prefix and suffix isolate one replacement",
+		Name: "Additional: Long common prefix and suffix " +
+			"isolate one replacement",
 		Input: `["abcxdef","abcydef"]`,
 		Want:  `1`,
 	},
 	maximumEditDistanceCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -179,17 +204,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	word1, word2 := parseEditDistanceInput(input)
@@ -200,14 +229,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -234,11 +264,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -15,14 +15,15 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Pow(x, n)
 
 Source: LeetCode
 Problem ID: 50
 Source URL: https://leetcode.com/problems/powx-n/description/
 
-Implement pow(x, n), which calculates x raised to the power n (i.e., x^n).
+Implement pow(x, n), which calculates x raised to the power n (i.e.,
+x^n).
 
 Example 1:
 
@@ -51,16 +52,17 @@ Constraints:
 - Either x is not zero or n > 0.
 
 - -10^4 <= x^n <= 10^4
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parsePowxNInput(input string) (float64, int) {
 	var args []json.RawMessage
@@ -68,17 +70,26 @@ func parsePowxNInput(input string) (float64, int) {
 		panic(fmt.Errorf("parse powx-n input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse powx-n input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse powx-n input: got %d arguments, want 2",
+				len(args),
+			),
+		)
 	}
 	var x float64
 	argumentError0 := json.Unmarshal(args[0], &x)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse powx-n argument x: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse powx-n argument x: %w", argumentError0),
+		)
 	}
 	var n int
 	argumentError1 := json.Unmarshal(args[1], &n)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse powx-n argument n: %w", argumentError1))
+		panic(
+			fmt.Errorf("parse powx-n argument n: %w", argumentError1),
+		)
 	}
 	return x, n
 }
@@ -87,8 +98,9 @@ func formatPowxNOutput(value float64) string {
 	return fmt.Sprintf("%.5f", value)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -162,8 +174,9 @@ var sampleCases = []testrunner.Case{
 	},
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -172,17 +185,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	x, n := parsePowxNInput(input)
@@ -193,14 +210,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -227,11 +245,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

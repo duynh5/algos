@@ -15,28 +15,41 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Game of Life
 
 Source: LeetCode
 Problem ID: 289
 Source URL: https://leetcode.com/problems/game-of-life/description/
 
-According to Wikipedia's article: "The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970."
+According to Wikipedia's article: "The Game of Life, also known simply
+as Life, is a cellular automaton devised by the British mathematician
+John Horton Conway in 1970."
 
-The board is made up of an m x n grid of cells, where each cell has an initial state: live (represented by a 1) or dead (represented by a 0). Each cell interacts with its eight neighbors (horizontal, vertical, diagonal) using the following four rules (taken from the above Wikipedia article):
+The board is made up of an m x n grid of cells, where each cell has an
+initial state: live (represented by a 1) or dead (represented by a 0).
+Each cell interacts with its eight neighbors (horizontal, vertical,
+diagonal) using the following four rules (taken from the above
+Wikipedia article):
 
-- Any live cell with fewer than two live neighbors dies as if caused by under-population.
+- Any live cell with fewer than two live neighbors dies as if caused
+  by under-population.
 
-- Any live cell with two or three live neighbors lives on to the next generation.
+- Any live cell with two or three live neighbors lives on to the next
+  generation.
 
-- Any live cell with more than three live neighbors dies, as if by over-population.
+- Any live cell with more than three live neighbors dies, as if by
+  over-population.
 
-- Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+- Any dead cell with exactly three live neighbors becomes a live cell,
+  as if by reproduction.
 
-The next state of the board is determined by applying the above rules simultaneously to every cell in the current state of the m x n grid board. In this process, births and deaths occur simultaneously.
+The next state of the board is determined by applying the above rules
+simultaneously to every cell in the current state of the m x n grid
+board. In this process, births and deaths occur simultaneously.
 
-Given the current state of the board, update the board to reflect its next state.
+Given the current state of the board, update the board to reflect its
+next state.
 
 Note that you do not need to return anything.
 
@@ -62,19 +75,25 @@ Constraints:
 
 Follow up:
 
-- Could you solve it in-place? Remember that the board needs to be updated simultaneously: You cannot update some cells first and then use their updated values to update other cells.
+- Could you solve it in-place? Remember that the board needs to be
+  updated simultaneously: You cannot update some cells first and then
+  use their updated values to update other cells.
 
-- In this question, we represent the board using a 2D array. In principle, the board is infinite, which would cause problems when the active area encroaches upon the border of the array (i.e., live cells reach the border). How would you address these problems?
-===============================================================================
+- In this question, we represent the board using a 2D array. In
+  principle, the board is infinite, which would cause problems when
+  the active area encroaches upon the border of the array (i.e., live
+  cells reach the border). How would you address these problems?
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseGameOfLifeInput(input string) [][]int {
 	var args []json.RawMessage
@@ -82,12 +101,23 @@ func parseGameOfLifeInput(input string) [][]int {
 		panic(fmt.Errorf("parse game-of-life input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse game-of-life input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse game-of-life input: got %d arguments, "+
+					"want 1",
+				len(args),
+			),
+		)
 	}
 	var board [][]int
 	argumentError0 := json.Unmarshal(args[0], &board)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse game-of-life argument board: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse game-of-life argument board: %w",
+				argumentError0,
+			),
+		)
 	}
 	return board
 }
@@ -117,13 +147,21 @@ func maximumGameOfLifeCase() testrunner.Case {
 	}
 	output, err := json.Marshal(want)
 	if err != nil {
-		panic(fmt.Errorf("build maximum game-of-life output: %w", err))
+		panic(
+			fmt.Errorf("build maximum game-of-life output: %w", err),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum all-live board overpopulates except corners", Input: string(input), Want: string(output)}
+	return testrunner.Case{
+		Name: "Boundary: Maximum all-live board " +
+			"overpopulates except corners",
+		Input: string(input),
+		Want:  string(output),
+	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -173,8 +211,9 @@ var sampleCases = []testrunner.Case{
 	maximumGameOfLifeCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -183,17 +222,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	board := parseGameOfLifeInput(input)
@@ -203,14 +246,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -237,11 +281,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

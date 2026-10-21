@@ -15,16 +15,19 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Rotate Image
 
 Source: LeetCode
 Problem ID: 48
 Source URL: https://leetcode.com/problems/rotate-image/description/
 
-You are given an n x n 2D matrix representing an image, rotate the image by 90 degrees (clockwise).
+You are given an n x n 2D matrix representing an image, rotate the
+image by 90 degrees (clockwise).
 
-You have to rotate the image in-place, which means you have to modify the input 2D matrix directly. DO NOT allocate another 2D matrix and do the rotation.
+You have to rotate the image in-place, which means you have to modify
+the input 2D matrix directly. DO NOT allocate another 2D matrix and do
+the rotation.
 
 Example 1:
 
@@ -43,16 +46,17 @@ Constraints:
 - 1 <= n <= 20
 
 - -1000 <= matrix[i][j] <= 1000
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseRotateImageInput(input string) [][]int {
 	var args []json.RawMessage
@@ -60,12 +64,23 @@ func parseRotateImageInput(input string) [][]int {
 		panic(fmt.Errorf("parse rotate-image input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse rotate-image input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse rotate-image input: got %d arguments, "+
+					"want 1",
+				len(args),
+			),
+		)
 	}
 	var matrix [][]int
 	argumentError0 := json.Unmarshal(args[0], &matrix)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse rotate-image argument matrix: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse rotate-image argument matrix: %w",
+				argumentError0,
+			),
+		)
 	}
 	return matrix
 }
@@ -91,14 +106,16 @@ func maximumRotateImageCase() testrunner.Case {
 		panic(fmt.Errorf("build maximum rotate-image input: %w", err))
 	}
 	return testrunner.Case{
-		Name:  "Boundary: Maximum matrix of minimum values is rotation-invariant",
+		Name: "Boundary: Maximum matrix of minimum values " +
+			"is rotation-invariant",
 		Input: string(input),
 		Want:  formatRotateImageOutput(matrix),
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -126,7 +143,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `[[1,-1000],[1000,0]]`,
 	},
 	{
-		Name:  "Additional: Negative values rotate clockwise around the center",
+		Name: "Additional: Negative values rotate clockwise " +
+			"around the center",
 		Input: `[[[-1,-2,-3],[-4,-5,-6],[-7,-8,-9]]]`,
 		Want:  `[[-7,-4,-1],[-8,-5,-2],[-9,-6,-3]]`,
 	},
@@ -138,8 +156,9 @@ var sampleCases = []testrunner.Case{
 	maximumRotateImageCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -148,17 +167,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	matrix := parseRotateImageInput(input)
@@ -168,14 +191,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -202,11 +226,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

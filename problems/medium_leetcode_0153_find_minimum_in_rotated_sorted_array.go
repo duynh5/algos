@@ -15,22 +15,27 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Find Minimum in Rotated Sorted Array
 
 Source: LeetCode
 Problem ID: 153
-Source URL: https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0153
 
-Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array nums = [0,1,2,4,5,6,7] might become:
+Suppose an array of length n sorted in ascending order is rotated
+between 1 and n times. For example, the array nums = [0,1,2,4,5,6,7]
+might become:
 
 - [4,5,6,7,0,1,2] if it was rotated 4 times.
 
 - [0,1,2,4,5,6,7] if it was rotated 7 times.
 
-Notice that rotating an array [a[0], a[1], a[2], ..., a[n-1]] 1 time results in the array [a[n-1], a[0], a[1], a[2], ..., a[n-2]].
+Notice that rotating an array [a[0], a[1], a[2], ..., a[n-1]] 1 time
+results in the array [a[n-1], a[0], a[1], a[2], ..., a[n-2]].
 
-Given the sorted rotated array nums of unique elements, return the minimum element of this array.
+Given the sorted rotated array nums of unique elements, return the
+minimum element of this array.
 
 You must write an algorithm that runs in O(log n) time.
 
@@ -44,13 +49,15 @@ Example 2:
 
 Input: nums = [4,5,6,7,0,1,2]
 Output: 0
-Explanation: The original array was [0,1,2,4,5,6,7] and it was rotated 4 times.
+Explanation: The original array was [0,1,2,4,5,6,7] and it was rotated
+4 times.
 
 Example 3:
 
 Input: nums = [11,13,15,17]
 Output: 11
-Explanation: The original array was [11,13,15,17] and it was rotated 4 times.
+Explanation: The original array was [11,13,15,17] and it was rotated 4
+times.
 
 Constraints:
 
@@ -63,29 +70,39 @@ Constraints:
 - All the integers of nums are unique.
 
 - nums is sorted and rotated between 1 and n times.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseFindMinimumInRotatedSortedArrayInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse find-minimum-in-rotated-sorted-array input: %w", err))
+		panic(
+			fmt.Errorf("parse find-minimum-in-rotated-sorted-array "+
+				"input: %w", err),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse find-minimum-in-rotated-sorted-array input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf("parse find-minimum-in-rotated-sorted-array "+
+				"input: got %d arguments, want 1", len(args)),
+		)
 	}
 	var nums []int
 	argumentError0 := json.Unmarshal(args[0], &nums)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse find-minimum-in-rotated-sorted-array argument nums: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse find-minimum-in-rotated-sorted-array "+
+				"argument nums: %w", argumentError0),
+		)
 	}
 	return nums
 }
@@ -98,17 +115,23 @@ func maximumFindMinimumInRotatedSortedArrayCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{nums})
 	if err != nil {
-		panic(fmt.Errorf("build maximum find-minimum-rotated-array input: %w", err))
+		panic(fmt.Errorf("build maximum find-minimum-rotated-array "+
+			"input: %w", err))
 	}
-	return testrunner.Case{Name: "Boundary: Maximum array rotated once", Input: string(input), Want: `-2500`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum array rotated once",
+		Input: string(input),
+		Want:  `-2500`,
+	}
 }
 
 func formatFindMinimumInRotatedSortedArrayOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -163,8 +186,9 @@ var sampleCases = []testrunner.Case{
 	maximumFindMinimumInRotatedSortedArrayCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -173,17 +197,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	nums := parseFindMinimumInRotatedSortedArrayInput(input)
@@ -193,14 +221,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -227,11 +256,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

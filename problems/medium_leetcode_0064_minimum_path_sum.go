@@ -15,14 +15,17 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Minimum Path Sum
 
 Source: LeetCode
 Problem ID: 64
-Source URL: https://leetcode.com/problems/minimum-path-sum/description/
+Source URL:
+https://leetcode.com/problems/minimum-path-sum/description/
 
-Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right, which minimizes the sum of all numbers along its path.
+Given a m x n grid filled with non-negative numbers, find a path from
+top left to bottom right, which minimizes the sum of all numbers along
+its path.
 
 Note: You can only move either down or right at any point in time.
 
@@ -46,16 +49,17 @@ Constraints:
 - 1 <= m, n <= 200
 
 - 0 <= grid[i][j] <= 200
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseMinimumPathSumInput(input string) [][]int {
 	var args []json.RawMessage
@@ -63,12 +67,18 @@ func parseMinimumPathSumInput(input string) [][]int {
 		panic(fmt.Errorf("parse minimum-path-sum input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse minimum-path-sum input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse minimum-path-sum input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	var grid [][]int
 	argumentError0 := json.Unmarshal(args[0], &grid)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse minimum-path-sum argument grid: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse minimum-path-sum argument grid: %w",
+				argumentError0,
+			),
+		)
 	}
 	return grid
 }
@@ -83,10 +93,16 @@ func maximumMinimumPathSumCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{grid})
 	if err != nil {
-		panic(fmt.Errorf("build maximum minimum-path-sum input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum minimum-path-sum input: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
-		Name:  "Boundary: Maximum dimensions and values count every path cell",
+		Name: "Boundary: Maximum dimensions and values " +
+			"count every path cell",
 		Input: string(input),
 		Want:  `79800`,
 	}
@@ -96,8 +112,9 @@ func formatMinimumPathSumOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -135,7 +152,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `200`,
 	},
 	{
-		Name:  "Adversarial: Cheapest immediate move leads to an expensive route",
+		Name: "Adversarial: Cheapest immediate move leads " +
+			"to an expensive route",
 		Input: `[[[1,1,100],[2,100,100],[2,2,1]]]`,
 		Want:  `8`,
 	},
@@ -152,8 +170,9 @@ var sampleCases = []testrunner.Case{
 	maximumMinimumPathSumCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -162,17 +181,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	grid := parseMinimumPathSumInput(input)
@@ -182,14 +205,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -216,11 +240,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

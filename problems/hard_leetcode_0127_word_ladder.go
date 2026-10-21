@@ -15,34 +15,43 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Word Ladder
 
 Source: LeetCode
 Problem ID: 127
 Source URL: https://leetcode.com/problems/word-ladder/description/
 
-A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words beginWord -> s_1 -> s_2 -> ... -> s_k such that:
+A transformation sequence from word beginWord to word endWord using a
+dictionary wordList is a sequence of words beginWord -> s_1 -> s_2 ->
+... -> s_k such that:
 
 - Every adjacent pair of words differs by a single letter.
 
-- Every s_i for 1 <= i <= k is in wordList. Note that beginWord does not need to be in wordList.
+- Every s_i for 1 <= i <= k is in wordList. Note that beginWord does
+  not need to be in wordList.
 
 - s_k == endWord
 
-Given two words, beginWord and endWord, and a dictionary wordList, return the number of words in the shortest transformation sequence from beginWord to endWord, or 0 if no such sequence exists.
+Given two words, beginWord and endWord, and a dictionary wordList,
+return the number of words in the shortest transformation sequence
+from beginWord to endWord, or 0 if no such sequence exists.
 
 Example 1:
 
-Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+Input: beginWord = "hit", endWord = "cog", wordList =
+["hot","dot","dog","lot","log","cog"]
 Output: 5
-Explanation: One shortest transformation sequence is "hit" -> "hot" -> "dot" -> "dog" -> cog", which is 5 words long.
+Explanation: One shortest transformation sequence is "hit" -> "hot" ->
+"dot" -> "dog" -> cog", which is 5 words long.
 
 Example 2:
 
-Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
+Input: beginWord = "hit", endWord = "cog", wordList =
+["hot","dot","dog","lot","log"]
 Output: 0
-Explanation: The endWord "cog" is not in wordList, therefore there is no valid transformation sequence.
+Explanation: The endWord "cog" is not in wordList, therefore there is
+no valid transformation sequence.
 
 Constraints:
 
@@ -54,21 +63,23 @@ Constraints:
 
 - wordList[i].length == beginWord.length
 
-- beginWord, endWord, and wordList[i] consist of lowercase English letters.
+- beginWord, endWord, and wordList[i] consist of lowercase English
+  letters.
 
 - beginWord != endWord
 
 - All the words in wordList are unique.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseWordLadderInput(input string) (string, string, []string) {
 	var args []json.RawMessage
@@ -76,22 +87,40 @@ func parseWordLadderInput(input string) (string, string, []string) {
 		panic(fmt.Errorf("parse word-ladder input: %w", err))
 	}
 	if len(args) != 3 {
-		panic(fmt.Sprintf("parse word-ladder input: got %d arguments, want 3", len(args)))
+		panic(
+			fmt.Sprintf("parse word-ladder input: got %d arguments, "+
+				"want 3", len(args)),
+		)
 	}
 	var beginWord string
 	argumentError0 := json.Unmarshal(args[0], &beginWord)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse word-ladder argument beginWord: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse word-ladder argument beginWord: %w",
+				argumentError0,
+			),
+		)
 	}
 	var endWord string
 	argumentError1 := json.Unmarshal(args[1], &endWord)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse word-ladder argument endWord: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse word-ladder argument endWord: %w",
+				argumentError1,
+			),
+		)
 	}
 	var wordList []string
 	argumentError2 := json.Unmarshal(args[2], &wordList)
 	if argumentError2 != nil {
-		panic(fmt.Errorf("parse word-ladder argument wordList: %w", argumentError2))
+		panic(
+			fmt.Errorf(
+				"parse word-ladder argument wordList: %w",
+				argumentError2,
+			),
+		)
 	}
 	return beginWord, endWord, wordList
 }
@@ -121,7 +150,8 @@ func makeMaximumWordLadderCase() testrunner.Case {
 		panic(fmt.Errorf("build word-ladder input: %w", err))
 	}
 	return testrunner.Case{
-		Name:  "Additional: Maximum dictionary with length-ten transformation",
+		Name: "Additional: Maximum dictionary with length-" +
+			"ten transformation",
 		Input: string(input),
 		Want:  `11`,
 	}
@@ -131,8 +161,9 @@ func formatWordLadderOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -170,15 +201,17 @@ var sampleCases = []testrunner.Case{
 		Want:  `4`,
 	},
 	{
-		Name:  "Additional: Cycles do not change shortest path",
-		Input: `["red","tax",["ted","tex","red","tax","tad","den","rex","pee"]]`,
-		Want:  `4`,
+		Name: "Additional: Cycles do not change shortest path",
+		Input: `["red","tax",["ted","tex","red","tax","tad",` +
+			`"den","rex","pee"]]`,
+		Want: `4`,
 	},
 	makeMaximumWordLadderCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -187,17 +220,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	beginWord, endWord, wordList := parseWordLadderInput(input)
@@ -209,14 +246,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -243,11 +281,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

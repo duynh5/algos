@@ -16,14 +16,17 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Zigzag Conversion
 
 Source: LeetCode
 Problem ID: 6
-Source URL: https://leetcode.com/problems/zigzag-conversion/description/
+Source URL:
+https://leetcode.com/problems/zigzag-conversion/description/
 
-The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+The string "PAYPALISHIRING" is written in a zigzag pattern on a given
+number of rows like this: (you may want to display this pattern in a
+fixed font for better legibility)
 
 P A H N
 A P L S I I G
@@ -31,7 +34,8 @@ Y I R
 
 And then read line by line: "PAHNAPLSIIGYIR"
 
-Write the code that will take a string and make this conversion given a number of rows:
+Write the code that will take a string and make this conversion given
+a number of rows:
 
 string convert(string s, int numRows);
 
@@ -59,19 +63,21 @@ Constraints:
 
 - 1 <= s.length <= 1000
 
-- s consists of English letters (lower-case and upper-case), ',' and '.'.
+- s consists of English letters (lower-case and upper-case), ',' and
+  '.'.
 
 - 1 <= numRows <= 1000
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseZigzagConversionInput(input string) (string, int) {
 	var args []json.RawMessage
@@ -79,17 +85,28 @@ func parseZigzagConversionInput(input string) (string, int) {
 		panic(fmt.Errorf("parse zigzag-conversion input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse zigzag-conversion input: got %d arguments, want 2", len(args)))
+		panic(fmt.Sprintf("parse zigzag-conversion input: got %d "+
+			"arguments, want 2", len(args)))
 	}
 	var s string
 	argumentError0 := json.Unmarshal(args[0], &s)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse zigzag-conversion argument s: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse zigzag-conversion argument s: %w",
+				argumentError0,
+			),
+		)
 	}
 	var numRows int
 	argumentError1 := json.Unmarshal(args[1], &numRows)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse zigzag-conversion argument numRows: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse zigzag-conversion argument numRows: %w",
+				argumentError1,
+			),
+		)
 	}
 	return s, numRows
 }
@@ -98,11 +115,21 @@ func maximumZigzagConversionCase() testrunner.Case {
 	s := strings.Repeat("Ab,.", 250)
 	input, err := json.Marshal([]any{s, 1000})
 	if err != nil {
-		panic(fmt.Errorf("build maximum zigzag-conversion input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum zigzag-conversion input: %w",
+				err,
+			),
+		)
 	}
 	want, err := json.Marshal(s)
 	if err != nil {
-		panic(fmt.Errorf("build maximum zigzag-conversion output: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum zigzag-conversion output: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum string and row count preserve order",
@@ -115,8 +142,9 @@ func formatZigzagConversionOutput(result string) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -176,8 +204,9 @@ var sampleCases = []testrunner.Case{
 	maximumZigzagConversionCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -186,17 +215,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	s, numRows := parseZigzagConversionInput(input)
@@ -207,14 +240,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -241,11 +275,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -16,16 +16,21 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Lowest Common Ancestor of a Binary Tree
 
 Source: LeetCode
 Problem ID: 236
-Source URL: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0236
 
-Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+Given a binary tree, find the lowest common ancestor (LCA) of two
+given nodes in the tree.
 
-According to the definition of LCA on Wikipedia: "The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself)."
+According to the definition of LCA on Wikipedia: "The lowest common
+ancestor is defined between two nodes p and q as the lowest node in T
+that has both p and q as descendants (where we allow a node to be a
+descendant of itself)."
 
 Example 1:
 
@@ -37,7 +42,8 @@ Example 2:
 
 Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
 Output: 5
-Explanation: The LCA of nodes 5 and 4 is 5, since a node can be a descendant of itself according to the LCA definition.
+Explanation: The LCA of nodes 5 and 4 is 5, since a node can be a
+descendant of itself according to the LCA definition.
 
 Example 3:
 
@@ -55,43 +61,51 @@ Constraints:
 - p != q
 
 - p and q will exist in the tree.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val               int
 	Left, Right, Next *TreeNode
 }
 
-func parseLowestCommonAncestorOfABinaryTreeInput(input string) (*TreeNode, *TreeNode, *TreeNode) {
+func parseLowestCommonAncestorOfABinaryTreeInput(
+	input string,
+) (*TreeNode, *TreeNode, *TreeNode) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-tree input: %w", err))
+		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-"+
+			"tree input: %w", err))
 	}
 	if len(args) != 3 {
-		panic(fmt.Sprintf("parse lowest-common-ancestor-of-a-binary-tree input: got %d arguments, want 3", len(args)))
+		panic(fmt.Sprintf("parse lowest-common-ancestor-of-a-binary-"+
+			"tree input: got %d arguments, want 3", len(args)))
 	}
 	root, argumentError0 := decodeTreeNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-tree argument root: %w", argumentError0))
+		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-"+
+			"tree argument root: %w", argumentError0))
 	}
 	var p int
 	argumentError1 := json.Unmarshal(args[1], &p)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-tree argument p: %w", argumentError1))
+		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-"+
+			"tree argument p: %w", argumentError1))
 	}
 	var q int
 	argumentError2 := json.Unmarshal(args[2], &q)
 	if argumentError2 != nil {
-		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-tree argument q: %w", argumentError2))
+		panic(fmt.Errorf("parse lowest-common-ancestor-of-a-binary-"+
+			"tree argument q: %w", argumentError2))
 	}
 	var pNode, qNode *TreeNode
 	queue := []*TreeNode{root}
@@ -112,14 +126,16 @@ func parseLowestCommonAncestorOfABinaryTreeInput(input string) (*TreeNode, *Tree
 		}
 	}
 	if pNode == nil || qNode == nil {
-		panic("parse lowest-common-ancestor input: p or q is absent from the tree")
+		panic("parse lowest-common-ancestor input: p or q " +
+			"is absent from the tree")
 	}
 	return root, pNode, qNode
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+	if err := json.Unmarshal(raw, &values); err != nil ||
+		len(values) == 0 {
 		return nil, err
 	}
 	if values[0] == nil {
@@ -147,7 +163,9 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
-func formatLowestCommonAncestorOfABinaryTreeOutput(node *TreeNode) string {
+func formatLowestCommonAncestorOfABinaryTreeOutput(
+	node *TreeNode,
+) string {
 	if node == nil {
 		return `null`
 	}
@@ -168,9 +186,14 @@ func maximumLowestCommonAncestorOfABinaryTreeCase() testrunner.Case {
 			right = (right - 1) / 2
 		}
 	}
-	input, err := json.Marshal([]any{values, values[pIndex], values[qIndex]})
+	input, err := json.Marshal(
+		[]any{values, values[pIndex], values[qIndex]},
+	)
 	if err != nil {
-		panic(fmt.Errorf("build maximum lowest-common-ancestor input: %w", err))
+		panic(
+			fmt.Errorf("build maximum lowest-common-ancestor input: "+
+				"%w", err),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum tree with two deepest targets",
@@ -179,8 +202,9 @@ func maximumLowestCommonAncestorOfABinaryTreeCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -225,8 +249,9 @@ var sampleCases = []testrunner.Case{
 	maximumLowestCommonAncestorOfABinaryTreeCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -235,17 +260,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	root, p, q := parseLowestCommonAncestorOfABinaryTreeInput(input)
@@ -257,14 +286,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -291,11 +321,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

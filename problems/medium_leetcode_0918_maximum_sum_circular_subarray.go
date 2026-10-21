@@ -15,18 +15,24 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Maximum Sum Circular Subarray
 
 Source: LeetCode
 Problem ID: 918
-Source URL: https://leetcode.com/problems/maximum-sum-circular-subarray/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0918
 
-Given a circular integer array nums of length n, return the maximum possible sum of a non-empty subarray of nums.
+Given a circular integer array nums of length n, return the maximum
+possible sum of a non-empty subarray of nums.
 
-A circular array means the end of the array connects to the beginning of the array. Formally, the next element of nums[i] is nums[(i + 1) % n] and the previous element of nums[i] is nums[(i - 1 + n) % n].
+A circular array means the end of the array connects to the beginning
+of the array. Formally, the next element of nums[i] is nums[(i + 1) %
+n] and the previous element of nums[i] is nums[(i - 1 + n) % n].
 
-A subarray may only include each element of the fixed buffer nums at most once. Formally, for a subarray nums[i], nums[i + 1], ..., nums[j], there does not exist i <= k1, k2 <= j with k1 % n == k2 % n.
+A subarray may only include each element of the fixed buffer nums at
+most once. Formally, for a subarray nums[i], nums[i + 1], ...,
+nums[j], there does not exist i <= k1, k2 <= j with k1 % n == k2 % n.
 
 Example 1:
 
@@ -53,29 +59,42 @@ Constraints:
 - 1 <= n <= 3 * 10^4
 
 - -3 * 10^4 <= nums[i] <= 3 * 10^4
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseMaximumSumCircularSubarrayInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse maximum-sum-circular-subarray input: %w", err))
+		panic(
+			fmt.Errorf("parse maximum-sum-circular-subarray input: "+
+				"%w", err),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse maximum-sum-circular-subarray input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf("parse maximum-sum-circular-subarray input: "+
+				"got %d arguments, want 1", len(args)),
+		)
 	}
 	var nums []int
 	argumentError0 := json.Unmarshal(args[0], &nums)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse maximum-sum-circular-subarray argument nums: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse maximum-sum-circular-subarray argument "+
+					"nums: %w",
+				argumentError0,
+			),
+		)
 	}
 	return nums
 }
@@ -87,17 +106,27 @@ func maximumMaximumSumCircularSubarrayCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{nums})
 	if err != nil {
-		panic(fmt.Errorf("build maximum circular-subarray input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum circular-subarray input: %w",
+				err,
+			),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum positive array", Input: string(input), Want: `900000000`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum positive array",
+		Input: string(input),
+		Want:  `900000000`,
+	}
 }
 
 func formatMaximumSumCircularSubarrayOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -147,8 +176,9 @@ var sampleCases = []testrunner.Case{
 	maximumMaximumSumCircularSubarrayCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -157,17 +187,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	nums := parseMaximumSumCircularSubarrayInput(input)
@@ -177,14 +211,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -211,11 +246,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

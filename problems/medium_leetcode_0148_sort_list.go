@@ -15,14 +15,15 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Sort List
 
 Source: LeetCode
 Problem ID: 148
 Source URL: https://leetcode.com/problems/sort-list/description/
 
-Given the head of a linked list, return the list after sorting it in ascending order.
+Given the head of a linked list, return the list after sorting it in
+ascending order.
 
 Example 1:
 
@@ -45,17 +46,19 @@ Constraints:
 
 - -10^5 <= Node.val <= 10^5
 
-Follow up: Can you sort the linked list in O(n logn) time and O(1) memory (i.e. constant space)?
-===============================================================================
+Follow up: Can you sort the linked list in O(n logn) time and O(1)
+memory (i.e. constant space)?
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type ListNode struct {
 	Val  int
@@ -68,11 +71,17 @@ func parseSortListInput(input string) *ListNode {
 		panic(fmt.Errorf("parse sort-list input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse sort-list input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse sort-list input: got %d arguments, "+
+			"want 1", len(args)))
 	}
 	head, argumentError0 := decodeListNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse sort-list argument head: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse sort-list argument head: %w",
+				argumentError0,
+			),
+		)
 	}
 	return head
 }
@@ -95,7 +104,8 @@ func formatSortListOutput(head *ListNode) string {
 	values := make([]int, 0)
 	for node := head; node != nil; node = node.Next {
 		if len(values) == 50000 {
-			panic("format sort-list output: list exceeds 50000 nodes or contains a cycle")
+			panic("format sort-list output: list exceeds 50000 " +
+				"nodes or contains a cycle")
 		}
 		values = append(values, node.Val)
 	}
@@ -121,11 +131,16 @@ func maximumSortListCase() testrunner.Case {
 	if err != nil {
 		panic(fmt.Errorf("build maximum sort-list output: %w", err))
 	}
-	return testrunner.Case{Name: "Boundary: Maximum descending list", Input: string(input), Want: string(want)}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum descending list",
+		Input: string(input),
+		Want:  string(want),
+	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -175,8 +190,9 @@ var sampleCases = []testrunner.Case{
 	maximumSortListCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -185,17 +201,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	head := parseSortListInput(input)
@@ -205,14 +225,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -239,11 +260,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

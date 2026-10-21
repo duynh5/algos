@@ -3,7 +3,8 @@
 set -euo pipefail
 
 usage() {
-  echo "usage: $0 <easy|medium|hard> <problem-id> <descriptive-slug> [source]" >&2
+  echo "usage: $0 <easy|medium|hard> <problem-id> "\
+"<descriptive-slug> [source]" >&2
 }
 
 fail() {
@@ -28,9 +29,13 @@ case $difficulty in
   *) fail "difficulty must be easy, medium, or hard" ;;
 esac
 
-[[ $source_name =~ ^[a-z0-9]+$ ]] || fail "source must contain lowercase letters and digits"
-[[ $problem_id =~ ^[a-z0-9]+$ ]] || fail "problem ID must contain lowercase letters and digits"
-[[ $slug =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || fail "slug must contain lowercase letters, digits, and single hyphen separators"
+[[ $source_name =~ ^[a-z0-9]+$ ]] ||
+  fail "source must contain lowercase letters and digits"
+[[ $problem_id =~ ^[a-z0-9]+$ ]] ||
+  fail "problem ID must contain lowercase letters and digits"
+[[ $slug =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] ||
+  fail "slug must contain lowercase letters, digits, and "\
+"single hyphen separators"
 
 filename_problem_id=$problem_id
 if [[ $problem_id =~ ^[0-9]+$ ]]; then
@@ -43,17 +48,31 @@ default_root=$(cd "$script_directory/.." && pwd)
 repository_root=${ALGOS_REPO_ROOT:-$default_root}
 source_file="$repository_root/workbench/main.go"
 problem_root="$repository_root/problems"
-filename="solved_${difficulty}_${source_name}_${filename_problem_id}_${slug//-/_}.go"
+link_targets="$repository_root/CONCEPTS_LINKS.md"
+filename="solved_${difficulty}_${source_name}_"\
+"${filename_problem_id}_${slug//-/_}.go"
 destination="$problem_root/$filename"
+link_anchor=""
+if (( ${#filename} > 70 )); then
+  link_anchor="problem-file-${source_name}-${filename_problem_id}"
+fi
 
 [[ -f $source_file ]] || fail "$source_file was not found"
-[[ -f "$problem_root/README.md" ]] || fail "$problem_root/README.md was not found"
+[[ -f "$problem_root/README.md" ]] ||
+  fail "$problem_root/README.md was not found"
+[[ -f $link_targets ]] || fail "$link_targets was not found"
 [[ ! -e $destination ]] || fail "$destination already exists"
-rg -q '^const archiveReady = true$' "$source_file" || fail "workbench is not marked ready to archive"
+if [[ -n $link_anchor ]] &&
+  rg -Fq "id=\"$link_anchor\"" "$link_targets"; then
+  fail "link anchor $link_anchor already exists"
+fi
+rg -q '^const archiveReady = true$' "$source_file" ||
+  fail "workbench is not marked ready to archive"
 
 (cd "$repository_root" && go test ./workbench)
 
-temporary_directory=$(mktemp -d "$repository_root/.archive-workbench.XXXXXX")
+temporary_directory=$(mktemp -d \
+  "$repository_root/.archive-workbench.XXXXXX")
 temporary_file="$temporary_directory/$filename"
 cleanup() {
   rm -f "$temporary_file"
@@ -73,7 +92,16 @@ gofmt -w "$temporary_file"
 (cd "$repository_root" && go run "$temporary_file")
 
 mv "$temporary_file" "$destination"
-printf -- '- [%s](%s)\n' "$filename" "$filename" >> "$problem_root/README.md"
+if (( ${#filename} <= 70 )); then
+  printf -- '- [\n%s\n](\n%s\n)\n' \
+    "$filename" "$filename" >> "$problem_root/README.md"
+else
+  printf '\n<a id="%s"></a>\n\n- [%s](problems/%s)\n' \
+    "$link_anchor" "$filename" "$filename" >> "$link_targets"
+  printf -- '- [%s %s archive](\n../CONCEPTS_LINKS.md#%s\n)\n' \
+    "$source_name" "$problem_id" "$link_anchor" \
+    >> "$problem_root/README.md"
+fi
 rmdir "$temporary_directory"
 trap - EXIT
 

@@ -16,16 +16,21 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Valid Palindrome
 
 Source: LeetCode
 Problem ID: 125
-Source URL: https://leetcode.com/problems/valid-palindrome/description/
+Source URL:
+https://leetcode.com/problems/valid-palindrome/description/
 
-A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+A phrase is a palindrome if, after converting all uppercase letters
+into lowercase letters and removing all non-alphanumeric characters,
+it reads the same forward and backward. Alphanumeric characters
+include letters and numbers.
 
-Given a string s, return true if it is a palindrome, or false otherwise.
+Given a string s, return true if it is a palindrome, or false
+otherwise.
 
 Example 1:
 
@@ -43,24 +48,27 @@ Example 3:
 
 Input: s = " "
 Output: true
-Explanation: s is an empty string "" after removing non-alphanumeric characters.
-Since an empty string reads the same forward and backward, it is a palindrome.
+Explanation: s is an empty string "" after removing non-alphanumeric
+characters.
+Since an empty string reads the same forward and backward, it is a
+palindrome.
 
 Constraints:
 
 - 1 <= s.length <= 2 * 10^5
 
 - s consists only of printable ASCII characters.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseValidPalindromeInput(input string) string {
 	var args []json.RawMessage
@@ -68,12 +76,18 @@ func parseValidPalindromeInput(input string) string {
 		panic(fmt.Errorf("parse valid-palindrome input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse valid-palindrome input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse valid-palindrome input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	var s string
 	argumentError0 := json.Unmarshal(args[0], &s)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse valid-palindrome argument s: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse valid-palindrome argument s: %w",
+				argumentError0,
+			),
+		)
 	}
 	return s
 }
@@ -82,10 +96,16 @@ func maximumValidPalindromeCase() testrunner.Case {
 	value := strings.Repeat("A,", 100000)
 	input, err := json.Marshal([]any{value})
 	if err != nil {
-		panic(fmt.Errorf("build maximum valid-palindrome case: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum valid-palindrome case: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
-		Name:  "Boundary: Maximum length alternates letters and punctuation",
+		Name: "Boundary: Maximum length alternates letters " +
+			"and punctuation",
 		Input: string(input),
 		Want:  `true`,
 	}
@@ -95,8 +115,9 @@ func formatValidPalindromeOutput(result bool) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -161,8 +182,9 @@ var sampleCases = []testrunner.Case{
 	maximumValidPalindromeCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -171,17 +193,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	s := parseValidPalindromeInput(input)
@@ -191,14 +217,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -225,11 +252,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

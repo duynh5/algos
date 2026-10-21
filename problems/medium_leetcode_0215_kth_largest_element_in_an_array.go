@@ -15,16 +15,19 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Kth Largest Element in an Array
 
 Source: LeetCode
 Problem ID: 215
-Source URL: https://leetcode.com/problems/kth-largest-element-in-an-array/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0215
 
-Given an integer array nums and an integer k, return the k^th largest element in the array.
+Given an integer array nums and an integer k, return the k^th largest
+element in the array.
 
-Note that it is the k^th largest element in the sorted order, not the k^th distinct element.
+Note that it is the k^th largest element in the sorted order, not the
+k^th distinct element.
 
 Can you solve it without sorting?
 
@@ -43,34 +46,49 @@ Constraints:
 - 1 <= k <= nums.length <= 10^5
 
 - -10^4 <= nums[i] <= 10^4
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseKthLargestElementInAnArrayInput(input string) ([]int, int) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse kth-largest-element-in-an-array input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse kth-largest-element-in-an-array input: "+
+					"%w",
+				err,
+			),
+		)
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse kth-largest-element-in-an-array input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse kth-largest-element-in-an-array input: "+
+					"got %d arguments, want 2",
+				len(args),
+			),
+		)
 	}
 	var nums []int
 	argumentError0 := json.Unmarshal(args[0], &nums)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse kth-largest-element-in-an-array argument nums: %w", argumentError0))
+		panic(fmt.Errorf("parse kth-largest-element-in-an-array "+
+			"argument nums: %w", argumentError0))
 	}
 	var k int
 	argumentError1 := json.Unmarshal(args[1], &k)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse kth-largest-element-in-an-array argument k: %w", argumentError1))
+		panic(fmt.Errorf("parse kth-largest-element-in-an-array "+
+			"argument k: %w", argumentError1))
 	}
 	return nums, k
 }
@@ -84,15 +102,20 @@ func maximumKthLargestElementInAnArrayCase() testrunner.Case {
 	if err != nil {
 		panic(fmt.Errorf("build maximum kth-largest input: %w", err))
 	}
-	return testrunner.Case{Name: "Boundary: Maximum input asks for the minimum", Input: string(input), Want: `-10000`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum input asks for the minimum",
+		Input: string(input),
+		Want:  `-10000`,
+	}
 }
 
 func formatKthLargestElementInAnArrayOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -125,7 +148,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `10000`,
 	},
 	{
-		Name:  "Adversarial: Rank counts duplicates rather than distinct values",
+		Name: "Adversarial: Rank counts duplicates rather " +
+			"than distinct values",
 		Input: `[[9,9,9,8,7],3]`,
 		Want:  `9`,
 	},
@@ -142,8 +166,9 @@ var sampleCases = []testrunner.Case{
 	maximumKthLargestElementInAnArrayCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -152,17 +177,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	nums, k := parseKthLargestElementInAnArrayInput(input)
@@ -173,14 +202,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -207,11 +237,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

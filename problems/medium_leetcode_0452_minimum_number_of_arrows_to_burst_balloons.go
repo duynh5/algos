@@ -15,18 +15,29 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Minimum Number of Arrows to Burst Balloons
 
 Source: LeetCode
 Problem ID: 452
-Source URL: https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0452
 
-There are some spherical balloons taped onto a flat wall that represents the XY-plane. The balloons are represented as a 2D integer array points where points[i] = [x_start, x_end] denotes a balloon whose horizontal diameter stretches between x_start and x_end. You do not know the exact y-coordinates of the balloons.
+There are some spherical balloons taped onto a flat wall that
+represents the XY-plane. The balloons are represented as a 2D integer
+array points where points[i] = [x_start, x_end] denotes a balloon
+whose horizontal diameter stretches between x_start and x_end. You do
+not know the exact y-coordinates of the balloons.
 
-Arrows can be shot up directly vertically (in the positive y-direction) from different points along the x-axis. A balloon with x_start and x_end is burst by an arrow shot at x if x_start <= x <= x_end. There is no limit to the number of arrows that can be shot. A shot arrow keeps traveling up infinitely, bursting any balloons in its path.
+Arrows can be shot up directly vertically (in the positive
+y-direction) from different points along the x-axis. A balloon with
+x_start and x_end is burst by an arrow shot at x if x_start <= x <=
+x_end. There is no limit to the number of arrows that can be shot. A
+shot arrow keeps traveling up infinitely, bursting any balloons in its
+path.
 
-Given the array points, return the minimum number of arrows that must be shot to burst all balloons.
+Given the array points, return the minimum number of arrows that must
+be shot to burst all balloons.
 
 Example 1:
 
@@ -40,7 +51,8 @@ Example 2:
 
 Input: points = [[1,2],[3,4],[5,6],[7,8]]
 Output: 4
-Explanation: One arrow needs to be shot for each balloon for a total of 4 arrows.
+Explanation: One arrow needs to be shot for each balloon for a total
+of 4 arrows.
 
 Example 3:
 
@@ -57,51 +69,66 @@ Constraints:
 - points[i].length == 2
 
 - -2^31 <= x_start < x_end <= 2^31 - 1
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
-func parseMinimumNumberOfArrowsToBurstBalloonsInput(input string) [][]int {
+func parseMinimumNumberOfArrowsToBurstBalloonsInput(
+	input string,
+) [][]int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse minimum-number-of-arrows-to-burst-balloons input: %w", err))
+		panic(fmt.Errorf("parse minimum-number-of-arrows-to-burst-"+
+			"balloons input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse minimum-number-of-arrows-to-burst-balloons input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse minimum-number-of-arrows-to-burst-"+
+			"balloons input: got %d arguments, want 1", len(args)))
 	}
 	var points [][]int
 	argumentError0 := json.Unmarshal(args[0], &points)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse minimum-number-of-arrows-to-burst-balloons argument points: %w", argumentError0))
+		panic(fmt.Errorf("parse minimum-number-of-arrows-to-burst-"+
+			"balloons argument points: %w", argumentError0))
 	}
 	return points
 }
 
-func maximumMinimumNumberOfArrowsToBurstBalloonsCase() testrunner.Case {
+func maximumArrowBurstCase() testrunner.Case {
 	points := make([][]int, 100000)
 	for index := range points {
 		points[index] = []int{index * 2, index*2 + 1}
 	}
 	input, err := json.Marshal([]any{points})
 	if err != nil {
-		panic(fmt.Errorf("build maximum balloon-arrows input: %w", err))
+		panic(
+			fmt.Errorf("build maximum balloon-arrows input: %w", err),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum disjoint balloons", Input: string(input), Want: `100000`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum disjoint balloons",
+		Input: string(input),
+		Want:  `100000`,
+	}
 }
 
-func formatMinimumNumberOfArrowsToBurstBalloonsOutput(result int) string {
+func formatMinimumNumberOfArrowsToBurstBalloonsOutput(
+	result int,
+) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -153,11 +180,12 @@ var sampleCases = []testrunner.Case{
 		Input: `[[[-2147483648,0],[0,2147483647]]]`,
 		Want:  `1`,
 	},
-	maximumMinimumNumberOfArrowsToBurstBalloonsCase(),
+	maximumArrowBurstCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -166,17 +194,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	points := parseMinimumNumberOfArrowsToBurstBalloonsInput(input)
@@ -186,14 +218,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -220,11 +253,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -15,20 +15,24 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Search a 2D Matrix
 
 Source: LeetCode
 Problem ID: 74
-Source URL: https://leetcode.com/problems/search-a-2d-matrix/description/
+Source URL:
+https://leetcode.com/problems/search-a-2d-matrix/description/
 
-You are given an m x n integer matrix matrix with the following two properties:
+You are given an m x n integer matrix matrix with the following two
+properties:
 
 - Each row is sorted in non-decreasing order.
 
-- The first integer of each row is greater than the last integer of the previous row.
+- The first integer of each row is greater than the last integer of
+  the previous row.
 
-Given an integer target, return true if target is in matrix or false otherwise.
+Given an integer target, return true if target is in matrix or false
+otherwise.
 
 You must write a solution in O(log(m * n)) time complexity.
 
@@ -51,16 +55,17 @@ Constraints:
 - 1 <= m, n <= 100
 
 - -10^4 <= matrix[i][j], target <= 10^4
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseSearchA2dMatrixInput(input string) ([][]int, int) {
 	var args []json.RawMessage
@@ -68,17 +73,28 @@ func parseSearchA2dMatrixInput(input string) ([][]int, int) {
 		panic(fmt.Errorf("parse search-a-2d-matrix input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse search-a-2d-matrix input: got %d arguments, want 2", len(args)))
+		panic(fmt.Sprintf("parse search-a-2d-matrix input: got %d "+
+			"arguments, want 2", len(args)))
 	}
 	var matrix [][]int
 	argumentError0 := json.Unmarshal(args[0], &matrix)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse search-a-2d-matrix argument matrix: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse search-a-2d-matrix argument matrix: %w",
+				argumentError0,
+			),
+		)
 	}
 	var target int
 	argumentError1 := json.Unmarshal(args[1], &target)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse search-a-2d-matrix argument target: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse search-a-2d-matrix argument target: %w",
+				argumentError1,
+			),
+		)
 	}
 	return matrix, target
 }
@@ -95,7 +111,12 @@ func maximumSearchA2dMatrixCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{matrix, 1234})
 	if err != nil {
-		panic(fmt.Errorf("build maximum search-a-2d-matrix input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum search-a-2d-matrix input: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum matrix contains an interior target",
@@ -108,8 +129,9 @@ func formatSearchA2dMatrixOutput(result bool) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -174,8 +196,9 @@ var sampleCases = []testrunner.Case{
 	maximumSearchA2dMatrixCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -184,17 +207,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	matrix, target := parseSearchA2dMatrixInput(input)
@@ -205,14 +232,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -239,11 +267,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

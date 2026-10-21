@@ -15,16 +15,21 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Count Complete Tree Nodes
 
 Source: LeetCode
 Problem ID: 222
-Source URL: https://leetcode.com/problems/count-complete-tree-nodes/description/
+Source URL:
+https://leetcode.com/problems/count-complete-tree-nodes/description/
 
-Given the root of a complete binary tree, return the number of the nodes in the tree.
+Given the root of a complete binary tree, return the number of the
+nodes in the tree.
 
-According to Wikipedia, every level, except possibly the last, is completely filled in a complete binary tree, and all nodes in the last level are as far left as possible. It can have between 1 and 2^h nodes inclusive at the last level h.
+According to Wikipedia, every level, except possibly the last, is
+completely filled in a complete binary tree, and all nodes in the last
+level are as far left as possible. It can have between 1 and 2^h nodes
+inclusive at the last level h.
 
 Design an algorithm that runs in less than O(n) time complexity.
 
@@ -50,16 +55,17 @@ Constraints:
 - 0 <= Node.val <= 5 * 10^4
 
 - The tree is guaranteed to be complete.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val               int
@@ -69,21 +75,31 @@ type TreeNode struct {
 func parseCountCompleteTreeNodesInput(input string) *TreeNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse count-complete-tree-nodes input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse count-complete-tree-nodes input: %w",
+				err,
+			),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse count-complete-tree-nodes input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf("parse count-complete-tree-nodes input: got "+
+				"%d arguments, want 1", len(args)),
+		)
 	}
 	root, argumentError0 := decodeTreeNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse count-complete-tree-nodes argument root: %w", argumentError0))
+		panic(fmt.Errorf("parse count-complete-tree-nodes argument "+
+			"root: %w", argumentError0))
 	}
 	return root
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+	if err := json.Unmarshal(raw, &values); err != nil ||
+		len(values) == 0 {
 		return nil, err
 	}
 	if values[0] == nil {
@@ -118,17 +134,23 @@ func maximumCountCompleteTreeNodesCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{values})
 	if err != nil {
-		panic(fmt.Errorf("build maximum count-complete-tree-nodes input: %w", err))
+		panic(fmt.Errorf("build maximum count-complete-tree-nodes "+
+			"input: %w", err))
 	}
-	return testrunner.Case{Name: "Boundary: Maximum complete tree", Input: string(input), Want: `50000`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum complete tree",
+		Input: string(input),
+		Want:  `50000`,
+	}
 }
 
 func formatCountCompleteTreeNodesOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -173,8 +195,9 @@ var sampleCases = []testrunner.Case{
 	maximumCountCompleteTreeNodesCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -183,17 +206,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	root := parseCountCompleteTreeNodesInput(input)
@@ -203,14 +230,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -237,11 +265,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

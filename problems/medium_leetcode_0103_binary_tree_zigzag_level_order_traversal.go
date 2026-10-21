@@ -15,14 +15,17 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Binary Tree Zigzag Level Order Traversal
 
 Source: LeetCode
 Problem ID: 103
-Source URL: https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0103
 
-Given the root of a binary tree, return the zigzag level order traversal of its nodes' values. (i.e., from left to right, then right to left for the next level and alternate between).
+Given the root of a binary tree, return the zigzag level order
+traversal of its nodes' values. (i.e., from left to right, then right
+to left for the next level and alternate between).
 
 Example 1:
 
@@ -44,40 +47,47 @@ Constraints:
 - The number of nodes in the tree is in the range [0, 2000].
 
 - -100 <= Node.val <= 100
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val               int
 	Left, Right, Next *TreeNode
 }
 
-func parseBinaryTreeZigzagLevelOrderTraversalInput(input string) *TreeNode {
+func parseBinaryTreeZigzagLevelOrderTraversalInput(
+	input string,
+) *TreeNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse binary-tree-zigzag-level-order-traversal input: %w", err))
+		panic(fmt.Errorf("parse binary-tree-zigzag-level-order-"+
+			"traversal input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse binary-tree-zigzag-level-order-traversal input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse binary-tree-zigzag-level-order-"+
+			"traversal input: got %d arguments, want 1", len(args)))
 	}
 	root, argumentError0 := decodeTreeNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse binary-tree-zigzag-level-order-traversal argument root: %w", argumentError0))
+		panic(fmt.Errorf("parse binary-tree-zigzag-level-order-"+
+			"traversal argument root: %w", argumentError0))
 	}
 	return root
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+	if err := json.Unmarshal(raw, &values); err != nil ||
+		len(values) == 0 {
 		return nil, err
 	}
 	if values[0] == nil {
@@ -105,39 +115,64 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
-func maximumBinaryTreeZigzagLevelOrderTraversalCase() testrunner.Case {
+func maximumZigzagTraversalCase() testrunner.Case {
 	values := make([]int, 2000)
 	levels := make([][]int, 0, 11)
 	for index := range values {
 		values[index] = index%201 - 100
 	}
-	for start, width, depth := 0, 1, 0; start < len(values); start, width, depth = start+width, width*2, depth+1 {
+	for start, width, depth := 0, 1, 0; start < len(values); {
 		end := min(start+width, len(values))
 		level := append([]int(nil), values[start:end]...)
 		if depth%2 == 1 {
-			for left, right := 0, len(level)-1; left < right; left, right = left+1, right-1 {
+			for left, right := 0, len(level)-1; left < right; {
 				level[left], level[right] = level[right], level[left]
+				left++
+				right--
 			}
 		}
 		levels = append(levels, level)
+		start += width
+		width *= 2
+		depth++
 	}
 	input, err := json.Marshal([]any{values})
 	if err != nil {
-		panic(fmt.Errorf("build maximum binary-tree-zigzag-level-order-traversal input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum binary-tree-zigzag-level-order-"+
+					"traversal input: %w",
+				err,
+			),
+		)
 	}
 	want, err := json.Marshal(levels)
 	if err != nil {
-		panic(fmt.Errorf("build maximum binary-tree-zigzag-level-order-traversal output: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum binary-tree-zigzag-level-order-"+
+					"traversal output: %w",
+				err,
+			),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum complete-prefix tree alternates every level", Input: string(input), Want: string(want)}
+	return testrunner.Case{
+		Name: "Boundary: Maximum complete-prefix tree " +
+			"alternates every level",
+		Input: string(input),
+		Want:  string(want),
+	}
 }
 
-func formatBinaryTreeZigzagLevelOrderTraversalOutput(result [][]int) string {
+func formatBinaryTreeZigzagLevelOrderTraversalOutput(
+	result [][]int,
+) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -170,7 +205,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `[[1],[2],[3]]`,
 	},
 	{
-		Name:  "Adversarial: Sparse fourth level reverses only present nodes",
+		Name: "Adversarial: Sparse fourth level reverses " +
+			"only present nodes",
 		Input: `[[1,2,3,null,4,5,null,6,7]]`,
 		Want:  `[[1],[3,2],[4,5],[7,6]]`,
 	},
@@ -179,11 +215,12 @@ var sampleCases = []testrunner.Case{
 		Input: `[[100,-100,100,-100]]`,
 		Want:  `[[100],[100,-100],[-100]]`,
 	},
-	maximumBinaryTreeZigzagLevelOrderTraversalCase(),
+	maximumZigzagTraversalCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -192,17 +229,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	root := parseBinaryTreeZigzagLevelOrderTraversalInput(input)
@@ -212,14 +253,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -246,11 +288,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -15,14 +15,17 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Construct Binary Tree from Inorder and Postorder Traversal
 
 Source: LeetCode
 Problem ID: 106
-Source URL: https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0106
 
-Given two integer arrays inorder and postorder where inorder is the inorder traversal of a binary tree and postorder is the postorder traversal of the same tree, construct and return the binary tree.
+Given two integer arrays inorder and postorder where inorder is the
+inorder traversal of a binary tree and postorder is the postorder
+traversal of the same tree, construct and return the binary tree.
 
 Example 1:
 
@@ -49,44 +52,74 @@ Constraints:
 - inorder is guaranteed to be the inorder traversal of the tree.
 
 - postorder is guaranteed to be the postorder traversal of the tree.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val         int
 	Left, Right *TreeNode
 }
 
-func parseConstructBinaryTreeFromInorderAndPostorderTraversalInput(input string) ([]int, []int) {
+func parseConstructBinaryTreeFromInorderAndPostorderTraversalInput(
+	input string,
+) ([]int, []int) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse construct-binary-tree-from-inorder-and-postorder-traversal input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse construct-binary-tree-from-inorder-and-"+
+					"postorder-traversal input: %w",
+				err,
+			),
+		)
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse construct-binary-tree-from-inorder-and-postorder-traversal input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse construct-binary-tree-from-inorder-and-"+
+					"postorder-traversal input: got %d arguments, "+
+					"want 2",
+				len(args),
+			),
+		)
 	}
 	var inorder []int
 	argumentError0 := json.Unmarshal(args[0], &inorder)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse construct-binary-tree-from-inorder-and-postorder-traversal argument inorder: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse construct-binary-tree-from-inorder-and-"+
+					"postorder-traversal argument inorder: %w",
+				argumentError0,
+			),
+		)
 	}
 	var postorder []int
 	argumentError1 := json.Unmarshal(args[1], &postorder)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse construct-binary-tree-from-inorder-and-postorder-traversal argument postorder: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse construct-binary-tree-from-inorder-and-"+
+					"postorder-traversal argument postorder: %w",
+				argumentError1,
+			),
+		)
 	}
 	return inorder, postorder
 }
 
-func formatConstructBinaryTreeFromInorderAndPostorderTraversalOutput(root *TreeNode) string {
+func formatConstructBinaryTreeFromInorderAndPostorderTraversalOutput(
+	root *TreeNode,
+) string {
 	if root == nil {
 		return `[]`
 	}
@@ -108,12 +141,13 @@ func formatConstructBinaryTreeFromInorderAndPostorderTraversalOutput(root *TreeN
 	}
 	output, err := json.Marshal(values)
 	if err != nil {
-		panic(fmt.Errorf("format construct-binary-tree-from-inorder-and-postorder-traversal output: %w", err))
+		panic(fmt.Errorf("format construct-binary-tree-from-inorder-"+
+			"and-postorder-traversal output: %w", err))
 	}
 	return string(output)
 }
 
-func maximumConstructBinaryTreeFromInorderAndPostorderTraversalCase() testrunner.Case {
+func maximumInorderPostorderTreeCase() testrunner.Case {
 	inorder := make([]int, 3000)
 	postorder := make([]int, 3000)
 	output := make([]any, 0, 5999)
@@ -127,17 +161,24 @@ func maximumConstructBinaryTreeFromInorderAndPostorderTraversalCase() testrunner
 	}
 	input, err := json.Marshal([]any{inorder, postorder})
 	if err != nil {
-		panic(fmt.Errorf("build maximum construct-tree-inorder-postorder input: %w", err))
+		panic(fmt.Errorf("build maximum construct-tree-inorder-"+
+			"postorder input: %w", err))
 	}
 	want, err := json.Marshal(output)
 	if err != nil {
-		panic(fmt.Errorf("build maximum construct-tree-inorder-postorder output: %w", err))
+		panic(fmt.Errorf("build maximum construct-tree-inorder-"+
+			"postorder output: %w", err))
 	}
-	return testrunner.Case{Name: "Boundary: Maximum right-skewed tree", Input: string(input), Want: string(want)}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum right-skewed tree",
+		Input: string(input),
+		Want:  string(want),
+	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -174,11 +215,12 @@ var sampleCases = []testrunner.Case{
 		Input: `[[-3000,0,3000],[-3000,3000,0]]`,
 		Want:  `[0,-3000,3000]`,
 	},
-	maximumConstructBinaryTreeFromInorderAndPostorderTraversalCase(),
+	maximumInorderPostorderTreeCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -187,20 +229,27 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
-	inorder, postorder := parseConstructBinaryTreeFromInorderAndPostorderTraversalInput(input)
+	inorder, postorder :=
+		parseConstructBinaryTreeFromInorderAndPostorderTraversalInput(
+			input,
+		)
 	_ = inorder
 	_ = postorder
 
@@ -208,14 +257,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -242,11 +292,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

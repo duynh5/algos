@@ -15,16 +15,19 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Majority Element
 
 Source: LeetCode
 Problem ID: 169
-Source URL: https://leetcode.com/problems/majority-element/description/
+Source URL:
+https://leetcode.com/problems/majority-element/description/
 
 Given an array nums of size n, return the majority element.
 
-The majority element is the element that appears more than floor(n / 2) times. You may assume that the majority element always exists in the array.
+The majority element is the element that appears more than floor(n /
+2) times. You may assume that the majority element always exists in
+the array.
 
 Example 1:
 
@@ -44,19 +47,22 @@ Constraints:
 
 - -10^9 <= nums[i] <= 10^9
 
-- The input is generated such that a majority element will exist in the array.
+- The input is generated such that a majority element will exist in
+  the array.
 
-Follow-up: Could you solve the problem in linear time and in O(1) space?
-===============================================================================
+Follow-up: Could you solve the problem in linear time and in O(1)
+space?
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseMajorityElementInput(input string) []int {
 	var args []json.RawMessage
@@ -64,12 +70,18 @@ func parseMajorityElementInput(input string) []int {
 		panic(fmt.Errorf("parse majority-element input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse majority-element input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse majority-element input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	var nums []int
 	argumentError0 := json.Unmarshal(args[0], &nums)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse majority-element argument nums: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse majority-element argument nums: %w",
+				argumentError0,
+			),
+		)
 	}
 	return nums
 }
@@ -84,7 +96,12 @@ func maximumMajorityElementCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{nums})
 	if err != nil {
-		panic(fmt.Errorf("build maximum majority-element case: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum majority-element case: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum length with bare majority",
@@ -97,8 +114,9 @@ func formatMajorityElementOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -158,8 +176,9 @@ var sampleCases = []testrunner.Case{
 	maximumMajorityElementCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -168,17 +187,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	nums := parseMajorityElementInput(input)
@@ -188,14 +211,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -222,11 +246,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

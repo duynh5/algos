@@ -15,14 +15,15 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Rotate List
 
 Source: LeetCode
 Problem ID: 61
 Source URL: https://leetcode.com/problems/rotate-list/description/
 
-Given the head of a linked list, rotate the list to the right by k places.
+Given the head of a linked list, rotate the list to the right by k
+places.
 
 Example 1:
 
@@ -41,16 +42,17 @@ Constraints:
 - -100 <= Node.val <= 100
 
 - 0 <= k <= 2 * 10^9
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type ListNode struct {
 	Val  int
@@ -63,16 +65,29 @@ func parseRotateListInput(input string) (*ListNode, int) {
 		panic(fmt.Errorf("parse rotate-list input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse rotate-list input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf("parse rotate-list input: got %d arguments, "+
+				"want 2", len(args)),
+		)
 	}
 	head, argumentError0 := decodeListNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse rotate-list argument head: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse rotate-list argument head: %w",
+				argumentError0,
+			),
+		)
 	}
 	var k int
 	argumentError1 := json.Unmarshal(args[1], &k)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse rotate-list argument k: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse rotate-list argument k: %w",
+				argumentError1,
+			),
+		)
 	}
 	return head, k
 }
@@ -95,7 +110,8 @@ func formatRotateListOutput(head *ListNode) string {
 	values := make([]int, 0)
 	for node := head; node != nil; node = node.Next {
 		if len(values) == 500 {
-			panic("format rotate-list output: list exceeds 500 nodes or contains a cycle")
+			panic("format rotate-list output: list exceeds 500 " +
+				"nodes or contains a cycle")
 		}
 		values = append(values, node.Val)
 	}
@@ -124,14 +140,16 @@ func maximumRotateListCase() testrunner.Case {
 		panic(fmt.Errorf("build maximum rotate-list output: %w", err))
 	}
 	return testrunner.Case{
-		Name:  "Boundary: Maximum node count and rotation preserve repeated values",
+		Name: "Boundary: Maximum node count and rotation " +
+			"preserve repeated values",
 		Input: string(input),
 		Want:  formatRotateListOutput(head),
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -186,8 +204,9 @@ var sampleCases = []testrunner.Case{
 	maximumRotateListCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -196,17 +215,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	head, k := parseRotateListInput(input)
@@ -217,14 +240,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -251,11 +275,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

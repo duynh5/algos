@@ -15,12 +15,13 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Invert Binary Tree
 
 Source: LeetCode
 Problem ID: 226
-Source URL: https://leetcode.com/problems/invert-binary-tree/description/
+Source URL:
+https://leetcode.com/problems/invert-binary-tree/description/
 
 Given the root of a binary tree, invert the tree, and return its root.
 
@@ -44,16 +45,17 @@ Constraints:
 - The number of nodes in the tree is in the range [0, 100].
 
 - -100 <= Node.val <= 100
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val               int
@@ -66,18 +68,25 @@ func parseInvertBinaryTreeInput(input string) *TreeNode {
 		panic(fmt.Errorf("parse invert-binary-tree input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse invert-binary-tree input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse invert-binary-tree input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	root, argumentError0 := decodeTreeNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse invert-binary-tree argument root: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse invert-binary-tree argument root: %w",
+				argumentError0,
+			),
+		)
 	}
 	return root
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+	if err := json.Unmarshal(raw, &values); err != nil ||
+		len(values) == 0 {
 		return nil, err
 	}
 	if values[0] == nil {
@@ -149,11 +158,21 @@ func maximumInvertBinaryTreeCase() testrunner.Case {
 
 	input, err := json.Marshal([]any{inputTree})
 	if err != nil {
-		panic(fmt.Errorf("build maximum invert-binary-tree input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum invert-binary-tree input: %w",
+				err,
+			),
+		)
 	}
 	want, err := json.Marshal(invertedTree)
 	if err != nil {
-		panic(fmt.Errorf("build maximum invert-binary-tree output: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum invert-binary-tree output: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum-node right chain becomes a left chain",
@@ -162,8 +181,9 @@ func maximumInvertBinaryTreeCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -201,7 +221,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `[1,3,2,5,null,4]`,
 	},
 	{
-		Name:  "Additional: Duplicate values do not identify tree positions",
+		Name: "Additional: Duplicate values do not identify " +
+			"tree positions",
 		Input: `[[1,1,1,1,null,null,1]]`,
 		Want:  `[1,1,1,1,null,null,1]`,
 	},
@@ -213,8 +234,9 @@ var sampleCases = []testrunner.Case{
 	maximumInvertBinaryTreeCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -223,17 +245,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	root := parseInvertBinaryTreeInput(input)
@@ -243,14 +269,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -277,11 +304,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

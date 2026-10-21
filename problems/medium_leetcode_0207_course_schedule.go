@@ -15,16 +15,20 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Course Schedule
 
 Source: LeetCode
 Problem ID: 207
 Source URL: https://leetcode.com/problems/course-schedule/description/
 
-There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [a_i, b_i] indicates that you must take course b_i first if you want to take course a_i.
+There are a total of numCourses courses you have to take, labeled from
+0 to numCourses - 1. You are given an array prerequisites where
+prerequisites[i] = [a_i, b_i] indicates that you must take course b_i
+first if you want to take course a_i.
 
-- For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+- For example, the pair [0, 1], indicates that to take course 0 you
+  have to first take course 1.
 
 Return true if you can finish all courses. Otherwise, return false.
 
@@ -40,7 +44,8 @@ Example 2:
 Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
 Output: false
 Explanation: There are a total of 2 courses to take.
-To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+To take course 1 you should have finished course 0, and to take course
+0 you should also have finished course 1. So it is impossible.
 
 Constraints:
 
@@ -53,16 +58,17 @@ Constraints:
 - 0 <= a_i, b_i < numCourses
 
 - All the pairs prerequisites[i] are unique.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseCourseScheduleInput(input string) (int, [][]int) {
 	var args []json.RawMessage
@@ -70,17 +76,22 @@ func parseCourseScheduleInput(input string) (int, [][]int) {
 		panic(fmt.Errorf("parse course-schedule input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse course-schedule input: got %d arguments, want 2", len(args)))
+		panic(fmt.Sprintf("parse course-schedule input: got %d "+
+			"arguments, want 2", len(args)))
 	}
 	var numCourses int
 	argumentError0 := json.Unmarshal(args[0], &numCourses)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse course-schedule argument numCourses: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse course-schedule argument numCourses: "+
+				"%w", argumentError0),
+		)
 	}
 	var prerequisites [][]int
 	argumentError1 := json.Unmarshal(args[1], &prerequisites)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse course-schedule argument prerequisites: %w", argumentError1))
+		panic(fmt.Errorf("parse course-schedule argument "+
+			"prerequisites: %w", argumentError1))
 	}
 	return numCourses, prerequisites
 }
@@ -88,23 +99,38 @@ func parseCourseScheduleInput(input string) (int, [][]int) {
 func maximumCourseScheduleCase() testrunner.Case {
 	prerequisites := make([][]int, 0, 5000)
 	for gap := 1; gap < 2000 && len(prerequisites) < 5000; gap++ {
-		for prerequisite := 0; prerequisite+gap < 2000 && len(prerequisites) < 5000; prerequisite++ {
-			prerequisites = append(prerequisites, []int{prerequisite + gap, prerequisite})
+		prerequisite := 0
+		for prerequisite+gap < 2000 && len(prerequisites) < 5000 {
+			prerequisites = append(
+				prerequisites,
+				[]int{prerequisite + gap, prerequisite},
+			)
+			prerequisite++
 		}
 	}
 	input, err := json.Marshal([]any{2000, prerequisites})
 	if err != nil {
-		panic(fmt.Errorf("build maximum course-schedule input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum course-schedule input: %w",
+				err,
+			),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum acyclic course graph", Input: string(input), Want: `true`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum acyclic course graph",
+		Input: string(input),
+		Want:  `true`,
+	}
 }
 
 func formatCourseScheduleOutput(result bool) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -154,8 +180,9 @@ var sampleCases = []testrunner.Case{
 	maximumCourseScheduleCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -164,17 +191,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	numCourses, prerequisites := parseCourseScheduleInput(input)
@@ -185,14 +216,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -219,11 +251,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

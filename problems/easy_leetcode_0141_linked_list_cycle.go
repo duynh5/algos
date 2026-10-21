@@ -15,30 +15,39 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Linked List Cycle
 
 Source: LeetCode
 Problem ID: 141
-Source URL: https://leetcode.com/problems/linked-list-cycle/description/
+Source URL:
+https://leetcode.com/problems/linked-list-cycle/description/
 
-Given head, the head of a linked list, determine if the linked list has a cycle in it.
+Given head, the head of a linked list, determine if the linked list
+has a cycle in it.
 
-There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer. Internally, pos is used to denote the index of the node that tail's next pointer is connected to. Note that pos is not passed as a parameter.
+There is a cycle in a linked list if there is some node in the list
+that can be reached again by continuously following the next pointer.
+Internally, pos is used to denote the index of the node that tail's
+next pointer is connected to. Note that pos is not passed as a
+parameter.
 
-Return true if there is a cycle in the linked list. Otherwise, return false.
+Return true if there is a cycle in the linked list. Otherwise, return
+false.
 
 Example 1:
 
 Input: head = [3,2,0,-4], pos = 1
 Output: true
-Explanation: There is a cycle in the linked list, where the tail connects to the 1st node (0-indexed).
+Explanation: There is a cycle in the linked list, where the tail
+connects to the 1st node (0-indexed).
 
 Example 2:
 
 Input: head = [1,2], pos = 0
 Output: true
-Explanation: There is a cycle in the linked list, where the tail connects to the 0th node.
+Explanation: There is a cycle in the linked list, where the tail
+connects to the 0th node.
 
 Example 3:
 
@@ -55,16 +64,17 @@ Constraints:
 - pos is -1 or a valid index in the linked-list.
 
 Follow up: Can you solve it using O(1) (i.e. constant) memory?
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type ListNode struct {
 	Val  int
@@ -77,16 +87,27 @@ func parseLinkedListCycleInput(input string) *ListNode {
 		panic(fmt.Errorf("parse linked-list-cycle input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse linked-list-cycle input: got %d arguments, want 2", len(args)))
+		panic(fmt.Sprintf("parse linked-list-cycle input: got %d "+
+			"arguments, want 2", len(args)))
 	}
 	head, argumentError0 := decodeListNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse linked-list-cycle argument head: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse linked-list-cycle argument head: %w",
+				argumentError0,
+			),
+		)
 	}
 	var pos int
 	argumentError1 := json.Unmarshal(args[1], &pos)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse linked-list-cycle argument pos: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse linked-list-cycle argument pos: %w",
+				argumentError1,
+			),
+		)
 	}
 	if pos >= 0 {
 		tail, target := head, head
@@ -122,7 +143,12 @@ func maximumLinkedListCycleCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{values, len(values) - 1})
 	if err != nil {
-		panic(fmt.Errorf("build maximum linked-list-cycle case: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum linked-list-cycle case: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum-length tail self-cycle",
@@ -135,8 +161,9 @@ func formatLinkedListCycleOutput(result bool) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -201,8 +228,9 @@ var sampleCases = []testrunner.Case{
 	maximumLinkedListCycleCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -211,17 +239,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	head := parseLinkedListCycleInput(input)
@@ -231,14 +263,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -265,11 +298,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

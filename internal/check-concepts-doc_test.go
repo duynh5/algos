@@ -3,50 +3,12 @@
 package main
 
 import (
-	"strings"
 	"testing"
 )
 
-func TestValidateLineWidth(t *testing.T) {
-	testCases := []struct {
-		name       string
-		contents   string
-		wantIssues int
-	}{
-		{
-			name:       "accepts exact limit",
-			contents:   strings.Repeat("a", guideLineWidth),
-			wantIssues: 0,
-		},
-		{
-			name:       "rejects one character over limit",
-			contents:   strings.Repeat("a", guideLineWidth+1),
-			wantIssues: 1,
-		},
-		{
-			name:       "counts Unicode characters instead of bytes",
-			contents:   strings.Repeat("\u00e9", guideLineWidth),
-			wantIssues: 0,
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			issues := validateLineWidth("guide.md", []byte(testCase.contents))
-			if len(issues) != testCase.wantIssues {
-				t.Fatalf(
-					"validateLineWidth() returned %d issues; want %d: %v",
-					len(issues),
-					testCase.wantIssues,
-					issues,
-				)
-			}
-		})
-	}
-}
-
 func TestCollectTargetsRecognizesMultilineAnchor(t *testing.T) {
-	const legacyAnchor = "e4-distinguish-missing-keys-from-stored-values-" +
+	const legacyAnchor = "e4-distinguish-missing-keys-from-stored-" +
+		"values-" +
 		"map-presence-and-sets"
 	prose := []byte("<a\nid=\n" + legacyAnchor + ">\n</a>\n")
 
@@ -59,5 +21,29 @@ func TestCollectTargetsRecognizesMultilineAnchor(t *testing.T) {
 	}
 	if _, exists := targets[legacyAnchor]; !exists {
 		t.Fatalf("collectTargets() did not find %q", legacyAnchor)
+	}
+}
+
+func TestValidateDocumentLinksRecognizesMultilineDestination(
+	t *testing.T,
+) {
+	const destination = "https://example.com/a-very-long-destination"
+	document := &document{
+		path: "links.md",
+		prose: []byte(
+			"- [Example](\n" + destination + "\n)\n",
+		),
+		targets: make(map[string]struct{}),
+	}
+
+	issues, counts, externalLinks := validateDocumentLinks(document)
+	if len(issues) != 0 {
+		t.Fatalf("validateDocumentLinks() returned issues: %v", issues)
+	}
+	if counts.external != 1 {
+		t.Fatalf("external link count = %d; want 1", counts.external)
+	}
+	if _, exists := externalLinks[destination]; !exists {
+		t.Fatalf("external links do not contain %q", destination)
 	}
 }

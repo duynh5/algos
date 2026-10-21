@@ -15,14 +15,16 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Merge k Sorted Lists
 
 Source: LeetCode
 Problem ID: 23
-Source URL: https://leetcode.com/problems/merge-k-sorted-lists/description/
+Source URL:
+https://leetcode.com/problems/merge-k-sorted-lists/description/
 
-You are given an array of k linked-lists lists, each linked-list is sorted in ascending order.
+You are given an array of k linked-lists lists, each linked-list is
+sorted in ascending order.
 
 Merge all the linked-lists into one sorted linked-list and return it.
 
@@ -62,16 +64,17 @@ Constraints:
 - lists[i] is sorted in ascending order.
 
 - The sum of lists[i].length will not exceed 10^4.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type ListNode struct {
 	Val  int
@@ -84,11 +87,15 @@ func parseMergeKSortedListsInput(input string) []*ListNode {
 		panic(fmt.Errorf("parse merge-k-sorted-lists input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse merge-k-sorted-lists input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse merge-k-sorted-lists input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	lists, argumentError0 := decodeListNodes(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse merge-k-sorted-lists argument lists: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse merge-k-sorted-lists argument lists: "+
+				"%w", argumentError0),
+		)
 	}
 	return lists
 }
@@ -127,13 +134,16 @@ func formatMergeKSortedListsOutput(head *ListNode) string {
 	values := make([]int, 0)
 	for node := head; node != nil; node = node.Next {
 		if len(values) == 10000 {
-			panic("format merge-k-sorted-lists output: list exceeds 10000 nodes or contains a cycle")
+			panic("format merge-k-sorted-lists output: list " +
+				"exceeds 10000 nodes or contains a cycle")
 		}
 		values = append(values, node.Val)
 	}
 	output, err := json.Marshal(values)
 	if err != nil {
-		panic(fmt.Errorf("format merge-k-sorted-lists output: %w", err))
+		panic(
+			fmt.Errorf("format merge-k-sorted-lists output: %w", err),
+		)
 	}
 	return string(output)
 }
@@ -148,17 +158,30 @@ func maximumMergeKSortedListsCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{lists})
 	if err != nil {
-		panic(fmt.Errorf("build maximum merge-k-sorted-lists input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum merge-k-sorted-lists input: %w",
+				err,
+			),
+		)
 	}
 	output, err := json.Marshal(want)
 	if err != nil {
-		panic(fmt.Errorf("build maximum merge-k-sorted-lists output: %w", err))
+		panic(
+			fmt.Errorf("build maximum merge-k-sorted-lists output: "+
+				"%w", err),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum list count and total nodes", Input: string(input), Want: string(output)}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum list count and total nodes",
+		Input: string(input),
+		Want:  string(output),
+	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -203,8 +226,9 @@ var sampleCases = []testrunner.Case{
 	maximumMergeKSortedListsCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -213,17 +237,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	lists := parseMergeKSortedListsInput(input)
@@ -233,14 +261,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -267,11 +296,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

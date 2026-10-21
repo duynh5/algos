@@ -15,60 +15,81 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Best Time to Buy and Sell Stock
 
 Source: LeetCode
 Problem ID: 121
-Source URL: https://leetcode.com/problems/best-time-to-buy-and-sell-stock/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0121
 
-You are given an array prices where prices[i] is the price of a given stock on the i^th day.
+You are given an array prices where prices[i] is the price of a given
+stock on the i^th day.
 
-You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+You want to maximize your profit by choosing a single day to buy one
+stock and choosing a different day in the future to sell that stock.
 
-Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
+Return the maximum profit you can achieve from this transaction. If
+you cannot achieve any profit, return 0.
 
 Example 1:
 
 Input: prices = [7,1,5,3,6,4]
 Output: 5
-Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
-Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.
+Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6),
+profit = 6-1 = 5.
+Note that buying on day 2 and selling on day 1 is not allowed because
+you must buy before you sell.
 
 Example 2:
 
 Input: prices = [7,6,4,3,1]
 Output: 0
-Explanation: In this case, no transactions are done and the max profit = 0.
+Explanation: In this case, no transactions are done and the max profit
+= 0.
 
 Constraints:
 
 - 1 <= prices.length <= 10^5
 
 - 0 <= prices[i] <= 10^4
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseBestTimeToBuyAndSellStockInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse best-time-to-buy-and-sell-stock input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse best-time-to-buy-and-sell-stock input: "+
+					"%w",
+				err,
+			),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse best-time-to-buy-and-sell-stock input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse best-time-to-buy-and-sell-stock input: "+
+					"got %d arguments, want 1",
+				len(args),
+			),
+		)
 	}
 	var prices []int
 	argumentError0 := json.Unmarshal(args[0], &prices)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse best-time-to-buy-and-sell-stock argument prices: %w", argumentError0))
+		panic(fmt.Errorf("parse best-time-to-buy-and-sell-stock "+
+			"argument prices: %w", argumentError0))
 	}
 	return prices
 }
@@ -95,8 +116,9 @@ func formatBestTimeToBuyAndSellStockOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -151,8 +173,9 @@ var sampleCases = []testrunner.Case{
 	maximumBestTimeToBuyAndSellStockCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -161,17 +184,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	prices := parseBestTimeToBuyAndSellStockInput(input)
@@ -181,14 +208,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -215,11 +243,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

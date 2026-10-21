@@ -15,14 +15,16 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Set Matrix Zeroes
 
 Source: LeetCode
 Problem ID: 73
-Source URL: https://leetcode.com/problems/set-matrix-zeroes/description/
+Source URL:
+https://leetcode.com/problems/set-matrix-zeroes/description/
 
-Given an m x n integer matrix matrix, if an element is 0, set its entire row and column to 0's.
+Given an m x n integer matrix matrix, if an element is 0, set its
+entire row and column to 0's.
 
 You must do it in place.
 
@@ -50,19 +52,21 @@ Follow up:
 
 - A straightforward solution using O(mn) space is probably a bad idea.
 
-- A simple improvement uses O(m + n) space, but still not the best solution.
+- A simple improvement uses O(m + n) space, but still not the best
+  solution.
 
 - Could you devise a constant space solution?
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseSetMatrixZeroesInput(input string) [][]int {
 	var args []json.RawMessage
@@ -70,12 +74,18 @@ func parseSetMatrixZeroesInput(input string) [][]int {
 		panic(fmt.Errorf("parse set-matrix-zeroes input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse set-matrix-zeroes input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse set-matrix-zeroes input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	var matrix [][]int
 	argumentError0 := json.Unmarshal(args[0], &matrix)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse set-matrix-zeroes argument matrix: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse set-matrix-zeroes argument matrix: %w",
+				argumentError0,
+			),
+		)
 	}
 	return matrix
 }
@@ -103,7 +113,12 @@ func maximumSetMatrixZeroesCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{matrix})
 	if err != nil {
-		panic(fmt.Errorf("build maximum set-matrix-zeroes input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum set-matrix-zeroes input: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum matrix first row zeroes every column",
@@ -112,8 +127,9 @@ func maximumSetMatrixZeroesCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -146,12 +162,14 @@ var sampleCases = []testrunner.Case{
 		Want:  `[[0,0,0,0]]`,
 	},
 	{
-		Name:  "Additional: Zero in a single column zeroes the whole column",
+		Name: "Additional: Zero in a single column zeroes " +
+			"the whole column",
 		Input: `[[[1],[0],[3]]]`,
 		Want:  `[[0],[0],[0]]`,
 	},
 	{
-		Name:  "Adversarial: First-row zero marks its column without clearing others",
+		Name: "Adversarial: First-row zero marks its column " +
+			"without clearing others",
 		Input: `[[[1,0,3],[4,5,6]]]`,
 		Want:  `[[0,0,0],[4,0,6]]`,
 	},
@@ -168,8 +186,9 @@ var sampleCases = []testrunner.Case{
 	maximumSetMatrixZeroesCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -178,17 +197,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	matrix := parseSetMatrixZeroesInput(input)
@@ -198,14 +221,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -232,11 +256,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

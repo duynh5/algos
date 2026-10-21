@@ -15,16 +15,18 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Remove Duplicates from Sorted List II
 
 Source: LeetCode
 Problem ID: 82
-Source URL: https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0082
 
 You are given the head of a sorted linked list.
 
-Delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list.
+Delete all nodes that have duplicate numbers, leaving only distinct
+numbers from the original list.
 
 Return the linked list sorted as well.
 
@@ -45,33 +47,48 @@ Constraints:
 - -100 <= Node.val <= 100
 
 - The list is guaranteed to be sorted in ascending order.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type ListNode struct {
 	Val  int
 	Next *ListNode
 }
 
-func parseRemoveDuplicatesFromSortedListIiInput(input string) *ListNode {
+func parseRemoveDuplicatesFromSortedListIiInput(
+	input string,
+) *ListNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse remove-duplicates-from-sorted-list-ii input: %w", err))
+		panic(
+			fmt.Errorf("parse remove-duplicates-from-sorted-list-ii "+
+				"input: %w", err),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse remove-duplicates-from-sorted-list-ii input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse remove-duplicates-from-sorted-list-ii "+
+					"input: got %d arguments, want 1",
+				len(args),
+			),
+		)
 	}
 	head, argumentError0 := decodeListNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse remove-duplicates-from-sorted-list-ii argument head: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse remove-duplicates-from-sorted-list-ii "+
+				"argument head: %w", argumentError0),
+		)
 	}
 	return head
 }
@@ -90,17 +107,27 @@ func decodeListNode(raw json.RawMessage) (*ListNode, error) {
 	return dummy.Next, nil
 }
 
-func formatRemoveDuplicatesFromSortedListIiOutput(head *ListNode) string {
+func formatRemoveDuplicatesFromSortedListIiOutput(
+	head *ListNode,
+) string {
 	values := make([]int, 0)
 	for node := head; node != nil; node = node.Next {
 		if len(values) == 300 {
-			panic("format remove-duplicates-from-sorted-list-ii output: list exceeds 300 nodes or contains a cycle")
+			panic("format remove-duplicates-from-sorted-list-ii " +
+				"output: list exceeds 300 nodes or contains a " +
+				"cycle")
 		}
 		values = append(values, node.Val)
 	}
 	output, err := json.Marshal(values)
 	if err != nil {
-		panic(fmt.Errorf("format remove-duplicates-from-sorted-list-ii output: %w", err))
+		panic(
+			fmt.Errorf(
+				"format remove-duplicates-from-sorted-list-ii "+
+					"output: %w",
+				err,
+			),
+		)
 	}
 	return string(output)
 }
@@ -112,7 +139,10 @@ func maximumRemoveDuplicatesFromSortedListIiCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{values})
 	if err != nil {
-		panic(fmt.Errorf("build maximum remove-duplicates-from-sorted-list-ii input: %w", err))
+		panic(
+			fmt.Errorf("build maximum remove-duplicates-from-sorted-"+
+				"list-ii input: %w", err),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum list removes every duplicated pair",
@@ -121,8 +151,9 @@ func maximumRemoveDuplicatesFromSortedListIiCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -165,7 +196,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `[2]`,
 	},
 	{
-		Name:  "Adversarial: Separate duplicate runs preserve intervening uniques",
+		Name: "Adversarial: Separate duplicate runs " +
+			"preserve intervening uniques",
 		Input: `[[-100,-100,-99,0,1,1,100]]`,
 		Want:  `[-99,0,100]`,
 	},
@@ -177,8 +209,9 @@ var sampleCases = []testrunner.Case{
 	maximumRemoveDuplicatesFromSortedListIiCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -187,17 +220,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	head := parseRemoveDuplicatesFromSortedListIiInput(input)
@@ -207,14 +244,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -241,11 +279,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

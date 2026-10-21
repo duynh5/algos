@@ -15,33 +15,43 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Minimum Genetic Mutation
 
 Source: LeetCode
 Problem ID: 433
-Source URL: https://leetcode.com/problems/minimum-genetic-mutation/description/
+Source URL:
+https://leetcode.com/problems/minimum-genetic-mutation/description/
 
-A gene string can be represented by an 8-character long string, with choices from 'A', 'C', 'G', and 'T'.
+A gene string can be represented by an 8-character long string, with
+choices from 'A', 'C', 'G', and 'T'.
 
-Suppose we need to investigate a mutation from a gene string startGene to a gene string endGene where one mutation is defined as one single character changed in the gene string.
+Suppose we need to investigate a mutation from a gene string startGene
+to a gene string endGene where one mutation is defined as one single
+character changed in the gene string.
 
 - For example, "AACCGGTT" --> "AACCGGTA" is one mutation.
 
-There is also a gene bank bank that records all the valid gene mutations. A gene must be in bank to make it a valid gene string.
+There is also a gene bank bank that records all the valid gene
+mutations. A gene must be in bank to make it a valid gene string.
 
-Given the two gene strings startGene and endGene and the gene bank bank, return the minimum number of mutations needed to mutate from startGene to endGene. If there is no such a mutation, return -1.
+Given the two gene strings startGene and endGene and the gene bank
+bank, return the minimum number of mutations needed to mutate from
+startGene to endGene. If there is no such a mutation, return -1.
 
-Note that the starting point is assumed to be valid, so it might not be included in the bank.
+Note that the starting point is assumed to be valid, so it might not
+be included in the bank.
 
 Example 1:
 
-Input: startGene = "AACCGGTT", endGene = "AACCGGTA", bank = ["AACCGGTA"]
+Input: startGene = "AACCGGTT", endGene = "AACCGGTA", bank =
+["AACCGGTA"]
 Output: 1
 
 Example 2:
 
-Input: startGene = "AACCGGTT", endGene = "AAACGGTA", bank = ["AACCGGTA","AACCGCTA","AAACGGTA"]
+Input: startGene = "AACCGGTT", endGene = "AAACGGTA", bank =
+["AACCGGTA","AACCGCTA","AAACGGTA"]
 Output: 2
 
 Constraints:
@@ -50,40 +60,58 @@ Constraints:
 
 - startGene.length == endGene.length == bank[i].length == 8
 
-- startGene, endGene, and bank[i] consist of only the characters ['A', 'C', 'G', 'T'].
-===============================================================================
+- startGene, endGene, and bank[i] consist of only the characters ['A',
+  'C', 'G', 'T'].
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
-func parseMinimumGeneticMutationInput(input string) (string, string, []string) {
+func parseMinimumGeneticMutationInput(
+	input string,
+) (string, string, []string) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse minimum-genetic-mutation input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse minimum-genetic-mutation input: %w",
+				err,
+			),
+		)
 	}
 	if len(args) != 3 {
-		panic(fmt.Sprintf("parse minimum-genetic-mutation input: got %d arguments, want 3", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse minimum-genetic-mutation input: got %d "+
+					"arguments, want 3",
+				len(args),
+			),
+		)
 	}
 	var startGene string
 	argumentError0 := json.Unmarshal(args[0], &startGene)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse minimum-genetic-mutation argument startGene: %w", argumentError0))
+		panic(fmt.Errorf("parse minimum-genetic-mutation argument "+
+			"startGene: %w", argumentError0))
 	}
 	var endGene string
 	argumentError1 := json.Unmarshal(args[1], &endGene)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse minimum-genetic-mutation argument endGene: %w", argumentError1))
+		panic(fmt.Errorf("parse minimum-genetic-mutation argument "+
+			"endGene: %w", argumentError1))
 	}
 	var bank []string
 	argumentError2 := json.Unmarshal(args[2], &bank)
 	if argumentError2 != nil {
-		panic(fmt.Errorf("parse minimum-genetic-mutation argument bank: %w", argumentError2))
+		panic(fmt.Errorf("parse minimum-genetic-mutation argument "+
+			"bank: %w", argumentError2))
 	}
 	return startGene, endGene, bank
 }
@@ -92,8 +120,9 @@ func formatMinimumGeneticMutationOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -121,14 +150,18 @@ var sampleCases = []testrunner.Case{
 		Want:  `-1`,
 	},
 	{
-		Name:  "Additional: Shortest route ignores a dead-end branch",
-		Input: `["AAAAAAAA","AACCAAAA",["CAAAAAAA","ACAAAAAA","AACAAAAA","AACCAAAA"]]`,
-		Want:  `2`,
+		Name: "Additional: Shortest route ignores a dead-end branch",
+		Input: `["AAAAAAAA","AACCAAAA",["CAAAAAAA",` +
+			`"ACAAAAAA","AACAAAAA","AACCAAAA"]]`,
+		Want: `2`,
 	},
 	{
-		Name:  "Boundary: Maximum bank supports eight mutations",
-		Input: `["AAAAAAAA","CCCCCCCC",["CAAAAAAA","CCAAAAAA","CCCAAAAA","CCCCAAAA","CCCCCAAA","CCCCCCAA","CCCCCCCA","CCCCCCCC","GGGGGGGG","TTTTTTTT"]]`,
-		Want:  `8`,
+		Name: "Boundary: Maximum bank supports eight mutations",
+		Input: `["AAAAAAAA","CCCCCCCC",["CAAAAAAA",` +
+			`"CCAAAAAA","CCCAAAAA","CCCCAAAA","CCCCCAAA",` +
+			`"CCCCCCAA","CCCCCCCA","CCCCCCCC","GGGGGGGG",` +
+			`"TTTTTTTT"]]`,
+		Want: `8`,
 	},
 	{
 		Name:  "Additional: All gene characters participate",
@@ -137,8 +170,9 @@ var sampleCases = []testrunner.Case{
 	},
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -147,20 +181,26 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
-	startGene, endGene, bank := parseMinimumGeneticMutationInput(input)
+	startGene, endGene, bank := parseMinimumGeneticMutationInput(
+		input,
+	)
 	_ = startGene
 	_ = endGene
 	_ = bank
@@ -169,14 +209,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -203,11 +244,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

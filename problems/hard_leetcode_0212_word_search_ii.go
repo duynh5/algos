@@ -16,20 +16,27 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Word Search II
 
 Source: LeetCode
 Problem ID: 212
 Source URL: https://leetcode.com/problems/word-search-ii/description/
 
-Given an m x n board of characters and a list of strings words, return all words on the board.
+Given an m x n board of characters and a list of strings words, return
+all words on the board.
 
-Each word must be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once in a word.
+Each word must be constructed from letters of sequentially adjacent
+cells, where adjacent cells are horizontally or vertically
+neighboring. The same letter cell may not be used more than once in a
+word.
 
 Example 1:
 
-Input: board = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words = ["oath","pea","eat","rain"]
+Input: board =
+[["o","a","a","n"],["e","t","a","e"],
+["i","h","k","r"],["i","f","l","v"]],
+words = ["oath","pea","eat","rain"]
 Output: ["eat","oath"]
 
 Example 2:
@@ -54,16 +61,17 @@ Constraints:
 - words[i] consists of lowercase English letters.
 
 - All the strings of words are unique.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseWordSearchIiInput(input string) ([][]byte, []string) {
 	var args []json.RawMessage
@@ -71,16 +79,32 @@ func parseWordSearchIiInput(input string) ([][]byte, []string) {
 		panic(fmt.Errorf("parse word-search-ii input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse word-search-ii input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse word-search-ii input: got %d arguments,"+
+					" want 2",
+				len(args),
+			),
+		)
 	}
 	board, argumentError0 := decodeCharacterMatrix(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse word-search-ii argument board: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse word-search-ii argument board: %w",
+				argumentError0,
+			),
+		)
 	}
 	var words []string
 	argumentError1 := json.Unmarshal(args[1], &words)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse word-search-ii argument words: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse word-search-ii argument words: %w",
+				argumentError1,
+			),
+		)
 	}
 	return board, words
 }
@@ -95,7 +119,11 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 		result[row] = make([]byte, len(rows[row]))
 		for column, value := range rows[row] {
 			if len(value) != 1 {
-				return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column)
+				return nil, fmt.Errorf(
+					"cell (%d,%d) is not one character",
+					row,
+					column,
+				)
 			}
 			result[row][column] = value[0]
 		}
@@ -142,13 +170,16 @@ func makeMaximumWordSearchIiCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
-		Name:  "Official example 1",
-		Input: `[[["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]],["oath","pea","eat","rain"]]`,
-		Want:  `["eat","oath"]`,
+		Name: "Official example 1",
+		Input: `[[["o","a","a","n"],["e","t","a","e"],["i",` +
+			`"h","k","r"],["i","f","l","v"]],["oath",` +
+			`"pea","eat","rain"]]`,
+		Want: `["eat","oath"]`,
 	},
 	{
 		Name:  "Official example 2",
@@ -181,15 +212,17 @@ var sampleCases = []testrunner.Case{
 		Want:  `[]`,
 	},
 	{
-		Name:  "Additional: Maximum-length words in both directions",
-		Input: `[[["a","b","c","d","e","f","g","h","i","j"]],["abcdefghij","jihgfedcba","abcdefghi"]]`,
-		Want:  `["abcdefghi","abcdefghij","jihgfedcba"]`,
+		Name: "Additional: Maximum-length words in both directions",
+		Input: `[[["a","b","c","d","e","f","g","h","i","j"]],` +
+			`["abcdefghij","jihgfedcba","abcdefghi"]]`,
+		Want: `["abcdefghi","abcdefghij","jihgfedcba"]`,
 	},
 	makeMaximumWordSearchIiCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -198,17 +231,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	board, words := parseWordSearchIiInput(input)
@@ -219,14 +256,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -253,11 +291,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

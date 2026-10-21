@@ -16,14 +16,15 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Valid Anagram
 
 Source: LeetCode
 Problem ID: 242
 Source URL: https://leetcode.com/problems/valid-anagram/description/
 
-Given two strings s and t, return true if t is an anagram of s, and false otherwise.
+Given two strings s and t, return true if t is an anagram of s, and
+false otherwise.
 
 Example 1:
 
@@ -43,17 +44,19 @@ Constraints:
 
 - s and t consist of lowercase English letters.
 
-Follow up: What if the inputs contain Unicode characters? How would you adapt your solution to such a case?
-===============================================================================
+Follow up: What if the inputs contain Unicode characters? How would
+you adapt your solution to such a case?
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseValidAnagramInput(input string) (string, string) {
 	var args []json.RawMessage
@@ -61,17 +64,33 @@ func parseValidAnagramInput(input string) (string, string) {
 		panic(fmt.Errorf("parse valid-anagram input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse valid-anagram input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse valid-anagram input: got %d arguments, "+
+					"want 2",
+				len(args),
+			),
+		)
 	}
 	var s string
 	argumentError0 := json.Unmarshal(args[0], &s)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse valid-anagram argument s: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse valid-anagram argument s: %w",
+				argumentError0,
+			),
+		)
 	}
 	var t string
 	argumentError1 := json.Unmarshal(args[1], &t)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse valid-anagram argument t: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse valid-anagram argument t: %w",
+				argumentError1,
+			),
+		)
 	}
 	return s, t
 }
@@ -94,8 +113,9 @@ func formatValidAnagramOutput(result bool) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -133,20 +153,23 @@ var sampleCases = []testrunner.Case{
 		Want:  `false`,
 	},
 	{
-		Name:  "Additional: Every lowercase letter can be reordered",
-		Input: `["abcdefghijklmnopqrstuvwxyz","zyxwvutsrqponmlkjihgfedcba"]`,
-		Want:  `true`,
+		Name: "Additional: Every lowercase letter can be reordered",
+		Input: `["abcdefghijklmnopqrstuvwxyz",` +
+			`"zyxwvutsrqponmlkjihgfedcba"]`,
+		Want: `true`,
 	},
 	{
-		Name:  "Adversarial: One missing letter replaced by a duplicate",
-		Input: `["abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxya"]`,
-		Want:  `false`,
+		Name: "Adversarial: One missing letter replaced by a duplicate",
+		Input: `["abcdefghijklmnopqrstuvwxyz",` +
+			`"abcdefghijklmnopqrstuvwxya"]`,
+		Want: `false`,
 	},
 	maximumValidAnagramCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -155,17 +178,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	s, t := parseValidAnagramInput(input)
@@ -176,14 +203,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -210,11 +238,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -15,16 +15,20 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Single Number II
 
 Source: LeetCode
 Problem ID: 137
-Source URL: https://leetcode.com/problems/single-number-ii/description/
+Source URL:
+https://leetcode.com/problems/single-number-ii/description/
 
-Given an integer array nums where every element appears three times except for one, which appears exactly once. Find the single element and return it.
+Given an integer array nums where every element appears three times
+except for one, which appears exactly once. Find the single element
+and return it.
 
-You must implement a solution with a linear runtime complexity and use only constant extra space.
+You must implement a solution with a linear runtime complexity and use
+only constant extra space.
 
 Example 1:
 
@@ -42,17 +46,19 @@ Constraints:
 
 - -2^31 <= nums[i] <= 2^31 - 1
 
-- Each element in nums appears exactly three times except for one element which appears once.
-===============================================================================
+- Each element in nums appears exactly three times except for one
+  element which appears once.
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseSingleNumberIiInput(input string) []int {
 	var args []json.RawMessage
@@ -60,12 +66,18 @@ func parseSingleNumberIiInput(input string) []int {
 		panic(fmt.Errorf("parse single-number-ii input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse single-number-ii input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse single-number-ii input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	var nums []int
 	argumentError0 := json.Unmarshal(args[0], &nums)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse single-number-ii argument nums: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse single-number-ii argument nums: %w",
+				argumentError0,
+			),
+		)
 	}
 	return nums
 }
@@ -78,17 +90,28 @@ func maximumSingleNumberIiCase() testrunner.Case {
 	nums = append(nums, -2147483648)
 	input, err := json.Marshal([]any{nums})
 	if err != nil {
-		panic(fmt.Errorf("build maximum single-number-ii input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum single-number-ii input: %w",
+				err,
+			),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Largest valid input with minimum unique value", Input: string(input), Want: `-2147483648`}
+	return testrunner.Case{
+		Name: "Boundary: Largest valid input with minimum " +
+			"unique value",
+		Input: string(input),
+		Want:  `-2147483648`,
+	}
 }
 
 func formatSingleNumberIiOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -121,7 +144,8 @@ var sampleCases = []testrunner.Case{
 		Want:  `2147483647`,
 	},
 	{
-		Name:  "Adversarial: Sign bit differs across repeated and unique values",
+		Name: "Adversarial: Sign bit differs across " +
+			"repeated and unique values",
 		Input: `[[-2147483648,7,-2147483648,-2147483648]]`,
 		Want:  `7`,
 	},
@@ -133,8 +157,9 @@ var sampleCases = []testrunner.Case{
 	maximumSingleNumberIiCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -143,17 +168,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	nums := parseSingleNumberIiInput(input)
@@ -163,14 +192,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -197,11 +227,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

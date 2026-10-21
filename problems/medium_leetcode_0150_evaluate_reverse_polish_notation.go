@@ -15,16 +15,19 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Evaluate Reverse Polish Notation
 
 Source: LeetCode
 Problem ID: 150
-Source URL: https://leetcode.com/problems/evaluate-reverse-polish-notation/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0150
 
-You are given an array of strings tokens that represents an arithmetic expression in a Reverse Polish Notation.
+You are given an array of strings tokens that represents an arithmetic
+expression in a Reverse Polish Notation.
 
-Evaluate the expression. Return an integer that represents the value of the expression.
+Evaluate the expression. Return an integer that represents the value
+of the expression.
 
 Note that:
 
@@ -36,9 +39,11 @@ Note that:
 
 - There will not be any division by zero.
 
-- The input represents a valid arithmetic expression in a reverse polish notation.
+- The input represents a valid arithmetic expression in a reverse
+  polish notation.
 
-- The answer and all the intermediate calculations can be represented in a 32-bit integer.
+- The answer and all the intermediate calculations can be represented
+  in a 32-bit integer.
 
 Example 1:
 
@@ -54,7 +59,8 @@ Explanation: (4 + (13 / 5)) = 6
 
 Example 3:
 
-Input: tokens = ["10","6","9","3","+","-11","*","/","*","17","+","5","+"]
+Input: tokens =
+["10","6","9","3","+","-11","*","/","*","17","+","5","+"]
 Output: 22
 Explanation: ((10 * (6 / ((9 + 3) * -11))) + 17) + 5
 = ((10 * (6 / (12 * -11))) + 17) + 5
@@ -68,30 +74,35 @@ Constraints:
 
 - 1 <= tokens.length <= 10^4
 
-- tokens[i] is either an operator: "+", "-", "*", or "/", or an integer in the range [-200, 200].
-===============================================================================
+- tokens[i] is either an operator: "+", "-", "*", or "/", or an
+  integer in the range [-200, 200].
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseEvaluateReversePolishNotationInput(input string) []string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse evaluate-reverse-polish-notation input: %w", err))
+		panic(fmt.Errorf("parse evaluate-reverse-polish-notation "+
+			"input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse evaluate-reverse-polish-notation input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse evaluate-reverse-polish-notation "+
+			"input: got %d arguments, want 1", len(args)))
 	}
 	var tokens []string
 	argumentError0 := json.Unmarshal(args[0], &tokens)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse evaluate-reverse-polish-notation argument tokens: %w", argumentError0))
+		panic(fmt.Errorf("parse evaluate-reverse-polish-notation "+
+			"argument tokens: %w", argumentError0))
 	}
 	return tokens
 }
@@ -106,17 +117,28 @@ func maximumEvaluateReversePolishNotationCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{tokens})
 	if err != nil {
-		panic(fmt.Errorf("build maximum reverse-polish-notation input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum reverse-polish-notation input: "+
+					"%w",
+				err,
+			),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Largest valid token sequence", Input: string(input), Want: `5000`}
+	return testrunner.Case{
+		Name:  "Boundary: Largest valid token sequence",
+		Input: string(input),
+		Want:  `5000`,
+	}
 }
 
 func formatEvaluateReversePolishNotationOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -129,9 +151,10 @@ var sampleCases = []testrunner.Case{
 		Want:  `6`,
 	},
 	{
-		Name:  "Official example 3",
-		Input: `[["10","6","9","3","+","-11","*","/","*","17","+","5","+"]]`,
-		Want:  `22`,
+		Name: "Official example 3",
+		Input: `[["10","6","9","3","+","-11","*","/","*",` +
+			`"17","+","5","+"]]`,
+		Want: `22`,
 	},
 	{
 		Name:  "Additional: Single addition",
@@ -171,8 +194,9 @@ var sampleCases = []testrunner.Case{
 	maximumEvaluateReversePolishNotationCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -181,17 +205,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	tokens := parseEvaluateReversePolishNotationInput(input)
@@ -201,14 +229,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -235,11 +264,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

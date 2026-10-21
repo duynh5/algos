@@ -27,8 +27,10 @@ func TestDecodeJSONArgsRejectsWrongArgumentCount(t *testing.T) {
 	var nums []int
 
 	err := DecodeJSONArgs(`[[2,7,11,15],9]`, &nums)
-	if err == nil || !strings.Contains(err.Error(), "got 2 arguments, want 1") {
-		t.Fatalf("DecodeJSONArgs() error = %v, want argument-count error", err)
+	if err == nil ||
+		!strings.Contains(err.Error(), "got 2 arguments, want 1") {
+		t.Fatalf("DecodeJSONArgs() error = %v, want argument-"+
+			"count error", err)
 	}
 }
 
@@ -37,8 +39,10 @@ func TestDecodeJSONArgsReturnsArgumentContext(t *testing.T) {
 	var target int
 
 	err := DecodeJSONArgs(`[[2,7,11,15],"nine"]`, &nums, &target)
-	if err == nil || !strings.Contains(err.Error(), "decode JSON argument 2") {
-		t.Fatalf("DecodeJSONArgs() error = %v, want contextual argument error", err)
+	if err == nil ||
+		!strings.Contains(err.Error(), "decode JSON argument 2") {
+		t.Fatalf("DecodeJSONArgs() error = %v, want contextual "+
+			"argument error", err)
 	}
 }
 
@@ -52,14 +56,26 @@ func TestFormatJSONOutput(t *testing.T) {
 		{name: "string", value: "answer", want: `"answer"`},
 		{name: "slice", value: []int{2, 1}, want: `[2,1]`},
 		{name: "nil slice", value: []int(nil), want: `[]`},
-		{name: "nested nil slice", value: [][]int{nil, []int{1}}, want: `[[],[1]]`},
-		{name: "heterogeneous operations", value: []any{nil, true, 3}, want: `[null,true,3]`},
+		{
+			name:  "nested nil slice",
+			value: [][]int{nil, []int{1}},
+			want:  `[[],[1]]`,
+		},
+		{
+			name:  "heterogeneous operations",
+			value: []any{nil, true, 3},
+			want:  `[null,true,3]`,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			if got := FormatJSONOutput(test.value); got != test.want {
-				t.Fatalf("FormatJSONOutput() = %q, want %q", got, test.want)
+				t.Fatalf(
+					"FormatJSONOutput() = %q, want %q",
+					got,
+					test.want,
+				)
 			}
 		})
 	}
@@ -69,8 +85,10 @@ func TestFormatJSONOutputPanicsForUnsupportedValue(t *testing.T) {
 	defer func() {
 		recovered := recover()
 		err, isError := recovered.(error)
-		if recovered == nil || !isError || !strings.Contains(err.Error(), "format JSON output") {
-			t.Fatalf("FormatJSONOutput() panic = %v, want contextual formatting error", recovered)
+		if recovered == nil || !isError ||
+			!strings.Contains(err.Error(), "format JSON output") {
+			t.Fatalf("FormatJSONOutput() panic = %v, want "+
+				"contextual formatting error", recovered)
 		}
 	}()
 
@@ -81,7 +99,10 @@ func TestRunReportsPassesAndFailures(t *testing.T) {
 	cases := []Case{{Name: "Example", Input: "hello", Want: "HELLO"}}
 	solutions := []Solution{
 		{Name: "correct", Run: strings.ToUpper},
-		{Name: "incorrect", Run: func(input string) string { return input }},
+		{
+			Name: "incorrect",
+			Run:  func(input string) string { return input },
+		},
 	}
 	var output bytes.Buffer
 
@@ -90,10 +111,19 @@ func TestRunReportsPassesAndFailures(t *testing.T) {
 		t.Fatalf("Run() error = %v, want one failed check", err)
 	}
 	if !strings.Contains(output.String(), "PASS  correct / Example") {
-		t.Fatalf("Run() output missing pass result:\n%s", output.String())
+		t.Fatalf(
+			"Run() output missing pass result:\n%s",
+			output.String(),
+		)
 	}
-	if !strings.Contains(output.String(), "FAIL  incorrect / Example") {
-		t.Fatalf("Run() output missing failure result:\n%s", output.String())
+	if !strings.Contains(
+		output.String(),
+		"FAIL  incorrect / Example",
+	) {
+		t.Fatalf(
+			"Run() output missing failure result:\n%s",
+			output.String(),
+		)
 	}
 }
 
@@ -105,14 +135,27 @@ func TestRunSelectsConfiguredCase(t *testing.T) {
 	}
 	var output bytes.Buffer
 
-	if err := Run(&output, cases, []Solution{{Name: "uppercase", Run: strings.ToUpper}}); err != nil {
+	if err := Run(
+		&output,
+		cases,
+		[]Solution{{Name: "uppercase", Run: strings.ToUpper}},
+	); err != nil {
 		t.Fatalf("Run() error = %v, want nil", err)
 	}
 	if strings.Contains(output.String(), "First") {
-		t.Fatalf("Run() output includes unselected case:\n%s", output.String())
+		t.Fatalf(
+			"Run() output includes unselected case:\n%s",
+			output.String(),
+		)
 	}
-	if !strings.Contains(output.String(), "PASS  uppercase / Second") {
-		t.Fatalf("Run() output missing selected case:\n%s", output.String())
+	if !strings.Contains(
+		output.String(),
+		"PASS  uppercase / Second",
+	) {
+		t.Fatalf(
+			"Run() output missing selected case:\n%s",
+			output.String(),
+		)
 	}
 }
 
@@ -120,8 +163,18 @@ func TestRunRejectsOutOfRangeConfiguredCase(t *testing.T) {
 	t.Setenv(caseNumberEnvironmentVariable, "2")
 	cases := []Case{{Name: "Only case"}}
 
-	err := Run(&bytes.Buffer{}, cases, []Solution{{Name: "identity", Run: func(input string) string { return input }}})
-	if err == nil || err.Error() != "case 2 is out of range; 1 cases configured" {
+	err := Run(
+		&bytes.Buffer{},
+		cases,
+		[]Solution{
+			{
+				Name: "identity",
+				Run:  func(input string) string { return input },
+			},
+		},
+	)
+	if err == nil ||
+		err.Error() != "case 2 is out of range; 1 cases configured" {
 		t.Fatalf("Run() error = %v, want out-of-range error", err)
 	}
 }
@@ -129,8 +182,18 @@ func TestRunRejectsOutOfRangeConfiguredCase(t *testing.T) {
 func TestRunRejectsInvalidConfiguredCase(t *testing.T) {
 	t.Setenv(caseNumberEnvironmentVariable, "invalid")
 
-	err := Run(&bytes.Buffer{}, []Case{{Name: "Only case"}}, []Solution{{Name: "identity", Run: func(input string) string { return input }}})
-	if err == nil || !strings.Contains(err.Error(), "must be a positive integer") {
+	err := Run(
+		&bytes.Buffer{},
+		[]Case{{Name: "Only case"}},
+		[]Solution{
+			{
+				Name: "identity",
+				Run:  func(input string) string { return input },
+			},
+		},
+	)
+	if err == nil ||
+		!strings.Contains(err.Error(), "must be a positive integer") {
 		t.Fatalf("Run() error = %v, want positive-integer error", err)
 	}
 }
@@ -143,7 +206,8 @@ func TestRunRejectsInvalidRegistration(t *testing.T) {
 	}
 
 	err := Run(&bytes.Buffer{}, cases, solutions)
-	if err == nil || !strings.Contains(err.Error(), "registered more than once") {
+	if err == nil ||
+		!strings.Contains(err.Error(), "registered more than once") {
 		t.Fatalf("Run() error = %v, want duplicate-name error", err)
 	}
 }
@@ -154,7 +218,11 @@ func TestRunAllowsNoConfiguredCases(t *testing.T) {
 	if err := Run(&output, nil, nil); err != nil {
 		t.Fatalf("Run() error = %v, want nil", err)
 	}
-	if !strings.Contains(output.String(), "No sample cases configured") {
-		t.Fatalf("Run() output missing empty-workbench guidance: %s", output.String())
+	if !strings.Contains(
+		output.String(),
+		"No sample cases configured",
+	) {
+		t.Fatalf("Run() output missing empty-workbench "+
+			"guidance: %s", output.String())
 	}
 }

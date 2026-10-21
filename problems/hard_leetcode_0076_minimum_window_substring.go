@@ -16,14 +16,18 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Minimum Window Substring
 
 Source: LeetCode
 Problem ID: 76
-Source URL: https://leetcode.com/problems/minimum-window-substring/description/
+Source URL:
+https://leetcode.com/problems/minimum-window-substring/description/
 
-Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window. If there is no such substring, return the empty string "".
+Given two strings s and t of lengths m and n respectively, return the
+minimum window substring of s such that every character in t
+(including duplicates) is included in the window. If there is no such
+substring, return the empty string "".
 
 The testcases will be generated such that the answer is unique.
 
@@ -31,7 +35,8 @@ Example 1:
 
 Input: s = "ADOBECODEBANC", t = "ABC"
 Output: "BANC"
-Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+Explanation: The minimum window substring "BANC" includes 'A', 'B',
+and 'C' from string t.
 
 Example 2:
 
@@ -57,34 +62,52 @@ Constraints:
 - s and t consist of uppercase and lowercase English letters.
 
 Follow up: Could you find an algorithm that runs in O(m + n) time?
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseMinimumWindowSubstringInput(input string) (string, string) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse minimum-window-substring input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse minimum-window-substring input: %w",
+				err,
+			),
+		)
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse minimum-window-substring input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse minimum-window-substring input: got %d "+
+					"arguments, want 2",
+				len(args),
+			),
+		)
 	}
 	var s string
 	argumentError0 := json.Unmarshal(args[0], &s)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse minimum-window-substring argument s: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse minimum-window-substring argument s: "+
+				"%w", argumentError0),
+		)
 	}
 	var t string
 	argumentError1 := json.Unmarshal(args[1], &t)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse minimum-window-substring argument t: %w", argumentError1))
+		panic(
+			fmt.Errorf("parse minimum-window-substring argument t: "+
+				"%w", argumentError1),
+		)
 	}
 	return s, t
 }
@@ -93,11 +116,21 @@ func makeMaximumMinimumWindowSubstringCase() testrunner.Case {
 	value := strings.Repeat("a", 100000)
 	input, err := json.Marshal([]string{value, value})
 	if err != nil {
-		panic(fmt.Errorf("build minimum-window-substring input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build minimum-window-substring input: %w",
+				err,
+			),
+		)
 	}
 	expected, err := json.Marshal(value)
 	if err != nil {
-		panic(fmt.Errorf("build minimum-window-substring output: %w", err))
+		panic(
+			fmt.Errorf(
+				"build minimum-window-substring output: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Additional: Both strings at maximum length",
@@ -110,8 +143,9 @@ func formatMinimumWindowSubstringOutput(result string) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -166,8 +200,9 @@ var sampleCases = []testrunner.Case{
 	makeMaximumMinimumWindowSubstringCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -176,17 +211,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	s, t := parseMinimumWindowSubstringInput(input)
@@ -197,14 +236,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -231,11 +271,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

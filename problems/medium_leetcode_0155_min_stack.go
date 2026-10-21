@@ -15,14 +15,15 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Min Stack
 
 Source: LeetCode
 Problem ID: 155
 Source URL: https://leetcode.com/problems/min-stack/description/
 
-Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
+Design a stack that supports push, pop, top, and retrieving the
+minimum element in constant time.
 
 Implement the MinStack class:
 
@@ -36,7 +37,8 @@ Implement the MinStack class:
 
 - int getMin() retrieves the minimum element in the stack.
 
-You must implement a solution with O(1) time complexity for each function.
+You must implement a solution with O(1) time complexity for each
+function.
 
 Example 1:
 
@@ -61,40 +63,62 @@ Constraints:
 
 - -2^31 <= val <= 2^31 - 1
 
-- Methods pop, top and getMin operations will always be called on non-empty stacks.
+- Methods pop, top and getMin operations will always be called on
+  non-empty stacks.
 
 - At most 3 * 10^4 calls will be made to push, pop, top, and getMin.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
-func parseMinStackInput(input string) ([]string, [][]json.RawMessage) {
+func parseMinStackInput(
+	input string,
+) ([]string, [][]json.RawMessage) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
 		panic(fmt.Errorf("parse min-stack input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse min-stack input: got %d arguments, want 2", len(args)))
+		panic(fmt.Sprintf("parse min-stack input: got %d arguments, "+
+			"want 2", len(args)))
 	}
 	var operations []string
 	argumentError0 := json.Unmarshal(args[0], &operations)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse min-stack argument operations: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse min-stack argument operations: %w",
+				argumentError0,
+			),
+		)
 	}
 	var arguments [][]json.RawMessage
 	argumentError1 := json.Unmarshal(args[1], &arguments)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse min-stack argument arguments: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse min-stack argument arguments: %w",
+				argumentError1,
+			),
+		)
 	}
 	if len(operations) != len(arguments) {
-		panic(fmt.Sprintf("parse min-stack input: got %d operations and %d argument lists", len(operations), len(arguments)))
+		panic(
+			fmt.Sprintf(
+				"parse min-stack input: got %d operations and "+
+					"%d argument lists",
+				len(operations),
+				len(arguments),
+			),
+		)
 	}
 	return operations, arguments
 }
@@ -103,53 +127,68 @@ func formatMinStackOutput(result []any) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
-		Name:  "Official example 1",
-		Input: `[["MinStack","push","push","push","getMin","pop","top","getMin"],[[],[-2],[0],[-3],[],[],[],[]]]`,
-		Want:  `[null,null,null,null,-3,null,0,-2]`,
+		Name: "Official example 1",
+		Input: `[["MinStack","push","push","push","getMin",` +
+			`"pop","top","getMin"],[[],[-2],[0],[-3],[],` +
+			`[],[],[]]]`,
+		Want: `[null,null,null,null,-3,null,0,-2]`,
 	},
 	{
-		Name:  "Additional: Duplicate minimum survives pop",
-		Input: `[["MinStack","push","push","getMin","pop","getMin"],[[],[1],[1],[],[],[]]]`,
-		Want:  `[null,null,null,1,null,1]`,
+		Name: "Additional: Duplicate minimum survives pop",
+		Input: `[["MinStack","push","push","getMin","pop",` +
+			`"getMin"],[[],[1],[1],[],[],[]]]`,
+		Want: `[null,null,null,1,null,1]`,
 	},
 	{
-		Name:  "Additional: Integer boundaries",
-		Input: `[["MinStack","push","push","getMin","top"],[[],[2147483647],[-2147483648],[],[]]]`,
-		Want:  `[null,null,null,-2147483648,-2147483648]`,
+		Name: "Additional: Integer boundaries",
+		Input: `[["MinStack","push","push","getMin","top"],` +
+			`[[],[2147483647],[-2147483648],[],[]]]`,
+		Want: `[null,null,null,-2147483648,-2147483648]`,
 	},
 	{
-		Name:  "Additional: Single element supports every valid query",
-		Input: `[["MinStack","push","top","getMin","pop"],[[],[7],[],[],[]]]`,
-		Want:  `[null,null,7,7,null]`,
+		Name: "Additional: Single element supports every valid query",
+		Input: `[["MinStack","push","top","getMin","pop"],` +
+			`[[],[7],[],[],[]]]`,
+		Want: `[null,null,7,7,null]`,
 	},
 	{
-		Name:  "Additional: Increasing values keep the first minimum",
-		Input: `[["MinStack","push","push","push","getMin","pop","top","getMin"],[[],[1],[2],[3],[],[],[],[]]]`,
-		Want:  `[null,null,null,null,1,null,2,1]`,
+		Name: "Additional: Increasing values keep the first minimum",
+		Input: `[["MinStack","push","push","push","getMin",` +
+			`"pop","top","getMin"],[[],[1],[2],[3],[],[],` +
+			`[],[]]]`,
+		Want: `[null,null,null,null,1,null,2,1]`,
 	},
 	{
-		Name:  "Additional: Decreasing values restore prior minimum",
-		Input: `[["MinStack","push","push","push","getMin","pop","getMin","top"],[[],[3],[2],[1],[],[],[],[]]]`,
-		Want:  `[null,null,null,null,1,null,2,2]`,
+		Name: "Additional: Decreasing values restore prior minimum",
+		Input: `[["MinStack","push","push","push","getMin",` +
+			`"pop","getMin","top"],[[],[3],[2],[1],[],[],` +
+			`[],[]]]`,
+		Want: `[null,null,null,null,1,null,2,2]`,
 	},
 	{
-		Name:  "Additional: Duplicate negative minimum survives one pop",
-		Input: `[["MinStack","push","push","push","push","getMin","pop","pop","getMin","top"],[[],[0],[-1],[-1],[2],[],[],[],[],[]]]`,
-		Want:  `[null,null,null,null,null,-1,null,null,-1,-1]`,
+		Name: "Additional: Duplicate negative minimum survives one pop",
+		Input: `[["MinStack","push","push","push","push",` +
+			`"getMin","pop","pop","getMin","top"],[[],[0],` +
+			`[-1],[-1],[2],[],[],[],[],[]]]`,
+		Want: `[null,null,null,null,null,-1,null,null,-1,-1]`,
 	},
 	{
-		Name:  "Additional: Minimum returns to positive value",
-		Input: `[["MinStack","push","push","push","pop","getMin","pop","getMin","top"],[[],[5],[1],[4],[],[],[],[],[]]]`,
-		Want:  `[null,null,null,null,null,1,null,5,5]`,
+		Name: "Additional: Minimum returns to positive value",
+		Input: `[["MinStack","push","push","push","pop",` +
+			`"getMin","pop","getMin","top"],[[],[5],[1],` +
+			`[4],[],[],[],[],[]]]`,
+		Want: `[null,null,null,null,null,1,null,5,5]`,
 	},
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -158,17 +197,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	operations, arguments := parseMinStackInput(input)
@@ -179,14 +222,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -213,11 +257,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

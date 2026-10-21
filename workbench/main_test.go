@@ -7,7 +7,9 @@ import (
 	"github.com/duyserveacc/algos/internal/testrunner"
 )
 
-func TestArchiveReadyWorkbenchHasCurrentAttemptAndThreeAgentSolutions(t *testing.T) {
+func TestArchiveReadyWorkbenchHasCurrentAttemptAndThreeAgentSolutions(
+	t *testing.T,
+) {
 	if !archiveReady {
 		t.Skip("workbench is not ready to archive")
 	}
@@ -19,7 +21,10 @@ func TestArchiveReadyWorkbenchHasCurrentAttemptAndThreeAgentSolutions(t *testing
 		t.Fatalf("len(solutions) = %d, want %d", got, want)
 	}
 	if solutions[0].Name != "current attempt" {
-		t.Fatalf("solutions[0].Name = %q, want current attempt", solutions[0].Name)
+		t.Fatalf(
+			"solutions[0].Name = %q, want current attempt",
+			solutions[0].Name,
+		)
 	}
 
 	seen := make(map[string]struct{}, len(solutions))
@@ -36,12 +41,20 @@ func TestArchiveReadyWorkbenchHasCurrentAttemptAndThreeAgentSolutions(t *testing
 
 func TestConfiguredSamplesAgainstEverySolution(t *testing.T) {
 	if len(sampleCases) == 0 {
-		t.Skip("add workbench samples to enable active-problem checks")
+		t.Skip(
+			"add workbench samples to enable active-problem checks",
+		)
 	}
 
 	for _, result := range testrunner.Evaluate(sampleCases, solutions) {
 		if !result.Passed {
-			t.Errorf("%s / %s: got %q, want %q", result.Solution, result.Sample, result.Got, result.Want)
+			t.Errorf(
+				"%s / %s: got %q, want %q",
+				result.Solution,
+				result.Sample,
+				result.Got,
+				result.Want,
+			)
 		}
 	}
 }

@@ -1,9 +1,9 @@
 //go:build ignore
 
-// Command check-concepts-doc validates the structure and local links of the
-// concepts guide. Run it from the repository root with:
+// Command check-concepts-doc validates the structure and local links
+// of the concepts guide. Run it from the repository root with:
 //
-//	go run internal/check-concepts-doc.go
+// go run internal/check-concepts-doc.go
 package main
 
 import (
@@ -18,22 +18,33 @@ import (
 	"sort"
 	"strings"
 	"unicode"
-	"unicode/utf8"
 )
 
 const (
 	guidePath       = "CONCEPTS.md"
 	linkTargetsPath = "CONCEPTS_LINKS.md"
-	guideLineWidth  = 70
 )
 
 var (
-	headingPattern = regexp.MustCompile(`^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$`)
-	anchorPattern  = regexp.MustCompile(`(?s)<a\s+(?:id|name)\s*=\s*"?([A-Za-z0-9_-]+)"?[^>]*>`)
-	linkPattern    = regexp.MustCompile(`(?s)!?\[[^]]*\]\([ \t\r\n]*([^\s)]+)(?:[ \t\r\n]+["'][^)]*)?\)`)
-	inboundPattern = regexp.MustCompile(`CONCEPTS\.md#([A-Za-z0-9_-]+)`)
-	tablePattern   = regexp.MustCompile(`^[ \t]*\|.*\|[ \t]*$`)
-	tableRule      = regexp.MustCompile(`^[ \t]*\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-{3,}:?[ \t]*)+\|?[ \t]*$`)
+	headingPattern = regexp.MustCompile(
+		`^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$`,
+	)
+	anchorPattern = regexp.MustCompile(
+		`(?s)<a\s+(?:id|name)\s*=\s*"?([A-Za-z0-9_-` +
+			`]+)"?[^>]*>`,
+	)
+	linkPattern = regexp.MustCompile(
+		`(?s)!?\[[^]]*\]\([ \t\r\n]*([^\s)]+)(?:[ ` +
+			`\t\r\n]+["'][^)]*)?[ \t\r\n]*\)`,
+	)
+	inboundPattern = regexp.MustCompile(
+		`CONCEPTS\.md#([A-Za-z0-9_-]+)`,
+	)
+	tablePattern = regexp.MustCompile(`^[ \t]*\|.*\|[ \t]*$`)
+	tableRule    = regexp.MustCompile(
+		`^[ \t]*\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-` +
+			`{3,}:?[ \t]*)+\|?[ \t]*$`,
+	)
 )
 
 var requiredFields = []string{
@@ -51,22 +62,29 @@ var requiredFields = []string{
 }
 
 var baselineExternalLinks = []string{
-	"https://careers.microsoft.com/v2/global/en/hiring-tips/technical-interviewing.html",
-	"https://d3no4ktch0fdq4.cloudfront.net/public/course/files/Meta_SWE_full_loop_guide.pdf",
-	"https://leetcode.com/discuss/post/6460774/Meta-or-E4-SWE-or-USA-or-Feb-2025-or-Passed-Hiring-Committee/",
+	"https://careers.microsoft.com/v2/global/en/" +
+		"hiring-tips/technical-interviewing.html",
+	"https://d3no4ktch0fdq4.cloudfront.net/public/" +
+		"course/files/Meta_SWE_full_loop_guide.pdf",
+	"https://leetcode.com/discuss/post/6460774/" +
+		"Meta-or-E4-SWE-or-USA-or-Feb-2025-or-Passed-" +
+		"Hiring-Committee/",
 	"https://leetcode.com/discuss/post/6522571/",
 	"https://leetcode.com/discuss/post/7227003/",
 	"https://leetcode.com/discuss/post/7327020/",
-	"https://leetcode.com/discuss/post/8420230/amazon-sde-2-interview-experience-2026-e-t1g8/",
+	"https://leetcode.com/discuss/post/8420230/" +
+		"amazon-sde-2-interview-experience-2026-e-" +
+		"t1g8/",
 	"https://leetcode.com/studyplan/top-interview-150/",
 	"https://neetcode.io/roadmap",
-	"https://www.amazon.jobs/content/en/how-we-hire/interview-prep/software-development-topics",
+	"https://www.amazon.jobs/content/en/how-we-" +
+		"hire/interview-prep/software-development-" +
+		"topics",
 	"https://www.techinterviewhandbook.org/grind75/faq",
 }
 
 type document struct {
 	path            string
-	contents        []byte
 	prose           []byte
 	targets         map[string]struct{}
 	headingCount    int
@@ -89,33 +107,42 @@ func main() {
 		fatal(err)
 	}
 
-	guide, issues := readDocument(filepath.Join(repositoryRoot, guidePath))
+	guide, issues := readDocument(
+		filepath.Join(repositoryRoot, guidePath),
+	)
 	linkTargets, linkTargetIssues := readDocument(
 		filepath.Join(repositoryRoot, linkTargetsPath),
 	)
 	issues = append(issues, linkTargetIssues...)
 	if guide != nil {
-		issues = append(issues, validateLineWidth(guidePath, guide.contents)...)
-		issues = append(issues, validateTeachingEntries(guide.prose)...)
+		issues = append(
+			issues,
+			validateTeachingEntries(guide.prose)...)
 		issues = append(issues, validateNoTables(guide.prose)...)
 	}
 
 	counts := linkCounts{}
 	externalLinks := make(map[string]struct{})
 	if guide != nil {
-		linkIssues, linkTotals, guideExternalLinks := validateDocumentLinks(guide)
+		linkIssues, linkTotals, guideExternalLinks := validateDocumentLinks(
+			guide,
+		)
 		issues = append(issues, linkIssues...)
 		counts = linkTotals
 		for destination := range guideExternalLinks {
 			externalLinks[destination] = struct{}{}
 		}
 
-		inboundIssues, inboundCount := validateInboundLinks(repositoryRoot, guide.targets)
+		inboundIssues, inboundCount := validateInboundLinks(
+			repositoryRoot,
+			guide.targets,
+		)
 		issues = append(issues, inboundIssues...)
 		counts.inbound = inboundCount
 	}
 	if linkTargets != nil {
-		linkIssues, linkTotals, targetExternalLinks := validateDocumentLinks(linkTargets)
+		linkIssues, linkTotals, targetExternalLinks :=
+			validateDocumentLinks(linkTargets)
 		issues = append(issues, linkIssues...)
 		counts.internal += linkTotals.internal
 		counts.local += linkTotals.local
@@ -126,7 +153,13 @@ func main() {
 	}
 	for _, baselineLink := range baselineExternalLinks {
 		if _, exists := externalLinks[baselineLink]; !exists {
-			issues = append(issues, fmt.Sprintf("missing baseline external link %s", baselineLink))
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"missing baseline external link %s",
+					baselineLink,
+				),
+			)
 		}
 	}
 
@@ -140,8 +173,20 @@ func main() {
 
 	fmt.Printf("headings: %d\n", guide.headingCount)
 	fmt.Printf("explicit anchors: %d\n", guide.explicitAnchors)
-	fmt.Printf("fenced blocks: %d (%d go, %d text)\n", guide.fenceCount, guide.goBlockCount, guide.textBlockCount)
-	fmt.Printf("links: %d internal, %d local files, %d external, %d repository inbound\n", counts.internal, counts.local, counts.external, counts.inbound)
+	fmt.Printf(
+		"fenced blocks: %d (%d go, %d text)\n",
+		guide.fenceCount,
+		guide.goBlockCount,
+		guide.textBlockCount,
+	)
+	fmt.Printf(
+		"links: %d internal, %d local files, %d "+
+			"external, %d repository inbound\n",
+		counts.internal,
+		counts.local,
+		counts.external,
+		counts.inbound,
+	)
 	fmt.Println("teaching entries: 93 with 11 ordered fields each")
 }
 
@@ -151,11 +196,14 @@ func readDocument(path string) (*document, []string) {
 		return nil, []string{err.Error()}
 	}
 
-	prose, fences, goBlocks, textBlocks, fenceIssues := proseOutsideFences(path, contents)
-	targets, headings, anchors, targetIssues := collectTargets(path, prose)
+	prose, fences, goBlocks, textBlocks, fenceIssues :=
+		proseOutsideFences(path, contents)
+	targets, headings, anchors, targetIssues := collectTargets(
+		path,
+		prose,
+	)
 	return &document{
 		path:            path,
-		contents:        contents,
 		prose:           prose,
 		targets:         targets,
 		headingCount:    headings,
@@ -166,33 +214,10 @@ func readDocument(path string) (*document, []string) {
 	}, append(fenceIssues, targetIssues...)
 }
 
-func validateLineWidth(path string, contents []byte) []string {
-	issues := make([]string, 0)
-	scanner := bufio.NewScanner(bytes.NewReader(contents))
-	lineNumber := 0
-	for scanner.Scan() {
-		lineNumber++
-		width := utf8.RuneCountInString(scanner.Text())
-		if width > guideLineWidth {
-			issues = append(
-				issues,
-				fmt.Sprintf(
-					"%s:%d: line has %d characters; maximum is %d",
-					path,
-					lineNumber,
-					width,
-					guideLineWidth,
-				),
-			)
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		issues = append(issues, fmt.Sprintf("%s: line-width scan: %v", path, err))
-	}
-	return issues
-}
-
-func proseOutsideFences(path string, contents []byte) ([]byte, int, int, int, []string) {
+func proseOutsideFences(
+	path string,
+	contents []byte,
+) ([]byte, int, int, int, []string) {
 	var prose bytes.Buffer
 	scanner := bufio.NewScanner(bytes.NewReader(contents))
 	scanner.Buffer(make([]byte, 64*1024), 1024*1024)
@@ -234,15 +259,28 @@ func proseOutsideFences(path string, contents []byte) ([]byte, int, int, int, []
 
 	issues := make([]string, 0, 2)
 	if err := scanner.Err(); err != nil {
-		issues = append(issues, fmt.Sprintf("%s: scan: %v", path, err))
+		issues = append(
+			issues,
+			fmt.Sprintf("%s: scan: %v", path, err),
+		)
 	}
 	if inFence {
-		issues = append(issues, fmt.Sprintf("%s:%d: unclosed fenced code block", path, fenceStart))
+		issues = append(
+			issues,
+			fmt.Sprintf(
+				"%s:%d: unclosed fenced code block",
+				path,
+				fenceStart,
+			),
+		)
 	}
 	return prose.Bytes(), blocks, goBlocks, textBlocks, issues
 }
 
-func collectTargets(path string, prose []byte) (map[string]struct{}, int, int, []string) {
+func collectTargets(
+	path string,
+	prose []byte,
+) (map[string]struct{}, int, int, []string) {
 	targets := make(map[string]struct{})
 	targetOrigins := make(map[string]string)
 	slugUses := make(map[string]int)
@@ -260,7 +298,16 @@ func collectTargets(path string, prose []byte) (map[string]struct{}, int, int, [
 		if match := headingPattern.FindStringSubmatch(line); match != nil {
 			level := len(match[1])
 			if previousLevel > 0 && level > previousLevel+1 {
-				issues = append(issues, fmt.Sprintf("%s:%d: heading jumps from level %d to %d", path, lineNumber, previousLevel, level))
+				issues = append(
+					issues,
+					fmt.Sprintf(
+						"%s:%d: heading jumps from level %d to %d",
+						path,
+						lineNumber,
+						previousLevel,
+						level,
+					),
+				)
 			}
 			previousLevel = level
 			base := githubSlug(match[2])
@@ -270,26 +317,59 @@ func collectTargets(path string, prose []byte) (map[string]struct{}, int, int, [
 			}
 			slugUses[base]++
 			if origin, exists := targetOrigins[slug]; exists {
-				issues = append(issues, fmt.Sprintf("%s:%d: generated target %q duplicates %s", path, lineNumber, slug, origin))
+				issues = append(
+					issues,
+					fmt.Sprintf(
+						"%s:%d: generated target %q duplicates %s",
+						path,
+						lineNumber,
+						slug,
+						origin,
+					),
+				)
 			}
 			targets[slug] = struct{}{}
-			targetOrigins[slug] = fmt.Sprintf("heading at line %d", lineNumber)
+			targetOrigins[slug] = fmt.Sprintf(
+				"heading at line %d",
+				lineNumber,
+			)
 			headings++
 		}
 	}
-	// Scan the complete prose so valid HTML anchors may span physical lines.
+	// Scan the complete prose so valid HTML anchors may span physical
+	// lines.
 	for _, match := range anchorPattern.FindAllSubmatchIndex(prose, -1) {
 		anchor := string(prose[match[2]:match[3]])
 		lineNumber := bytes.Count(prose[:match[0]], []byte{'\n'}) + 1
 		explicitUses[anchor]++
 		if explicitUses[anchor] > 1 {
-			issues = append(issues, fmt.Sprintf("%s:%d: duplicate explicit anchor %q", path, lineNumber, anchor))
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s:%d: duplicate explicit anchor %q",
+					path,
+					lineNumber,
+					anchor,
+				),
+			)
 		}
 		if origin, exists := targetOrigins[anchor]; exists {
-			issues = append(issues, fmt.Sprintf("%s:%d: explicit anchor %q duplicates %s", path, lineNumber, anchor, origin))
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s:%d: explicit anchor %q duplicates %s",
+					path,
+					lineNumber,
+					anchor,
+					origin,
+				),
+			)
 		}
 		targets[anchor] = struct{}{}
-		targetOrigins[anchor] = fmt.Sprintf("explicit anchor at line %d", lineNumber)
+		targetOrigins[anchor] = fmt.Sprintf(
+			"explicit anchor at line %d",
+			lineNumber,
+		)
 		anchors++
 	}
 	return targets, headings, anchors, issues
@@ -299,7 +379,10 @@ func githubSlug(heading string) string {
 	var slug strings.Builder
 	for _, current := range strings.ToLower(heading) {
 		switch {
-		case unicode.IsLetter(current), unicode.IsDigit(current), current == '-', current == '_':
+		case unicode.IsLetter(current),
+			unicode.IsDigit(current),
+			current == '-',
+			current == '_':
 			slug.WriteRune(current)
 		case unicode.IsSpace(current):
 			slug.WriteByte('-')
@@ -331,7 +414,17 @@ func validateTeachingEntries(prose []byte) []string {
 			continue
 		}
 		if index != expected {
-			issues = append(issues, fmt.Sprintf("%s:%d: teaching field %q appears where %q is required", guidePath, lineNumber, match[2], requiredFields[expected]))
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s:%d: teaching field %q appears where %q is "+
+						"required",
+					guidePath,
+					lineNumber,
+					match[2],
+					requiredFields[expected],
+				),
+			)
 			expected = (index + 1) % len(requiredFields)
 			continue
 		}
@@ -339,7 +432,18 @@ func validateTeachingEntries(prose []byte) []string {
 		if expected == 0 {
 			entryLevel = level
 		} else if level != entryLevel {
-			issues = append(issues, fmt.Sprintf("%s:%d: teaching field %q uses level %d; entry started at level %d", guidePath, lineNumber, match[2], level, entryLevel))
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s:%d: teaching field %q uses level %d; "+
+						"entry started at level %d",
+					guidePath,
+					lineNumber,
+					match[2],
+					level,
+					entryLevel,
+				),
+			)
 		}
 		expected++
 		if expected == len(requiredFields) {
@@ -348,10 +452,24 @@ func validateTeachingEntries(prose []byte) []string {
 		}
 	}
 	if expected != 0 {
-		issues = append(issues, fmt.Sprintf("%s: final teaching entry stops before %q", guidePath, requiredFields[expected]))
+		issues = append(
+			issues,
+			fmt.Sprintf(
+				"%s: final teaching entry stops before %q",
+				guidePath,
+				requiredFields[expected],
+			),
+		)
 	}
 	if entryCount != 93 {
-		issues = append(issues, fmt.Sprintf("%s: teaching entries: got %d, want 93", guidePath, entryCount))
+		issues = append(
+			issues,
+			fmt.Sprintf(
+				"%s: teaching entries: got %d, want 93",
+				guidePath,
+				entryCount,
+			),
+		)
 	}
 	return issues
 }
@@ -359,22 +477,37 @@ func validateTeachingEntries(prose []byte) []string {
 func validateNoTables(prose []byte) []string {
 	lines := strings.Split(string(prose), "\n")
 	for index := 1; index < len(lines); index++ {
-		if tablePattern.MatchString(lines[index-1]) && tableRule.MatchString(lines[index]) {
-			return []string{fmt.Sprintf("%s:%d: Markdown tables are not allowed in teaching entries", guidePath, index)}
+		if tablePattern.MatchString(lines[index-1]) &&
+			tableRule.MatchString(lines[index]) {
+			return []string{
+				fmt.Sprintf(
+					"%s:%d: Markdown tables are not allowed in "+
+						"teaching entries",
+					guidePath,
+					index,
+				),
+			}
 		}
 	}
 	return nil
 }
 
-func validateDocumentLinks(document *document) ([]string, linkCounts, map[string]struct{}) {
+func validateDocumentLinks(
+	document *document,
+) ([]string, linkCounts, map[string]struct{}) {
 	issues := make([]string, 0)
 	counts := linkCounts{}
 	externalLinks := make(map[string]struct{})
 	displayPath := filepath.Base(document.path)
-	for _, match := range linkPattern.FindAllSubmatch(withoutInlineCode(document.prose), -1) {
+	proseWithoutCode := withoutInlineCode(document.prose)
+	for _, match := range linkPattern.FindAllSubmatch(
+		proseWithoutCode,
+		-1,
+	) {
 		destination := strings.Trim(string(match[1]), "<>")
 		switch {
-		case strings.HasPrefix(destination, "http://"), strings.HasPrefix(destination, "https://"):
+		case strings.HasPrefix(destination, "http://"),
+			strings.HasPrefix(destination, "https://"):
 			counts.external++
 			externalLinks[destination] = struct{}{}
 			continue
@@ -385,13 +518,29 @@ func validateDocumentLinks(document *document) ([]string, linkCounts, map[string
 		pathPart, fragment, _ := strings.Cut(destination, "#")
 		decodedFragment, err := url.PathUnescape(fragment)
 		if err != nil {
-			issues = append(issues, fmt.Sprintf("%s: invalid escaped fragment %q: %v", displayPath, fragment, err))
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s: invalid escaped fragment %q: %v",
+					displayPath,
+					fragment,
+					err,
+				),
+			)
 			continue
 		}
 		if pathPart == "" {
 			counts.internal++
-			if _, exists := document.targets[decodedFragment]; fragment != "" && !exists {
-				issues = append(issues, fmt.Sprintf("%s: unresolved fragment #%s", displayPath, decodedFragment))
+			_, fragmentExists := document.targets[decodedFragment]
+			if fragment != "" && !fragmentExists {
+				issues = append(
+					issues,
+					fmt.Sprintf(
+						"%s: unresolved fragment #%s",
+						displayPath,
+						decodedFragment,
+					),
+				)
 			}
 			continue
 		}
@@ -399,20 +548,50 @@ func validateDocumentLinks(document *document) ([]string, linkCounts, map[string
 		counts.local++
 		decodedPath, err := url.PathUnescape(pathPart)
 		if err != nil {
-			issues = append(issues, fmt.Sprintf("%s: invalid escaped path %q: %v", displayPath, pathPart, err))
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s: invalid escaped path %q: %v",
+					displayPath,
+					pathPart,
+					err,
+				),
+			)
 			continue
 		}
-		targetPath := filepath.Clean(filepath.Join(filepath.Dir(document.path), filepath.FromSlash(decodedPath)))
+		targetPath := filepath.Clean(
+			filepath.Join(
+				filepath.Dir(document.path),
+				filepath.FromSlash(decodedPath),
+			),
+		)
 		if _, err := os.Stat(targetPath); err != nil {
-			issues = append(issues, fmt.Sprintf("%s: unresolved local path %s: %v", displayPath, decodedPath, err))
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s: unresolved local path %s: %v",
+					displayPath,
+					decodedPath,
+					err,
+				),
+			)
 			continue
 		}
-		if fragment != "" && strings.EqualFold(filepath.Ext(targetPath), ".md") {
+		if fragment != "" &&
+			strings.EqualFold(filepath.Ext(targetPath), ".md") {
 			targetDocument, targetIssues := readDocument(targetPath)
 			issues = append(issues, targetIssues...)
 			if targetDocument != nil {
 				if _, exists := targetDocument.targets[decodedFragment]; !exists {
-					issues = append(issues, fmt.Sprintf("%s: unresolved fragment %s#%s", displayPath, decodedPath, decodedFragment))
+					issues = append(
+						issues,
+						fmt.Sprintf(
+							"%s: unresolved fragment %s#%s",
+							displayPath,
+							decodedPath,
+							decodedFragment,
+						),
+					)
 				}
 			}
 		}
@@ -448,44 +627,64 @@ func withoutInlineCode(prose []byte) []byte {
 	return result
 }
 
-func validateInboundLinks(repositoryRoot string, guideTargets map[string]struct{}) ([]string, int) {
+func validateInboundLinks(
+	repositoryRoot string,
+	guideTargets map[string]struct{},
+) ([]string, int) {
 	issues := make([]string, 0)
 	count := 0
-	err := filepath.WalkDir(repositoryRoot, func(path string, entry fs.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if entry.IsDir() {
-			if entry.Name() == ".git" {
-				return filepath.SkipDir
+	err := filepath.WalkDir(
+		repositoryRoot,
+		func(path string, entry fs.DirEntry, walkErr error) error {
+			if walkErr != nil {
+				return walkErr
 			}
-			return nil
-		}
-		if path == filepath.Join(repositoryRoot, guidePath) {
-			return nil
-		}
-		contents, err := os.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		if bytes.IndexByte(contents, 0) >= 0 {
-			return nil
-		}
-		for _, match := range inboundPattern.FindAllSubmatch(contents, -1) {
-			count++
-			fragment := string(match[1])
-			if _, exists := guideTargets[fragment]; !exists {
-				relativePath, relErr := filepath.Rel(repositoryRoot, path)
-				if relErr != nil {
-					relativePath = path
+			if entry.IsDir() {
+				if entry.Name() == ".git" {
+					return filepath.SkipDir
 				}
-				issues = append(issues, fmt.Sprintf("%s: unresolved inbound concepts fragment #%s", relativePath, fragment))
+				return nil
 			}
-		}
-		return nil
-	})
+			if path == filepath.Join(repositoryRoot, guidePath) {
+				return nil
+			}
+			contents, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			if bytes.IndexByte(contents, 0) >= 0 {
+				return nil
+			}
+			matches := inboundPattern.FindAllSubmatch(contents, -1)
+			for _, match := range matches {
+				count++
+				fragment := string(match[1])
+				if _, exists := guideTargets[fragment]; !exists {
+					relativePath, relErr := filepath.Rel(
+						repositoryRoot,
+						path,
+					)
+					if relErr != nil {
+						relativePath = path
+					}
+					issues = append(
+						issues,
+						fmt.Sprintf(
+							"%s: unresolved inbound concepts fragment #%s",
+							relativePath,
+							fragment,
+						),
+					)
+				}
+			}
+			return nil
+		},
+	)
 	if err != nil {
-		issues = append(issues, fmt.Sprintf("scan repository links: %v", err))
+		issues = append(
+			issues,
+			fmt.Sprintf("scan repository links: %v", err),
+		)
 	}
 	return issues, count
 }

@@ -15,16 +15,19 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Triangle
 
 Source: LeetCode
 Problem ID: 120
 Source URL: https://leetcode.com/problems/triangle/description/
 
-Given a triangle array, return the minimum path sum from top to bottom.
+Given a triangle array, return the minimum path sum from top to
+bottom.
 
-For each step, you may move to an adjacent number of the row below. More formally, if you are on index i on the current row, you may move to either index i or index i + 1 on the next row.
+For each step, you may move to an adjacent number of the row below.
+More formally, if you are on index i on the current row, you may move
+to either index i or index i + 1 on the next row.
 
 Example 1:
 
@@ -35,7 +38,8 @@ Explanation: The triangle looks like:
 3 4
 6 5 7
 4 1 8 3
-The minimum path sum from top to bottom is 2 + 3 + 5 + 1 = 11 (underlined above).
+The minimum path sum from top to bottom is 2 + 3 + 5 + 1 = 11
+(underlined above).
 
 Example 2:
 
@@ -52,17 +56,19 @@ Constraints:
 
 - -10^4 <= triangle[i][j] <= 10^4
 
-Follow up: Could you do this using only O(n) extra space, where n is the total number of rows in the triangle?
-===============================================================================
+Follow up: Could you do this using only O(n) extra space, where n is
+the total number of rows in the triangle?
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseTriangleInput(input string) [][]int {
 	var args []json.RawMessage
@@ -70,12 +76,23 @@ func parseTriangleInput(input string) [][]int {
 		panic(fmt.Errorf("parse triangle input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse triangle input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse triangle input: got %d arguments, want "+
+					"1",
+				len(args),
+			),
+		)
 	}
 	var triangle [][]int
 	argumentError0 := json.Unmarshal(args[0], &triangle)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse triangle argument triangle: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse triangle argument triangle: %w",
+				argumentError0,
+			),
+		)
 	}
 	return triangle
 }
@@ -92,15 +109,20 @@ func maximumTriangleCase() testrunner.Case {
 	if err != nil {
 		panic(fmt.Errorf("build maximum triangle input: %w", err))
 	}
-	return testrunner.Case{Name: "Boundary: Maximum rows and values", Input: string(input), Want: `2000000`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum rows and values",
+		Input: string(input),
+		Want:  `2000000`,
+	}
 }
 
 func formatTriangleOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -140,8 +162,9 @@ var sampleCases = []testrunner.Case{
 	maximumTriangleCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -150,17 +173,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	triangle := parseTriangleInput(input)
@@ -170,14 +197,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -204,11 +232,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

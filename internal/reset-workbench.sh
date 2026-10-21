@@ -33,7 +33,8 @@ workbench_file="$repository_root/workbench/main.go"
 workbench_test_file="$repository_root/workbench/main_test.go"
 
 [[ -f $template_file ]] || fail "$template_file was not found"
-[[ -f $template_test_file ]] || fail "$template_test_file was not found"
+[[ -f $template_test_file ]] ||
+  fail "$template_test_file was not found"
 
 if [[ -f $workbench_file ]] && [[ -f $workbench_test_file ]] && \
   cmp -s "$template_file" "$workbench_file" && \
@@ -42,11 +43,15 @@ if [[ -f $workbench_file ]] && [[ -f $workbench_test_file ]] && \
   exit 0
 fi
 
-if [[ -f $workbench_file ]] && ! rg -q '^const archiveReady = true$' "$workbench_file" && [[ $force != true ]]; then
-  fail "workbench contains unarchived changes; archive it first or rerun with --force"
+if [[ -f $workbench_file ]] &&
+  ! rg -q '^const archiveReady = true$' "$workbench_file" &&
+  [[ $force != true ]]; then
+  fail "workbench contains unarchived changes; archive it first "\
+"or rerun with --force"
 fi
 
-temporary_directory=$(mktemp -d "$repository_root/.reset-workbench.XXXXXX")
+temporary_directory=$(mktemp -d \
+  "$repository_root/.reset-workbench.XXXXXX")
 temporary_file="$temporary_directory/main.go"
 temporary_test_file="$temporary_directory/main_test.go"
 cleanup() {
@@ -61,7 +66,10 @@ gofmt -w "$temporary_file" "$temporary_test_file"
 (cd "$repository_root" && go run "$temporary_file")
 
 if [[ -f "$repository_root/go.mod" ]]; then
-	(cd "$repository_root" && go test "$temporary_file" "$temporary_test_file")
+	(
+		cd "$repository_root"
+		go test "$temporary_file" "$temporary_test_file"
+	)
 fi
 
 mv "$temporary_file" "$workbench_file"

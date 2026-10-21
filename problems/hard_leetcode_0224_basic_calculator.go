@@ -16,16 +16,19 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Basic Calculator
 
 Source: LeetCode
 Problem ID: 224
-Source URL: https://leetcode.com/problems/basic-calculator/description/
+Source URL:
+https://leetcode.com/problems/basic-calculator/description/
 
-Given a string s representing a valid expression, implement a basic calculator to evaluate it, and return the result of the evaluation.
+Given a string s representing a valid expression, implement a basic
+calculator to evaluate it, and return the result of the evaluation.
 
-Note: You are not allowed to use any built-in function which evaluates strings as mathematical expressions, such as eval().
+Note: You are not allowed to use any built-in function which evaluates
+strings as mathematical expressions, such as eval().
 
 Example 1:
 
@@ -50,23 +53,27 @@ Constraints:
 
 - s represents a valid expression.
 
-- '+' is not used as a unary operation (i.e., "+1" and "+(2 + 3)" is invalid).
+- '+' is not used as a unary operation (i.e., "+1" and "+(2 + 3)" is
+  invalid).
 
-- '-' could be used as a unary operation (i.e., "-1" and "-(2 + 3)" is valid).
+- '-' could be used as a unary operation (i.e., "-1" and "-(2 + 3)" is
+  valid).
 
 - There will be no two consecutive operators in the input.
 
-- Every number and running calculation will fit in a signed 32-bit integer.
-===============================================================================
+- Every number and running calculation will fit in a signed 32-bit
+  integer.
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseBasicCalculatorInput(input string) string {
 	var args []json.RawMessage
@@ -74,12 +81,18 @@ func parseBasicCalculatorInput(input string) string {
 		panic(fmt.Errorf("parse basic-calculator input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse basic-calculator input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse basic-calculator input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	var s string
 	argumentError0 := json.Unmarshal(args[0], &s)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse basic-calculator argument s: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse basic-calculator argument s: %w",
+				argumentError0,
+			),
+		)
 	}
 	return s
 }
@@ -98,10 +111,21 @@ func makeMaximumFlatBasicCalculatorCase() testrunner.Case {
 }
 
 func makeMaximumNestedBasicCalculatorCase() testrunner.Case {
-	expression := strings.Repeat("(", 149999) + "1" + strings.Repeat(")", 149999)
+	expression := strings.Repeat(
+		"(",
+		149999,
+	) + "1" + strings.Repeat(
+		")",
+		149999,
+	)
 	input, err := json.Marshal([]string{expression})
 	if err != nil {
-		panic(fmt.Errorf("build nested basic-calculator input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build nested basic-calculator input: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Additional: Maximum-length nested expression",
@@ -114,8 +138,9 @@ func formatBasicCalculatorOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -171,8 +196,9 @@ var sampleCases = []testrunner.Case{
 	makeMaximumNestedBasicCalculatorCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -181,17 +207,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	s := parseBasicCalculatorInput(input)
@@ -201,14 +231,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -235,11 +266,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

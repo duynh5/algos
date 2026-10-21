@@ -15,32 +15,43 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Surrounded Regions
 
 Source: LeetCode
 Problem ID: 130
-Source URL: https://leetcode.com/problems/surrounded-regions/description/
+Source URL:
+https://leetcode.com/problems/surrounded-regions/description/
 
-You are given an m x n matrix board containing letters 'X' and 'O', capture regions that are surrounded:
+You are given an m x n matrix board containing letters 'X' and 'O',
+capture regions that are surrounded:
 
-- Connect: A cell is connected to adjacent cells horizontally or vertically.
+- Connect: A cell is connected to adjacent cells horizontally or
+  vertically.
 
 - Region: To form a region connect every 'O' cell.
 
-- Surround: A region is surrounded if none of the 'O' cells in that region are on the edge of the board. Such regions are completely enclosed by 'X' cells.
+- Surround: A region is surrounded if none of the 'O' cells in that
+  region are on the edge of the board. Such regions are completely
+  enclosed by 'X' cells.
 
-To capture a surrounded region, replace all 'O's with 'X's in-place within the original board. You do not need to return anything.
+To capture a surrounded region, replace all 'O's with 'X's in-place
+within the original board. You do not need to return anything.
 
 Example 1:
 
-Input: board = [["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]
+Input: board =
+[["X","X","X","X"],["X","O","O","X"],
+["X","X","O","X"],["X","O","X","X"]]
 
-Output: [["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]
+Output:
+[["X","X","X","X"],["X","X","X","X"],
+["X","X","X","X"],["X","O","X","X"]]
 
 Explanation:
 
-In the above diagram, the bottom region is not captured because it is on the edge of the board and cannot be surrounded.
+In the above diagram, the bottom region is not captured because it is
+on the edge of the board and cannot be surrounded.
 
 Example 2:
 
@@ -57,16 +68,17 @@ Constraints:
 - 1 <= m, n <= 200
 
 - board[i][j] is 'X' or 'O'.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseSurroundedRegionsInput(input string) [][]byte {
 	var args []json.RawMessage
@@ -74,11 +86,17 @@ func parseSurroundedRegionsInput(input string) [][]byte {
 		panic(fmt.Errorf("parse surrounded-regions input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse surrounded-regions input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse surrounded-regions input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	board, argumentError0 := decodeCharacterMatrix(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse surrounded-regions argument board: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse surrounded-regions argument board: %w",
+				argumentError0,
+			),
+		)
 	}
 	return board
 }
@@ -93,7 +111,11 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 		result[row] = make([]byte, len(rows[row]))
 		for column, value := range rows[row] {
 			if len(value) != 1 {
-				return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column)
+				return nil, fmt.Errorf(
+					"cell (%d,%d) is not one character",
+					row,
+					column,
+				)
 			}
 			result[row][column] = value[0]
 		}
@@ -126,22 +148,39 @@ func maximumSurroundedRegionsCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{board})
 	if err != nil {
-		panic(fmt.Errorf("build maximum surrounded-regions input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum surrounded-regions input: %w",
+				err,
+			),
+		)
 	}
 	want, err := json.Marshal(board)
 	if err != nil {
-		panic(fmt.Errorf("build maximum surrounded-regions output: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum surrounded-regions output: %w",
+				err,
+			),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum all-border-connected board", Input: string(input), Want: string(want)}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum all-border-connected board",
+		Input: string(input),
+		Want:  string(want),
+	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
-		Name:  "Official example 1",
-		Input: `[[["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]]`,
-		Want:  `[["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]`,
+		Name: "Official example 1",
+		Input: `[[["X","X","X","X"],["X","O","O","X"],["X",` +
+			`"X","O","X"],["X","O","X","X"]]]`,
+		Want: `[["X","X","X","X"],["X","X","X","X"],["X",` +
+			`"X","X","X"],["X","O","X","X"]]`,
 	},
 	{
 		Name:  "Official example 2",
@@ -174,20 +213,25 @@ var sampleCases = []testrunner.Case{
 		Want:  `[["O"],["X"],["O"]]`,
 	},
 	{
-		Name:  "Adversarial: Diagonal border contact does not protect a region",
+		Name: "Adversarial: Diagonal border contact does " +
+			"not protect a region",
 		Input: `[[["O","X","X"],["X","O","X"],["X","X","X"]]]`,
 		Want:  `[["O","X","X"],["X","X","X"],["X","X","X"]]`,
 	},
 	{
-		Name:  "Adversarial: Enclosed and border-connected regions coexist",
-		Input: `[[["X","O","X","X","X"],["X","O","X","O","X"],["X","X","X","O","X"],["X","O","X","X","X"]]]`,
-		Want:  `[["X","O","X","X","X"],["X","O","X","X","X"],["X","X","X","X","X"],["X","O","X","X","X"]]`,
+		Name: "Adversarial: Enclosed and border-connected regions coexist",
+		Input: `[[["X","O","X","X","X"],["X","O","X","O",` +
+			`"X"],["X","X","X","O","X"],["X","O","X","X",` +
+			`"X"]]]`,
+		Want: `[["X","O","X","X","X"],["X","O","X","X","X"],` +
+			`["X","X","X","X","X"],["X","O","X","X","X"]]`,
 	},
 	maximumSurroundedRegionsCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -196,17 +240,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	board := parseSurroundedRegionsInput(input)
@@ -216,14 +264,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -250,11 +299,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

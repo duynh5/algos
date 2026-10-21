@@ -16,14 +16,17 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Search Insert Position
 
 Source: LeetCode
 Problem ID: 35
-Source URL: https://leetcode.com/problems/search-insert-position/description/
+Source URL:
+https://leetcode.com/problems/search-insert-position/description/
 
-Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+Given a sorted array of distinct integers and a target value, return
+the index if the target is found. If not, return the index where it
+would be if it were inserted in order.
 
 You must write an algorithm with O(log n) runtime complexity.
 
@@ -51,14 +54,14 @@ Constraints:
 - nums contains distinct values sorted in ascending order.
 
 - -10^4 <= target <= 10^4
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
 // This completed problem archive follows the workbench template.
 // Concept: ../CONCEPTS.md#binary-search
@@ -66,20 +69,29 @@ Constraints:
 func parseSearchInsertPositionInput(input string) ([]int, int) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse search-insert-position input: %w", err))
+		panic(
+			fmt.Errorf("parse search-insert-position input: %w", err),
+		)
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse search-insert-position input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf("parse search-insert-position input: got %d "+
+				"arguments, want 2", len(args)),
+		)
 	}
 	var nums []int
 	argumentError0 := json.Unmarshal(args[0], &nums)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse search-insert-position argument nums: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse search-insert-position argument nums: "+
+				"%w", argumentError0),
+		)
 	}
 	var target int
 	argumentError1 := json.Unmarshal(args[1], &target)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse search-insert-position argument target: %w", argumentError1))
+		panic(fmt.Errorf("parse search-insert-position argument "+
+			"target: %w", argumentError1))
 	}
 	return nums, target
 }
@@ -91,7 +103,10 @@ func maximumSearchInsertPositionCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{nums, 0})
 	if err != nil {
-		panic(fmt.Errorf("build maximum search-insert-position case: %w", err))
+		panic(
+			fmt.Errorf("build maximum search-insert-position case: "+
+				"%w", err),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum-length midpoint match",
@@ -104,8 +119,9 @@ func formatSearchInsertPositionOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -175,8 +191,9 @@ var sampleCases = []testrunner.Case{
 	maximumSearchInsertPositionCase(),
 }
 
-// archiveReady is true after the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady is true after the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = true
 
 // Registered implementations run against the same cases.
@@ -200,13 +217,17 @@ var agentSolutions = []testrunner.Solution{
 	},
 }
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	nums, target := parseSearchInsertPositionInput(input)
@@ -247,12 +268,12 @@ func solveCurrentAttempt(input string) string {
 	return strconv.Itoa(targ_i)
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// These functions remain separate from the preserved current attempt so each
-// approach can be compared against the same cases.
-// =============================================================================
+// These functions remain separate from the preserved current attempt
+// so each approach can be compared against the same cases.
+// ===================================================================
 
 func solveByLinearScan(input string) string {
 	nums, target := parseSearchInsertPositionInput(input)
@@ -305,114 +326,188 @@ func solveByLowerBound(input string) string {
 }
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
-- What is correct: The attempt uses sorted order to reduce a closed interval,
-  returns an exact midpoint match immediately, handles targets greater than
-  the final value, handles targets below the first active value, and finds
-  insertions between existing values. It passes all supplied cases and an
-  exhaustive comparison over 17,984 sorted-array and target combinations.
-- First failing assumption or bottleneck: There is no remaining correctness
-  failure in the stated non-empty, sorted, distinct input domain. The main
-  weakness is control-flow complexity: high = mid and low = mid retain the
-  inspected element, so progress depends on three boundary exits and the
-  low == mid adjacency exit. The two independent comparisons can also update
+- What is correct: The attempt uses sorted order to reduce a closed
+  interval,
+returns an exact midpoint match immediately, handles targets greater
+than
+the final value, handles targets below the first active value, and
+finds
+insertions between existing values. It passes all supplied cases and
+an
+exhaustive comparison over 17,984 sorted-array and target
+combinations.
+- First failing assumption or bottleneck: There is no remaining
+  correctness
+failure in the stated non-empty, sorted, distinct input domain. The
+main
+weakness is control-flow complexity: high = mid and low = mid retain
+the
+inspected element, so progress depends on three boundary exits and the
+low == mid adjacency exit. The two independent comparisons can also
+update
   mid twice in one iteration, making the invariant harder to audit.
-- Relevant concept and invariant: After the two outside-boundary checks, the
-  matching or insertion index is inside [low, high]. When low == mid, equality
-  has already failed, nums[low] < target, and target <= nums[high], so high is
-  the insertion point. This is the same binary-search family used by both
-  agent binary solutions, although their intervals shrink without special
+- Relevant concept and invariant: After the two outside-boundary
+  checks, the
+matching or insertion index is inside [low, high]. When low == mid,
+equality
+has already failed, nums[low] < target, and target <= nums[high], so
+high is
+the insertion point. This is the same binary-search family used by
+both
+agent binary solutions, although their intervals shrink without
+special
   boundary exits.
-- Concrete example: For nums = [1,3], target = 0, the attempt starts with
-  low = 0, mid = 1, high = 1. The midpoint does not match and target is not
-  greater than nums[high]. Since nums[low] = 1 is greater than target, the
+- Concrete example: For nums = [1,3], target = 0, the attempt starts
+  with
+low = 0, mid = 1, high = 1. The midpoint does not match and target is
+not
+greater than nums[high]. Since nums[low] = 1 is greater than target,
+the
   new lower-bound guard returns low = 0 directly.
-- Comparison with solution 1: Both seek the first value not below target. The
-  scan checks that condition directly at every index; the attempt uses sorted
-  order to discard ranges and achieves logarithmic worst-case search time.
-- Comparison with solution 2: Both use a closed binary-search interval and
-  stop early on equality. The recursive solution expresses progress through
-  disjoint [left, middle-1] and [middle+1, right] intervals and lets the
-  left > right base case produce the insertion point instead of using the
+- Comparison with solution 1: Both seek the first value not below
+  target. The
+scan checks that condition directly at every index; the attempt uses
+sorted
+order to discard ranges and achieves logarithmic worst-case search
+time.
+- Comparison with solution 2: Both use a closed binary-search interval
+  and
+stop early on equality. The recursive solution expresses progress
+through
+disjoint [left, middle-1] and [middle+1, right] intervals and lets the
+left > right base case produce the insertion point instead of using
+the
   attempt's explicit first, last, and adjacent-position exits.
-- Comparison with solution 3: Both use iterative binary search. The preferred
-  solution searches directly for the lower bound in [left, right), so every
-  branch shrinks the interval and convergence supplies boundary answers
+- Comparison with solution 3: Both use iterative binary search. The
+  preferred
+solution searches directly for the lower bound in [left, right), so
+every
+branch shrinks the interval and convergence supplies boundary answers
   without a special adjacency rule.
-- Time complexity: The search is Theta(1) when the initial midpoint matches
-  or target lies outside the active endpoints, and Theta(log n) on average and
-  in the worst case. JSON parsing makes this local wrapper Theta(n) end to end.
-- Auxiliary-space complexity: O(1) for the search. The local harness allocates
-  O(n) space for the parsed slice and O(log n) bytes for the decimal result.
+- Time complexity: The search is Theta(1) when the initial midpoint
+  matches
+or target lies outside the active endpoints, and Theta(log n) on
+average and
+in the worst case. JSON parsing makes this local wrapper Theta(n) end
+to end.
+- Auxiliary-space complexity: O(1) for the search. The local harness
+  allocates
+O(n) space for the parsed slice and O(log n) bytes for the decimal
+result.
 
 Solution 1 - Direct linear scan:
-- Correctness: The scan returns at the first index whose value is at least the
-  target. Every earlier value is therefore smaller, so that index is either
-  the matching position or the only position that preserves sorted order. If
-  no such value exists, every value is smaller and len(nums) is the correct
+- Correctness: The scan returns at the first index whose value is at
+  least the
+target. Every earlier value is therefore smaller, so that index is
+either
+the matching position or the only position that preserves sorted
+order. If
+no such value exists, every value is smaller and len(nums) is the
+correct
   insertion position.
-- Concrete example: For nums = [1,3,5,6], target = 2, index 0 contains 1 and
-  the scan continues. Index 1 contains 3, the first value at least 2, so the
+- Concrete example: For nums = [1,3,5,6], target = 2, index 0 contains
+  1 and
+the scan continues. Index 1 contains 3, the first value at least 2, so
+the
   function returns 1 without inspecting 5 or 6.
-- Comparison with current attempt: The scan has the same lower-bound result
-  but does not exploit sorted order to discard ranges. It is simpler and can
-  stop sooner for targets near the front, while the attempt has logarithmic
+- Comparison with current attempt: The scan has the same lower-bound
+  result
+but does not exploit sorted order to discard ranges. It is simpler and
+can
+stop sooner for targets near the front, while the attempt has
+logarithmic
   worst-case search time.
-- Time complexity: The search is Theta(1) in the best case, Theta(n) on
-  average, and Theta(n) in the worst case. Parsing is Theta(n), so the complete
+- Time complexity: The search is Theta(1) in the best case, Theta(n)
+  on
+average, and Theta(n) in the worst case. Parsing is Theta(n), so the
+complete
   local wrapper is Theta(n) in every case.
-- Auxiliary-space complexity: O(1) for the scan. The harness parsing and
+- Auxiliary-space complexity: O(1) for the scan. The harness parsing
+  and
   decimal output allocate O(n) and O(log n) space respectively.
 
 Solution 2 - Improved recursive binary search:
-- Correctness: A recursive call contains every location where target could be
-  found or inserted. Equality returns the match. If nums[middle] is smaller,
+- Correctness: A recursive call contains every location where target
+  could be
+found or inserted. Equality returns the match. If nums[middle] is
+smaller,
   sorted order excludes middle and everything left of it; otherwise it
-  excludes middle and everything right of it. When left > right, all excluded
-  values before left are smaller and all values at or after left are larger,
+excludes middle and everything right of it. When left > right, all
+excluded
+values before left are smaller and all values at or after left are
+larger,
   making left the insertion point.
-- Concrete example: For nums = [-5,-3,-1], target = -2, search(0,2) checks
-  middle = 1 with -3 and recurses to search(2,2). Middle = 2 contains -1, so
-  it recurses to search(2,1). The interval is empty and returns left = 2,
+- Concrete example: For nums = [-5,-3,-1], target = -2, search(0,2)
+  checks
+middle = 1 with -3 and recurses to search(2,2). Middle = 2 contains
+-1, so
+it recurses to search(2,1). The interval is empty and returns left =
+2,
   inserting -2 between -3 and -1.
-- Comparison with current attempt: Both are exact-match searches on closed
-  intervals. This version removes the attempt's retained midpoint and special
-  adjacent-element exits by excluding middle on every nonmatching branch; its
+- Comparison with current attempt: Both are exact-match searches on
+  closed
+intervals. This version removes the attempt's retained midpoint and
+special
+adjacent-element exits by excluding middle on every nonmatching
+branch; its
   tradeoff is one call-stack frame per search level.
-- Time complexity: The search is Theta(1) when the first midpoint matches and
-  Theta(log n) on average and in the worst case. Parsing still makes the local
+- Time complexity: The search is Theta(1) when the first midpoint
+  matches and
+Theta(log n) on average and in the worst case. Parsing still makes the
+local
   wrapper Theta(n) end to end.
-- Auxiliary-space complexity: O(log n) search stack in the worst case. The
-  harness additionally allocates O(n) for parsing and O(log n) for output.
+- Auxiliary-space complexity: O(log n) search stack in the worst case.
+  The
+harness additionally allocates O(n) for parsing and O(log n) for
+output.
 
 Solution 3 - Preferred iterative lower bound:
-- Correctness: The half-open interval [left, right) always contains the first
-  index whose value can be at least target. When nums[middle] is smaller, that
-  index must be after middle, so left becomes middle+1. Otherwise middle may
-  be the answer, so right becomes middle. The interval strictly shrinks; when
-  left == right, that sole boundary is the matching or insertion index.
-- Concrete example: For nums = [1,3,5,6], target = 7, [left,right) starts as
-  [0,4). Middle = 2 contains 5, so left becomes 3. Middle = 3 contains 6, so
-  left becomes 4. The interval [4,4) is empty and the function returns 4,
+- Correctness: The half-open interval [left, right) always contains
+  the first
+index whose value can be at least target. When nums[middle] is
+smaller, that
+index must be after middle, so left becomes middle+1. Otherwise middle
+may
+be the answer, so right becomes middle. The interval strictly shrinks;
+when
+left == right, that sole boundary is the matching or insertion index.
+- Concrete example: For nums = [1,3,5,6], target = 7, [left,right)
+  starts as
+[0,4). Middle = 2 contains 5, so left becomes 3. Middle = 3 contains
+6, so
+left becomes 4. The interval [4,4) is empty and the function returns
+4,
   correctly placing 7 after every existing value.
-- Comparison with current attempt: Both use O(1)-space iterative binary
-  search. Lower bound uses one mutually exclusive update per iteration and
-  needs no equality, last-element, or adjacent-element special case, making
+- Comparison with current attempt: Both use O(1)-space iterative
+  binary
+search. Lower bound uses one mutually exclusive update per iteration
+and
+needs no equality, last-element, or adjacent-element special case,
+making
   its progress and final answer direct consequences of one invariant.
-- Time complexity: The search is Theta(log n) in the best, average, and worst
-  cases for non-empty input. JSON parsing makes the local wrapper Theta(n).
-- Auxiliary-space complexity: O(1) for the search. The harness additionally
-  allocates O(n) for the parsed input and O(log n) for the output string.
+- Time complexity: The search is Theta(log n) in the best, average,
+  and worst
+cases for non-empty input. JSON parsing makes the local wrapper
+Theta(n).
+- Auxiliary-space complexity: O(1) for the search. The harness
+  additionally
+allocates O(n) for the parsed input and O(log n) for the output
+string.
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

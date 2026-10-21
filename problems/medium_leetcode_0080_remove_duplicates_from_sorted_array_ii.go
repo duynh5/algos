@@ -16,20 +16,29 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Remove Duplicates from Sorted Array II
 
 Source: LeetCode
 Problem ID: 80
-Source URL: https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0080
 
-Given an integer array nums sorted in non-decreasing order, remove some duplicates in-place such that each unique element appears at most twice. The relative order of the elements should be kept the same.
+Given an integer array nums sorted in non-decreasing order, remove
+some duplicates in-place such that each unique element appears at most
+twice. The relative order of the elements should be kept the same.
 
-Since it is impossible to change the length of the array in some languages, you must instead have the result be placed in the first part of the array nums. More formally, if there are k elements after removing the duplicates, then the first k elements of nums should hold the final result. It does not matter what you leave beyond the first k elements.
+Since it is impossible to change the length of the array in some
+languages, you must instead have the result be placed in the first
+part of the array nums. More formally, if there are k elements after
+removing the duplicates, then the first k elements of nums should hold
+the final result. It does not matter what you leave beyond the first k
+elements.
 
 Return k after placing the final result in the first k slots of nums.
 
-Do not allocate extra space for another array. You must do this by modifying the input array in-place with O(1) extra memory.
+Do not allocate extra space for another array. You must do this by
+modifying the input array in-place with O(1) extra memory.
 
 Custom Judge:
 
@@ -51,15 +60,19 @@ Example 1:
 
 Input: nums = [1,1,1,2,2,3]
 Output: 5, nums = [1,1,2,2,3,_]
-Explanation: Your function should return k = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively.
-It does not matter what you leave beyond the returned k (hence they are underscores).
+Explanation: Your function should return k = 5, with the first five
+elements of nums being 1, 1, 2, 2 and 3 respectively.
+It does not matter what you leave beyond the returned k (hence they
+are underscores).
 
 Example 2:
 
 Input: nums = [0,0,1,1,1,1,2,3,3]
 Output: 7, nums = [0,0,1,1,2,3,3,_,_]
-Explanation: Your function should return k = 7, with the first seven elements of nums being 0, 0, 1, 1, 2, 3 and 3 respectively.
-It does not matter what you leave beyond the returned k (hence they are underscores).
+Explanation: Your function should return k = 7, with the first seven
+elements of nums being 0, 0, 1, 1, 2, 3 and 3 respectively.
+It does not matter what you leave beyond the returned k (hence they
+are underscores).
 
 Constraints:
 
@@ -68,36 +81,61 @@ Constraints:
 - -10^4 <= nums[i] <= 10^4
 
 - nums is sorted in non-decreasing order.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseRemoveDuplicatesFromSortedArrayIiInput(input string) []int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse remove-duplicates-from-sorted-array-ii input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse remove-duplicates-from-sorted-array-ii "+
+					"input: %w",
+				err,
+			),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse remove-duplicates-from-sorted-array-ii input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse remove-duplicates-from-sorted-array-ii "+
+					"input: got %d arguments, want 1",
+				len(args),
+			),
+		)
 	}
 	var nums []int
 	argumentError0 := json.Unmarshal(args[0], &nums)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse remove-duplicates-from-sorted-array-ii argument nums: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse remove-duplicates-from-sorted-array-ii "+
+					"argument nums: %w",
+				argumentError0,
+			),
+		)
 	}
 	return nums
 }
 
-func formatRemoveDuplicatesFromSortedArrayIiOutput(nums []int, k int) string {
+func formatRemoveDuplicatesFromSortedArrayIiOutput(
+	nums []int,
+	k int,
+) string {
 	if k < 0 || k > len(nums) {
-		panic(fmt.Sprintf("format remove-duplicates-from-sorted-array-ii output: k=%d outside [0,%d]", k, len(nums)))
+		panic(
+			fmt.Sprintf("format remove-duplicates-from-sorted-array-"+
+				"ii output: k=%d outside [0,%d]", k, len(nums)),
+		)
 	}
 	var output strings.Builder
 	fmt.Fprintf(&output, "%d, nums = [", k)
@@ -122,7 +160,10 @@ func maximumRemoveDuplicatesFromSortedArrayIiCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{nums})
 	if err != nil {
-		panic(fmt.Errorf("build maximum remove-duplicates-from-sorted-array-ii input: %w", err))
+		panic(
+			fmt.Errorf("build maximum remove-duplicates-from-sorted-"+
+				"array-ii input: %w", err),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum equal run keeps exactly two values",
@@ -131,8 +172,9 @@ func maximumRemoveDuplicatesFromSortedArrayIiCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -182,8 +224,9 @@ var sampleCases = []testrunner.Case{
 	maximumRemoveDuplicatesFromSortedArrayIiCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -192,17 +235,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	nums := parseRemoveDuplicatesFromSortedArrayIiInput(input)
@@ -212,14 +259,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -246,11 +294,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

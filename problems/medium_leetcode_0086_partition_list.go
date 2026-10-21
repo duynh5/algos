@@ -15,16 +15,18 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Partition List
 
 Source: LeetCode
 Problem ID: 86
 Source URL: https://leetcode.com/problems/partition-list/description/
 
-Given the head of a linked list and a value x, partition it such that all nodes less than x come before nodes greater than or equal to x.
+Given the head of a linked list and a value x, partition it such that
+all nodes less than x come before nodes greater than or equal to x.
 
-You should preserve the original relative order of the nodes in each of the two partitions.
+You should preserve the original relative order of the nodes in each
+of the two partitions.
 
 Example 1:
 
@@ -43,16 +45,17 @@ Constraints:
 - -100 <= Node.val <= 100
 
 - -200 <= x <= 200
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type ListNode struct {
 	Val  int
@@ -65,16 +68,32 @@ func parsePartitionListInput(input string) (*ListNode, int) {
 		panic(fmt.Errorf("parse partition-list input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse partition-list input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse partition-list input: got %d arguments,"+
+					" want 2",
+				len(args),
+			),
+		)
 	}
 	head, argumentError0 := decodeListNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse partition-list argument head: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse partition-list argument head: %w",
+				argumentError0,
+			),
+		)
 	}
 	var x int
 	argumentError1 := json.Unmarshal(args[1], &x)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse partition-list argument x: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse partition-list argument x: %w",
+				argumentError1,
+			),
+		)
 	}
 	return head, x
 }
@@ -97,7 +116,8 @@ func formatPartitionListOutput(head *ListNode) string {
 	values := make([]int, 0)
 	for node := head; node != nil; node = node.Next {
 		if len(values) == 200 {
-			panic("format partition-list output: list exceeds 200 nodes or contains a cycle")
+			panic("format partition-list output: list exceeds " +
+				"200 nodes or contains a cycle")
 		}
 		values = append(values, node.Val)
 	}
@@ -120,21 +140,30 @@ func maximumPartitionListCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{values, 0})
 	if err != nil {
-		panic(fmt.Errorf("build maximum partition-list input: %w", err))
+		panic(
+			fmt.Errorf("build maximum partition-list input: %w", err),
+		)
 	}
 	want, err := json.Marshal(wantValues)
 	if err != nil {
-		panic(fmt.Errorf("build maximum partition-list output: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum partition-list output: %w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
-		Name:  "Boundary: Maximum alternating list preserves both partition orders",
+		Name: "Boundary: Maximum alternating list preserves " +
+			"both partition orders",
 		Input: string(input),
 		Want:  string(want),
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -189,8 +218,9 @@ var sampleCases = []testrunner.Case{
 	maximumPartitionListCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -199,17 +229,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	head, x := parsePartitionListInput(input)
@@ -220,14 +254,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -254,11 +289,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

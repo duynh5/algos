@@ -15,7 +15,7 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Summary Ranges
 
 Source: LeetCode
@@ -26,7 +26,10 @@ You are given a sorted unique integer array nums.
 
 A range [a,b] is the set of all integers from a to b (inclusive).
 
-Return the smallest sorted list of ranges that cover all the numbers in the array exactly. That is, each element of nums is covered by exactly one of the ranges, and there is no integer x such that x is in one of the ranges but not in nums.
+Return the smallest sorted list of ranges that cover all the numbers
+in the array exactly. That is, each element of nums is covered by
+exactly one of the ranges, and there is no integer x such that x is in
+one of the ranges but not in nums.
 
 Each range [a,b] in the list should be output as:
 
@@ -62,16 +65,17 @@ Constraints:
 - All the values of nums are unique.
 
 - nums is sorted in ascending order.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseSummaryRangesInput(input string) []int {
 	var args []json.RawMessage
@@ -79,12 +83,23 @@ func parseSummaryRangesInput(input string) []int {
 		panic(fmt.Errorf("parse summary-ranges input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse summary-ranges input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse summary-ranges input: got %d arguments,"+
+					" want 1",
+				len(args),
+			),
+		)
 	}
 	var nums []int
 	argumentError0 := json.Unmarshal(args[0], &nums)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse summary-ranges argument nums: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse summary-ranges argument nums: %w",
+				argumentError0,
+			),
+		)
 	}
 	return nums
 }
@@ -107,7 +122,9 @@ func maximumSummaryRangesCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{nums})
 	if err != nil {
-		panic(fmt.Errorf("build maximum summary-ranges input: %w", err))
+		panic(
+			fmt.Errorf("build maximum summary-ranges input: %w", err),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum length alternates ten short ranges",
@@ -116,8 +133,9 @@ func maximumSummaryRangesCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -172,8 +190,9 @@ var sampleCases = []testrunner.Case{
 	maximumSummaryRangesCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -182,17 +201,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	nums := parseSummaryRangesInput(input)
@@ -202,14 +225,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -236,11 +260,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

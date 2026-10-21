@@ -15,14 +15,16 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Binary Tree Level Order Traversal
 
 Source: LeetCode
 Problem ID: 102
-Source URL: https://leetcode.com/problems/binary-tree-level-order-traversal/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0102
 
-Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
+Given the root of a binary tree, return the level order traversal of
+its nodes' values. (i.e., from left to right, level by level).
 
 Example 1:
 
@@ -44,16 +46,17 @@ Constraints:
 - The number of nodes in the tree is in the range [0, 2000].
 
 - -1000 <= Node.val <= 1000
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val               int
@@ -63,21 +66,25 @@ type TreeNode struct {
 func parseBinaryTreeLevelOrderTraversalInput(input string) *TreeNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse binary-tree-level-order-traversal input: %w", err))
+		panic(fmt.Errorf("parse binary-tree-level-order-traversal "+
+			"input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse binary-tree-level-order-traversal input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse binary-tree-level-order-traversal "+
+			"input: got %d arguments, want 1", len(args)))
 	}
 	root, argumentError0 := decodeTreeNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse binary-tree-level-order-traversal argument root: %w", argumentError0))
+		panic(fmt.Errorf("parse binary-tree-level-order-traversal "+
+			"argument root: %w", argumentError0))
 	}
 	return root
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+	if err := json.Unmarshal(raw, &values); err != nil ||
+		len(values) == 0 {
 		return nil, err
 	}
 	if values[0] == nil {
@@ -111,27 +118,38 @@ func maximumBinaryTreeLevelOrderTraversalCase() testrunner.Case {
 	for index := range values {
 		values[index] = index%2001 - 1000
 	}
-	for start, width := 0, 1; start < len(values); start, width = start+width, width*2 {
+	for start, width := 0, 1; start < len(values); {
 		end := min(start+width, len(values))
 		levels = append(levels, values[start:end])
+		start += width
+		width *= 2
 	}
 	input, err := json.Marshal([]any{values})
 	if err != nil {
-		panic(fmt.Errorf("build maximum binary-tree-level-order-traversal input: %w", err))
+		panic(fmt.Errorf("build maximum binary-tree-level-order-"+
+			"traversal input: %w", err))
 	}
 	want, err := json.Marshal(levels)
 	if err != nil {
-		panic(fmt.Errorf("build maximum binary-tree-level-order-traversal output: %w", err))
+		panic(fmt.Errorf("build maximum binary-tree-level-order-"+
+			"traversal output: %w", err))
 	}
-	return testrunner.Case{Name: "Boundary: Maximum complete-prefix tree", Input: string(input), Want: string(want)}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum complete-prefix tree",
+		Input: string(input),
+		Want:  string(want),
+	}
 }
 
-func formatBinaryTreeLevelOrderTraversalOutput(result [][]int) string {
+func formatBinaryTreeLevelOrderTraversalOutput(
+	result [][]int,
+) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -176,8 +194,9 @@ var sampleCases = []testrunner.Case{
 	maximumBinaryTreeLevelOrderTraversalCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -186,17 +205,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	root := parseBinaryTreeLevelOrderTraversalInput(input)
@@ -206,14 +229,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -240,11 +264,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -3,7 +3,8 @@
 set -euo pipefail
 
 usage() {
-  echo "usage: $0 [--case <number>] [<[solved_]difficulty_source_problem_id_name.go>]" >&2
+  echo "usage: $0 [--case <number>] "\
+"[<[solved_]difficulty_source_problem_id_name.go>]" >&2
 }
 
 fail() {
@@ -12,7 +13,11 @@ fail() {
 }
 
 is_valid_filename() {
-  [[ $1 =~ ^(solved_)?(easy|medium|hard)_[a-z0-9]+_([0-9]{4,}|[a-z0-9]*[a-z][a-z0-9]*)_[a-z0-9]+(_[a-z0-9]+)*\.go$ ]]
+  local filename_pattern
+  filename_pattern='^(solved_)?(easy|medium|hard)_[a-z0-9]+_'
+  filename_pattern+='([0-9]{4,}|[a-z0-9]*[a-z][a-z0-9]*)_'
+  filename_pattern+='[a-z0-9]+(_[a-z0-9]+)*\.go$'
+  [[ $1 =~ $filename_pattern ]]
 }
 
 script_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -24,7 +29,8 @@ detect_active_problem() {
   local active_file_count=0
   local -a active_files
 
-  git -C "$repository_root" rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
+  git -C "$repository_root" rev-parse \
+    --is-inside-work-tree >/dev/null 2>&1 ||
     fail "$repository_root is not a Git worktree; provide a filename"
 
   while IFS= read -r candidate_path; do
@@ -37,21 +43,26 @@ detect_active_problem() {
     active_file_count=$((active_file_count + 1))
   done < <(
     {
-      git -C "$repository_root" diff --name-only --diff-filter=ACMR -- problems
-      git -C "$repository_root" diff --cached --name-only --diff-filter=ACMR -- problems
-      git -C "$repository_root" ls-files --others --exclude-standard -- problems
+      git -C "$repository_root" diff --name-only \
+        --diff-filter=ACMR -- problems
+      git -C "$repository_root" diff --cached --name-only \
+        --diff-filter=ACMR -- problems
+      git -C "$repository_root" ls-files --others \
+        --exclude-standard -- problems
     } | LC_ALL=C sort -u
   )
 
   case $active_file_count in
     0)
-      fail "no modified or untracked problem file found; provide a filename"
+      fail "no modified or untracked problem file found; "\
+"provide a filename"
       ;;
     1)
       printf '%s\n' "${active_files[0]}"
       ;;
     *)
-      echo "error: multiple modified or untracked problem files found; provide a filename:" >&2
+      echo "error: multiple modified or untracked problem files "\
+"found; provide a filename:" >&2
       printf '  %s\n' "${active_files[@]}" >&2
       return 1
       ;;
@@ -96,7 +107,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ $case_option_seen == true && ! $case_number =~ ^[1-9][0-9]*$ ]]; then
+if [[ $case_option_seen == true &&
+  ! $case_number =~ ^[1-9][0-9]*$ ]]; then
   fail "--case must be a positive integer"
 fi
 
@@ -110,9 +122,14 @@ else
   esac
 fi
 
-is_valid_filename "$filename" || fail "filename must match [solved_]<difficulty>_<source>_<problem_id>_<descriptive_slug>.go with a zero-padded numeric ID"
+is_valid_filename "$filename" ||
+  fail "filename must match [solved_]<difficulty>_<source>_"\
+"<problem_id>_<descriptive_slug>.go with a zero-padded numeric ID"
 problem_file="$repository_root/problems/$filename"
 
 [[ -f $problem_file ]] || fail "$problem_file was not found"
 
-(cd "$repository_root" && ALGOS_RUN_PROBLEM_CASE_NUMBER=$case_number go run "$problem_file")
+(
+  cd "$repository_root"
+  ALGOS_RUN_PROBLEM_CASE_NUMBER=$case_number go run "$problem_file"
+)

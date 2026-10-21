@@ -15,14 +15,16 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Jump Game
 
 Source: LeetCode
 Problem ID: 55
 Source URL: https://leetcode.com/problems/jump-game/description/
 
-You are given an integer array nums. You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.
+You are given an integer array nums. You are initially positioned at
+the array's first index, and each element in the array represents your
+maximum jump length at that position.
 
 Return true if you can reach the last index, or false otherwise.
 
@@ -30,29 +32,33 @@ Example 1:
 
 Input: nums = [2,3,1,1,4]
 Output: true
-Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last
+index.
 
 Example 2:
 
 Input: nums = [3,2,1,0,4]
 Output: false
-Explanation: You will always arrive at index 3 no matter what. Its maximum jump length is 0, which makes it impossible to reach the last index.
+Explanation: You will always arrive at index 3 no matter what. Its
+maximum jump length is 0, which makes it impossible to reach the last
+index.
 
 Constraints:
 
 - 1 <= nums.length <= 10^4
 
 - 0 <= nums[i] <= 10^5
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseJumpGameInput(input string) []int {
 	var args []json.RawMessage
@@ -60,12 +66,18 @@ func parseJumpGameInput(input string) []int {
 		panic(fmt.Errorf("parse jump-game input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse jump-game input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse jump-game input: got %d arguments, "+
+			"want 1", len(args)))
 	}
 	var nums []int
 	argumentError0 := json.Unmarshal(args[0], &nums)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse jump-game argument nums: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse jump-game argument nums: %w",
+				argumentError0,
+			),
+		)
 	}
 	return nums
 }
@@ -90,8 +102,9 @@ func formatJumpGameOutput(result bool) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -146,8 +159,9 @@ var sampleCases = []testrunner.Case{
 	maximumJumpGameCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -156,17 +170,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	nums := parseJumpGameInput(input)
@@ -176,14 +194,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -210,11 +229,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

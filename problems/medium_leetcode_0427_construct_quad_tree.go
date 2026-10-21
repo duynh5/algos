@@ -15,22 +15,28 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Construct Quad Tree
 
 Source: LeetCode
 Problem ID: 427
-Source URL: https://leetcode.com/problems/construct-quad-tree/description/
+Source URL:
+https://leetcode.com/problems/construct-quad-tree/description/
 
-Given a n * n matrix grid of 0's and 1's only. We want to represent grid with a Quad-Tree.
+Given a n * n matrix grid of 0's and 1's only. We want to represent
+grid with a Quad-Tree.
 
 Return the root of the Quad-Tree representing grid.
 
-A Quad-Tree is a tree data structure in which each internal node has exactly four children. Besides, each node has two attributes:
+A Quad-Tree is a tree data structure in which each internal node has
+exactly four children. Besides, each node has two attributes:
 
-- val: True if the node represents a grid of 1's or False if the node represents a grid of 0's. Notice that you can assign the val to True or False when isLeaf is False, and both are accepted in the answer.
+- val: True if the node represents a grid of 1's or False if the node
+  represents a grid of 0's. Notice that you can assign the val to True
+  or False when isLeaf is False, and both are accepted in the answer.
 
-- isLeaf: True if the node is a leaf node on the tree or False if the node has four children.
+- isLeaf: True if the node is a leaf node on the tree or False if the
+  node has four children.
 
 class Node {
 public boolean val;
@@ -41,38 +47,60 @@ public Node bottomLeft;
 public Node bottomRight;
 }
 
-We can construct a Quad-Tree from a two-dimensional area using the following steps:
+We can construct a Quad-Tree from a two-dimensional area using the
+following steps:
 
-- If the current grid has the same value (i.e all 1's or all 0's) set isLeaf True and set val to the value of the grid and set the four children to Null and stop.
+- If the current grid has the same value (i.e all 1's or all 0's) set
+  isLeaf True and set val to the value of the grid and set the four
+  children to Null and stop.
 
-- If the current grid has different values, set isLeaf to False and set val to any value and divide the current grid into four sub-grids as shown in the photo.
+- If the current grid has different values, set isLeaf to False and
+  set val to any value and divide the current grid into four sub-grids
+  as shown in the photo.
 
 - Recurse for each of the children with the proper sub-grid.
 
-If you want to know more about the Quad-Tree, you can refer to the wiki.
+If you want to know more about the Quad-Tree, you can refer to the
+wiki.
 
 Quad-Tree format:
 
-You don't need to read this section for solving the problem. This is only if you want to understand the output format here. The output represents the serialized format of a Quad-Tree using level order traversal, where null signifies a path terminator where no node exists below.
+You don't need to read this section for solving the problem. This is
+only if you want to understand the output format here. The output
+represents the serialized format of a Quad-Tree using level order
+traversal, where null signifies a path terminator where no node exists
+below.
 
-It is very similar to the serialization of the binary tree. The only difference is that the node is represented as a list [isLeaf, val].
+It is very similar to the serialization of the binary tree. The only
+difference is that the node is represented as a list [isLeaf, val].
 
-If the value of isLeaf or val is True we represent it as 1 in the list [isLeaf, val] and if the value of isLeaf or val is False we represent it as 0.
+If the value of isLeaf or val is True we represent it as 1 in the list
+[isLeaf, val] and if the value of isLeaf or val is False we represent
+it as 0.
 
 Example 1:
 
 Input: grid = [[0,1],[1,0]]
 Output: [[0,1],[1,0],[1,1],[1,1],[1,0]]
 Explanation: The explanation of this example is shown below:
-Notice that 0 represents False and 1 represents True in the photo representing the Quad-Tree.
+Notice that 0 represents False and 1 represents True in the photo
+representing the Quad-Tree.
 
 Example 2:
 
-Input: grid = [[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0]]
-Output: [[0,1],[1,1],[0,1],[1,1],[1,0],null,null,null,null,[1,0],[1,0],[1,1],[1,1]]
-Explanation: All values in the grid are not the same. We divide the grid into four sub-grids.
+Input: grid =
+[[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],
+[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],
+[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],
+[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0]]
+Output:
+[[0,1],[1,1],[0,1],[1,1],[1,0],null,null,null,null,
+[1,0],[1,0],[1,1],[1,1]]
+Explanation: All values in the grid are not the same. We divide the
+grid into four sub-grids.
 The topLeft, bottomLeft and bottomRight each has the same value.
-The topRight have different values so we divide it into 4 sub-grids where each has the same value.
+The topRight have different values so we divide it into 4 sub-grids
+where each has the same value.
 Explanation is shown in the photo below:
 
 Constraints:
@@ -80,16 +108,17 @@ Constraints:
 - n == grid.length == grid[i].length
 
 - n == 2^x where 0 <= x <= 6
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type QuadNode struct {
 	Val                                        bool
@@ -103,12 +132,18 @@ func parseConstructQuadTreeInput(input string) [][]int {
 		panic(fmt.Errorf("parse construct-quad-tree input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse construct-quad-tree input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse construct-quad-tree input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	var grid [][]int
 	argumentError0 := json.Unmarshal(args[0], &grid)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse construct-quad-tree argument grid: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse construct-quad-tree argument grid: %w",
+				argumentError0,
+			),
+		)
 	}
 	return grid
 }
@@ -135,7 +170,13 @@ func formatConstructQuadTreeOutput(root *QuadNode) string {
 			leaf = 1
 			queue = append(queue, nil, nil, nil, nil)
 		} else {
-			queue = append(queue, node.TopLeft, node.TopRight, node.BottomLeft, node.BottomRight)
+			queue = append(
+				queue,
+				node.TopLeft,
+				node.TopRight,
+				node.BottomLeft,
+				node.BottomRight,
+			)
 		}
 		values = append(values, [2]int{leaf, value})
 	}
@@ -144,7 +185,9 @@ func formatConstructQuadTreeOutput(root *QuadNode) string {
 	}
 	output, err := json.Marshal(values)
 	if err != nil {
-		panic(fmt.Errorf("format construct-quad-tree output: %w", err))
+		panic(
+			fmt.Errorf("format construct-quad-tree output: %w", err),
+		)
 	}
 	return string(output)
 }
@@ -156,13 +199,24 @@ func maximumConstructQuadTreeCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{grid})
 	if err != nil {
-		panic(fmt.Errorf("build maximum construct-quad-tree input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum construct-quad-tree input: %w",
+				err,
+			),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum uniform grid collapses to one leaf", Input: string(input), Want: `[[1,0]]`}
+	return testrunner.Case{
+		Name: "Boundary: Maximum uniform grid collapses to " +
+			"one leaf",
+		Input: string(input),
+		Want:  `[[1,0]]`,
+	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -170,9 +224,13 @@ var sampleCases = []testrunner.Case{
 		Want:  `[[0,1],[1,0],[1,1],[1,1],[1,0]]`,
 	},
 	{
-		Name:  "Official example 2",
-		Input: `[[[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0]]]`,
-		Want:  `[[0,1],[1,1],[0,1],[1,1],[1,0],null,null,null,null,[1,0],[1,0],[1,1],[1,1]]`,
+		Name: "Official example 2",
+		Input: `[[[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,` +
+			`1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,0,0,0,` +
+			`0],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,` +
+			`1,1,0,0,0,0]]]`,
+		Want: `[[0,1],[1,1],[0,1],[1,1],[1,0],null,null,` +
+			`null,null,[1,0],[1,0],[1,1],[1,1]]`,
 	},
 	{
 		Name:  "Additional: Single zero cell",
@@ -202,8 +260,9 @@ var sampleCases = []testrunner.Case{
 	maximumConstructQuadTreeCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -212,17 +271,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	grid := parseConstructQuadTreeInput(input)
@@ -232,14 +295,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -266,11 +330,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

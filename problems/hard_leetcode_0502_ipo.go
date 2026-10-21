@@ -15,20 +15,29 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 IPO
 
 Source: LeetCode
 Problem ID: 502
 Source URL: https://leetcode.com/problems/ipo/description/
 
-Suppose LeetCode will start its IPO soon. In order to sell a good price of its shares to Venture Capital, LeetCode would like to work on some projects to increase its capital before the IPO. Since it has limited resources, it can only finish at most k distinct projects before the IPO. Help LeetCode design the best way to maximize its total capital after finishing at most k distinct projects.
+Suppose LeetCode will start its IPO soon. In order to sell a good
+price of its shares to Venture Capital, LeetCode would like to work on
+some projects to increase its capital before the IPO. Since it has
+limited resources, it can only finish at most k distinct projects
+before the IPO. Help LeetCode design the best way to maximize its
+total capital after finishing at most k distinct projects.
 
-You are given n projects where the i^th project has a pure profit profits[i] and a minimum capital of capital[i] is needed to start it.
+You are given n projects where the i^th project has a pure profit
+profits[i] and a minimum capital of capital[i] is needed to start it.
 
-Initially, you have w capital. When you finish a project, you will obtain its pure profit and the profit will be added to your total capital.
+Initially, you have w capital. When you finish a project, you will
+obtain its pure profit and the profit will be added to your total
+capital.
 
-Pick a list of at most k distinct projects from given projects to maximize your final capital, and return the final maximized capital.
+Pick a list of at most k distinct projects from given projects to
+maximize your final capital, and return the final maximized capital.
 
 The answer is guaranteed to fit in a 32-bit signed integer.
 
@@ -36,10 +45,14 @@ Example 1:
 
 Input: k = 2, w = 0, profits = [1,2,3], capital = [0,1,1]
 Output: 4
-Explanation: Since your initial capital is 0, you can only start the project indexed 0.
-After finishing it you will obtain profit 1 and your capital becomes 1.
-With capital 1, you can either start the project indexed 1 or the project indexed 2.
-Since you can choose at most 2 projects, you need to finish the project indexed 2 to get the maximum capital.
+Explanation: Since your initial capital is 0, you can only start the
+project indexed 0.
+After finishing it you will obtain profit 1 and your capital becomes
+1.
+With capital 1, you can either start the project indexed 1 or the
+project indexed 2.
+Since you can choose at most 2 projects, you need to finish the
+project indexed 2 to get the maximum capital.
 Therefore, output the final maximized capital, which is 0 + 1 + 3 = 4.
 
 Example 2:
@@ -62,16 +75,17 @@ Constraints:
 - 0 <= profits[i] <= 10^4
 
 - 0 <= capital[i] <= 10^9
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseIpoInput(input string) (int, int, []int, []int) {
 	var args []json.RawMessage
@@ -79,7 +93,12 @@ func parseIpoInput(input string) (int, int, []int, []int) {
 		panic(fmt.Errorf("parse ipo input: %w", err))
 	}
 	if len(args) != 4 {
-		panic(fmt.Sprintf("parse ipo input: got %d arguments, want 4", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse ipo input: got %d arguments, want 4",
+				len(args),
+			),
+		)
 	}
 	var k int
 	argumentError0 := json.Unmarshal(args[0], &k)
@@ -94,12 +113,22 @@ func parseIpoInput(input string) (int, int, []int, []int) {
 	var profits []int
 	argumentError2 := json.Unmarshal(args[2], &profits)
 	if argumentError2 != nil {
-		panic(fmt.Errorf("parse ipo argument profits: %w", argumentError2))
+		panic(
+			fmt.Errorf(
+				"parse ipo argument profits: %w",
+				argumentError2,
+			),
+		)
 	}
 	var capital []int
 	argumentError3 := json.Unmarshal(args[3], &capital)
 	if argumentError3 != nil {
-		panic(fmt.Errorf("parse ipo argument capital: %w", argumentError3))
+		panic(
+			fmt.Errorf(
+				"parse ipo argument capital: %w",
+				argumentError3,
+			),
+		)
 	}
 	return k, w, profits, capital
 }
@@ -125,8 +154,9 @@ func formatIpoOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -176,8 +206,9 @@ var sampleCases = []testrunner.Case{
 	makeMaximumIpoCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -186,17 +217,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	k, w, profits, capital := parseIpoInput(input)
@@ -209,14 +244,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -243,11 +279,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

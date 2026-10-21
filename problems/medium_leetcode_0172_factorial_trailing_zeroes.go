@@ -15,12 +15,13 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Factorial Trailing Zeroes
 
 Source: LeetCode
 Problem ID: 172
-Source URL: https://leetcode.com/problems/factorial-trailing-zeroes/description/
+Source URL:
+https://leetcode.com/problems/factorial-trailing-zeroes/description/
 
 Given an integer n, return the number of trailing zeroes in n!.
 
@@ -47,30 +48,43 @@ Constraints:
 
 - 0 <= n <= 10^4
 
-Follow up: Could you write a solution that works in logarithmic time complexity?
-===============================================================================
+Follow up: Could you write a solution that works in logarithmic time
+complexity?
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseFactorialTrailingZeroesInput(input string) int {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse factorial-trailing-zeroes input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse factorial-trailing-zeroes input: %w",
+				err,
+			),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse factorial-trailing-zeroes input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf("parse factorial-trailing-zeroes input: got "+
+				"%d arguments, want 1", len(args)),
+		)
 	}
 	var n int
 	argumentError0 := json.Unmarshal(args[0], &n)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse factorial-trailing-zeroes argument n: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse factorial-trailing-zeroes argument n: "+
+				"%w", argumentError0),
+		)
 	}
 	return n
 }
@@ -79,8 +93,9 @@ func formatFactorialTrailingZeroesOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -134,8 +149,9 @@ var sampleCases = []testrunner.Case{
 	},
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -144,17 +160,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	n := parseFactorialTrailingZeroesInput(input)
@@ -164,14 +184,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -198,11 +219,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

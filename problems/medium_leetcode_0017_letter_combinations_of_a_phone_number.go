@@ -15,16 +15,20 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Letter Combinations of a Phone Number
 
 Source: LeetCode
 Problem ID: 17
-Source URL: https://leetcode.com/problems/letter-combinations-of-a-phone-number/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0017
 
-Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent. Return the answer in any order.
+Given a string containing digits from 2-9 inclusive, return all
+possible letter combinations that the number could represent. Return
+the answer in any order.
 
-A mapping of digits to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.
+A mapping of digits to letters (just like on the telephone buttons) is
+given below. Note that 1 does not map to any letters.
 
 Example 1:
 
@@ -41,39 +45,55 @@ Constraints:
 - 1 <= digits.length <= 4
 
 - digits[i] is a digit in the range ['2', '9'].
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseLetterCombinationsOfAPhoneNumberInput(input string) string {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse letter-combinations-of-a-phone-number input: %w", err))
+		panic(
+			fmt.Errorf("parse letter-combinations-of-a-phone-number "+
+				"input: %w", err),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse letter-combinations-of-a-phone-number input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse letter-combinations-of-a-phone-number "+
+					"input: got %d arguments, want 1",
+				len(args),
+			),
+		)
 	}
 	var digits string
 	argumentError0 := json.Unmarshal(args[0], &digits)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse letter-combinations-of-a-phone-number argument digits: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse letter-combinations-of-a-phone-number "+
+				"argument digits: %w", argumentError0),
+		)
 	}
 	return digits
 }
 
-func formatLetterCombinationsOfAPhoneNumberOutput(result []string) string {
+func formatLetterCombinationsOfAPhoneNumberOutput(
+	result []string,
+) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -93,17 +113,20 @@ var sampleCases = []testrunner.Case{
 	{
 		Name:  "Additional: Two four-letter digits",
 		Input: `["79"]`,
-		Want:  `["pw","px","py","pz","qw","qx","qy","qz","rw","rx","ry","rz","sw","sx","sy","sz"]`,
+		Want: `["pw","px","py","pz","qw","qx","qy","qz",` +
+			`"rw","rx","ry","rz","sw","sx","sy","sz"]`,
 	},
 	{
-		Name:  "Additional: Repeated digit preserves every positional choice",
+		Name: "Additional: Repeated digit preserves every " +
+			"positional choice",
 		Input: `["22"]`,
 		Want:  `["aa","ab","ac","ba","bb","bc","ca","cb","cc"]`,
 	},
 	{
 		Name:  "Additional: Mixed three-letter and four-letter digits",
 		Input: `["27"]`,
-		Want:  `["ap","aq","ar","as","bp","bq","br","bs","cp","cq","cr","cs"]`,
+		Want: `["ap","aq","ar","as","bp","bq","br","bs",` +
+			`"cp","cq","cr","cs"]`,
 	},
 	{
 		Name:  "Additional: Remaining three-letter single digit",
@@ -113,12 +136,26 @@ var sampleCases = []testrunner.Case{
 	{
 		Name:  "Boundary: Maximum four-digit length",
 		Input: `["2345"]`,
-		Want:  `["adgj","adgk","adgl","adhj","adhk","adhl","adij","adik","adil","aegj","aegk","aegl","aehj","aehk","aehl","aeij","aeik","aeil","afgj","afgk","afgl","afhj","afhk","afhl","afij","afik","afil","bdgj","bdgk","bdgl","bdhj","bdhk","bdhl","bdij","bdik","bdil","begj","begk","begl","behj","behk","behl","beij","beik","beil","bfgj","bfgk","bfgl","bfhj","bfhk","bfhl","bfij","bfik","bfil","cdgj","cdgk","cdgl","cdhj","cdhk","cdhl","cdij","cdik","cdil","cegj","cegk","cegl","cehj","cehk","cehl","ceij","ceik","ceil","cfgj","cfgk","cfgl","cfhj","cfhk","cfhl","cfij","cfik","cfil"]`,
+		Want: `["adgj","adgk","adgl","adhj","adhk","adhl",` +
+			`"adij","adik","adil","aegj","aegk","aegl",` +
+			`"aehj","aehk","aehl","aeij","aeik","aeil",` +
+			`"afgj","afgk","afgl","afhj","afhk","afhl",` +
+			`"afij","afik","afil","bdgj","bdgk","bdgl",` +
+			`"bdhj","bdhk","bdhl","bdij","bdik","bdil",` +
+			`"begj","begk","begl","behj","behk","behl",` +
+			`"beij","beik","beil","bfgj","bfgk","bfgl",` +
+			`"bfhj","bfhk","bfhl","bfij","bfik","bfil",` +
+			`"cdgj","cdgk","cdgl","cdhj","cdhk","cdhl",` +
+			`"cdij","cdik","cdil","cegj","cegk","cegl",` +
+			`"cehj","cehk","cehl","ceij","ceik","ceil",` +
+			`"cfgj","cfgk","cfgl","cfhj","cfhk","cfhl",` +
+			`"cfij","cfik","cfil"]`,
 	},
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -127,17 +164,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	digits := parseLetterCombinationsOfAPhoneNumberInput(input)
@@ -147,14 +188,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -181,11 +223,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

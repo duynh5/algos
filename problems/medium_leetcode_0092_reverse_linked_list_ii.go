@@ -15,14 +15,17 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Reverse Linked List II
 
 Source: LeetCode
 Problem ID: 92
-Source URL: https://leetcode.com/problems/reverse-linked-list-ii/description/
+Source URL:
+https://leetcode.com/problems/reverse-linked-list-ii/description/
 
-Given the head of a singly linked list and two integers left and right where left <= right, reverse the nodes of the list from position left to position right, and return the reversed list.
+Given the head of a singly linked list and two integers left and right
+where left <= right, reverse the nodes of the list from position left
+to position right, and return the reversed list.
 
 Example 1:
 
@@ -45,43 +48,63 @@ Constraints:
 - 1 <= left <= right <= n
 
 Follow up: Could you do it in one pass?
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type ListNode struct {
 	Val  int
 	Next *ListNode
 }
 
-func parseReverseLinkedListIiInput(input string) (*ListNode, int, int) {
+func parseReverseLinkedListIiInput(
+	input string,
+) (*ListNode, int, int) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse reverse-linked-list-ii input: %w", err))
+		panic(
+			fmt.Errorf("parse reverse-linked-list-ii input: %w", err),
+		)
 	}
 	if len(args) != 3 {
-		panic(fmt.Sprintf("parse reverse-linked-list-ii input: got %d arguments, want 3", len(args)))
+		panic(
+			fmt.Sprintf("parse reverse-linked-list-ii input: got %d "+
+				"arguments, want 3", len(args)),
+		)
 	}
 	head, argumentError0 := decodeListNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse reverse-linked-list-ii argument head: %w", argumentError0))
+		panic(
+			fmt.Errorf("parse reverse-linked-list-ii argument head: "+
+				"%w", argumentError0),
+		)
 	}
 	var left int
 	argumentError1 := json.Unmarshal(args[1], &left)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse reverse-linked-list-ii argument left: %w", argumentError1))
+		panic(
+			fmt.Errorf("parse reverse-linked-list-ii argument left: "+
+				"%w", argumentError1),
+		)
 	}
 	var right int
 	argumentError2 := json.Unmarshal(args[2], &right)
 	if argumentError2 != nil {
-		panic(fmt.Errorf("parse reverse-linked-list-ii argument right: %w", argumentError2))
+		panic(
+			fmt.Errorf(
+				"parse reverse-linked-list-ii argument right: "+
+					"%w",
+				argumentError2,
+			),
+		)
 	}
 	return head, left, right
 }
@@ -104,13 +127,19 @@ func formatReverseLinkedListIiOutput(head *ListNode) string {
 	values := make([]int, 0)
 	for node := head; node != nil; node = node.Next {
 		if len(values) == 500 {
-			panic("format reverse-linked-list-ii output: list exceeds 500 nodes or contains a cycle")
+			panic("format reverse-linked-list-ii output: list " +
+				"exceeds 500 nodes or contains a cycle")
 		}
 		values = append(values, node.Val)
 	}
 	output, err := json.Marshal(values)
 	if err != nil {
-		panic(fmt.Errorf("format reverse-linked-list-ii output: %w", err))
+		panic(
+			fmt.Errorf(
+				"format reverse-linked-list-ii output: %w",
+				err,
+			),
+		)
 	}
 	return string(output)
 }
@@ -124,21 +153,32 @@ func maximumReverseLinkedListIiCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{values, 1, 500})
 	if err != nil {
-		panic(fmt.Errorf("build maximum reverse-linked-list-ii input: %w", err))
+		panic(
+			fmt.Errorf("build maximum reverse-linked-list-ii input: "+
+				"%w", err),
+		)
 	}
 	want, err := json.Marshal(wantValues)
 	if err != nil {
-		panic(fmt.Errorf("build maximum reverse-linked-list-ii output: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum reverse-linked-list-ii output: "+
+					"%w",
+				err,
+			),
+		)
 	}
 	return testrunner.Case{
-		Name:  "Boundary: Maximum list is reversed from first through last node",
+		Name: "Boundary: Maximum list is reversed from " +
+			"first through last node",
 		Input: string(input),
 		Want:  string(want),
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -188,8 +228,9 @@ var sampleCases = []testrunner.Case{
 	maximumReverseLinkedListIiCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -198,17 +239,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	head, left, right := parseReverseLinkedListIiInput(input)
@@ -220,14 +265,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -254,11 +300,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

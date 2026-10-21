@@ -16,7 +16,7 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Word Pattern
 
 Source: LeetCode
@@ -25,13 +25,15 @@ Source URL: https://leetcode.com/problems/word-pattern/description/
 
 Given a pattern and a string s, find if s follows the same pattern.
 
-Here follow means a full match, such that there is a bijection between a letter in pattern and a non-empty word in s. Specifically:
+Here follow means a full match, such that there is a bijection between
+a letter in pattern and a non-empty word in s. Specifically:
 
 - Each letter in pattern maps to exactly one unique word in s.
 
 - Each unique word in s maps to exactly one letter in pattern.
 
-- No two letters map to the same word, and no two words map to the same letter.
+- No two letters map to the same word, and no two words map to the
+  same letter.
 
 Example 1:
 
@@ -72,16 +74,17 @@ Constraints:
 - s does not contain any leading or trailing spaces.
 
 - All the words in s are separated by a single space.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseWordPatternInput(input string) (string, string) {
 	var args []json.RawMessage
@@ -89,17 +92,33 @@ func parseWordPatternInput(input string) (string, string) {
 		panic(fmt.Errorf("parse word-pattern input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse word-pattern input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse word-pattern input: got %d arguments, "+
+					"want 2",
+				len(args),
+			),
+		)
 	}
 	var pattern string
 	argumentError0 := json.Unmarshal(args[0], &pattern)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse word-pattern argument pattern: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse word-pattern argument pattern: %w",
+				argumentError0,
+			),
+		)
 	}
 	var s string
 	argumentError1 := json.Unmarshal(args[1], &s)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse word-pattern argument s: %w", argumentError1))
+		panic(
+			fmt.Errorf(
+				"parse word-pattern argument s: %w",
+				argumentError1,
+			),
+		)
 	}
 	return pattern, s
 }
@@ -111,12 +130,15 @@ func maximumWordPatternCase() testrunner.Case {
 	for index := range words {
 		words[index] = mapping[index%len(mapping)]
 	}
-	input, err := json.Marshal([]any{pattern, strings.Join(words, " ")})
+	input, err := json.Marshal(
+		[]any{pattern, strings.Join(words, " ")},
+	)
 	if err != nil {
 		panic(fmt.Errorf("build maximum word-pattern case: %w", err))
 	}
 	return testrunner.Case{
-		Name:  "Boundary: Maximum pattern length with near-maximum sentence",
+		Name: "Boundary: Maximum pattern length with near-" +
+			"maximum sentence",
 		Input: string(input),
 		Want:  `true`,
 	}
@@ -126,8 +148,9 @@ func formatWordPatternOutput(result bool) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -175,15 +198,17 @@ var sampleCases = []testrunner.Case{
 		Want:  `true`,
 	},
 	{
-		Name:  "Adversarial: Repeated palindrome pattern remains consistent",
+		Name: "Adversarial: Repeated palindrome pattern " +
+			"remains consistent",
 		Input: `["abcba","one two three two one"]`,
 		Want:  `true`,
 	},
 	maximumWordPatternCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -192,17 +217,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	pattern, s := parseWordPatternInput(input)
@@ -213,14 +242,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -247,11 +277,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

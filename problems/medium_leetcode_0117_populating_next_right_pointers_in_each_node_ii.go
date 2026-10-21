@@ -17,12 +17,13 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Populating Next Right Pointers in Each Node II
 
 Source: LeetCode
 Problem ID: 117
-Source URL: https://leetcode.com/problems/populating-next-right-pointers-in-each-node-ii/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0117
 
 Given a binary tree
 
@@ -33,7 +34,8 @@ Node *right;
 Node *next;
 }
 
-Populate each next pointer to point to its next right node. If there is no next right node, the next pointer should be set to NULL.
+Populate each next pointer to point to its next right node. If there
+is no next right node, the next pointer should be set to NULL.
 
 Initially, all next pointers are set to NULL.
 
@@ -41,7 +43,11 @@ Example 1:
 
 Input: root = [1,2,3,4,5,null,7]
 Output: [1,#,2,3,#,4,5,7,#]
-Explanation: Given the above binary tree (Figure A), your function should populate each next pointer to point to its next right node, just like in Figure B. The serialized output is in level order as connected by the next pointers, with '#' signifying the end of each level.
+Explanation: Given the above binary tree (Figure A), your function
+should populate each next pointer to point to its next right node,
+just like in Figure B. The serialized output is in level order as
+connected by the next pointers, with '#' signifying the end of each
+level.
 
 Example 2:
 
@@ -58,41 +64,64 @@ Follow-up:
 
 - You may only use constant extra space.
 
-- The recursive approach is fine. You may assume implicit stack space does not count as extra space for this problem.
-===============================================================================
+- The recursive approach is fine. You may assume implicit stack space
+  does not count as extra space for this problem.
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val               int
 	Left, Right, Next *TreeNode
 }
 
-func parsePopulatingNextRightPointersInEachNodeIiInput(input string) *TreeNode {
+func parsePopulatingNextRightPointersInEachNodeIiInput(
+	input string,
+) *TreeNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse populating-next-right-pointers-in-each-node-ii input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse populating-next-right-pointers-in-each-"+
+					"node-ii input: %w",
+				err,
+			),
+		)
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse populating-next-right-pointers-in-each-node-ii input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse populating-next-right-pointers-in-each-"+
+					"node-ii input: got %d arguments, want 1",
+				len(args),
+			),
+		)
 	}
 	root, argumentError0 := decodeTreeNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse populating-next-right-pointers-in-each-node-ii argument root: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse populating-next-right-pointers-in-each-"+
+					"node-ii argument root: %w",
+				argumentError0,
+			),
+		)
 	}
 	return root
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+	if err := json.Unmarshal(raw, &values); err != nil ||
+		len(values) == 0 {
 		return nil, err
 	}
 	if values[0] == nil {
@@ -120,7 +149,9 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
-func formatPopulatingNextRightPointersInEachNodeIiOutput(root *TreeNode) string {
+func formatPopulatingNextRightPointersInEachNodeIiOutput(
+	root *TreeNode,
+) string {
 	if root == nil {
 		return `[]`
 	}
@@ -143,22 +174,27 @@ func formatPopulatingNextRightPointersInEachNodeIiOutput(root *TreeNode) string 
 	return "[" + strings.Join(parts, ",") + "]"
 }
 
-func maximumPopulatingNextRightPointersInEachNodeIiCase() testrunner.Case {
+func maximumNextPointerCase() testrunner.Case {
 	values := make([]int, 6000)
 	parts := make([]string, 0, 6013)
 	for index := range values {
 		values[index] = index%201 - 100
 	}
-	for start, width := 0, 1; start < len(values); start, width = start+width, width*2 {
+	for start, width := 0, 1; start < len(values); {
 		end := min(start+width, len(values))
 		for _, value := range values[start:end] {
 			parts = append(parts, strconv.Itoa(value))
 		}
 		parts = append(parts, "#")
+		start += width
+		width *= 2
 	}
 	input, err := json.Marshal([]any{values})
 	if err != nil {
-		panic(fmt.Errorf("build maximum populate-next-pointers input: %w", err))
+		panic(
+			fmt.Errorf("build maximum populate-next-pointers input: "+
+				"%w", err),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum complete-prefix tree links every level",
@@ -167,8 +203,9 @@ func maximumPopulatingNextRightPointersInEachNodeIiCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -210,11 +247,12 @@ var sampleCases = []testrunner.Case{
 		Input: `[[100,-100,100,-100,null,null,-100]]`,
 		Want:  `[100,#,-100,100,#,-100,-100,#]`,
 	},
-	maximumPopulatingNextRightPointersInEachNodeIiCase(),
+	maximumNextPointerCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -223,17 +261,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	root := parsePopulatingNextRightPointersInEachNodeIiInput(input)
@@ -243,14 +285,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -277,11 +320,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -16,27 +16,33 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Design Add and Search Words Data Structure
 
 Source: LeetCode
 Problem ID: 211
-Source URL: https://leetcode.com/problems/design-add-and-search-words-data-structure/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0211
 
-Design a data structure that supports adding new words and finding if a string matches any previously added string.
+Design a data structure that supports adding new words and finding if
+a string matches any previously added string.
 
 Implement the WordDictionary class:
 
 - WordDictionary() Initializes the object.
 
-- void addWord(word) Adds word to the data structure, it can be matched later.
+- void addWord(word) Adds word to the data structure, it can be
+  matched later.
 
-- bool search(word) Returns true if there is any string in the data structure that matches word or false otherwise. word may contain dots '.' where dots can be matched with any letter.
+- bool search(word) Returns true if there is any string in the data
+  structure that matches word or false otherwise. word may contain
+  dots '.' where dots can be matched with any letter.
 
 Example:
 
 Input
-["WordDictionary","addWord","addWord","addWord","search","search","search","search"]
+["WordDictionary","addWord","addWord","addWord","search",
+"search","search","search"]
 [[],["bad"],["dad"],["mad"],["pad"],["bad"],[".ad"],["b.."]]
 Output
 [null,null,null,null,false,true,true,true]
@@ -62,37 +68,46 @@ Constraints:
 - There will be at most 2 dots in word for search queries.
 
 - At most 10^4 calls will be made to addWord and search.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
-func parseDesignAddAndSearchWordsDataStructureInput(input string) ([]string, [][]json.RawMessage) {
+func parseDesignAddAndSearchWordsDataStructureInput(
+	input string,
+) ([]string, [][]json.RawMessage) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse design-add-and-search-words-data-structure input: %w", err))
+		panic(fmt.Errorf("parse design-add-and-search-words-data-"+
+			"structure input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse design-add-and-search-words-data-structure input: got %d arguments, want 2", len(args)))
+		panic(fmt.Sprintf("parse design-add-and-search-words-data-"+
+			"structure input: got %d arguments, want 2", len(args)))
 	}
 	var operations []string
 	argumentError0 := json.Unmarshal(args[0], &operations)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse design-add-and-search-words-data-structure argument operations: %w", argumentError0))
+		panic(fmt.Errorf("parse design-add-and-search-words-data-"+
+			"structure argument operations: %w", argumentError0))
 	}
 	var arguments [][]json.RawMessage
 	argumentError1 := json.Unmarshal(args[1], &arguments)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse design-add-and-search-words-data-structure argument arguments: %w", argumentError1))
+		panic(fmt.Errorf("parse design-add-and-search-words-data-"+
+			"structure argument arguments: %w", argumentError1))
 	}
 	if len(operations) != len(arguments) {
-		panic(fmt.Sprintf("parse design-add-and-search-words-data-structure input: got %d operations and %d argument lists", len(operations), len(arguments)))
+		panic(fmt.Sprintf("parse design-add-and-search-words-data-"+
+			"structure input: got %d operations and %d "+
+			"argument lists", len(operations), len(arguments)))
 	}
 	return operations, arguments
 }
@@ -102,11 +117,26 @@ func maximumLengthWordDictionaryCase() testrunner.Case {
 	twoWildcardQuery := "." + strings.Repeat("a", 23) + "."
 	otherWord := strings.Repeat("a", 24) + "b"
 	input, err := json.Marshal([]any{
-		[]string{"WordDictionary", "addWord", "search", "search", "search"},
-		[]any{[]any{}, []any{word}, []any{word}, []any{twoWildcardQuery}, []any{otherWord}},
+		[]string{
+			"WordDictionary",
+			"addWord",
+			"search",
+			"search",
+			"search",
+		},
+		[]any{
+			[]any{},
+			[]any{word},
+			[]any{word},
+			[]any{twoWildcardQuery},
+			[]any{otherWord},
+		},
 	})
 	if err != nil {
-		panic(fmt.Errorf("build maximum-length word-dictionary case: %w", err))
+		panic(
+			fmt.Errorf("build maximum-length word-dictionary case: "+
+				"%w", err),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum-length word and two wildcards",
@@ -115,58 +145,74 @@ func maximumLengthWordDictionaryCase() testrunner.Case {
 	}
 }
 
-func formatDesignAddAndSearchWordsDataStructureOutput(result []any) string {
+func formatDesignAddAndSearchWordsDataStructureOutput(
+	result []any,
+) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
-		Name:  "Official example 1",
-		Input: `[["WordDictionary","addWord","addWord","addWord","search","search","search","search"],[[],["bad"],["dad"],["mad"],["pad"],["bad"],[".ad"],["b.."]]]`,
-		Want:  `[null,null,null,null,false,true,true,true]`,
+		Name: "Official example 1",
+		Input: `[["WordDictionary","addWord","addWord",` +
+			`"addWord","search","search","search",` +
+			`"search"],[[],["bad"],["dad"],["mad"],` +
+			`["pad"],["bad"],[".ad"],["b.."]]]`,
+		Want: `[null,null,null,null,false,true,true,true]`,
 	},
 	{
-		Name:  "Additional: Length must match",
-		Input: `[["WordDictionary","addWord","search","search"],[[],["a"],["."],[".."]]]`,
-		Want:  `[null,null,true,false]`,
+		Name: "Additional: Length must match",
+		Input: `[["WordDictionary","addWord","search",` +
+			`"search"],[[],["a"],["."],[".."]]]`,
+		Want: `[null,null,true,false]`,
 	},
 	{
-		Name:  "Additional: Wildcard in the middle",
-		Input: `[["WordDictionary","addWord","search","search"],[[],["cat"],["c.t"],["..t"]]]`,
-		Want:  `[null,null,true,true]`,
+		Name: "Additional: Wildcard in the middle",
+		Input: `[["WordDictionary","addWord","search",` +
+			`"search"],[[],["cat"],["c.t"],["..t"]]]`,
+		Want: `[null,null,true,true]`,
 	},
 	{
-		Name:  "Additional: Queries before first insertion",
-		Input: `[["WordDictionary","search","addWord","search"],[[],["a"],["a"],["a"]]]`,
-		Want:  `[null,false,null,true]`,
+		Name: "Additional: Queries before first insertion",
+		Input: `[["WordDictionary","search","addWord",` +
+			`"search"],[[],["a"],["a"],["a"]]]`,
+		Want: `[null,false,null,true]`,
 	},
 	{
-		Name:  "Additional: One-character wildcard",
-		Input: `[["WordDictionary","addWord","search","search"],[[],["a"],["."],["b"]]]`,
-		Want:  `[null,null,true,false]`,
+		Name: "Additional: One-character wildcard",
+		Input: `[["WordDictionary","addWord","search",` +
+			`"search"],[[],["a"],["."],["b"]]]`,
+		Want: `[null,null,true,false]`,
 	},
 	{
-		Name:  "Additional: Wildcards at both ends",
-		Input: `[["WordDictionary","addWord","search","search"],[[],["code"],[".od."],["c..e"]]]`,
-		Want:  `[null,null,true,true]`,
+		Name: "Additional: Wildcards at both ends",
+		Input: `[["WordDictionary","addWord","search",` +
+			`"search"],[[],["code"],[".od."],["c..e"]]]`,
+		Want: `[null,null,true,true]`,
 	},
 	{
-		Name:  "Additional: Wildcard explores sibling branches",
-		Input: `[["WordDictionary","addWord","addWord","addWord","search","search","search"],[[],["bad"],["bed"],["bid"],["b.d"],[".ed"],["b.."]]]`,
-		Want:  `[null,null,null,null,true,true,true]`,
+		Name: "Additional: Wildcard explores sibling branches",
+		Input: `[["WordDictionary","addWord","addWord",` +
+			`"addWord","search","search","search"],[[],` +
+			`["bad"],["bed"],["bid"],["b.d"],[".ed"],` +
+			`["b.."]]]`,
+		Want: `[null,null,null,null,true,true,true]`,
 	},
 	{
-		Name:  "Additional: Duplicate insertion is idempotent",
-		Input: `[["WordDictionary","addWord","addWord","search"],[[],["same"],["same"],["same"]]]`,
-		Want:  `[null,null,null,true]`,
+		Name: "Additional: Duplicate insertion is idempotent",
+		Input: `[["WordDictionary","addWord","addWord",` +
+			`"search"],[[],["same"],["same"],["same"]]]`,
+		Want: `[null,null,null,true]`,
 	},
 	maximumLengthWordDictionaryCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -175,20 +221,27 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
-	operations, arguments := parseDesignAddAndSearchWordsDataStructureInput(input)
+	operations, arguments :=
+		parseDesignAddAndSearchWordsDataStructureInput(
+			input,
+		)
 	_ = operations
 	_ = arguments
 
@@ -196,14 +249,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -230,11 +284,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

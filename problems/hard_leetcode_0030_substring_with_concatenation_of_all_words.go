@@ -17,20 +17,27 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Substring with Concatenation of All Words
 
 Source: LeetCode
 Problem ID: 30
-Source URL: https://leetcode.com/problems/substring-with-concatenation-of-all-words/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0030
 
-You are given a string s and an array of strings words. All the strings of words are of the same length.
+You are given a string s and an array of strings words. All the
+strings of words are of the same length.
 
-A concatenated string is a string that exactly contains all the strings of any permutation of words concatenated.
+A concatenated string is a string that exactly contains all the
+strings of any permutation of words concatenated.
 
-- For example, if words = ["ab","cd","ef"], then "abcdef", "abefcd", "cdabef", "cdefab", "efabcd", and "efcdab" are all concatenated strings. "acdbef" is not a concatenated string because it is not the concatenation of any permutation of words.
+- For example, if words = ["ab","cd","ef"], then "abcdef", "abefcd",
+  "cdabef", "cdefab", "efabcd", and "efcdab" are all concatenated
+  strings. "acdbef" is not a concatenated string because it is not the
+  concatenation of any permutation of words.
 
-Return an array of the starting indices of all the concatenated substrings in s. You can return the answer in any order.
+Return an array of the starting indices of all the concatenated
+substrings in s. You can return the answer in any order.
 
 Example 1:
 
@@ -40,13 +47,16 @@ Output: [0,9]
 
 Explanation:
 
-The substring starting at 0 is "barfoo". It is the concatenation of ["bar","foo"] which is a permutation of words.
+The substring starting at 0 is "barfoo". It is the concatenation of
+["bar","foo"] which is a permutation of words.
 
-The substring starting at 9 is "foobar". It is the concatenation of ["foo","bar"] which is a permutation of words.
+The substring starting at 9 is "foobar". It is the concatenation of
+["foo","bar"] which is a permutation of words.
 
 Example 2:
 
-Input: s = "wordgoodgoodgoodbestword", words = ["word","good","best","word"]
+Input: s = "wordgoodgoodgoodbestword", words =
+["word","good","best","word"]
 
 Output: []
 
@@ -62,11 +72,14 @@ Output: [6,9,12]
 
 Explanation:
 
-The substring starting at 6 is "foobarthe". It is the concatenation of ["foo","bar","the"].
+The substring starting at 6 is "foobarthe". It is the concatenation of
+["foo","bar","the"].
 
-The substring starting at 9 is "barthefoo". It is the concatenation of ["bar","the","foo"].
+The substring starting at 9 is "barthefoo". It is the concatenation of
+["bar","the","foo"].
 
-The substring starting at 12 is "thefoobar". It is the concatenation of ["the","foo","bar"].
+The substring starting at 12 is "thefoobar". It is the concatenation
+of ["the","foo","bar"].
 
 Constraints:
 
@@ -77,58 +90,88 @@ Constraints:
 - 1 <= words[i].length <= 30
 
 - s and words[i] consist of lowercase English letters.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
-func parseSubstringWithConcatenationOfAllWordsInput(input string) (string, []string) {
+func parseSubstringWithConcatenationOfAllWordsInput(
+	input string,
+) (string, []string) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse substring-with-concatenation-of-all-words input: %w", err))
+		panic(fmt.Errorf("parse substring-with-concatenation-of-all-"+
+			"words input: %w", err))
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse substring-with-concatenation-of-all-words input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf("parse substring-with-concatenation-of-all-"+
+				"words input: got %d arguments, want 2", len(args)),
+		)
 	}
 	var s string
 	argumentError0 := json.Unmarshal(args[0], &s)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse substring-with-concatenation-of-all-words argument s: %w", argumentError0))
+		panic(fmt.Errorf("parse substring-with-concatenation-of-all-"+
+			"words argument s: %w", argumentError0))
 	}
 	var words []string
 	argumentError1 := json.Unmarshal(args[1], &words)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse substring-with-concatenation-of-all-words argument words: %w", argumentError1))
+		panic(fmt.Errorf("parse substring-with-concatenation-of-all-"+
+			"words argument words: %w", argumentError1))
 	}
 	return s, words
 }
 
-func formatSubstringWithConcatenationOfAllWordsOutput(indices []int) string {
+func formatSubstringWithConcatenationOfAllWordsOutput(
+	indices []int,
+) string {
 	sorted := append([]int(nil), indices...)
 	sort.Ints(sorted)
 	encoded, err := json.Marshal(sorted)
 	if err != nil {
-		panic(fmt.Errorf("format substring-with-concatenation output: %w", err))
+		panic(
+			fmt.Errorf("format substring-with-concatenation output: "+
+				"%w", err),
+		)
 	}
 	return string(encoded)
 }
 
-func makeSubstringConcatenationCase(name, s string, words []string, want []int) testrunner.Case {
+func makeSubstringConcatenationCase(
+	name, s string,
+	words []string,
+	want []int,
+) testrunner.Case {
 	input, err := json.Marshal([]any{s, words})
 	if err != nil {
-		panic(fmt.Errorf("build substring-with-concatenation input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build substring-with-concatenation input: %w",
+				err,
+			),
+		)
 	}
 	expected, err := json.Marshal(want)
 	if err != nil {
-		panic(fmt.Errorf("build substring-with-concatenation output: %w", err))
+		panic(
+			fmt.Errorf("build substring-with-concatenation output: "+
+				"%w", err),
+		)
 	}
-	return testrunner.Case{Name: name, Input: string(input), Want: string(expected)}
+	return testrunner.Case{
+		Name:  name,
+		Input: string(input),
+		Want:  string(expected),
+	}
 }
 
 func makeMaximumSubstringConcatenationCase() testrunner.Case {
@@ -143,15 +186,17 @@ func makeMaximumSubstringConcatenationCase() testrunner.Case {
 		want[index] = index
 	}
 	return makeSubstringConcatenationCase(
-		"Additional: Maximum source and word count with overlapping matches",
+		"Additional: Maximum source and word count "+
+			"with overlapping matches",
 		strings.Repeat("a", sourceLength),
 		words,
 		want,
 	)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -199,15 +244,18 @@ var sampleCases = []testrunner.Case{
 		Want:  `[6]`,
 	},
 	{
-		Name:  "Additional: Maximum word length",
-		Input: `["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"]]`,
-		Want:  `[0]`,
+		Name: "Additional: Maximum word length",
+		Input: `["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbb` +
+			`bbbbbbbbbbbbbbbbbb",["aaaaaaaaaaaaaaaaaaaaaa` +
+			`aaaaaaaa","bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"]]`,
+		Want: `[0]`,
 	},
 	makeMaximumSubstringConcatenationCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -216,17 +264,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	s, words := parseSubstringWithConcatenationOfAllWordsInput(input)
@@ -237,14 +289,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -271,11 +324,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

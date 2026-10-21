@@ -8,7 +8,7 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 PASTE THE COMPLETE PROBLEM BELOW THIS LINE
 
 Source: LeetCode
@@ -16,24 +16,28 @@ Problem ID:
 Source URL:
 
 PASTE THE COMPLETE PROBLEM ABOVE THIS LINE
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem, such as parseTwoSumInput. Put setup used only by the
-// current attempt at the top of solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem, such as parseTwoSumInput. Put
+// setup
+// used only by the current attempt at the top of
+// solveCurrentAttempt below.
 
-// formatCurrentProblemOutput serializes ordinary scalar, slice, and matrix
-// results for the test runner. Rename it for the problem and replace its body
-// only when the judge uses a structural or custom output representation.
+// formatCurrentProblemOutput serializes ordinary scalar, slice, and
+// matrix results for the test runner. Rename it for the problem and
+// replace its body only when the judge uses a structural or custom
+// output representation.
 func formatCurrentProblemOutput(result any) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Add one entry per example. Encode arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Add one entry per example. Encode arguments as a
+// positional JSON array.
 var sampleCases = []testrunner.Case{
 	// {
 	// 	Name:  "Example 1",
@@ -42,9 +46,9 @@ var sampleCases = []testrunner.Case{
 	// },
 }
 
-// archiveReady is set to true only after the problem, samples, preserved
-// current attempt, three agent solutions, analysis, and regression coverage
-// are complete and verified.
+// archiveReady is set to true only after the problem, samples,
+// preserved current attempt, three agent solutions, analysis, and
+// regression coverage are complete and verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -53,43 +57,49 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions contains three implementations authored during review: a
-// direct approach, an improved approach, and the preferred approach.
+// agentSolutions contains three implementations authored during
+// review: a direct approach, an improved approach, and the preferred
+// approach.
 var agentSolutions = []testrunner.Solution{}
 
-// solutions keeps the user's attempt separate while running every case against
-// it and all three agent-authored approaches.
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+// solutions keeps the user's attempt separate while running every
+// case against it and all three agent-authored approaches.
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Preserve this function's algorithm body during review. Add agent-authored
-// implementations in the separate section below, even when one uses the same
-// algorithmic method.
-// =============================================================================
+// Preserve this function's algorithm body during review. Add
+// agent-authored implementations in the separate section below, even
+// when one uses the same algorithmic method.
+// ===================================================================
 
-// solveCurrentAttempt is the only function you need to change initially. It
-// receives the exact sample input string and returns the expected output form.
-// Parse with the problem-specific adapter above, keep the algorithm strongly
-// typed, and pass the result to the problem-specific output formatter.
-// Leading and trailing whitespace is ignored during comparison; internal
-// whitespace remains significant.
+// solveCurrentAttempt is the only function you need to change
+// initially. It receives the exact sample input string and returns
+// the expected output form. Parse with the problem-specific adapter,
+// keep the algorithm strongly typed, and pass the result to the
+// problem-specific output formatter. Leading and trailing whitespace
+// is ignored during comparison; internal whitespace remains
+// significant.
 func solveCurrentAttempt(input string) string {
 	// Parse input, implement your algorithm, then return
 	// formatCurrentProblemOutput(result).
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Add the direct, improved, and preferred implementations here during review.
-// Keep parsing helpers and judge-owned types in the compact support block above.
-// =============================================================================
+// Add the direct, improved, and preferred implementations here during
+// review. Keep parsing helpers and judge-owned types in the compact
+// support block above.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -116,11 +126,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

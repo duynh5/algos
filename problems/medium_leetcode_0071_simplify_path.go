@@ -16,14 +16,16 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Simplify Path
 
 Source: LeetCode
 Problem ID: 71
 Source URL: https://leetcode.com/problems/simplify-path/description/
 
-You are given an absolute path for a Unix-style file system, which always begins with a slash '/'. Your task is to transform this absolute path into its simplified canonical path.
+You are given an absolute path for a Unix-style file system, which
+always begins with a slash '/'. Your task is to transform this
+absolute path into its simplified canonical path.
 
 The rules of a Unix-style file system are as follows:
 
@@ -31,19 +33,25 @@ The rules of a Unix-style file system are as follows:
 
 - A double period '..' represents the previous/parent directory.
 
-- Multiple consecutive slashes such as '//' and '///' are treated as a single slash '/'.
+- Multiple consecutive slashes such as '//' and '///' are treated as a
+  single slash '/'.
 
-- Any sequence of periods that does not match the rules above should be treated as a valid directory or file name. For example, '...' and '....' are valid directory or file names.
+- Any sequence of periods that does not match the rules above should
+  be treated as a valid directory or file name. For example, '...' and
+  '....' are valid directory or file names.
 
 The simplified canonical path should follow these rules:
 
 - The path must start with a single slash '/'.
 
-- Directories within the path must be separated by exactly one slash '/'.
+- Directories within the path must be separated by exactly one slash
+  '/'.
 
-- The path must not end with a slash '/', unless it is the root directory.
+- The path must not end with a slash '/', unless it is the root
+  directory.
 
-- The path must not have any single or double periods ('.' and '..') used to denote current or parent directories.
+- The path must not have any single or double periods ('.' and '..')
+  used to denote current or parent directories.
 
 Return the simplified canonical path.
 
@@ -75,7 +83,8 @@ Output: "/home/user/Pictures"
 
 Explanation:
 
-A double period ".." refers to the directory up a level (the parent directory).
+A double period ".." refers to the directory up a level (the parent
+directory).
 
 Example 4:
 
@@ -101,19 +110,21 @@ Constraints:
 
 - 1 <= path.length <= 3000
 
-- path consists of English letters, digits, period '.', slash '/' or '_'.
+- path consists of English letters, digits, period '.', slash '/' or
+  '_'.
 
 - path is a valid absolute Unix path.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseSimplifyPathInput(input string) string {
 	var args []json.RawMessage
@@ -121,12 +132,23 @@ func parseSimplifyPathInput(input string) string {
 		panic(fmt.Errorf("parse simplify-path input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse simplify-path input: got %d arguments, want 1", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse simplify-path input: got %d arguments, "+
+					"want 1",
+				len(args),
+			),
+		)
 	}
 	var path string
 	argumentError0 := json.Unmarshal(args[0], &path)
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse simplify-path argument path: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse simplify-path argument path: %w",
+				argumentError0,
+			),
+		)
 	}
 	return path
 }
@@ -143,7 +165,9 @@ func maximumSimplifyPathCase() testrunner.Case {
 	path := strings.Repeat("/", 3000)
 	input, err := json.Marshal([]any{path})
 	if err != nil {
-		panic(fmt.Errorf("build maximum simplify-path input: %w", err))
+		panic(
+			fmt.Errorf("build maximum simplify-path input: %w", err),
+		)
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum-length separator-only path is root",
@@ -152,8 +176,9 @@ func maximumSimplifyPathCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -201,17 +226,20 @@ var sampleCases = []testrunner.Case{
 		Want:  `"/"`,
 	},
 	{
-		Name:  "Additional: Current and parent segments cancel nested names",
+		Name: "Additional: Current and parent segments " +
+			"cancel nested names",
 		Input: `["/a/./b/../../c/"]`,
 		Want:  `"/c"`,
 	},
 	{
-		Name:  "Adversarial: Multi-dot segments other than two dots are names",
+		Name: "Adversarial: Multi-dot segments other than " +
+			"two dots are names",
 		Input: `["/..hidden/.../..x/...."]`,
 		Want:  `"/..hidden/.../..x/...."`,
 	},
 	{
-		Name:  "Additional: Digits and underscores remain in directory names",
+		Name: "Additional: Digits and underscores remain in " +
+			"directory names",
 		Input: `["/a_1//b2/../c_3"]`,
 		Want:  `"/a_1/c_3"`,
 	},
@@ -223,8 +251,9 @@ var sampleCases = []testrunner.Case{
 	maximumSimplifyPathCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -233,17 +262,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	path := parseSimplifyPathInput(input)
@@ -253,14 +286,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -287,11 +321,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -15,18 +15,23 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Reverse Nodes in k-Group
 
 Source: LeetCode
 Problem ID: 25
-Source URL: https://leetcode.com/problems/reverse-nodes-in-k-group/description/
+Source URL:
+https://leetcode.com/problems/reverse-nodes-in-k-group/description/
 
-Given the head of a linked list, reverse the nodes of the list k at a time, and return the modified list.
+Given the head of a linked list, reverse the nodes of the list k at a
+time, and return the modified list.
 
-k is a positive integer and is less than or equal to the length of the linked list. If the number of nodes is not a multiple of k then left-out nodes, in the end, should remain as it is.
+k is a positive integer and is less than or equal to the length of the
+linked list. If the number of nodes is not a multiple of k then
+left-out nodes, in the end, should remain as it is.
 
-You may not alter the values in the list's nodes, only nodes themselves may be changed.
+You may not alter the values in the list's nodes, only nodes
+themselves may be changed.
 
 Example 1:
 
@@ -47,16 +52,17 @@ Constraints:
 - 0 <= Node.val <= 1000
 
 Follow-up: Can you solve the problem in O(1) extra memory space?
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type ListNode struct {
 	Val  int
@@ -66,19 +72,34 @@ type ListNode struct {
 func parseReverseNodesInKGroupInput(input string) (*ListNode, int) {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse reverse-nodes-in-k-group input: %w", err))
+		panic(
+			fmt.Errorf(
+				"parse reverse-nodes-in-k-group input: %w",
+				err,
+			),
+		)
 	}
 	if len(args) != 2 {
-		panic(fmt.Sprintf("parse reverse-nodes-in-k-group input: got %d arguments, want 2", len(args)))
+		panic(
+			fmt.Sprintf(
+				"parse reverse-nodes-in-k-group input: got %d "+
+					"arguments, want 2",
+				len(args),
+			),
+		)
 	}
 	head, argumentError0 := decodeListNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse reverse-nodes-in-k-group argument head: %w", argumentError0))
+		panic(fmt.Errorf("parse reverse-nodes-in-k-group argument "+
+			"head: %w", argumentError0))
 	}
 	var k int
 	argumentError1 := json.Unmarshal(args[1], &k)
 	if argumentError1 != nil {
-		panic(fmt.Errorf("parse reverse-nodes-in-k-group argument k: %w", argumentError1))
+		panic(
+			fmt.Errorf("parse reverse-nodes-in-k-group argument k: "+
+				"%w", argumentError1),
+		)
 	}
 	return head, k
 }
@@ -104,25 +125,50 @@ func formatReverseNodesInKGroupOutput(head *ListNode) string {
 		head = head.Next
 	}
 	if head != nil {
-		panic("format reverse-nodes-in-k-group output: list exceeds 5000 nodes or contains a cycle")
+		panic("format reverse-nodes-in-k-group output: list " +
+			"exceeds 5000 nodes or contains a cycle")
 	}
 	encoded, err := json.Marshal(values)
 	if err != nil {
-		panic(fmt.Errorf("format reverse-nodes-in-k-group output: %w", err))
+		panic(
+			fmt.Errorf(
+				"format reverse-nodes-in-k-group output: %w",
+				err,
+			),
+		)
 	}
 	return string(encoded)
 }
 
-func makeReverseNodesInKGroupCase(name string, values []int, k int, want []int) testrunner.Case {
+func makeReverseNodesInKGroupCase(
+	name string,
+	values []int,
+	k int,
+	want []int,
+) testrunner.Case {
 	input, err := json.Marshal([]any{values, k})
 	if err != nil {
-		panic(fmt.Errorf("build reverse-nodes-in-k-group input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build reverse-nodes-in-k-group input: %w",
+				err,
+			),
+		)
 	}
 	expected, err := json.Marshal(want)
 	if err != nil {
-		panic(fmt.Errorf("build reverse-nodes-in-k-group output: %w", err))
+		panic(
+			fmt.Errorf(
+				"build reverse-nodes-in-k-group output: %w",
+				err,
+			),
+		)
 	}
-	return testrunner.Case{Name: name, Input: string(input), Want: string(expected)}
+	return testrunner.Case{
+		Name:  name,
+		Input: string(input),
+		Want:  string(expected),
+	}
 }
 
 func makeMaximumReverseNodesInKGroupCase() testrunner.Case {
@@ -134,11 +180,17 @@ func makeMaximumReverseNodesInKGroupCase() testrunner.Case {
 	for index := range values {
 		want[index] = values[len(values)-1-index]
 	}
-	return makeReverseNodesInKGroupCase("Additional: Constraint maximum single group", values, len(values), want)
+	return makeReverseNodesInKGroupCase(
+		"Additional: Constraint maximum single group",
+		values,
+		len(values),
+		want,
+	)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -188,8 +240,9 @@ var sampleCases = []testrunner.Case{
 	makeMaximumReverseNodesInKGroupCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -198,17 +251,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	head, k := parseReverseNodesInKGroupInput(input)
@@ -219,14 +276,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -253,11 +311,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

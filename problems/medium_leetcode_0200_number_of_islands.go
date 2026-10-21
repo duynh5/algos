@@ -15,16 +15,20 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Number of Islands
 
 Source: LeetCode
 Problem ID: 200
-Source URL: https://leetcode.com/problems/number-of-islands/description/
+Source URL:
+https://leetcode.com/problems/number-of-islands/description/
 
-Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water), return the number of islands.
+Given an m x n 2D binary grid grid which represents a map of '1's
+(land) and '0's (water), return the number of islands.
 
-An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+An island is surrounded by water and is formed by connecting adjacent
+lands horizontally or vertically. You may assume all four edges of the
+grid are all surrounded by water.
 
 Example 1:
 
@@ -55,16 +59,17 @@ Constraints:
 - 1 <= m, n <= 300
 
 - grid[i][j] is '0' or '1'.
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 func parseNumberOfIslandsInput(input string) [][]byte {
 	var args []json.RawMessage
@@ -72,11 +77,17 @@ func parseNumberOfIslandsInput(input string) [][]byte {
 		panic(fmt.Errorf("parse number-of-islands input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse number-of-islands input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse number-of-islands input: got %d "+
+			"arguments, want 1", len(args)))
 	}
 	grid, argumentError0 := decodeCharacterMatrix(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse number-of-islands argument grid: %w", argumentError0))
+		panic(
+			fmt.Errorf(
+				"parse number-of-islands argument grid: %w",
+				argumentError0,
+			),
+		)
 	}
 	return grid
 }
@@ -91,7 +102,11 @@ func decodeCharacterMatrix(raw json.RawMessage) ([][]byte, error) {
 		result[row] = make([]byte, len(rows[row]))
 		for column, value := range rows[row] {
 			if len(value) != 1 {
-				return nil, fmt.Errorf("cell (%d,%d) is not one character", row, column)
+				return nil, fmt.Errorf(
+					"cell (%d,%d) is not one character",
+					row,
+					column,
+				)
 			}
 			result[row][column] = value[0]
 		}
@@ -113,27 +128,41 @@ func maximumNumberOfIslandsCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{grid})
 	if err != nil {
-		panic(fmt.Errorf("build maximum number-of-islands input: %w", err))
+		panic(
+			fmt.Errorf(
+				"build maximum number-of-islands input: %w",
+				err,
+			),
+		)
 	}
-	return testrunner.Case{Name: "Boundary: Maximum checkerboard grid", Input: string(input), Want: `45000`}
+	return testrunner.Case{
+		Name:  "Boundary: Maximum checkerboard grid",
+		Input: string(input),
+		Want:  `45000`,
+	}
 }
 
 func formatNumberOfIslandsOutput(result int) string {
 	return testrunner.FormatJSONOutput(result)
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
-		Name:  "Official example 1",
-		Input: `[[["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]]`,
-		Want:  `1`,
+		Name: "Official example 1",
+		Input: `[[["1","1","1","1","0"],["1","1","0","1",` +
+			`"0"],["1","1","0","0","0"],["0","0","0","0",` +
+			`"0"]]]`,
+		Want: `1`,
 	},
 	{
-		Name:  "Official example 2",
-		Input: `[[["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]]`,
-		Want:  `3`,
+		Name: "Official example 2",
+		Input: `[[["1","1","0","0","0"],["1","1","0","0",` +
+			`"0"],["0","0","1","0","0"],["0","0","0","1",` +
+			`"1"]]]`,
+		Want: `3`,
 	},
 	{
 		Name:  "Additional: Single water cell",
@@ -173,8 +202,9 @@ var sampleCases = []testrunner.Case{
 	maximumNumberOfIslandsCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -183,17 +213,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	grid := parseNumberOfIslandsInput(input)
@@ -203,14 +237,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -237,11 +272,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}

@@ -15,20 +15,24 @@ import (
 )
 
 /*
-===============================================================================
+======================================================================
 Average of Levels in Binary Tree
 
 Source: LeetCode
 Problem ID: 637
-Source URL: https://leetcode.com/problems/average-of-levels-in-binary-tree/description/
+Source URL:
+../CONCEPTS_LINKS.md#leetcode-source-0637
 
-Given the root of a binary tree, return the average value of the nodes on each level in the form of an array. Answers within 10^-5 of the actual answer will be accepted.
+Given the root of a binary tree, return the average value of the nodes
+on each level in the form of an array. Answers within 10^-5 of the
+actual answer will be accepted.
 
 Example 1:
 
 Input: root = [3,9,20,null,null,15,7]
 Output: [3.00000,14.50000,11.00000]
-Explanation: The average value of nodes on level 0 is 3, on level 1 is 14.5, and on level 2 is 11.
+Explanation: The average value of nodes on level 0 is 3, on level 1 is
+14.5, and on level 2 is 11.
 Hence return [3, 14.5, 11].
 
 Example 2:
@@ -41,16 +45,17 @@ Constraints:
 - The number of nodes in the tree is in the range [1, 10^4].
 
 - -2^31 <= Node.val <= 2^31 - 1
-===============================================================================
+======================================================================
 */
 
 // Problem-specific support.
 //
-// Keep shared judge types and parsing or formatting helpers here. Name adapters
-// after the problem. Put setup used only by the current attempt at the top of
-// solveCurrentAttempt below.
+// Keep shared judge types and parsing or formatting helpers here.
+// Name adapters after the problem. Put setup used only by the current
+// attempt at the top of solveCurrentAttempt below.
 //
-// This intentionally unsolved practice archive follows the workbench template.
+// This intentionally unsolved practice archive follows the workbench
+// template.
 
 type TreeNode struct {
 	Val               int
@@ -60,21 +65,25 @@ type TreeNode struct {
 func parseAverageOfLevelsInBinaryTreeInput(input string) *TreeNode {
 	var args []json.RawMessage
 	if err := json.Unmarshal([]byte(input), &args); err != nil {
-		panic(fmt.Errorf("parse average-of-levels-in-binary-tree input: %w", err))
+		panic(fmt.Errorf("parse average-of-levels-in-binary-tree "+
+			"input: %w", err))
 	}
 	if len(args) != 1 {
-		panic(fmt.Sprintf("parse average-of-levels-in-binary-tree input: got %d arguments, want 1", len(args)))
+		panic(fmt.Sprintf("parse average-of-levels-in-binary-tree "+
+			"input: got %d arguments, want 1", len(args)))
 	}
 	root, argumentError0 := decodeTreeNode(args[0])
 	if argumentError0 != nil {
-		panic(fmt.Errorf("parse average-of-levels-in-binary-tree argument root: %w", argumentError0))
+		panic(fmt.Errorf("parse average-of-levels-in-binary-tree "+
+			"argument root: %w", argumentError0))
 	}
 	return root
 }
 
 func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	var values []*int
-	if err := json.Unmarshal(raw, &values); err != nil || len(values) == 0 {
+	if err := json.Unmarshal(raw, &values); err != nil ||
+		len(values) == 0 {
 		return nil, err
 	}
 	if values[0] == nil {
@@ -102,10 +111,13 @@ func decodeTreeNode(raw json.RawMessage) (*TreeNode, error) {
 	return root, nil
 }
 
-func formatAverageOfLevelsInBinaryTreeOutput(averages []float64) string {
+func formatAverageOfLevelsInBinaryTreeOutput(
+	averages []float64,
+) string {
 	output, err := json.Marshal(averages)
 	if err != nil {
-		panic(fmt.Errorf("format average-of-levels-in-binary-tree output: %w", err))
+		panic(fmt.Errorf("format average-of-levels-in-binary-tree "+
+			"output: %w", err))
 	}
 	return string(output)
 }
@@ -124,7 +136,8 @@ func maximumAverageOfLevelsInBinaryTreeCase() testrunner.Case {
 	}
 	input, err := json.Marshal([]any{values})
 	if err != nil {
-		panic(fmt.Errorf("build maximum average-of-levels-in-binary-tree case: %w", err))
+		panic(fmt.Errorf("build maximum average-of-levels-in-binary-"+
+			"tree case: %w", err))
 	}
 	return testrunner.Case{
 		Name:  "Boundary: Maximum nodes all hold the maximum value",
@@ -133,8 +146,9 @@ func maximumAverageOfLevelsInBinaryTreeCase() testrunner.Case {
 	}
 }
 
-// sampleCases contains the examples that every registered solution must pass.
-// Inputs encode the judge arguments as a positional JSON array.
+// sampleCases contains the examples that every registered solution
+// must pass. Inputs encode the judge arguments as a positional JSON
+// array.
 var sampleCases = []testrunner.Case{
 	{
 		Name:  "Official example 1",
@@ -184,8 +198,9 @@ var sampleCases = []testrunner.Case{
 	maximumAverageOfLevelsInBinaryTreeCase(),
 }
 
-// archiveReady remains false until the current attempt, three agent solutions,
-// analysis, and regression coverage are complete and verified.
+// archiveReady remains false until the current attempt, three agent
+// solutions, analysis, and regression coverage are complete and
+// verified.
 const archiveReady = false
 
 // Registered implementations run against the same cases.
@@ -194,17 +209,21 @@ var currentAttemptSolution = testrunner.Solution{
 	Run:  solveCurrentAttempt,
 }
 
-// agentSolutions is intentionally empty until an AI review adds direct,
-// improved, and preferred implementations.
+// agentSolutions is intentionally empty until an AI review adds
+// direct, improved, and preferred implementations.
 var agentSolutions = []testrunner.Solution{}
 
-var solutions = append([]testrunner.Solution{currentAttemptSolution}, agentSolutions...)
+var solutions = append(
+	[]testrunner.Solution{currentAttemptSolution},
+	agentSolutions...,
+)
 
-// =============================================================================
+// ===================================================================
 // CURRENT ATTEMPT
 //
-// Implement your solution here. Keep this body intact when requesting review.
-// =============================================================================
+// Implement your solution here. Keep this body intact when requesting
+// review.
+// ===================================================================
 
 func solveCurrentAttempt(input string) string {
 	root := parseAverageOfLevelsInBinaryTreeInput(input)
@@ -214,14 +233,15 @@ func solveCurrentAttempt(input string) string {
 	return ""
 }
 
-// =============================================================================
+// ===================================================================
 // AGENT SOLUTIONS
 //
-// Intentionally blank until you ask an AI agent to review this problem.
-// =============================================================================
+// Intentionally blank until you ask an AI agent to review this
+// problem.
+// ===================================================================
 
 /*
-===============================================================================
+======================================================================
 AGENT REVIEW AND COMPLEXITY ANALYSIS
 
 Current attempt:
@@ -248,11 +268,15 @@ Solution 3 - Preferred:
 - Auxiliary-space complexity:
 
 AGENT REVIEW AND COMPLEXITY ANALYSIS END
-===============================================================================
+======================================================================
 */
 
 func main() {
-	if err := testrunner.Run(os.Stdout, sampleCases, solutions); err != nil {
+	if err := testrunner.Run(
+		os.Stdout,
+		sampleCases,
+		solutions,
+	); err != nil {
 		fmt.Fprintln(os.Stderr, "workbench:", err)
 		os.Exit(1)
 	}
