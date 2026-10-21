@@ -135,8 +135,7 @@ example, an `###` entry uses `#### The problem it solves`; a deeply nested
 The contemporary interview evidence below gives context for what to practice;
 it is not a teaching entry and does not use the eleven-heading contract.
 
-The coverage is cross-checked against the repository's
-[Top Interview 150 manifest](../scripts/top-interview-150.tsv), LeetCode's
+The coverage is cross-checked against LeetCode's
 [Top Interview 150](https://leetcode.com/studyplan/top-interview-150/), the
 [Grind 75 study guidance](https://www.techinterviewhandbook.org/grind75/faq),
 and the [NeetCode roadmap](https://neetcode.io/roadmap). These lists determine

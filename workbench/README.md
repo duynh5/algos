@@ -18,6 +18,10 @@ correctness, work, and memory use. Shared code that runs every test case lives i
 5. Run `./scripts/workbench.sh` from the repository root.
 6. Ask Codex to review or solve "the problem in the workbench."
 
+`./scripts/workbench.sh` is equivalent to running `go run ./workbench` followed
+by `go test ./workbench`. The program prints `PASS` or `FAIL` for every
+solution/sample pair before the script runs the workbench tests.
+
 When you ask Codex to add inputs or examples, it also creates or updates the
 parser and calls it at the beginning of `solveCurrentAttempt`. Your algorithm
 therefore begins with values such as `[]int`, `string`, or `*ListNode` instead
@@ -30,7 +34,7 @@ checks. The archive script refuses incomplete workbench content.
 
 The shared runner gives each solution one input string and expects one output
 string. For a site such as LeetCode, where the submitted function receives
-several arguments, write those arguments in call order as a JSON array—the
+several arguments, write those arguments in call order as a JSON array--the
 bracketed text format shown below:
 
 ```go
@@ -67,8 +71,9 @@ If copied problem text contains the uncommon sequence `*/`, change it to `* /`
 so it does not close the Go block comment early.
 
 During review, Codex preserves the user's attempt and evaluates it separately
-from its three solutions. It links relevant material in
-[`concepts/`](../concepts/), then runs the same official examples and additional
+from its three solutions. It first restates the required inputs, outputs,
+limits, and important edge cases, then links relevant material in
+[`concepts/`](../concepts/). It runs the same official examples and additional
 bug-catching cases against all four implementations. Detailed explanations of
 why each solution works and how its work and memory grow remain in the analysis
 block in `main.go`.
@@ -79,7 +84,9 @@ Once verified, the complete problem is copied to its permanent file under
 Completed files receive a `solved_` filename prefix. The source defaults to
 `leetcode`, and numeric problem IDs receive leading zeroes until they contain at
 least four digits. Provide the optional final argument only for another source.
-Do not overwrite an unarchived workbench problem.
+The archive command adds source metadata, runs the new standalone file, and
+adds it to the problem index. It refuses an incomplete workbench or an existing
+destination. Do not overwrite an unarchived workbench problem.
 
 After verifying the archived file, restore the standard blank template with:
 
@@ -87,5 +94,8 @@ After verifying the archived file, restore the standard blank template with:
 ./scripts/reset-workbench.sh
 ```
 
-The reset command refuses unfinished changes. Use `--force` only when you
-explicitly want to discard the current workbench without archiving it.
+The reset command replaces both `main.go` and `main_test.go` and refuses
+unfinished changes. Before replacement, it formats, runs, and tests temporary
+copies of the blank templates; a failed check leaves the active workbench
+unchanged. Use `--force` only when you explicitly want to discard the current
+workbench without archiving it.

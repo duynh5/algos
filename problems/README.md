@@ -3,7 +3,9 @@
 Every problem is a Go file directly inside this directory, and each file can be
 run on its own. A completed file contains the problem statement, test cases, the
 user's original attempt, three agent-authored solutions, an explanation of why
-each solution works, and its work and memory costs.
+each solution works, and its work and memory costs. Problem-specific algorithms
+remain in that standalone file so the selected function is easy to copy into an
+online judge.
 
 A newly retrieved practice file has the same sections, but its current solution,
 list of agent solutions, and analysis begin blank. It still includes the source
@@ -30,8 +32,11 @@ numeric order inside the same completion status, difficulty, and source group:
 
 LeetCode is the default source. Pass another source explicitly when archiving a
 problem from elsewhere. A source URL can remain inside the file for attribution.
-Every problem file starts with `//go:build ignore`. This tells package-wide Go
-commands not to combine these independent `main` programs into one package.
+Check the source's licensing terms before redistributing an imported problem
+statement. Every problem file starts with `//go:build ignore`. This tells
+package-wide Go commands not to combine these independent `main` programs into
+one package. Passing one filename directly to `go run` still runs it with the
+shared `internal/testrunner` package.
 
 Archive and run problems with:
 
@@ -41,6 +46,13 @@ Archive and run problems with:
 ./scripts/run-problem.sh solved_easy_leetcode_0001_two_sum.go
 ./scripts/test-problems.sh
 ```
+
+Without `--case`, `run-problem.sh` runs every configured case; `--case 1` runs
+only the first case. Without a filename, it selects the only modified or
+untracked problem file and reports an error when there are zero or multiple
+candidates. An explicit filename must match
+`[solved_]<difficulty>_<source>_<problem-id>_<slug>.go`. The bulk
+`test-problems.sh` command reports and skips files with `archiveReady = false`.
 
 ## Problems
 
