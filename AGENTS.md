@@ -135,12 +135,37 @@ preserving the user's algorithm body.
    the preferred agent approach when appropriate. Reserve full-width section
    banners for `CURRENT ATTEMPT` and `AGENT SOLUTIONS`. Use compact one-line
    labels for adapters, registries, and other supporting functions.
-7. Run the same `sampleCases` and table-driven regression cases against the
+7. Comment every agent-authored solution and any helper local to that solution
+   so a learner can follow each logical code block without relying on the
+   analysis section. Do not rewrite the preserved current attempt merely to add
+   comments. Apply these comment rules:
+   - Place comments immediately before the code they explain and cover each
+     meaningful phase: input or boundary handling, state initialization, the
+     main loop or recursion, important branches and mutations, state restoration
+     or backtracking, and result construction.
+   - Explain why the block exists, what invariant or state transition it
+     maintains, and how that advances the algorithm. Do not merely translate
+     individual Go statements into English or repeat self-explanatory syntax.
+   - Explain non-obvious Go or algorithmic details at the point of use, including
+     bit operations, sentinel values, type assertions, half-open ranges,
+     overflow guards, queue or stack ordering, visited-mark timing, and pruning
+     conditions.
+   - State externally visible side effects and important assumptions, such as
+     sorting or otherwise mutating an input slice, sharing backing arrays, or
+     relying on constraints that make an index or conversion safe.
+   - Give nested loops, recursive cases, and substantial branch bodies enough
+     context that their role and state changes are clear. Keep comments concise,
+     factual, and specific to the implementation; do not duplicate the full
+     correctness proof, worked trace, or complexity analysis.
+   - During validation, re-read the comments against the final code and correct
+     stale, misleading, or ambiguous explanations before considering the review
+     complete.
+8. Run the same `sampleCases` and table-driven regression cases against the
    current attempt and all three agent approaches.
    Include supplied examples, minimum or empty inputs when valid, boundary
    conditions, duplicate or adversarial values, and at least one case that
    distinguishes a common incorrect solution.
-8. In the resolved problem file's analysis section, explain each approach, its
+9. In the resolved problem file's analysis section, explain each approach, its
    correctness argument, and its time and auxiliary-space complexity. State
    best, average, and worst cases when they differ, and account for recursion,
    preprocessing, output, and meaningful Go allocations. For each solution,
@@ -148,7 +173,7 @@ preserving the user's algorithm body.
    variables, pointers, data structures, and state changes step by step so the
    reader can map the example directly to the code; an outcome-only example is
    not sufficient.
-9. For a workbench problem, run `./scripts/workbench.sh` and `go test ./...`.
+10. For a workbench problem, run `./scripts/workbench.sh` and `go test ./...`.
    For a problem under `problems/`, run `./scripts/run-problem.sh <filename>`,
    `./scripts/test-problems.sh`, and `go test ./...`. Set `archiveReady` to
    `true` only after the location-appropriate checks pass and the current
