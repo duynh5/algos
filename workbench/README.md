@@ -15,10 +15,10 @@ correctness, work, and memory use. Shared code that runs every test case lives i
    back to the problem's expected text.
 3. Add every supplied example to the `sampleCases` slice.
 4. Implement `solveCurrentAttempt` using the parsed Go values.
-5. Run `./scripts/workbench.sh` from the repository root.
+5. Run `./internal/workbench.sh` from the repository root.
 6. Ask Codex to review or solve "the problem in the workbench."
 
-`./scripts/workbench.sh` is equivalent to running `go run ./workbench` followed
+`./internal/workbench.sh` is equivalent to running `go run ./workbench` followed
 by `go test ./workbench`. The program prints `PASS` or `FAIL` for every
 solution/sample pair before the script runs the workbench tests.
 
@@ -80,7 +80,7 @@ block in `main.go`.
 
 Once verified, the complete problem is copied to its permanent file under
 [`problems/`](../problems/) with
-`./scripts/archive-workbench.sh <easy|medium|hard> <problem-id> <descriptive-slug> [source]`.
+`./internal/archive-workbench.sh <easy|medium|hard> <problem-id> <descriptive-slug> [source]`.
 Completed files receive a `solved_` filename prefix. The source defaults to
 `leetcode`, and numeric problem IDs receive leading zeroes until they contain at
 least four digits. Provide the optional final argument only for another source.
@@ -91,7 +91,7 @@ destination. Do not overwrite an unarchived workbench problem.
 After verifying the archived file, restore the standard blank template with:
 
 ```bash
-./scripts/reset-workbench.sh
+./internal/reset-workbench.sh
 ```
 
 The reset command replaces both `main.go` and `main_test.go` and refuses

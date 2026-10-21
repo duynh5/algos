@@ -562,18 +562,18 @@ which explains both the reverse return order and the stack memory.
 #### Go example
 
 ```go
-func factorial(n int64) int64 {
+func factorial(value int64) int64 {
 	// Zero and one terminate the recursion and both have factorial value one.
-	if n <= 1 {
+	if value <= 1 {
 		return 1
 	}
-	// Leave this call waiting with multiplier n while the smaller subproblem
-	// computes (n-1)!, then combine the two results as n * (n-1)!.
-	return n * factorial(n-1)
+	// Leave this call waiting with the current multiplier while the smaller
+	// subproblem computes the preceding factorial, then combine both results.
+	return value * factorial(value-1)
 }
 ```
 
-The stated contract requires `0 <= n <= 20`; validation belongs at the caller
+The stated contract requires `0 <= value <= 20`; validation belongs at the caller
 or can be added as a separate checked boundary.
 
 #### Work and memory
@@ -804,28 +804,28 @@ pairs.
 #### Go example
 
 ```go
-func hasBit(flags uint64, k uint) bool {
-	// A uint64 has positions 0 through 63. Shift a single 1 into position k,
+func hasBit(flags uint64, bitPosition uint) bool {
+	// A uint64 has positions 0 through 63. Shift a single 1 into bitPosition,
 	// AND it with flags, and test whether that position survives.
-	return k < 64 && flags&(uint64(1)<<k) != 0
+	return bitPosition < 64 && flags&(uint64(1)<<bitPosition) != 0
 }
 
-func setBit(flags uint64, k uint) (uint64, bool) {
+func setBit(flags uint64, bitPosition uint) (uint64, bool) {
 	// Refuse an unrepresentable position instead of pretending it exists.
-	if k >= 64 {
+	if bitPosition >= 64 {
 		return flags, false
 	}
 	// OR turns the selected bit on and leaves every other bit unchanged.
-	return flags | (uint64(1) << k), true
+	return flags | (uint64(1) << bitPosition), true
 }
 
-func clearBit(flags uint64, k uint) (uint64, bool) {
-	if k >= 64 {
+func clearBit(flags uint64, bitPosition uint) (uint64, bool) {
+	if bitPosition >= 64 {
 		return flags, false
 	}
-	// Go's bit-clear operator &^ turns off mask bits that are 1, so only bit k
-	// is cleared.
-	return flags &^ (uint64(1) << k), true
+	// Go's bit-clear operator &^ turns off mask bits that are 1, so only the
+	// selected bit is cleared.
+	return flags &^ (uint64(1) << bitPosition), true
 }
 ```
 
@@ -1064,29 +1064,29 @@ contains the factors needed by both inputs.
 ```go
 import "math"
 
-func gcd(a, b int64) int64 {
-	// Replacing (a,b) with (b,a%b) preserves their common divisors while making
-	// the second value smaller, so the process must eventually reach zero.
-	for b != 0 {
-		a, b = b, a%b
+func gcd(firstValue, secondValue int64) int64 {
+	// Replacing the pair with (secondValue, firstValue%secondValue) preserves
+	// their common divisors while making the second value smaller.
+	for secondValue != 0 {
+		firstValue, secondValue = secondValue, firstValue%secondValue
 	}
-	// When b is zero, a is the greatest common divisor.
-	return a
+	// When secondValue is zero, firstValue is the greatest common divisor.
+	return firstValue
 }
 
-func lcm(a, b int64) (int64, bool) {
+func lcm(firstValue, secondValue int64) (int64, bool) {
 	// Under this convention, any least common multiple involving zero is zero.
-	if a == 0 || b == 0 {
+	if firstValue == 0 || secondValue == 0 {
 		return 0, true
 	}
 	// Divide out the shared factors before multiplying. This reduces the size
 	// of the multiplication without changing the mathematical LCM.
-	left := a / gcd(a, b)
-	// Prove left*b fits in int64 before evaluating the product.
-	if left > math.MaxInt64/b {
+	reducedFirstValue := firstValue / gcd(firstValue, secondValue)
+	// Prove the product fits in int64 before evaluating it.
+	if reducedFirstValue > math.MaxInt64/secondValue {
 		return 0, false
 	}
-	return left * b, true
+	return reducedFirstValue * secondValue, true
 }
 ```
 
@@ -1205,19 +1205,20 @@ func normalizeFraction(numerator, denominator int64) (int64, int64, bool) {
 
 	// Euclid's algorithm needs magnitudes. Only the numerator can still be
 	// negative because the denominator was normalized above.
-	a, b := numerator, denominator
-	if a < 0 {
+	numeratorMagnitude := numerator
+	denominatorMagnitude := denominator
+	if numeratorMagnitude < 0 {
 		// GCD operates on magnitude; the original signed numerator remains intact
 		// for the final normalized result.
-		a = -a
+		numeratorMagnitude = -numeratorMagnitude
 	}
 	// Each Euclidean step preserves the shared divisors and reduces the second
-	// operand until a contains the GCD.
-	for b != 0 {
-		a, b = b, a%b
+	// operand until numeratorMagnitude contains the GCD.
+	for denominatorMagnitude != 0 {
+		numeratorMagnitude, denominatorMagnitude = denominatorMagnitude, numeratorMagnitude%denominatorMagnitude
 	}
 	// Divide both parts by their GCD to obtain the unique reduced pair.
-	return numerator / a, denominator / a, true
+	return numerator / numeratorMagnitude, denominator / numeratorMagnitude, true
 }
 ```
 
@@ -1327,49 +1328,54 @@ identify one.
 ```go
 // direction is comparable, so a normalized value can be used as a map key.
 type direction struct {
-	dx int64
-	dy int64
+	horizontalChange int64
+	verticalChange   int64
 }
 
-func normalizeDirection(dx, dy int64) (direction, bool) {
+func normalizeDirection(horizontalChange, verticalChange int64) (direction, bool) {
 	// Two identical points have no direction. The boolean reports this duplicate
 	// separately from valid vertical and horizontal directions.
-	if dx == 0 && dy == 0 {
+	if horizontalChange == 0 && verticalChange == 0 {
 		return direction{}, true
 	}
-	if dx == 0 {
+	if horizontalChange == 0 {
 		// Upward and downward vectors share the canonical vertical key (0,1)
 		// because this function represents an undirected line orientation.
-		return direction{dx: 0, dy: 1}, false
+		return direction{horizontalChange: 0, verticalChange: 1}, false
 	}
-	if dy == 0 {
+	if verticalChange == 0 {
 		// Leftward and rightward vectors likewise share the canonical horizontal
 		// key (1,0).
-		return direction{dx: 1, dy: 0}, false
+		return direction{horizontalChange: 1, verticalChange: 0}, false
 	}
 
 	// Compute the GCD of the absolute components so equivalent scaled vectors
 	// reduce to the same pair.
-	a, b := dx, dy
-	if a < 0 {
-		a = -a
+	horizontalMagnitude := horizontalChange
+	verticalMagnitude := verticalChange
+	if horizontalMagnitude < 0 {
+		horizontalMagnitude = -horizontalMagnitude
 	}
-	if b < 0 {
-		b = -b
+	if verticalMagnitude < 0 {
+		verticalMagnitude = -verticalMagnitude
 	}
-	// Euclid's algorithm leaves the positive GCD in a.
-	for b != 0 {
-		a, b = b, a%b
+	// Euclid's algorithm leaves the positive GCD in horizontalMagnitude.
+	for verticalMagnitude != 0 {
+		horizontalMagnitude, verticalMagnitude = verticalMagnitude, horizontalMagnitude%verticalMagnitude
 	}
-	dx /= a
-	dy /= a
-	// Choose one orientation convention: dx is always positive for nonvertical
-	// directions, so opposite sign encodings cannot create duplicate keys.
-	if dx < 0 {
-		dx = -dx
-		dy = -dy
+	horizontalChange /= horizontalMagnitude
+	verticalChange /= horizontalMagnitude
+	// Choose one orientation convention: horizontalChange is always positive for
+	// nonvertical directions, so opposite sign encodings cannot create duplicate
+	// keys.
+	if horizontalChange < 0 {
+		horizontalChange = -horizontalChange
+		verticalChange = -verticalChange
 	}
-	return direction{dx: dx, dy: dy}, false
+	return direction{
+		horizontalChange: horizontalChange,
+		verticalChange:   verticalChange,
+	}, false
 }
 ```
 
@@ -1478,12 +1484,12 @@ lower integer.
 ##### Go example
 
 ```go
-func normalizedRemainder(x, modulus int64) (int64, bool) {
+func normalizedRemainder(value, modulus int64) (int64, bool) {
 	// A positive modulus defines canonical representatives 0 through modulus-1.
 	if modulus <= 0 {
 		return 0, false
 	}
-	remainder := x % modulus
+	remainder := value % modulus
 	if remainder < 0 {
 		// Go keeps the dividend's sign; adding one modulus moves a negative
 		// remainder into the canonical nonnegative interval.
@@ -1492,14 +1498,14 @@ func normalizedRemainder(x, modulus int64) (int64, bool) {
 	return remainder, true
 }
 
-func floorDivide(x, divisor int64) (int64, bool) {
+func floorDivide(value, divisor int64) (int64, bool) {
 	if divisor <= 0 {
 		return 0, false
 	}
 	// Go truncates toward zero. For a negative nonmultiple, floor is one less
 	// than that truncated quotient.
-	quotient := x / divisor
-	if x%divisor < 0 {
+	quotient := value / divisor
+	if value%divisor < 0 {
 		quotient--
 	}
 	return quotient, true
@@ -1606,19 +1612,19 @@ factor of `5` appears, so the number of pairs is exactly the number of counted
 ##### Go example
 
 ```go
-func trailingZeroes(n int64) int64 {
+func trailingZeroes(value int64) int64 {
 	var zeroes int64
 	// Each division counts multiples of 5, then the extra factors contributed
 	// by multiples of 25, 125, and so on.
-	for n >= 5 {
-		n /= 5
-		zeroes += n
+	for value >= 5 {
+		value /= 5
+		zeroes += value
 	}
 	return zeroes
 }
 ```
 
-The function requires `n >= 0`.
+The function requires `value >= 0`.
 
 ##### Work and memory
 
@@ -1724,21 +1730,21 @@ was already marked.
 ##### Go example
 
 ```go
-func smallestFactor(n int) int {
+func smallestFactor(value int) int {
 	// Values below two have no prime factor under this function's contract.
-	if n < 2 {
+	if value < 2 {
 		return 0
 	}
-	// If n is composite, at least one factor is no larger than sqrt(n). Writing
-	// divisor <= n/divisor avoids overflowing divisor*divisor.
-	for divisor := 2; divisor <= n/divisor; divisor++ {
-		if n%divisor == 0 {
+	// If value is composite, at least one factor is no larger than its square
+	// root. Writing divisor <= value/divisor avoids overflowing divisor*divisor.
+	for divisor := 2; divisor <= value/divisor; divisor++ {
+		if value%divisor == 0 {
 			// Ascending search makes the first divisor found the smallest one.
 			return divisor
 		}
 	}
-	// No smaller divisor exists, so n itself is prime.
-	return n
+	// No smaller divisor exists, so value itself is prime.
+	return value
 }
 
 func primesThrough(limit int) []int {
@@ -1883,15 +1889,16 @@ func decimalRemainder(digits string, modulus int64) (int64, bool) {
 		return 0, false
 	}
 	var remainder int64
-	for i := 0; i < len(digits); i++ {
+	for digitIndex := 0; digitIndex < len(digits); digitIndex++ {
 		// Validate and convert one ASCII decimal digit without parsing the whole,
 		// potentially enormous, number.
-		if digits[i] < '0' || digits[i] > '9' {
+		if digits[digitIndex] < '0' || digits[digitIndex] > '9' {
 			return 0, false
 		}
-		digit := int64(digits[i] - '0')
-		// Appending a digit changes r to (10*r+digit) mod modulus. Keeping only
-		// r is valid because congruent prefixes stay congruent after appending.
+		digit := int64(digits[digitIndex] - '0')
+		// Appending a digit changes the remainder to
+		// (10*remainder+digit) mod modulus. Congruent prefixes stay congruent after
+		// appending, so retaining only the remainder is sufficient.
 		remainder = (remainder*10 + digit) % modulus
 	}
 	return remainder, true
@@ -1973,7 +1980,7 @@ Generate subsets of `[A,B,C]`. At each position, first exclude and then include
 the current value.
 
 1. **Position and choice: Start**
-   - **Before:** `current=[]`, index `0`
+   - **Before:** `currentSubset=[]`, index `0`
    - **Decision:** Explore both choices for `A`.
    - **After:** Exclude branch, then include branch
    - **Known correct:** Every subset belongs to exactly one branch.
@@ -1998,35 +2005,35 @@ For empty input, there is one subset--the empty subset--so the output is
 
 #### Why it works
 
-Before processing position `i`, `current` contains exactly the values selected
-from positions before `i`. Every subset either excludes position `i` or
-includes it, never both, so the two recursive branches are disjoint and cover
-all possibilities. When `i` reaches `n`, the choices for every position are
-fixed and one complete subset is copied. Because each level advances `i`, the
-process finishes.
+Before processing `currentIndex`, `currentSubset` contains exactly the values
+selected from earlier positions. Every subset either excludes the current
+position or includes it, never both, so the two recursive branches are
+disjoint and cover all possibilities. When `currentIndex` reaches the input
+length, the choices for every position are fixed and one complete subset is
+copied. Because each level advances `currentIndex`, the process finishes.
 
 #### Go example
 
 ```go
 func subsets(values []string) [][]string {
-	// current holds the choices on the active recursion path; result owns copies
-	// of complete paths so later backtracking cannot mutate saved subsets.
+	// currentSubset holds the choices on the active recursion path; result owns
+	// copies so later backtracking cannot mutate saved subsets.
 	result := make([][]string, 0)
-	current := make([]string, 0, len(values))
+	currentSubset := make([]string, 0, len(values))
 	var build func(int)
-	build = func(index int) {
-		if index == len(values) {
+	build = func(currentIndex int) {
+		if currentIndex == len(values) {
 			// Every input position has made its include/exclude decision.
-			result = append(result, append([]string{}, current...))
+			result = append(result, append([]string{}, currentSubset...))
 			return
 		}
-		// First enumerate subsets that exclude values[index].
-		build(index + 1)
+		// First enumerate subsets that exclude values[currentIndex].
+		build(currentIndex + 1)
 		// Then include it, enumerate that branch, and undo the choice before
 		// returning to the caller.
-		current = append(current, values[index])
-		build(index + 1)
-		current = current[:len(current)-1]
+		currentSubset = append(currentSubset, values[currentIndex])
+		build(currentIndex + 1)
+		currentSubset = currentSubset[:len(currentSubset)-1]
 	}
 	build(0)
 	return result
@@ -2037,7 +2044,7 @@ func subsets(values []string) [][]string {
 
 There are `2^n` returned subsets. Copying their elements costs
 `n*2^(n-1)` total element copies for `n>0`, so time and required output space
-are `O(n*2^n)`. The recursion and `current` slice use `O(n)` auxiliary space,
+are `O(n*2^n)`. The recursion and `currentSubset` slice use `O(n)` auxiliary space,
 excluding returned output. A permutation generator similarly cannot beat its
 `n!` output count, and storing all size-`k` combinations requires
 `O(k*C(n,k))` output space.
@@ -2149,25 +2156,26 @@ marked value or excludes it. Those cases cannot overlap and cover every group.
 ```go
 import "math/big"
 
-func combinationCount(n, k int64) (*big.Int, bool) {
-	// A combination count is defined here only for 0 <= k <= n.
-	if n < 0 || k < 0 || k > n {
+func combinationCount(numItems, numChosen int64) (*big.Int, bool) {
+	// A combination count is defined only when the chosen count is within the
+	// total item count.
+	if numItems < 0 || numChosen < 0 || numChosen > numItems {
 		return nil, false
 	}
 	// C(n,k) equals C(n,n-k); using the smaller side shortens the product.
-	if k > n-k {
-		k = n - k
+	if numChosen > numItems-numChosen {
+		numChosen = numItems - numChosen
 	}
 	// Reuse big.Int temporaries and apply one numerator and denominator factor
 	// per step. Every intermediate quotient is exact for this recurrence.
 	result := big.NewInt(1)
 	factor := new(big.Int)
 	divisor := new(big.Int)
-	for i := int64(1); i <= k; i++ {
-		// After this step, result equals C(n-k+i,i). Multiplying the previous
-		// count by n-k+i and dividing by i is exact; at i=k this becomes C(n,k).
-		result.Mul(result, factor.SetInt64(n-k+i))
-		result.Quo(result, divisor.SetInt64(i))
+	for numChosenSoFar := int64(1); numChosenSoFar <= numChosen; numChosenSoFar++ {
+		// Extend the count by one chosen item. This recurrence's division is exact
+		// at every step, including the final requested count.
+		result.Mul(result, factor.SetInt64(numItems-numChosen+numChosenSoFar))
+		result.Quo(result, divisor.SetInt64(numChosenSoFar))
 	}
 	return result, true
 }
@@ -2233,12 +2241,13 @@ output depth.
 For distinct size-`k` value combinations:
 
 1. Copy and sort the input so equal values are adjacent.
-2. Build `current` from left to right using increasing indexes.
-3. At one recursive depth, skip `sorted[i]` when `i>start` and it equals the
+2. Build `currentCombination` from left to right using increasing indexes.
+3. At one recursive depth, skip `sorted[candidateIndex]` when
+   `candidateIndex>startIndex` and it equals the
    immediately previous value.
-4. After choosing a value, recurse with `i+1`; this still permits another equal
-   value at the next depth.
-5. Copy `current` when its length reaches `k`.
+4. After choosing a value, recurse with `candidateIndex+1`; this still permits
+   another equal value at the next depth.
+5. Copy `currentCombination` when its length reaches `combinationLength`.
 
 ##### Step-by-step examples
 
@@ -2246,12 +2255,12 @@ For values `[1a,1b,2]` and `k=2`, the expected value outputs are
 `[[1,1],[1,2]]`.
 
 1. **Choice: First `1`**
-   - **Before:** `start=0`, `current=[]`
+   - **Before:** `startIndex=0`, `currentCombination=[]`
    - **Decision:** Choose index `0`.
-   - **After:** `current=[1]`, next start `1`
+   - **After:** `currentCombination=[1]`, next start index `1`
    - **Known correct:** Every result in this branch begins with `1`.
 2. **Choice: Second `1`**
-   - **Before:** `start=1`, `current=[1]`
+   - **Before:** `startIndex=1`, `currentCombination=[1]`
    - **Decision:** At a new depth, equal value is allowed.
    - **After:** Emit `[1,1]`
    - **Known correct:** The two positions can both be used.
@@ -2261,7 +2270,7 @@ For values `[1a,1b,2]` and `k=2`, the expected value outputs are
    - **After:** Emit `[1,2]`
    - **Known correct:** The other distinct suffix is included.
 4. **Choice: First-depth index `1`**
-   - **Before:** `start=0`, prior value was `1`
+   - **Before:** `startIndex=0`, prior value was `1`
    - **Decision:** Skip equal `1`; it would repeat both outputs above.
    - **After:** Continue to `2`
    - **Known correct:** No distinct value output is lost.
@@ -2275,7 +2284,7 @@ Increasing indexes ensure one input position is used at most once. At any
 depth, adjacent equal candidates would create the same next value and leave
 equivalent remaining suffixes, so keeping only the first removes duplicates
 without losing a value sequence. The skip is depth-local: after one `1` is in
-`current`, the next depth may choose the other position, which preserves
+`currentCombination`, the next depth may choose the other position, which preserves
 `[1,1]`.
 
 ##### Go example
@@ -2283,8 +2292,8 @@ without losing a value sequence. The skip is depth-local: after one `1` is in
 ```go
 import "sort"
 
-func uniqueCombinations(values []int, k int) [][]int {
-	if k < 0 || k > len(values) {
+func uniqueCombinations(values []int, combinationLength int) [][]int {
+	if combinationLength < 0 || combinationLength > len(values) {
 		return nil
 	}
 	// Sort a copy so equal values become adjacent without changing the caller's
@@ -2292,25 +2301,26 @@ func uniqueCombinations(values []int, k int) [][]int {
 	sorted := append([]int(nil), values...)
 	sort.Ints(sorted)
 	result := make([][]int, 0)
-	current := make([]int, 0, k)
+	currentCombination := make([]int, 0, combinationLength)
 	var build func(int)
-	build = func(start int) {
-		if len(current) == k {
-			// Save an independent copy because current is reused during backtracking.
-			result = append(result, append([]int{}, current...))
+	build = func(startIndex int) {
+		if len(currentCombination) == combinationLength {
+			// Save an independent copy because the active combination is reused
+			// during backtracking.
+			result = append(result, append([]int{}, currentCombination...))
 			return
 		}
-		for i := start; i < len(sorted); i++ {
-			if i > start && sorted[i] == sorted[i-1] {
+		for candidateIndex := startIndex; candidateIndex < len(sorted); candidateIndex++ {
+			if candidateIndex > startIndex && sorted[candidateIndex] == sorted[candidateIndex-1] {
 				// At one recursion depth, choosing the next equal value would create
 				// the same combination as choosing the previous one.
 				continue
 			}
 			// Choose this value, recurse using only later positions, then undo the
 			// choice so the next candidate starts from the same prefix.
-			current = append(current, sorted[i])
-			build(i + 1)
-			current = current[:len(current)-1]
+			currentCombination = append(currentCombination, sorted[candidateIndex])
+			build(candidateIndex + 1)
+			currentCombination = currentCombination[:len(currentCombination)-1]
 		}
 	}
 	build(0)
@@ -2324,7 +2334,7 @@ Sorting takes `O(n log n)` time and the copied slice uses `O(n)` auxiliary
 space. If `U` distinct outputs are returned, copying them costs `O(kU)` time
 and output space. The search can visit up to
 `sum(C(n,d), d=0..k)` states before duplicate pruning; recursion and
-`current` use `O(k)` additional space.
+`currentCombination` uses `O(k)` additional space.
 
 ##### When to use it
 
@@ -2685,8 +2695,9 @@ Rotate `[1, 2, 3, 4, 5]` right by `7`; the expected output is
    - **After:** `[4,5,1,2,3]`
    - **Known correct:** Every output position is final
 
-Boundary example: rotating `[]` by any `k` leaves it empty. The function must
-return before `k %= len(values)`, because remainder by zero is invalid.
+Boundary example: rotating `[]` by any number of positions leaves it empty. The
+function must return before `numPositions %= len(values)`, because remainder by
+zero is invalid.
 
 For a three-way partition of `[3, 1, 4, 3, 2]` around pivot `3`, the regions
 eventually become `[1, 2 | 3, 3 | 4]`: smaller, equal, and greater.
@@ -2703,13 +2714,13 @@ each step.
 ##### Go example
 
 ```go
-func rotateRight(values []int, k int) {
+func rotateRight(values []int, numPositions int) {
 	// Avoid remainder by zero; an empty slice is already fully rotated.
 	if len(values) == 0 {
 		return
 	}
 	// Rotating by a whole number of slice lengths has no effect.
-	k %= len(values)
+	numPositions %= len(values)
 	// reverse swaps the inclusive range from both ends toward the center.
 	reverse := func(left, right int) {
 		for left < right {
@@ -2718,11 +2729,11 @@ func rotateRight(values []int, k int) {
 			right--
 		}
 	}
-	// If the original slice is A B and len(B)==k, these three reversals change
+	// If the original slice is A B and len(B)==numPositions, these reversals change
 	// A B -> reverse(B) reverse(A) -> B A.
 	reverse(0, len(values)-1)
-	reverse(0, k-1)
-	reverse(k, len(values)-1)
+	reverse(0, numPositions-1)
+	reverse(numPositions, len(values)-1)
 }
 ```
 
@@ -2748,10 +2759,10 @@ swap value use `O(1)` auxiliary space. The input itself holds the result.
 
 ##### Common mistakes and edge cases
 
-> **Warning:** On an empty slice, `k %= len(values)` divides by zero. Test the
+> **Warning:** On an empty slice, `numPositions %= len(values)` divides by zero. Test the
 > length first.
 
-- Normalize a negative `k` separately if the input contract permits it; Go's
+- Normalize a negative `numPositions` separately if the input contract permits it; Go's
   remainder keeps the dividend's sign.
 - Reversing `[left, right]` requires inclusive endpoints; mixing that with a
   half-open range can skip or repeat an element.
@@ -2964,16 +2975,16 @@ func breadthFirstOrder(start int, neighbors [][]int) []int {
 	queue := []int{start}
 	seen[start] = true
 	order := make([]int, 0, len(neighbors))
-	// head advances through the slice without shifting queued values. Appends
-	// add newly discovered vertices at the back in FIFO order.
-	for head := 0; head < len(queue); head++ {
-		current := queue[head]
-		order = append(order, current)
-		for _, next := range neighbors[current] {
-			if !seen[next] {
-				// Mark when enqueuing so another edge cannot enqueue next again.
-				seen[next] = true
-				queue = append(queue, next)
+	// nextQueueIndex advances without shifting queued values. Appends add newly
+	// discovered vertices at the back in first-in, first-out order.
+	for nextQueueIndex := 0; nextQueueIndex < len(queue); nextQueueIndex++ {
+		currentVertex := queue[nextQueueIndex]
+		order = append(order, currentVertex)
+		for _, neighboringVertex := range neighbors[currentVertex] {
+			if !seen[neighboringVertex] {
+				// Mark when enqueuing so another edge cannot enqueue the neighbor again.
+				seen[neighboringVertex] = true
+				queue = append(queue, neighboringVertex)
 			}
 		}
 	}
@@ -3585,10 +3596,10 @@ strictly shrink and empty ranges stop.
 ```go
 func buildTree(preorderValues, inorderValues []int) *TreeNode {
 	// Map each unique value to its inorder position so subtree splits are O(1).
-	index := make(map[int]int, len(inorderValues))
-	for i, value := range inorderValues {
+	inorderIndexByValue := make(map[int]int, len(inorderValues))
+	for inorderIndex, value := range inorderValues {
 		// The input contract promises unique values, so each position has one key.
-		index[value] = i
+		inorderIndexByValue[value] = inorderIndex
 	}
 	// Preorder supplies roots in the order recursive calls need them.
 	nextPreorder := 0
@@ -3602,12 +3613,12 @@ func buildTree(preorderValues, inorderValues []int) *TreeNode {
 		// divides the remaining values into left and right subtrees.
 		value := preorderValues[nextPreorder]
 		nextPreorder++
-		split := index[value]
+		rootInorderIndex := inorderIndexByValue[value]
 		root := &TreeNode{Value: value}
-		// Values before split belong to the left subtree; values after it belong
-		// to the right. Recursive preorder consumption supplies each child root.
-		root.Left = build(left, split)
-		root.Right = build(split+1, right)
+		// Values before rootInorderIndex belong to the left subtree; values after it
+		// belong to the right. Recursive preorder consumption supplies each child root.
+		root.Left = build(left, rootInorderIndex)
+		root.Right = build(rootInorderIndex+1, right)
 		return root
 	}
 	// The initial half-open range covers the entire inorder traversal.
@@ -3693,7 +3704,7 @@ Find nodes two links from target `4` in the B.4.1 tree; expected output is
    - **After:** Return `[12]`
    - **Known correct:** Every returned node is exactly two links away
 
-Boundary example: `k=0` returns the target itself. A nil target returns an
+Boundary example: `targetDistance=0` returns the target itself. A nil target returns an
 empty result rather than trying to use a nil map key as a real node.
 
 ##### Why it works
@@ -3707,10 +3718,10 @@ termination.
 ##### Go example
 
 ```go
-func nodesAtDistance(root, target *TreeNode, k int) []int {
+func nodesAtDistance(root, target *TreeNode, targetDistance int) []int {
 	// A missing target has no meaningful distance, and negative distances cannot
 	// be reached by traversing edges.
-	if target == nil || k < 0 {
+	if target == nil || targetDistance < 0 {
 		return []int{}
 	}
 	// Record upward links because ordinary tree nodes expose only downward
@@ -3739,37 +3750,40 @@ func nodesAtDistance(root, target *TreeNode, k int) []int {
 	// revisiting a node through a different one of its three possible neighbors.
 	queue := []*TreeNode{target}
 	seen := map[*TreeNode]bool{target: true}
-	for distance := 0; distance < k; distance++ {
+	for distance := 0; distance < targetDistance; distance++ {
 		// Process exactly the current layer so one outer iteration equals one edge
 		// of distance from target.
-		levelSize := len(queue)
-		if levelSize == 0 {
+		numNodesInCurrentLayer := len(queue)
+		if numNodesInCurrentLayer == 0 {
 			// No frontier remains, so no node exists at this or any greater distance.
 			break
 		}
-		// Only remove the levelSize nodes that were present when this layer began.
-		// Newly appended nodes belong to the next distance and wait in the queue.
-		for i := 0; i < levelSize; i++ {
+		// Only remove the nodes that were present when this layer began. Newly
+		// appended nodes belong to the next distance and wait in the queue.
+		numNodesProcessedInCurrentLayer := 0
+		for numNodesProcessedInCurrentLayer < numNodesInCurrentLayer {
 			// Remove the oldest current-layer node from the queue front.
 			node := queue[0]
 			queue = queue[1:]
 			// Treat left child, right child, and parent as the node's undirected
 			// neighbors so the search can move away from target in every direction.
-			for _, next := range []*TreeNode{node.Left, node.Right, parent[node]} {
-				if next != nil && !seen[next] {
+			for _, neighboringNode := range []*TreeNode{node.Left, node.Right, parent[node]} {
+				if neighboringNode != nil && !seen[neighboringNode] {
 					// Mark before enqueueing: another neighbor in this layer may also
-					// point to next, but it must enter the next frontier only once.
-					seen[next] = true
-					queue = append(queue, next)
+					// point to this node, but it must enter the next frontier only once.
+					seen[neighboringNode] = true
+					queue = append(queue, neighboringNode)
 				}
 			}
+			numNodesProcessedInCurrentLayer++
 		}
 	}
-	// After k complete layers, the queue contains exactly the nodes at distance k.
+	// After the requested number of complete layers, the queue contains exactly
+	// the nodes at targetDistance.
 	values := make([]int, len(queue))
 	// Convert the node frontier to the value representation promised by the API.
-	for i, node := range queue {
-		values[i] = node.Value
+	for nodeIndex, node := range queue {
+		values[nodeIndex] = node.Value
 	}
 	return values
 }
@@ -3778,8 +3792,9 @@ func nodesAtDistance(root, target *TreeNode, k int) []int {
 ##### Work and memory
 
 Parent mapping and search each visit at most `n` nodes. The search also stops
-when its frontier becomes empty, so total time is `O(n)`, even when `k` is
-larger than the tree's height. The parent map, reached set, queue, and output
+when its frontier becomes empty, so total time is `O(n)`, even when
+`targetDistance` is larger than the tree's height. The parent map, reached set,
+queue, and output
 together use `O(n)` memory; the recursive mapping also uses `O(h)` call-stack
 space within that bound.
 
@@ -3803,7 +3818,8 @@ space within that bound.
 - Map pointers, not values; two distinct nodes may both store `7`.
 - Reject or separately define a target outside the root's tree; this example
   requires membership.
-- Decide whether negative `k` is invalid or produces an empty result.
+- Decide whether a negative `targetDistance` is invalid or produces an empty
+  result.
 
 ##### Related material
 
@@ -4498,38 +4514,38 @@ pass is safe because no further old-state decisions remain.
 func updateRow(values []int) {
 	// Values 1 and 3 were live in the old generation; 3 additionally records
 	// that the cell will be dead in the new generation.
-	oldLive := func(value int) bool {
+	wasAlive := func(value int) bool {
 		return value == 1 || value == 3
 	}
 	// First pass: decide every next state while preserving a decodable old state.
-	for i, value := range values {
-		liveNeighbors := 0
+	for cellIndex, value := range values {
+		numLiveNeighbors := 0
 		// Count the left neighbor only when its index exists, decoding temporary
 		// state 3 as formerly live.
-		if i > 0 && oldLive(values[i-1]) {
-			liveNeighbors++
+		if cellIndex > 0 && wasAlive(values[cellIndex-1]) {
+			numLiveNeighbors++
 		}
 		// Apply the identical check to the right neighbor without passing the end.
-		if i+1 < len(values) && oldLive(values[i+1]) {
-			liveNeighbors++
+		if cellIndex+1 < len(values) && wasAlive(values[cellIndex+1]) {
+			numLiveNeighbors++
 		}
-		nextLive := liveNeighbors == 1
-		if value == 0 && nextLive {
+		willBeAlive := numLiveNeighbors == 1
+		if value == 0 && willBeAlive {
 			// 2 means old dead, new live.
-			values[i] = 2
-		} else if value == 1 && !nextLive {
+			values[cellIndex] = 2
+		} else if value == 1 && !willBeAlive {
 			// 3 means old live, new dead.
-			values[i] = 3
+			values[cellIndex] = 3
 		}
 	}
 	// Second pass: every decision is complete, so discard the old-state encoding.
-	for i, value := range values {
+	for cellIndex, value := range values {
 		if value == 2 {
 			// A dead-to-live transition becomes its final live value.
-			values[i] = 1
+			values[cellIndex] = 1
 		} else if value == 3 {
 			// A live-to-dead transition becomes its final dead value.
-			values[i] = 0
+			values[cellIndex] = 0
 		}
 	}
 }
@@ -5527,30 +5543,30 @@ fact. Each step consumes a command, so the process terminates.
 ###### Go example
 
 ```go
-type robot struct{ x, y, direction int }
+type robot struct{ xCoordinate, yCoordinate, direction int }
 
 func runRobot(commands []string) (robot, bool) {
 	// The zero value starts at (0,0) facing direction 0, which the movement
 	// tables define as north.
-	r := robot{}
+	robotState := robot{}
 	for _, command := range commands {
 		switch command {
 		case "right":
 			// Direction cycles north, east, south, west; modulo wraps west to north.
-			r.direction = (r.direction + 1) % 4
+			robotState.direction = (robotState.direction + 1) % 4
 		case "move":
 			// Matching table indices turn the current direction into one coordinate
 			// step without a separate branch for every compass direction.
-			dx := [...]int{0, 1, 0, -1}
-			dy := [...]int{1, 0, -1, 0}
-			r.x += dx[r.direction]
-			r.y += dy[r.direction]
+			horizontalStepByDirection := [...]int{0, 1, 0, -1}
+			verticalStepByDirection := [...]int{1, 0, -1, 0}
+			robotState.xCoordinate += horizontalStepByDirection[robotState.direction]
+			robotState.yCoordinate += verticalStepByDirection[robotState.direction]
 		default:
 			// Reject the whole command sequence when its language is invalid.
 			return robot{}, false
 		}
 	}
-	return r, true
+	return robotState, true
 }
 ```
 
@@ -5624,7 +5640,7 @@ preventing index `0` from pairing with itself.
 
 ###### Why it works
 
-Before index `i`, the map contains exactly the defined facts from earlier
+Before `currentIndex`, the map contains exactly the defined facts from earlier
 positions. A successful complement lookup therefore proves a valid earlier
 partner; an unsuccessful lookup proves no retained earlier partner exists.
 The index advances each step, so the scan finishes.
@@ -5633,15 +5649,15 @@ The index advances each step, so the scan finishes.
 
 ```go
 func pairIndices(values []int, target int) (int, int, bool) {
-	// seen maps each earlier value to an index where it occurred.
-	seen := make(map[int]int, len(values))
-	for i, value := range values {
+	// earlierIndexByValue maps each earlier value to an index where it occurred.
+	earlierIndexByValue := make(map[int]int, len(values))
+	for currentIndex, value := range values {
 		// If target-value appeared earlier, the two distinct indices form a pair.
-		if j, found := seen[target-value]; found {
-			return j, i, true
+		if earlierIndex, found := earlierIndexByValue[target-value]; found {
+			return earlierIndex, currentIndex, true
 		}
 		// Insert only after lookup so a value cannot pair with its own index.
-		seen[value] = i
+		earlierIndexByValue[value] = currentIndex
 	}
 	return 0, 0, false
 }
@@ -5730,8 +5746,8 @@ func hasDuplicate(values []int) bool {
 	sort.Ints(ordered)
 	// Sorting makes equal values adjacent, reducing duplicate detection to one
 	// comparison per neighboring pair.
-	for i := 1; i < len(ordered); i++ {
-		if ordered[i] == ordered[i-1] {
+	for currentIndex := 1; currentIndex < len(ordered); currentIndex++ {
+		if ordered[currentIndex] == ordered[currentIndex-1] {
 			return true
 		}
 	}
@@ -6052,17 +6068,17 @@ parser cannot silently loop on an invalid character.
 
 ```go
 func parseSignedPrefix(input string) (int64, bool) {
-	i, negative := 0, false
+	currentIndex, negative := 0, false
 	// Skip only the leading ASCII spaces allowed by this parser's contract.
-	for i < len(input) && input[i] == ' ' {
-		i++
+	for currentIndex < len(input) && input[currentIndex] == ' ' {
+		currentIndex++
 	}
 	// Consume at most one optional sign before any digits.
-	if i < len(input) && (input[i] == '+' || input[i] == '-') {
-		if input[i] == '-' {
+	if currentIndex < len(input) && (input[currentIndex] == '+' || input[currentIndex] == '-') {
+		if input[currentIndex] == '-' {
 			negative = true
 		}
-		i++
+		currentIndex++
 	}
 	// A negative int64 may have magnitude MaxInt64+1, so select the allowable
 	// unsigned magnitude before accumulating digits.
@@ -6070,19 +6086,19 @@ func parseSignedPrefix(input string) (int64, bool) {
 	if negative {
 		limit++
 	}
-	start := i
+	firstDigitIndex := currentIndex
 	var magnitude uint64
 	// Parse the maximal digit prefix and rearrange the limit test so overflow is
 	// rejected before multiplying the current magnitude by ten.
-	for i < len(input) && input[i] >= '0' && input[i] <= '9' {
-		digit := uint64(input[i] - '0')
+	for currentIndex < len(input) && input[currentIndex] >= '0' && input[currentIndex] <= '9' {
+		digit := uint64(input[currentIndex] - '0')
 		if magnitude > (limit-digit)/10 {
 			return 0, false
 		}
 		magnitude = magnitude*10 + digit
-		i++
+		currentIndex++
 	}
-	if i == start {
+	if currentIndex == firstDigitIndex {
 		// Whitespace and a sign alone do not constitute a parsed integer.
 		return 0, false
 	}
@@ -6440,16 +6456,16 @@ func compress(values []int) []int {
 	ordered := append([]int(nil), values...)
 	sort.Ints(ordered)
 	// Assign the next rank only on a value's first sorted occurrence.
-	rank := make(map[int]int, len(ordered))
+	rankByValue := make(map[int]int, len(ordered))
 	for _, value := range ordered {
-		if _, found := rank[value]; !found {
-			rank[value] = len(rank)
+		if _, found := rankByValue[value]; !found {
+			rankByValue[value] = len(rankByValue)
 		}
 	}
 	// Translate the original sequence through the completed value-to-rank map.
 	result := make([]int, len(values))
-	for i, value := range values {
-		result[i] = rank[value]
+	for valueIndex, value := range values {
+		result[valueIndex] = rankByValue[value]
 	}
 	return result
 }
@@ -6986,19 +7002,21 @@ a range-query structure for arbitrary updates and queries.
 
 ```go
 func prefixSums(values []int) []int {
-	// prefix has an extra leading zero so prefix[i] equals the sum before index i.
-	prefix := make([]int, len(values)+1)
-	for i, value := range values {
-		// Extend the total through values[i] and store it one position to the right.
-		prefix[i+1] = prefix[i] + value
+	// prefixTotals has an extra leading zero so each position stores the sum of
+	// the values before the corresponding input index.
+	prefixTotals := make([]int, len(values)+1)
+	for valueIndex, value := range values {
+		// Extend the total through the current value and store it one position to
+		// the right.
+		prefixTotals[valueIndex+1] = prefixTotals[valueIndex] + value
 	}
-	return prefix
+	return prefixTotals
 }
 
-func rangeSum(prefix []int, left, right int) int {
+func rangeSum(prefixTotals []int, left, right int) int {
 	// Subtract the sum before left from the sum through right; everything outside
 	// the inclusive range cancels.
-	return prefix[right+1] - prefix[left]
+	return prefixTotals[right+1] - prefixTotals[left]
 }
 ```
 
@@ -7087,10 +7105,10 @@ func applyRangeAdds(length int, updates []rangeAdd) []int {
 		difference[update.right+1] -= update.delta
 	}
 	// A prefix sum reconstructs the total active delta at every output position.
-	result, running := make([]int, length), 0
-	for i := range result {
-		running += difference[i]
-		result[i] = running
+	result, runningTotal := make([]int, length), 0
+	for resultIndex := range result {
+		runningTotal += difference[resultIndex]
+		result[resultIndex] = runningTotal
 	}
 	return result
 }
@@ -7225,27 +7243,31 @@ with an input position.
 ```go
 type fenwick struct{ sums []int }
 
-// Internal indices are one-based. For a positive index i, i & -i isolates its
-// lowest 1 bit; that power of two is the size of the range stored at i.
+// Internal indices are one-based. For a positive oneBasedIndex,
+// oneBasedIndex & -oneBasedIndex isolates its lowest 1 bit; that power of two
+// is the size of the range stored at that index.
 func newFenwick(length int) *fenwick { return &fenwick{sums: make([]int, length+1)} }
-func (f *fenwick) add(index, delta int) {
-	// Start at the public index's one-based position. Adding i & -i moves to the
-	// next larger stored range that also contains the updated value.
-	for i := index + 1; i < len(f.sums); i += i & -i {
-		f.sums[i] += delta
+func (tree *fenwick) add(index, delta int) {
+	// Start at the public index's one-based position. Adding the lowest set bit
+	// moves to the next larger stored range that also contains the updated value.
+	for oneBasedIndex := index + 1; oneBasedIndex < len(tree.sums); oneBasedIndex += oneBasedIndex & -oneBasedIndex {
+		tree.sums[oneBasedIndex] += delta
 	}
 }
-func (f *fenwick) prefix(end int) int {
+func (tree *fenwick) prefix(end int) int {
 	total := 0
-	// Subtracting i & -i removes the range just counted. The visited disjoint
-	// ranges exactly cover the public half-open prefix [0,end).
-	for i := end; i > 0; i -= i & -i {
-		total += f.sums[i]
+	// Subtracting the lowest set bit removes the range just counted. The visited
+	// disjoint ranges exactly cover the public half-open prefix [0,end).
+	for oneBasedIndex := end; oneBasedIndex > 0; oneBasedIndex -= oneBasedIndex & -oneBasedIndex {
+		total += tree.sums[oneBasedIndex]
 	}
 	return total
 }
+
 // Two prefix sums isolate the inclusive range [left,right].
-func (f *fenwick) rangeSum(left, right int) int { return f.prefix(right+1) - f.prefix(left) }
+func (tree *fenwick) rangeSum(left, right int) int {
+	return tree.prefix(right+1) - tree.prefix(left)
+}
 ```
 
 The public indices are zero-based; the stored Fenwick positions are one-based.
@@ -7362,13 +7384,17 @@ type meeting struct{ start, end int }
 func selectMostMeetings(meetings []meeting) []meeting {
 	// Sort the supplied slice in place by end time. Finishing earlier leaves at
 	// least as much room for every later meeting, but the caller's order changes.
-	sort.Slice(meetings, func(i, j int) bool { return meetings[i].end < meetings[j].end })
-	selected, lastEnd := make([]meeting, 0, len(meetings)), math.MinInt
-	for _, current := range meetings {
-		if current.start >= lastEnd {
+	sort.Slice(meetings, func(leftIndex, rightIndex int) bool {
+		return meetings[leftIndex].end < meetings[rightIndex].end
+	})
+	selected := make([]meeting, 0, len(meetings))
+	endOfLastSelectedMeeting := math.MinInt
+	for _, candidateMeeting := range meetings {
+		if candidateMeeting.start >= endOfLastSelectedMeeting {
 			// Accept the earliest-finishing compatible meeting and move the boundary
 			// to its end; incompatible meetings are skipped.
-			selected, lastEnd = append(selected, current), current.end
+			selected = append(selected, candidateMeeting)
+			endOfLastSelectedMeeting = candidateMeeting.end
 		}
 	}
 	return selected
@@ -7730,25 +7756,25 @@ correctly.
 func breadthFirstDistances(graph [][]int, start int) []int {
 	// -1 means undiscovered, while nonnegative values are finalized edge counts
 	// from start in this unweighted graph.
-	distance := make([]int, len(graph))
-	for i := range distance {
-		distance[i] = -1
+	distanceByVertex := make([]int, len(graph))
+	for vertex := range distanceByVertex {
+		distanceByVertex[vertex] = -1
 	}
 	queue := []int{start}
-	distance[start] = 0
+	distanceByVertex[start] = 0
 	// FIFO processing visits all distance-d vertices before distance d+1.
-	for head := 0; head < len(queue); head++ {
-		vertex := queue[head]
-		for _, next := range graph[vertex] {
-			if distance[next] == -1 {
+	for nextQueueIndex := 0; nextQueueIndex < len(queue); nextQueueIndex++ {
+		vertex := queue[nextQueueIndex]
+		for _, neighboringVertex := range graph[vertex] {
+			if distanceByVertex[neighboringVertex] == -1 {
 				// The first discovery is a shortest path: extend the current shortest
 				// path by this one edge, then enqueue the vertex once.
-				distance[next] = distance[vertex] + 1
-				queue = append(queue, next)
+				distanceByVertex[neighboringVertex] = distanceByVertex[vertex] + 1
+				queue = append(queue, neighboringVertex)
 			}
 		}
 	}
-	return distance
+	return distanceByVertex
 }
 ```
 
@@ -7837,18 +7863,18 @@ an explicit count of unfinished prerequisites.
 
 ```go
 func topologicalOrder(graph [][]int) ([]int, bool) {
-	// indegree counts each vertex's unmet prerequisites.
-	indegree := make([]int, len(graph))
+	// numUnmetPrerequisitesByVertex counts each vertex's unmet prerequisites.
+	numUnmetPrerequisitesByVertex := make([]int, len(graph))
 	// Count every incoming edge once, including parallel prerequisites if present.
-	for _, edges := range graph {
-		for _, to := range edges {
-			indegree[to]++
+	for _, destinations := range graph {
+		for _, destinationVertex := range destinations {
+			numUnmetPrerequisitesByVertex[destinationVertex]++
 		}
 	}
 	// Vertices with no prerequisites can appear first.
 	queue := make([]int, 0, len(graph))
-	for vertex, count := range indegree {
-		if count == 0 {
+	for vertex, numUnmetPrerequisites := range numUnmetPrerequisitesByVertex {
+		if numUnmetPrerequisites == 0 {
 			// This vertex is ready immediately because it has no incoming edge.
 			queue = append(queue, vertex)
 		}
@@ -7856,16 +7882,16 @@ func topologicalOrder(graph [][]int) ([]int, bool) {
 	// Removing a vertex satisfies each outgoing prerequisite. A neighbor becomes
 	// ready exactly when its count reaches zero.
 	order := make([]int, 0, len(graph))
-	for head := 0; head < len(queue); head++ {
+	for nextQueueIndex := 0; nextQueueIndex < len(queue); nextQueueIndex++ {
 		// Emit the oldest ready vertex without shifting the queue slice.
-		vertex := queue[head]
+		vertex := queue[nextQueueIndex]
 		order = append(order, vertex)
-		for _, to := range graph[vertex] {
+		for _, destinationVertex := range graph[vertex] {
 			// Emitting vertex satisfies one prerequisite of this destination.
-			indegree[to]--
-			if indegree[to] == 0 {
+			numUnmetPrerequisitesByVertex[destinationVertex]--
+			if numUnmetPrerequisitesByVertex[destinationVertex] == 0 {
 				// The destination is ready after all its prerequisites reach the output.
-				queue = append(queue, to)
+				queue = append(queue, destinationVertex)
 			}
 		}
 	}
@@ -7953,36 +7979,40 @@ type weightedEdge struct{ to, cost int }
 func dijkstraDense(graph [][]weightedEdge, start int) []int {
 	// ^uint(0) has every unsigned bit set. Shifting right clears the top bit, so
 	// converting the result to int produces its largest positive value. This
-	// infinity sentinel marks vertices not yet reached; done marks final distances.
+	// infinity sentinel marks vertices not yet reached; finalized marks final
+	// distances.
 	const infinity = int(^uint(0) >> 1)
-	distance, done := make([]int, len(graph)), make([]bool, len(graph))
+	distanceByVertex := make([]int, len(graph))
+	finalized := make([]bool, len(graph))
 	// Begin with every vertex unreachable, then give start its zero-length path.
-	for i := range distance {
-		distance[i] = infinity
+	for vertex := range distanceByVertex {
+		distanceByVertex[vertex] = infinity
 	}
-	distance[start] = 0
+	distanceByVertex[start] = 0
 	for range graph {
 		// Among unfinished vertices, choose the smallest tentative distance.
 		vertex := -1
-		for i := range graph {
-			if !done[i] && (vertex < 0 || distance[i] < distance[vertex]) {
-				vertex = i
+		for candidateVertex := range graph {
+			if !finalized[candidateVertex] &&
+				(vertex < 0 || distanceByVertex[candidateVertex] < distanceByVertex[vertex]) {
+				vertex = candidateVertex
 			}
 		}
-		if vertex < 0 || distance[vertex] == infinity {
+		if vertex < 0 || distanceByVertex[vertex] == infinity {
 			// Every reachable vertex is done; the rest cannot be reached from start.
 			break
 		}
-		done[vertex] = true
+		finalized[vertex] = true
 		for _, edge := range graph[vertex] {
 			// Relax the edge only when addition is safe and the path improves the
 			// destination. Correctness requires every edge cost to be nonnegative.
-			if distance[vertex] <= infinity-edge.cost && distance[vertex]+edge.cost < distance[edge.to] {
-				distance[edge.to] = distance[vertex] + edge.cost
+			if distanceByVertex[vertex] <= infinity-edge.cost &&
+				distanceByVertex[vertex]+edge.cost < distanceByVertex[edge.to] {
+				distanceByVertex[edge.to] = distanceByVertex[vertex] + edge.cost
 			}
 		}
 	}
-	return distance
+	return distanceByVertex
 }
 ```
 
@@ -8080,34 +8110,34 @@ type directedEdge struct {
 	cost     int64
 }
 
-func bellmanFord(vertices, start int, edges []directedEdge) ([]int64, bool) {
+func bellmanFord(numVertices, start int, edges []directedEdge) ([]int64, bool) {
 	// MaxInt64 represents unreachable vertices; start reaches itself at cost zero.
-	distance := make([]int64, vertices)
-	for i := range distance {
-		distance[i] = math.MaxInt64
+	distanceByVertex := make([]int64, numVertices)
+	for vertex := range distanceByVertex {
+		distanceByVertex[vertex] = math.MaxInt64
 	}
-	distance[start] = 0
+	distanceByVertex[start] = 0
 	// relax applies the one-edge recurrence and reports whether it improved a
 	// reachable destination.
 	relax := func(edge directedEdge) bool {
-		if distance[edge.from] == math.MaxInt64 {
+		if distanceByVertex[edge.from] == math.MaxInt64 {
 			// No known path reaches the edge's source, so it cannot form a candidate.
 			return false
 		}
 		// Extend the best known source path by this edge. The function's contract
 		// requires every relevant path sum to fit in int64.
-		candidate := distance[edge.from] + edge.cost
-		if candidate >= distance[edge.to] {
+		candidateDistance := distanceByVertex[edge.from] + edge.cost
+		if candidateDistance >= distanceByVertex[edge.to] {
 			// The destination already has an equal or cheaper known path.
 			return false
 		}
 		// Record the cheaper path and report a change to the caller.
-		distance[edge.to] = candidate
+		distanceByVertex[edge.to] = candidateDistance
 		return true
 	}
-	// Any simple shortest path has at most vertices-1 edges. Stop early if a full
+	// Any simple shortest path has at most numVertices-1 edges. Stop early if a full
 	// pass makes no improvement.
-	for pass := 1; pass < vertices; pass++ {
+	for pass := 1; pass < numVertices; pass++ {
 		changed := false
 		for _, edge := range edges {
 			// Keep changed true once any edge improves during this pass; evaluating
@@ -8123,10 +8153,10 @@ func bellmanFord(vertices, start int, edges []directedEdge) ([]int64, bool) {
 	// simple paths have already been considered.
 	for _, edge := range edges {
 		if relax(edge) {
-			return distance, false
+			return distanceByVertex, false
 		}
 	}
-	return distance, true
+	return distanceByVertex, true
 }
 ```
 
@@ -8224,39 +8254,47 @@ the next lookup skips node `3`.
 ###### Go example
 
 ```go
-type disjointSet struct{ parent, size []int }
+type disjointSet struct {
+	parentByItem   []int
+	numItemsByRoot []int
+}
 
-func newDisjointSet(n int) *disjointSet {
+func newDisjointSet(numItems int) *disjointSet {
 	// Initially every element is a one-member tree whose root is itself.
-	d := &disjointSet{make([]int, n), make([]int, n)}
-	for i := range d.parent {
-		// Self-parenting makes i its root; size one records its single member.
-		d.parent[i], d.size[i] = i, 1
+	set := &disjointSet{
+		parentByItem:   make([]int, numItems),
+		numItemsByRoot: make([]int, numItems),
 	}
-	return d
-}
-func (d *disjointSet) find(x int) int {
-	for x != d.parent[x] {
-		// Point x to its grandparent while walking upward, shortening future finds.
-		d.parent[x] = d.parent[d.parent[x]]
-		x = d.parent[x]
+	for item := range set.parentByItem {
+		// Self-parenting makes item its root; one records its single member.
+		set.parentByItem[item], set.numItemsByRoot[item] = item, 1
 	}
-	return x
+	return set
 }
-func (d *disjointSet) union(a, b int) bool {
+func (set *disjointSet) find(item int) int {
+	for item != set.parentByItem[item] {
+		// Point the item to its grandparent while walking upward, shortening future
+		// searches for the same component root.
+		set.parentByItem[item] = set.parentByItem[set.parentByItem[item]]
+		item = set.parentByItem[item]
+	}
+	return item
+}
+func (set *disjointSet) union(firstItem, secondItem int) bool {
 	// Only roots represent groups; equal roots mean the elements are connected.
-	a, b = d.find(a), d.find(b)
-	if a == b {
+	firstRoot := set.find(firstItem)
+	secondRoot := set.find(secondItem)
+	if firstRoot == secondRoot {
 		// They already share a component, so no structural change is needed.
 		return false
 	}
-	if d.size[a] < d.size[b] {
+	if set.numItemsByRoot[firstRoot] < set.numItemsByRoot[secondRoot] {
 		// Attach the smaller tree below the larger to keep paths shallow.
-		a, b = b, a
+		firstRoot, secondRoot = secondRoot, firstRoot
 	}
-	d.parent[b] = a
-	// Only root a keeps a meaningful component size after the attachment.
-	d.size[a] += d.size[b]
+	set.parentByItem[secondRoot] = firstRoot
+	// Only firstRoot keeps a meaningful component size after the attachment.
+	set.numItemsByRoot[firstRoot] += set.numItemsByRoot[secondRoot]
 	return true
 }
 ```
@@ -8371,24 +8409,28 @@ disconnected.
 ```go
 type mstEdge struct{ from, to, cost int }
 
-func kruskal(vertices int, edges []mstEdge) (int, bool) {
+func kruskal(numVertices int, edges []mstEdge) (int, bool) {
 	// Sort the supplied edge slice in place, changing the caller's order.
 	// Considering edges from cheapest to most expensive makes each accepted edge
 	// the cheapest way to connect two currently separate components.
-	sort.Slice(edges, func(i, j int) bool { return edges[i].cost < edges[j].cost })
-	groups, total, used := newDisjointSet(vertices), 0, 0
+	sort.Slice(edges, func(leftIndex, rightIndex int) bool {
+		return edges[leftIndex].cost < edges[rightIndex].cost
+	})
+	groups := newDisjointSet(numVertices)
+	totalCost := 0
+	numEdgesUsed := 0
 	for _, edge := range edges {
 		if groups.union(edge.from, edge.to) {
 			// union rejects cycle-forming edges; accepted edges grow the forest.
-			total += edge.cost
-			used++
-			if used == vertices-1 {
+			totalCost += edge.cost
+			numEdgesUsed++
+			if numEdgesUsed == numVertices-1 {
 				break
 			}
 		}
 	}
-	// A nonempty spanning tree must contain exactly vertices-1 accepted edges.
-	return total, vertices == 0 || used == vertices-1
+	// A nonempty spanning tree must contain exactly numVertices-1 accepted edges.
+	return totalCost, numVertices == 0 || numEdgesUsed == numVertices-1
 }
 ```
 
@@ -8565,20 +8607,20 @@ the current value is the first later value that answers its question.
 func nextGreater(values []int) []int {
 	// -1 is the answer for indices that never encounter a greater value.
 	result := make([]int, len(values))
-	for i := range result {
-		result[i] = -1
+	for resultIndex := range result {
+		result[resultIndex] = -1
 	}
 	// stack holds unresolved indices whose values are non-increasing from bottom
 	// to top; equal values can coexist because neither is greater than the other.
 	stack := make([]int, 0, len(values))
-	for i, value := range values {
+	for currentIndex, value := range values {
 		for len(stack) > 0 && values[stack[len(stack)-1]] < value {
 			// value is the first greater value to the right of every popped index.
-			top := stack[len(stack)-1]
+			unresolvedIndex := stack[len(stack)-1]
 			stack = stack[:len(stack)-1]
-			result[top] = value
+			result[unresolvedIndex] = value
 		}
-		stack = append(stack, i)
+		stack = append(stack, currentIndex)
 	}
 	return result
 }
@@ -8675,8 +8717,8 @@ func windowMaximum(values []int, width int) []int {
 	// deque stores candidate indices in decreasing value order; the front is the
 	// maximum for the current window.
 	deque, result := make([]int, 0, width), make([]int, 0, len(values)-width+1)
-	for i, value := range values {
-		if len(deque) > 0 && deque[0] <= i-width {
+	for currentIndex, value := range values {
+		if len(deque) > 0 && deque[0] <= currentIndex-width {
 			// The front index has left the window and can no longer be an answer.
 			deque = deque[1:]
 		}
@@ -8685,8 +8727,8 @@ func windowMaximum(values []int, width int) []int {
 			// window in which both would appear.
 			deque = deque[:len(deque)-1]
 		}
-		deque = append(deque, i)
-		if i+1 >= width {
+		deque = append(deque, currentIndex)
+		if currentIndex+1 >= width {
 			// A complete window exists, and its maximum is the front candidate.
 			result = append(result, values[deque[0]])
 		}
@@ -8780,7 +8822,9 @@ func mergeIntervals(intervals []interval) []interval {
 	}
 	// Sort the supplied slice in place by start, changing the caller's order.
 	// Every later interval then begins no earlier than the current merged interval.
-	sort.Slice(intervals, func(i, j int) bool { return intervals[i].start < intervals[j].start })
+	sort.Slice(intervals, func(leftIndex, rightIndex int) bool {
+		return intervals[leftIndex].start < intervals[rightIndex].start
+	})
 	result := []interval{intervals[0]}
 	for _, next := range intervals[1:] {
 		last := &result[len(result)-1]
@@ -8885,11 +8929,11 @@ func maximumOverlap(events []sweepEvent) int {
 	// Sort the supplied event slice in place, changing the caller's order. At a
 	// tie, process negative end deltas before positive start deltas to model
 	// half-open intervals [start,end).
-	sort.Slice(events, func(i, j int) bool {
-		if events[i].position == events[j].position {
-			return events[i].delta < events[j].delta
+	sort.Slice(events, func(leftIndex, rightIndex int) bool {
+		if events[leftIndex].position == events[rightIndex].position {
+			return events[leftIndex].delta < events[rightIndex].delta
 		}
-		return events[i].position < events[j].position
+		return events[leftIndex].position < events[rightIndex].position
 	})
 	// active is the overlap immediately after applying each ordered boundary;
 	// best records the largest such count.
@@ -9092,17 +9136,17 @@ type trieNode struct {
 
 func (root *trieNode) insert(word string) {
 	node := root
-	for i := range len(word) {
+	for byteIndex := range len(word) {
 		// Allocate each sparse child map only when this prefix first needs one.
 		if node.children == nil {
 			node.children = make(map[byte]*trieNode)
 		}
-		if node.children[word[i]] == nil {
+		if node.children[word[byteIndex]] == nil {
 			// Missing byte edges create new prefix nodes; existing edges are shared
 			// with words that have the same prefix.
-			node.children[word[i]] = &trieNode{}
+			node.children[word[byteIndex]] = &trieNode{}
 		}
-		node = node.children[word[i]]
+		node = node.children[word[byteIndex]]
 	}
 	// The terminal flag distinguishes a complete word from a prefix alone.
 	node.word = true
@@ -9111,8 +9155,8 @@ func (root *trieNode) insert(word string) {
 func (root *trieNode) find(text string, wholeWord bool) bool {
 	node := root
 	// Follow one byte edge per input position; a missing edge proves absence.
-	for i := range len(text) {
-		node = node.children[text[i]]
+	for byteIndex := range len(text) {
+		node = node.children[text[byteIndex]]
 		if node == nil {
 			return false
 		}
@@ -9657,7 +9701,7 @@ func isEven(value int) bool {
 	return value%2 == 0
 }
 
-func TestIsEven(t *testing.T) {
+func TestIsEven(testContext *testing.T) {
 	// Each row names one behavior and keeps its input beside the expected result.
 	tests := []struct {
 		name  string
@@ -9670,11 +9714,16 @@ func TestIsEven(t *testing.T) {
 	}
 
 	// Run every row as a named subtest so a failure identifies the exact case.
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for _, testCase := range tests {
+		testContext.Run(testCase.name, func(subtestContext *testing.T) {
 			// Compare the actual result with the row's expectation and report both.
-			if got := isEven(test.value); got != test.want {
-				t.Errorf("isEven(%d) = %v, want %v", test.value, got, test.want)
+			if actual := isEven(testCase.value); actual != testCase.want {
+				subtestContext.Errorf(
+					"isEven(%d) = %v, want %v",
+					testCase.value,
+					actual,
+					testCase.want,
+				)
 			}
 		})
 	}
@@ -10105,36 +10154,40 @@ item. Each repair moves through a finite number of array levels.
 type intMinHeap []int
 
 // Len, Less, and Swap let heap.Interface maintain this slice as a min-heap.
-func (h intMinHeap) Len() int           { return len(h) }
-func (h intMinHeap) Less(i, j int) bool { return h[i] < h[j] }
-func (h intMinHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (heapValues intMinHeap) Len() int { return len(heapValues) }
+func (heapValues intMinHeap) Less(leftIndex, rightIndex int) bool {
+	return heapValues[leftIndex] < heapValues[rightIndex]
+}
+func (heapValues intMinHeap) Swap(leftIndex, rightIndex int) {
+	heapValues[leftIndex], heapValues[rightIndex] = heapValues[rightIndex], heapValues[leftIndex]
+}
 
-func (h *intMinHeap) Push(value any) {
+func (heapValues *intMinHeap) Push(value any) {
 	// heap.Interface passes values as any. The .(int) assertion recovers the
 	// required element type and would panic if a caller supplied a non-int value.
 	// The pointer receiver then grows the heap's backing slice.
-	*h = append(*h, value.(int))
+	*heapValues = append(*heapValues, value.(int))
 }
 
-func (h *intMinHeap) Pop() any {
+func (heapValues *intMinHeap) Pop() any {
 	// container/heap first swaps the root with the final slot; Pop removes and
 	// returns that final slot rather than searching for the minimum itself.
-	old := *h
-	last := len(old) - 1
-	value := old[last]
-	*h = old[:last]
+	valuesBeforeRemoval := *heapValues
+	lastIndex := len(valuesBeforeRemoval) - 1
+	value := valuesBeforeRemoval[lastIndex]
+	*heapValues = valuesBeforeRemoval[:lastIndex]
 	return value
 }
 
 func popAscending(values []int) []int {
 	// Clone protects the caller, and Init rearranges the copy into heap order.
-	h := intMinHeap(slices.Clone(values))
-	heap.Init(&h)
+	heapValues := intMinHeap(slices.Clone(values))
+	heap.Init(&heapValues)
 
 	// Every heap pop removes the current minimum, producing ascending output.
 	result := make([]int, 0, len(values))
-	for h.Len() > 0 {
-		result = append(result, heap.Pop(&h).(int))
+	for heapValues.Len() > 0 {
+		result = append(result, heap.Pop(&heapValues).(int))
 	}
 	return result
 }
@@ -11434,51 +11487,51 @@ type Stack[T any] struct {
 }
 
 // Push places value on top of the stack.
-func (s *Stack[T]) Push(value T) {
+func (stack *Stack[T]) Push(value T) {
 	// The slice's final position is the stack top.
-	s.items = append(s.items, value)
+	stack.items = append(stack.items, value)
 }
 
 // Pop removes and returns the top value. The boolean is false when the stack
 // is empty.
-func (s *Stack[T]) Pop() (T, bool) {
-	if len(s.items) == 0 {
+func (stack *Stack[T]) Pop() (T, bool) {
+	if len(stack.items) == 0 {
 		// Return T's zero value with false because there is no top element.
-		var zero T
-		return zero, false
+		var zeroValue T
+		return zeroValue, false
 	}
 
-	last := len(s.items) - 1
-	value := s.items[last]
+	lastItemIndex := len(stack.items) - 1
+	value := stack.items[lastItemIndex]
 	// Clear the hidden slot before shrinking so pointer-bearing T values do not
 	// remain reachable through the backing array.
-	var zero T
-	s.items[last] = zero
-	s.items = s.items[:last]
+	var zeroValue T
+	stack.items[lastItemIndex] = zeroValue
+	stack.items = stack.items[:lastItemIndex]
 	return value, true
 }
 
 // Peek returns the top value without removing it. The boolean is false when
 // the stack is empty.
-func (s *Stack[T]) Peek() (T, bool) {
-	if len(s.items) == 0 {
+func (stack *Stack[T]) Peek() (T, bool) {
+	if len(stack.items) == 0 {
 		// As with Pop, false distinguishes absence from a stored zero value.
-		var zero T
-		return zero, false
+		var zeroValue T
+		return zeroValue, false
 	}
 
 	// Read the final item without changing the slice length.
-	return s.items[len(s.items)-1], true
+	return stack.items[len(stack.items)-1], true
 }
 
 // Len returns the number of values in the stack.
-func (s *Stack[T]) Len() int {
-	return len(s.items)
+func (stack *Stack[T]) Len() int {
+	return len(stack.items)
 }
 
 // IsEmpty reports whether the stack contains no values.
-func (s *Stack[T]) IsEmpty() bool {
-	return len(s.items) == 0
+func (stack *Stack[T]) IsEmpty() bool {
+	return len(stack.items) == 0
 }
 ```
 
@@ -11730,26 +11783,26 @@ bytes of the first string, which is itself the maximum possible answer length.
 package commonprefixscan
 
 // LongestCommonPrefix returns the longest byte prefix shared by all strings.
-// It returns an empty string when strs is empty.
-func LongestCommonPrefix(strs []string) string {
+// It returns an empty string when strings is empty.
+func LongestCommonPrefix(strings []string) string {
 	// Empty input has no first row to use as the comparison baseline.
-	if len(strs) == 0 {
+	if len(strings) == 0 {
 		return ""
 	}
 
 	// Each byte in the first string is the expected value for one column.
-	for column := 0; column < len(strs[0]); column++ {
-		expected := strs[0][column]
-		for row := 1; row < len(strs); row++ {
+	for column := 0; column < len(strings[0]); column++ {
+		expectedByte := strings[0][column]
+		for row := 1; row < len(strings); row++ {
 			// Check length before indexing. A missing or unequal byte proves that the
 			// previously verified columns form the longest common prefix.
-			if column >= len(strs[row]) || strs[row][column] != expected {
-				return strs[0][:column]
+			if column >= len(strings[row]) || strings[row][column] != expectedByte {
+				return strings[0][:column]
 			}
 		}
 	}
 	// Every byte of the first string matched, so no longer prefix is possible.
-	return strs[0]
+	return strings[0]
 }
 ```
 

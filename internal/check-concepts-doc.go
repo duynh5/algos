@@ -3,7 +3,7 @@
 // Command check-concepts-doc validates the structure and local links of the
 // concepts guide. Run it from the repository root with:
 //
-//	go run scripts/check-concepts-doc.go
+//	go run internal/check-concepts-doc.go
 package main
 
 import (

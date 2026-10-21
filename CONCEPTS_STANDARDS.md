@@ -208,7 +208,7 @@ heading. For example, an `###` entry uses `#### The problem it solves`; a
 - Do not turn company tags or remembered question lists into claims about what
   is currently asked.
 - When intentionally replacing or removing a baseline external source, update
-  `scripts/check-concepts-doc.go` in the same change and explain why the new
+  `internal/check-concepts-doc.go` in the same change and explain why the new
   source supports the claim.
 
 ## 12. Update workflow
@@ -233,7 +233,7 @@ While editing:
    ownership, or navigation.
 4. Preserve an old fragment with an explicit anchor as soon as its heading is
    renamed.
-5. Update `scripts/check-concepts-doc.go` when an intentional structural change
+5. Update `internal/check-concepts-doc.go` when an intentional structural change
    alters the number of teaching entries or the maintained source contract.
 
 After editing:
@@ -253,11 +253,11 @@ Run these commands from the repository root after every update to
 `CONCEPTS.md`:
 
 ```bash
-/Users/nolan/.codex/scripts/check-non-ascii.py CONCEPTS_STANDARDS.md CONCEPTS.md
+~/.codex/scripts/check-non-ascii.py CONCEPTS_STANDARDS.md CONCEPTS.md
 git diff --check HEAD -- CONCEPTS_STANDARDS.md CONCEPTS.md
-go run scripts/check-concepts-doc.go
-go vet scripts/check-concepts-doc.go
-go test scripts/check-concepts-doc.go
+go run internal/check-concepts-doc.go
+go vet internal/check-concepts-doc.go
+go test internal/check-concepts-doc.go
 go test ./...
 ```
 

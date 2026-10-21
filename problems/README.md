@@ -41,10 +41,10 @@ shared `internal/testrunner` package.
 Archive and run problems with:
 
 ```bash
-./scripts/archive-workbench.sh easy 1 two-sum
-./scripts/run-problem.sh --case 1 solved_easy_leetcode_0001_two_sum.go
-./scripts/run-problem.sh solved_easy_leetcode_0001_two_sum.go
-./scripts/test-problems.sh
+./internal/archive-workbench.sh easy 1 two-sum
+./internal/run-problem.sh --case 1 solved_easy_leetcode_0001_two_sum.go
+./internal/run-problem.sh solved_easy_leetcode_0001_two_sum.go
+./internal/test-problems.sh
 ```
 
 Without `--case`, `run-problem.sh` runs every configured case; `--case 1` runs

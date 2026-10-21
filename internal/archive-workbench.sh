@@ -78,4 +78,4 @@ rmdir "$temporary_directory"
 trap - EXIT
 
 echo "archived $destination"
-echo "after verification, reset with ./scripts/reset-workbench.sh"
+echo "after verification, reset with ./internal/reset-workbench.sh"

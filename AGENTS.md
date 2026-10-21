@@ -223,9 +223,9 @@ When the completed problem is in the workbench:
    memory or the supplied ID alone. If the source disagrees or remains
    ambiguous, stop and ask the user before naming or archiving the file.
 4. Run
-   `./scripts/archive-workbench.sh <difficulty> <problem-id> <descriptive-slug> [source]`.
+   `./internal/archive-workbench.sh <difficulty> <problem-id> <descriptive-slug> [source]`.
 5. Run the location-appropriate archive checks in the validation matrix.
-6. Reset the active file with `./scripts/reset-workbench.sh` only after the
+6. Reset the active file with `./internal/reset-workbench.sh` only after the
    archive and all checks succeed.
 
 ## Validation Matrix
@@ -233,8 +233,8 @@ When the completed problem is in the workbench:
 | State and location | Required checks |
 | --- | --- |
 | Retrieved unsolved practice file | Format it and verify its scaffolding against `workbench/main.go.template`; expected failures from the blank attempt are not retrieval failures. |
-| Reviewed workbench problem | `./scripts/workbench.sh`, then `go test ./...`. |
-| Reviewed or archived file under `problems/`, including an archive created from the workbench | `./scripts/run-problem.sh <filename>`, `./scripts/test-problems.sh`, then `go test ./...`. |
+| Reviewed workbench problem | `./internal/workbench.sh`, then `go test ./...`. |
+| Reviewed or archived file under `problems/`, including an archive created from the workbench | `./internal/run-problem.sh <filename>`, `./internal/test-problems.sh`, then `go test ./...`. |
 
 ## Documentation Map
 
