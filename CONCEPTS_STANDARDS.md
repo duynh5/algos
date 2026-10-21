@@ -267,6 +267,7 @@ temporary package. Remove temporary validation artifacts after the checks.
 The concepts-document checker is the executable structural contract. It must
 continue to verify:
 
+- a maximum physical line width of 70 characters in `CONCEPTS.md`;
 - a valid heading hierarchy with no duplicate targets;
 - balanced fenced blocks;
 - all teaching entries and their eleven ordered fields;
@@ -279,6 +280,7 @@ continue to verify:
 
 An update to `CONCEPTS.md` is complete only when:
 
+- every line in `CONCEPTS.md` is at most 70 characters;
 - every changed teaching entry follows the eleven-part contract;
 - new terminology is explained in plain language before it is relied on;
 - ordinary and relevant boundary behavior are demonstrated with replayable

@@ -18,9 +18,14 @@ import (
 	"sort"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
-const guidePath = "CONCEPTS.md"
+const (
+	guidePath       = "CONCEPTS.md"
+	linkTargetsPath = "CONCEPTS_LINKS.md"
+	guideLineWidth  = 70
+)
 
 var (
 	headingPattern = regexp.MustCompile(`^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$`)
@@ -61,6 +66,7 @@ var baselineExternalLinks = []string{
 
 type document struct {
 	path            string
+	contents        []byte
 	prose           []byte
 	targets         map[string]struct{}
 	headingCount    int
@@ -84,20 +90,44 @@ func main() {
 	}
 
 	guide, issues := readDocument(filepath.Join(repositoryRoot, guidePath))
+	linkTargets, linkTargetIssues := readDocument(
+		filepath.Join(repositoryRoot, linkTargetsPath),
+	)
+	issues = append(issues, linkTargetIssues...)
 	if guide != nil {
+		issues = append(issues, validateLineWidth(guidePath, guide.contents)...)
 		issues = append(issues, validateTeachingEntries(guide.prose)...)
 		issues = append(issues, validateNoTables(guide.prose)...)
 	}
 
 	counts := linkCounts{}
+	externalLinks := make(map[string]struct{})
 	if guide != nil {
-		linkIssues, linkTotals := validateGuideLinks(guide)
+		linkIssues, linkTotals, guideExternalLinks := validateDocumentLinks(guide)
 		issues = append(issues, linkIssues...)
 		counts = linkTotals
+		for destination := range guideExternalLinks {
+			externalLinks[destination] = struct{}{}
+		}
 
 		inboundIssues, inboundCount := validateInboundLinks(repositoryRoot, guide.targets)
 		issues = append(issues, inboundIssues...)
 		counts.inbound = inboundCount
+	}
+	if linkTargets != nil {
+		linkIssues, linkTotals, targetExternalLinks := validateDocumentLinks(linkTargets)
+		issues = append(issues, linkIssues...)
+		counts.internal += linkTotals.internal
+		counts.local += linkTotals.local
+		counts.external += linkTotals.external
+		for destination := range targetExternalLinks {
+			externalLinks[destination] = struct{}{}
+		}
+	}
+	for _, baselineLink := range baselineExternalLinks {
+		if _, exists := externalLinks[baselineLink]; !exists {
+			issues = append(issues, fmt.Sprintf("missing baseline external link %s", baselineLink))
+		}
 	}
 
 	sort.Strings(issues)
@@ -125,6 +155,7 @@ func readDocument(path string) (*document, []string) {
 	targets, headings, anchors, targetIssues := collectTargets(path, prose)
 	return &document{
 		path:            path,
+		contents:        contents,
 		prose:           prose,
 		targets:         targets,
 		headingCount:    headings,
@@ -133,6 +164,32 @@ func readDocument(path string) (*document, []string) {
 		textBlockCount:  textBlocks,
 		explicitAnchors: anchors,
 	}, append(fenceIssues, targetIssues...)
+}
+
+func validateLineWidth(path string, contents []byte) []string {
+	issues := make([]string, 0)
+	scanner := bufio.NewScanner(bytes.NewReader(contents))
+	lineNumber := 0
+	for scanner.Scan() {
+		lineNumber++
+		width := utf8.RuneCountInString(scanner.Text())
+		if width > guideLineWidth {
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s:%d: line has %d characters; maximum is %d",
+					path,
+					lineNumber,
+					width,
+					guideLineWidth,
+				),
+			)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		issues = append(issues, fmt.Sprintf("%s: line-width scan: %v", path, err))
+	}
+	return issues
 }
 
 func proseOutsideFences(path string, contents []byte) ([]byte, int, int, int, []string) {
@@ -307,11 +364,16 @@ func validateNoTables(prose []byte) []string {
 	return nil
 }
 
-func validateGuideLinks(guide *document) ([]string, linkCounts) {
+func validateDocumentLinks(document *document) (
+	[]string,
+	linkCounts,
+	map[string]struct{},
+) {
 	issues := make([]string, 0)
 	counts := linkCounts{}
 	externalLinks := make(map[string]struct{})
-	for _, match := range linkPattern.FindAllSubmatch(withoutInlineCode(guide.prose), -1) {
+	displayPath := filepath.Base(document.path)
+	for _, match := range linkPattern.FindAllSubmatch(withoutInlineCode(document.prose), -1) {
 		destination := strings.Trim(string(match[1]), "<>")
 		switch {
 		case strings.HasPrefix(destination, "http://"), strings.HasPrefix(destination, "https://"):
@@ -325,13 +387,13 @@ func validateGuideLinks(guide *document) ([]string, linkCounts) {
 		pathPart, fragment, _ := strings.Cut(destination, "#")
 		decodedFragment, err := url.PathUnescape(fragment)
 		if err != nil {
-			issues = append(issues, fmt.Sprintf("%s: invalid escaped fragment %q: %v", guidePath, fragment, err))
+			issues = append(issues, fmt.Sprintf("%s: invalid escaped fragment %q: %v", displayPath, fragment, err))
 			continue
 		}
 		if pathPart == "" {
 			counts.internal++
-			if _, exists := guide.targets[decodedFragment]; fragment != "" && !exists {
-				issues = append(issues, fmt.Sprintf("%s: unresolved fragment #%s", guidePath, decodedFragment))
+			if _, exists := document.targets[decodedFragment]; fragment != "" && !exists {
+				issues = append(issues, fmt.Sprintf("%s: unresolved fragment #%s", displayPath, decodedFragment))
 			}
 			continue
 		}
@@ -339,12 +401,12 @@ func validateGuideLinks(guide *document) ([]string, linkCounts) {
 		counts.local++
 		decodedPath, err := url.PathUnescape(pathPart)
 		if err != nil {
-			issues = append(issues, fmt.Sprintf("%s: invalid escaped path %q: %v", guidePath, pathPart, err))
+			issues = append(issues, fmt.Sprintf("%s: invalid escaped path %q: %v", displayPath, pathPart, err))
 			continue
 		}
-		targetPath := filepath.Clean(filepath.Join(filepath.Dir(guide.path), filepath.FromSlash(decodedPath)))
+		targetPath := filepath.Clean(filepath.Join(filepath.Dir(document.path), filepath.FromSlash(decodedPath)))
 		if _, err := os.Stat(targetPath); err != nil {
-			issues = append(issues, fmt.Sprintf("%s: unresolved local path %s: %v", guidePath, decodedPath, err))
+			issues = append(issues, fmt.Sprintf("%s: unresolved local path %s: %v", displayPath, decodedPath, err))
 			continue
 		}
 		if fragment != "" && strings.EqualFold(filepath.Ext(targetPath), ".md") {
@@ -352,17 +414,12 @@ func validateGuideLinks(guide *document) ([]string, linkCounts) {
 			issues = append(issues, targetIssues...)
 			if targetDocument != nil {
 				if _, exists := targetDocument.targets[decodedFragment]; !exists {
-					issues = append(issues, fmt.Sprintf("%s: unresolved fragment %s#%s", guidePath, decodedPath, decodedFragment))
+					issues = append(issues, fmt.Sprintf("%s: unresolved fragment %s#%s", displayPath, decodedPath, decodedFragment))
 				}
 			}
 		}
 	}
-	for _, baselineLink := range baselineExternalLinks {
-		if _, exists := externalLinks[baselineLink]; !exists {
-			issues = append(issues, fmt.Sprintf("%s: missing baseline external link %s", guidePath, baselineLink))
-		}
-	}
-	return issues, counts
+	return issues, counts, externalLinks
 }
 
 func withoutInlineCode(prose []byte) []byte {
