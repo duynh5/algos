@@ -29,7 +29,7 @@ const (
 
 var (
 	headingPattern = regexp.MustCompile(`^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$`)
-	anchorPattern  = regexp.MustCompile(`<a[ \t]+(?:id|name)="([^"]+)"[^>]*>`)
+	anchorPattern  = regexp.MustCompile(`(?s)<a\s+(?:id|name)\s*=\s*"?([A-Za-z0-9_-]+)"?[^>]*>`)
 	linkPattern    = regexp.MustCompile(`(?s)!?\[[^]]*\]\([ \t\r\n]*([^\s)]+)(?:[ \t\r\n]+["'][^)]*)?\)`)
 	inboundPattern = regexp.MustCompile(`CONCEPTS\.md#([A-Za-z0-9_-]+)`)
 	tablePattern   = regexp.MustCompile(`^[ \t]*\|.*\|[ \t]*$`)
@@ -276,19 +276,21 @@ func collectTargets(path string, prose []byte) (map[string]struct{}, int, int, [
 			targetOrigins[slug] = fmt.Sprintf("heading at line %d", lineNumber)
 			headings++
 		}
-		for _, match := range anchorPattern.FindAllStringSubmatch(line, -1) {
-			anchor := match[1]
-			explicitUses[anchor]++
-			if explicitUses[anchor] > 1 {
-				issues = append(issues, fmt.Sprintf("%s:%d: duplicate explicit anchor %q", path, lineNumber, anchor))
-			}
-			if origin, exists := targetOrigins[anchor]; exists {
-				issues = append(issues, fmt.Sprintf("%s:%d: explicit anchor %q duplicates %s", path, lineNumber, anchor, origin))
-			}
-			targets[anchor] = struct{}{}
-			targetOrigins[anchor] = fmt.Sprintf("explicit anchor at line %d", lineNumber)
-			anchors++
+	}
+	// Scan the complete prose so valid HTML anchors may span physical lines.
+	for _, match := range anchorPattern.FindAllSubmatchIndex(prose, -1) {
+		anchor := string(prose[match[2]:match[3]])
+		lineNumber := bytes.Count(prose[:match[0]], []byte{'\n'}) + 1
+		explicitUses[anchor]++
+		if explicitUses[anchor] > 1 {
+			issues = append(issues, fmt.Sprintf("%s:%d: duplicate explicit anchor %q", path, lineNumber, anchor))
 		}
+		if origin, exists := targetOrigins[anchor]; exists {
+			issues = append(issues, fmt.Sprintf("%s:%d: explicit anchor %q duplicates %s", path, lineNumber, anchor, origin))
+		}
+		targets[anchor] = struct{}{}
+		targetOrigins[anchor] = fmt.Sprintf("explicit anchor at line %d", lineNumber)
+		anchors++
 	}
 	return targets, headings, anchors, issues
 }
@@ -364,11 +366,7 @@ func validateNoTables(prose []byte) []string {
 	return nil
 }
 
-func validateDocumentLinks(document *document) (
-	[]string,
-	linkCounts,
-	map[string]struct{},
-) {
+func validateDocumentLinks(document *document) ([]string, linkCounts, map[string]struct{}) {
 	issues := make([]string, 0)
 	counts := linkCounts{}
 	externalLinks := make(map[string]struct{})

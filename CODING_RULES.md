@@ -21,6 +21,21 @@ code examples embedded in documentation. Workflow-specific instructions in
 ## Structure and Maintainability
 
 - Prefer clear, direct code over clever or compressed implementations.
+- Prefer explicit, role-based identifiers even when they are longer. Name a
+  count, index, boundary, or state by what it measures and where it applies;
+  for example, use `numNodesInCurrentLayer` instead of `levelSize` and
+  `currentIndex` instead of `i`.
+- Avoid abbreviations such as `cur`, `prev`, and `idx`, vague names whose role
+  is not evident, and single-letter identifiers. Use conventional mathematical
+  symbols only when the surrounding explanation defines the same notation, or
+  when an external interface requires the name.
+- Name mappings and indexed collections by both the stored fact and its lookup
+  dimension when that relationship is not otherwise obvious; for example, use
+  `distanceByVertex` or `earlierIndexByValue` instead of `distance` or `seen`.
+- When renaming an identifier, update its comments, worked traces,
+  documentation, tests, and other explanatory references in the same change.
+- Do not shorten a precise identifier merely to fit a long statement. Split
+  declarations, conditions, or control flow into readable steps instead.
 - Put new code in the smallest project-appropriate location and connect it
   through existing entry points.
 - Extract a helper, type, or module only when it removes meaningful duplication

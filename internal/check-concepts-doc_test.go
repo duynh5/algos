@@ -44,3 +44,20 @@ func TestValidateLineWidth(t *testing.T) {
 		})
 	}
 }
+
+func TestCollectTargetsRecognizesMultilineAnchor(t *testing.T) {
+	const legacyAnchor = "e4-distinguish-missing-keys-from-stored-values-" +
+		"map-presence-and-sets"
+	prose := []byte("<a\nid=\n" + legacyAnchor + ">\n</a>\n")
+
+	targets, _, anchors, issues := collectTargets("guide.md", prose)
+	if len(issues) != 0 {
+		t.Fatalf("collectTargets() returned issues: %v", issues)
+	}
+	if anchors != 1 {
+		t.Fatalf("collectTargets() found %d anchors; want 1", anchors)
+	}
+	if _, exists := targets[legacyAnchor]; !exists {
+		t.Fatalf("collectTargets() did not find %q", legacyAnchor)
+	}
+}

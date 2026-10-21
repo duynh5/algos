@@ -7046,8 +7046,9 @@ can exceed the chosen integer type.
 
 - [E.2 Rolling dynamic programming](#e2-rolling-dynamic-programming)
   owns the Go implementation.
-- [C.1.3.10.1 Preserve order with
-  ranks](#c13101-coordinate-compression) owns coordinate compression.
+- [C.1.3.10.1 Preserve order (coordinate
+  compression)](#c13101-coordinate-compression) owns
+  coordinate compression.
 - [Climbing
   Stairs](problems/solved_easy_leetcode_0070_climbing_stairs.go) is
   the representative problem.
@@ -7056,7 +7057,7 @@ can exceed the chosen integer type.
 
 <a id="c13101-coordinate-compression"></a>
 
-##### C.1.3.10.1 Preserve order with ranks
+##### C.1.3.10.1 Preserve order (coordinate compression)
 
 ###### The problem it solves
 
@@ -11067,6 +11068,11 @@ and promised non-mutation explicitly.
   an array also affects memory lifetime.
 
 <a id="e4-map-presence-and-sets"></a>
+
+<a
+id=
+e4-distinguish-missing-keys-from-stored-values-map-presence-and-sets>
+</a>
 
 ### D.4 Map presence and sets
 
