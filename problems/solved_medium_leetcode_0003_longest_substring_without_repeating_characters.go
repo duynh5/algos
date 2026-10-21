@@ -284,7 +284,7 @@ Current attempt:
   deliberately compares bytes, so it would count UTF-8 bytes rather than
   Unicode code points if the input contract were expanded beyond ASCII.
 - Relevant concept and invariant: See
-  concepts/README.md#sliding-window and concepts/README.md#hash-map-or-set.
+  ../CONCEPTS.md#sliding-window and ../CONCEPTS.md#hash-map-or-set.
   After each right index is
   processed, s[i:j+1] contains no duplicate byte, i never decreases, m holds
   the latest processed index for each byte, and longest is the

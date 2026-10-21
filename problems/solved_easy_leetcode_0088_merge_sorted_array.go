@@ -353,7 +353,7 @@ Current attempt:
 - First failing assumption or bottleneck: No correctness assumption fails under
   the stated constraints. The first optimization limit is the m+n-element arr
   allocation plus the final copy, even though nums1 already owns enough space.
-- Relevant concept and invariant: See concepts/README.md#two-pointers.
+- Relevant concept and invariant: See ../CONCEPTS.md#two-pointers.
   Each pointer names the smallest unread value in its input.
 - Concrete example: For nums1=[1,3,5,0,0,0], m=3, nums2=[2,4,6], n=3,
   (i,j,arr) changes from (0,0,[]) to (1,0,[1]), (1,1,[1,2]),

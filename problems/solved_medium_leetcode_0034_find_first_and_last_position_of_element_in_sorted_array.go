@@ -385,7 +385,7 @@ Current attempt:
   The remaining duplication is that both searches repeat nearly the same
   binary-search structure and both search the full range even when target is
   absent.
-- Relevant concept and invariant: See concepts/README.md#binary-search.
+- Relevant concept and invariant: See ../CONCEPTS.md#binary-search.
   During the first search, the
   first occurrence remains in [left,right] whenever it exists; equality keeps
   middle by assigning right = middle. During the second, the last occurrence

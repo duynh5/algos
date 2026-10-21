@@ -61,7 +61,7 @@ Constraints:
 // solveCurrentAttempt below.
 //
 // This completed problem archive follows the workbench template.
-// Concept: concepts/README.md#binary-search
+// Concept: ../CONCEPTS.md#binary-search
 
 func parseSearchInsertPositionInput(input string) ([]int, int) {
 	var args []json.RawMessage

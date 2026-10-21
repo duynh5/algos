@@ -1,6 +1,6 @@
-# Maintenance Standards for `concepts/README.md`
+# Maintenance Standards for `CONCEPTS.md`
 
-These standards apply whenever `concepts/README.md` is changed. The current
+These standards apply whenever `CONCEPTS.md` is changed. The current
 working-tree version of the guide is the source of truth. Preserve its useful
 teaching material, examples, Go code, sources, links, and compatibility anchors
 unless a verified correction requires a change.
@@ -17,7 +17,7 @@ unless a verified correction requires a change.
 
 ## 2. Guide organization
 
-- Keep `concepts/README.md` as the single owning guide unless a separate change
+- Keep `CONCEPTS.md` as the single owning guide unless a separate change
   explicitly establishes a new documentation structure.
 - Preserve the current learning progression:
   1. how to use the guide and contemporary interview evidence;
@@ -250,11 +250,11 @@ After editing:
 ## 13. Validation
 
 Run these commands from the repository root after every update to
-`concepts/README.md`:
+`CONCEPTS.md`:
 
 ```bash
-/Users/nolan/.codex/scripts/check-non-ascii.py CONCEPTS_STANDARDS.md concepts/README.md
-git diff --check HEAD -- CONCEPTS_STANDARDS.md concepts/README.md
+/Users/nolan/.codex/scripts/check-non-ascii.py CONCEPTS_STANDARDS.md CONCEPTS.md
+git diff --check HEAD -- CONCEPTS_STANDARDS.md CONCEPTS.md
 go run scripts/check-concepts-doc.go
 go vet scripts/check-concepts-doc.go
 go test scripts/check-concepts-doc.go
@@ -277,7 +277,7 @@ continue to verify:
 
 ## 14. Definition of done
 
-An update to `concepts/README.md` is complete only when:
+An update to `CONCEPTS.md` is complete only when:
 
 - every changed teaching entry follows the eleven-part contract;
 - new terminology is explained in plain language before it is relied on;

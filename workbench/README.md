@@ -73,7 +73,7 @@ so it does not close the Go block comment early.
 During review, Codex preserves the user's attempt and evaluates it separately
 from its three solutions. It first restates the required inputs, outputs,
 limits, and important edge cases, then links relevant material in
-[`concepts/`](../concepts/). It runs the same official examples and additional
+[`CONCEPTS.md`](../CONCEPTS.md). It runs the same official examples and additional
 bug-catching cases against all four implementations. Detailed explanations of
 why each solution works and how its work and memory grow remain in the analysis
 block in `main.go`.

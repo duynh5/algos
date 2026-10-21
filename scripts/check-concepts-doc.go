@@ -20,13 +20,13 @@ import (
 	"unicode"
 )
 
-const guidePath = "concepts/README.md"
+const guidePath = "CONCEPTS.md"
 
 var (
 	headingPattern = regexp.MustCompile(`^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$`)
 	anchorPattern  = regexp.MustCompile(`<a[ \t]+(?:id|name)="([^"]+)"[^>]*>`)
 	linkPattern    = regexp.MustCompile(`(?s)!?\[[^]]*\]\([ \t\r\n]*([^\s)]+)(?:[ \t\r\n]+["'][^)]*)?\)`)
-	inboundPattern = regexp.MustCompile(`concepts/README\.md#([A-Za-z0-9_-]+)`)
+	inboundPattern = regexp.MustCompile(`CONCEPTS\.md#([A-Za-z0-9_-]+)`)
 	tablePattern   = regexp.MustCompile(`^[ \t]*\|.*\|[ \t]*$`)
 	tableRule      = regexp.MustCompile(`^[ \t]*\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-{3,}:?[ \t]*)+\|?[ \t]*$`)
 )

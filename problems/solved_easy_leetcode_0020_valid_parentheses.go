@@ -369,7 +369,7 @@ Current attempt:
   constant costs that the preferred solution avoids. An odd input length could
   be rejected before scanning, but omitting that shortcut does not change the
   asymptotic bound.
-- Relevant concept and invariant: See concepts/README.md#stack. Before
+- Relevant concept and invariant: See ../CONCEPTS.md#stack. Before
   processing s[index], stack
   contains exactly the unmatched opening brackets from s[:index], ordered from
   oldest to newest. A matching closer removes only the newest opener, which is

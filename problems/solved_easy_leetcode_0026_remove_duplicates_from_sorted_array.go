@@ -351,7 +351,7 @@ Current attempt:
   sorted, non-empty constraints. The main readability cost is expressing the
   write position indirectly as i-shift instead of tracking the kept-prefix
   length directly.
-- Relevant concept and invariant: See concepts/README.md#two-pointers.
+- Relevant concept and invariant: See ../CONCEPTS.md#two-pointers.
   After iteration i, nums[:i+1-shift] contains the unique values from the
   original prefix nums[:i+1], in sorted order.
 - Concrete example: For nums=[0,0,1,1,2], (i,val,shift,write) progresses as

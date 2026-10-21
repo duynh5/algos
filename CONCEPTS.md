@@ -485,7 +485,7 @@ progress measure; an invariant alone does not show that a loop terminates.
   explains how to account for the work after correctness is established.
 - [B.1.1 Moving values in place](#b11-moving-values-in-place) owns the slice
   operation demonstrated here.
-- [Remove Element](../problems/solved_easy_leetcode_0027_remove_element.go)
+- [Remove Element](problems/solved_easy_leetcode_0027_remove_element.go)
   applies the same prefix invariant to a judge problem.
 
 ### A.3 Recursion and saved work
@@ -867,9 +867,9 @@ mask is compact storage, not a shortcut around exponential enumeration.
   and overflow rules.
 - [A.7 Combinatorics and output size](#a7-combinatorics-and-output-size)
   accounts for all `2^n` subset outputs.
-- [Single Number](../problems/easy_leetcode_0136_single_number.go) applies XOR
+- [Single Number](problems/easy_leetcode_0136_single_number.go) applies XOR
   cancellation under an exact occurrence promise.
-- [Reverse Bits](../problems/easy_leetcode_0190_reverse_bits.go) treats the
+- [Reverse Bits](problems/easy_leetcode_0190_reverse_bits.go) treats the
   input as a fixed-width binary value.
 
 ### A.6 Keeping arithmetic values exact and consistent
@@ -1411,7 +1411,7 @@ vertical, negative, and duplicate cases all need explicit tests.
   owns Euclid's algorithm.
 - [A.6.2 Normalized fractions and ratios](#a62-normalized-fractions-and-ratios)
   explains canonical reduced pairs.
-- [Max Points on a Line](../problems/hard_leetcode_0149_max_points_on_a_line.go)
+- [Max Points on a Line](problems/hard_leetcode_0149_max_points_on_a_line.go)
   uses direction keys with duplicate counting.
 
 #### A.6.4 Modular arithmetic and negative division
@@ -1652,7 +1652,7 @@ integers.
 
 - [A.6.6 Factors and prime sieves](#a66-factors-and-prime-sieves) defines prime
   factors and repeated divisibility.
-- [Factorial Trailing Zeroes](../problems/medium_leetcode_0172_factorial_trailing_zeroes.go)
+- [Factorial Trailing Zeroes](problems/medium_leetcode_0172_factorial_trailing_zeroes.go)
   applies the factor-layer count.
 
 #### A.6.6 Factors and prime sieves
@@ -2475,7 +2475,7 @@ same, and the smallest signed integer cannot be made positive in the same type.
   handles digit text that cannot first become an integer.
 - [E.6 Overflow-safe integer reversal](#e6-overflow-safe-integer-reversal)
   owns the complete Go implementation.
-- [Palindrome Number](../problems/solved_easy_leetcode_0009_palindrome_number.go)
+- [Palindrome Number](problems/solved_easy_leetcode_0009_palindrome_number.go)
   compares full reversal with reversing only half the digits.
 
 <a id="b-data-structures"></a>
@@ -2890,9 +2890,9 @@ slice uses `O(n)` time and `O(n)` result space. A recursive walk can also retain
   reusable Go implementation.
 - [Fast and slow pointers](#c1332-fast-and-slow-pointers) uses different speeds
   to detect a cycle or locate a middle node.
-- [Add Two Numbers](../problems/solved_easy_leetcode_0002_add_two_numbers.go)
+- [Add Two Numbers](problems/solved_easy_leetcode_0002_add_two_numbers.go)
   combines unequal digit lists and carry state.
-- [Merge Two Sorted Lists](../problems/solved_easy_leetcode_0021_merge_two_sorted_lists.go)
+- [Merge Two Sorted Lists](problems/solved_easy_leetcode_0021_merge_two_sorted_lists.go)
   uses a dummy head and a maintained tail.
 
 ### B.3 Queues and deques
@@ -3162,7 +3162,7 @@ has `h = O(n)`. The best case finds the target at the root in `O(1)` time.
   ordering promise used by search.
 - [Binary search](#c136-binary-search) applies the same discard-one-side idea
   to indexed sorted data.
-- [Validate Binary Search Tree](../problems/medium_leetcode_0098_validate_binary_search_tree.go)
+- [Validate Binary Search Tree](problems/medium_leetcode_0098_validate_binary_search_tree.go)
   exercises ancestor bounds.
 
 #### B.4.2 Traversal order
@@ -3281,7 +3281,7 @@ maximum width, `O(w)`, plus `O(n)` output.
   order.
 - [Recursive return contracts](#b43-recursive-return-contracts) uses postorder
   to combine child answers.
-- [Binary Tree Level Order Traversal](../problems/medium_leetcode_0102_binary_tree_level_order_traversal.go)
+- [Binary Tree Level Order Traversal](problems/medium_leetcode_0102_binary_tree_level_order_traversal.go)
   groups the queue by depth.
 
 #### B.4.3 Recursive return contracts
@@ -3393,7 +3393,7 @@ and `O(n)` for a chain. No collection result is allocated.
   and memoization.
 - [Traversal order](#b42-traversal-order) explains why child-first work is
   postorder.
-- [Maximum Depth of Binary Tree](../problems/easy_leetcode_0104_maximum_depth_of_binary_tree.go)
+- [Maximum Depth of Binary Tree](problems/easy_leetcode_0104_maximum_depth_of_binary_tree.go)
   uses this exact contract.
 
 #### B.4.4 BST validation and costs
@@ -3520,7 +3520,7 @@ best-case `O(1)` time as `n` grows; a valid tree or a late violation requires
   promise being validated.
 - [Correctness and invariants](#a2-correctness-and-invariants) gives the general
   proof pattern.
-- [Validate Binary Search Tree](../problems/medium_leetcode_0098_validate_binary_search_tree.go)
+- [Validate Binary Search Tree](problems/medium_leetcode_0098_validate_binary_search_tree.go)
   is the representative exercise.
 
 #### B.4.5 Reconstruction from traversals
@@ -3648,7 +3648,7 @@ inorder instead makes worst-case time `O(n^2)`.
 - [Traversal order](#b42-traversal-order) defines preorder and inorder.
 - [Map presence and sets](#d4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
   explains checked lookups for untrusted values.
-- [Construct Binary Tree from Preorder and Inorder Traversal](../problems/medium_leetcode_0105_construct_binary_tree_from_preorder_and_inorder_traversal.go)
+- [Construct Binary Tree from Preorder and Inorder Traversal](problems/medium_leetcode_0105_construct_binary_tree_from_preorder_and_inorder_traversal.go)
   is the representative exercise.
 
 #### B.4.6 Traversing through parent links
@@ -3947,9 +3947,9 @@ adjacency list stores two entries per edge, still `O(V + E)`.
   [depth-first search](#c1320-depth-first-search) own traversal choices.
 - [Bellman-Ford](#c1324-bellman-ford-shortest-paths) naturally consumes an
   edge list.
-- [Clone Graph](../problems/medium_leetcode_0133_clone_graph.go) requires an
+- [Clone Graph](problems/medium_leetcode_0133_clone_graph.go) requires an
   identity-keyed clone map.
-- [Number of Islands](../problems/medium_leetcode_0200_number_of_islands.go)
+- [Number of Islands](problems/medium_leetcode_0200_number_of_islands.go)
   treats a grid as an implicit graph.
 
 ### B.6 Matrix traversal and in-place state
@@ -4056,7 +4056,7 @@ visits may use `O(1)` auxiliary state unless traversal adds a stack or queue.
 - [Graphs and grids](#b5-graphs-and-grids) owns implicit neighbor edges.
 - [Rows, columns, and shrinking boundaries](#b61-rows-columns-and-shrinking-boundaries)
   applies explicit rectangle boundaries.
-- [Matrix traversal problems](../problems/medium_leetcode_0054_spiral_matrix.go)
+- [Matrix traversal problems](problems/medium_leetcode_0054_spiral_matrix.go)
   expose row-column mistakes.
 
 #### B.6.1 Rows, columns, and shrinking boundaries
@@ -4183,7 +4183,7 @@ Every cell is appended once, so time is `O(rows*cols)`. Boundary variables use
 
 - [Matrix traversal and in-place state](#b6-matrix-traversal-and-in-place-state)
   owns shape and coordinate rules.
-- [Spiral Matrix](../problems/medium_leetcode_0054_spiral_matrix.go) is the
+- [Spiral Matrix](problems/medium_leetcode_0054_spiral_matrix.go) is the
   representative boundary exercise.
 
 #### B.6.2 Layer transformations
@@ -4282,7 +4282,7 @@ Transpose and row reversal each touch `O(n^2)` cells, so total time is
 
 - [Moving values in place](#b11-moving-values-in-place) owns the mutation
   tradeoff.
-- [Rotate Image](../problems/medium_leetcode_0048_rotate_image.go) exercises
+- [Rotate Image](problems/medium_leetcode_0048_rotate_image.go) exercises
   the transpose-and-reverse mapping.
 
 #### B.6.3 Reusing the first row and column as markers
@@ -4432,7 +4432,7 @@ the matrix stores its own markers.
 
 - [Matrix traversal and in-place state](#b6-matrix-traversal-and-in-place-state)
   owns rectangular-shape checks.
-- [Set Matrix Zeroes](../problems/medium_leetcode_0073_set_matrix_zeroes.go)
+- [Set Matrix Zeroes](problems/medium_leetcode_0073_set_matrix_zeroes.go)
   is the representative marker exercise.
 
 #### B.6.4 Keeping current and next state together
@@ -4570,7 +4570,7 @@ use `O(1)` auxiliary space. A clearer separate next-state grid would use
   owns coordinate and shape checks.
 - [Moving values in place](#b11-moving-values-in-place) discusses mutation
   contracts.
-- [Game of Life](../problems/medium_leetcode_0289_game_of_life.go) applies this
+- [Game of Life](problems/medium_leetcode_0289_game_of_life.go) applies this
   encoding to eight neighbors.
 
 ### B.7 Composing data structures
@@ -4702,9 +4702,9 @@ uses `O(n)` map and list storage. Two heaps use `O(n)` total storage and
 - [Map presence and sets](#d4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
   owns Go map lookup behavior.
 - [Heap or priority queue](#c1327-heap-or-priority-queue) owns heap operations.
-- [LRU Cache](../problems/medium_leetcode_0146_lru_cache.go) combines a map and
+- [LRU Cache](problems/medium_leetcode_0146_lru_cache.go) combines a map and
   doubly linked list.
-- [Insert Delete GetRandom O(1)](../problems/medium_leetcode_0380_insert_delete_getrandom_o1.go)
+- [Insert Delete GetRandom O(1)](problems/medium_leetcode_0380_insert_delete_getrandom_o1.go)
   uses the traced slice-map invariant.
 
 ### B.8 Streaming and online processing
@@ -4840,7 +4840,7 @@ instead cap retained state by its window size.
   state such as counts plus order or two heaps.
 - [Heap or priority queue](#c1327-heap-or-priority-queue) supports running
   median, top-`k`, and merging sorted streams.
-- [Find Median from Data Stream](../problems/hard_leetcode_0295_find_median_from_data_stream.go)
+- [Find Median from Data Stream](problems/hard_leetcode_0295_find_median_from_data_stream.go)
   maintains two balanced halves.
 
 ### B.9 Choosing a structure
@@ -5405,7 +5405,7 @@ only after an ordering argument, not for arbitrary input order.
   implementation.
 - [D.6 Bytes, runes, and visible characters](#d6-bytes-runes-and-visible-characters)
   explains how to choose the unit of text comparison.
-- [Longest Common Prefix](../problems/solved_easy_leetcode_0014_longest_common_prefix.go)
+- [Longest Common Prefix](problems/solved_easy_leetcode_0014_longest_common_prefix.go)
   applies this method to a judge problem.
 
 <a id="directional-scan"></a>
@@ -5479,7 +5479,7 @@ the problem rather than assuming every smaller-left value should subtract.
 ###### Related material
 
 - [E.8 Directional scan](#e8-directional-scan) owns the Go implementation.
-- [Roman to Integer](../problems/solved_easy_leetcode_0013_roman_to_integer.go)
+- [Roman to Integer](problems/solved_easy_leetcode_0013_roman_to_integer.go)
   is the representative problem.
 - [C.1.3.3 Simulation](#c133-simulation) handles rules needing more state.
 
@@ -5675,7 +5675,7 @@ in both directions so two source characters cannot collapse into one target.
 ###### Related material
 
 - [D.4 Map presence and sets](#d4-map-presence-and-sets) owns Go map behavior.
-- [Two Sum](../problems/solved_easy_leetcode_0001_two_sum.go) is the
+- [Two Sum](problems/solved_easy_leetcode_0001_two_sum.go) is the
   representative problem.
 - [C.1.3.33 Trie](#c1333-trie) supports shared-prefix lookup.
 
@@ -5860,7 +5860,7 @@ sorted input; wrapped input needs the separate sorted-side rule.
 ###### Related material
 
 - [E.1 Binary search bounds](#e1-binary-search-bounds) owns the Go implementation.
-- [Search Insert Position](../problems/solved_easy_leetcode_0035_search_insert_position.go) and [Search in Rotated Sorted Array](../problems/solved_medium_leetcode_0033_search_in_rotated_sorted_array.go) are representative problems.
+- [Search Insert Position](problems/solved_easy_leetcode_0035_search_insert_position.go) and [Search in Rotated Sorted Array](problems/solved_medium_leetcode_0033_search_in_rotated_sorted_array.go) are representative problems.
 
 <a id="c137-string-matching"></a>
 
@@ -6238,7 +6238,7 @@ centers for palindromes.
 
 - [E.9 Sorted two-pointer pair search](#e9-sorted-two-pointer-pair-search) owns the Go implementation.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants) traces read/write compaction.
-- [Palindrome Number](../problems/solved_easy_leetcode_0009_palindrome_number.go), [Longest Palindromic Substring](../problems/solved_medium_leetcode_0005_longest_palindromic_substring.go), [Remove Duplicates from Sorted Array](../problems/solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go), and [Remove Element](../problems/solved_easy_leetcode_0027_remove_element.go) are representative problems.
+- [Palindrome Number](problems/solved_easy_leetcode_0009_palindrome_number.go), [Longest Palindromic Substring](problems/solved_medium_leetcode_0005_longest_palindromic_substring.go), [Remove Duplicates from Sorted Array](problems/solved_easy_leetcode_0026_remove_duplicates_from_sorted_array.go), and [Remove Element](problems/solved_easy_leetcode_0027_remove_element.go) are representative problems.
 
 <a id="dynamic-programming"></a>
 
@@ -6384,7 +6384,7 @@ integer type.
 
 - [E.2 Rolling dynamic programming](#e2-rolling-dynamic-programming) owns the Go implementation.
 - [C.1.3.10.1 Preserve order with compact ranks](#c13101-coordinate-compression) owns coordinate compression.
-- [Climbing Stairs](../problems/solved_easy_leetcode_0070_climbing_stairs.go) is the representative problem.
+- [Climbing Stairs](problems/solved_easy_leetcode_0070_climbing_stairs.go) is the representative problem.
 
 <a id="c1311-divide-and-conquer"></a>
 
@@ -6820,7 +6820,7 @@ direct control is needed.
 
 - [E.5 Generic stack](#e5-generic-stack) owns the Go implementation.
 - [C.1.3.20 Depth-first search](#c1320-depth-first-search) can replace recursive calls with an explicit stack.
-- [Valid Parentheses](../problems/solved_easy_leetcode_0020_valid_parentheses.go) is the representative problem.
+- [Valid Parentheses](problems/solved_easy_leetcode_0020_valid_parentheses.go) is the representative problem.
 
 <a id="sliding-window"></a>
 
@@ -10920,7 +10920,7 @@ integer types where very large indexes are possible.
   owns method selection and the boundary invariant.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants) explains
   how the maintained facts prove the result.
-- [Find First and Last Position of Element in Sorted Array](../problems/solved_medium_leetcode_0034_find_first_and_last_position_of_element_in_sorted_array.go)
+- [Find First and Last Position of Element in Sorted Array](problems/solved_medium_leetcode_0034_find_first_and_last_position_of_element_in_sorted_array.go)
   uses both bounds around a duplicate range.
 
 <a id="d2-rolling-dynamic-programming"></a>
@@ -11062,7 +11062,7 @@ multiple assignment, right-hand expressions use the old values, so
   owns recurrence design and state selection.
 - [A.3 Recursion and saved work](#a3-recursion-and-saved-work) compares saved
   answers with repeated recursive calls.
-- [Climbing Stairs](../problems/solved_easy_leetcode_0070_climbing_stairs.go)
+- [Climbing Stairs](problems/solved_easy_leetcode_0070_climbing_stairs.go)
   uses this recurrence.
 
 <a id="d3-hash-map-complement-lookup"></a>
@@ -11191,7 +11191,7 @@ can produce several answers. Widen or validate arithmetic when
   owns the lookup method.
 - [D.4 Distinguish missing keys from stored values (map presence and sets)](#d4-distinguish-missing-keys-from-stored-values-map-presence-and-sets)
   explains the two-result lookup used here.
-- [Two Sum](../problems/solved_easy_leetcode_0001_two_sum.go) is the
+- [Two Sum](problems/solved_easy_leetcode_0001_two_sum.go) is the
   representative problem.
 
 <a id="d4-generic-singly-linked-list"></a>
@@ -11663,7 +11663,7 @@ representation. Keep the guard's subtraction before division; comparing only
   extraction and the reversal invariant.
 - [A.4 Integer limits and bits](#a4-integer-limits-and-bits) explains why
   range checks must precede unsafe arithmetic.
-- [Palindrome Number](../problems/solved_easy_leetcode_0009_palindrome_number.go)
+- [Palindrome Number](problems/solved_easy_leetcode_0009_palindrome_number.go)
   uses the same digit-extraction invariant under a narrower input range.
 
 <a id="d7-common-prefix-scan"></a>
@@ -11793,7 +11793,7 @@ the byte contract must be explicit.
   owns the method and its invariant.
 - [D.6 Bytes, runes, and visible characters](#d6-bytes-runes-and-visible-characters)
   explains how to choose the unit of comparison.
-- [Longest Common Prefix](../problems/solved_easy_leetcode_0014_longest_common_prefix.go)
+- [Longest Common Prefix](problems/solved_easy_leetcode_0014_longest_common_prefix.go)
   is the representative problem.
 
 <a id="d8-directional-scan"></a>
@@ -11934,7 +11934,7 @@ values are added because only a strictly smaller left value is subtracted.
   owns method selection and direction choice.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants) explains
   the maintained `rightValue` fact.
-- [Roman to Integer](../problems/solved_easy_leetcode_0013_roman_to_integer.go)
+- [Roman to Integer](problems/solved_easy_leetcode_0013_roman_to_integer.go)
   uses a related right-neighbor decision under Roman-numeral input rules.
 
 <a id="d9-sorted-two-pointer-pair-search"></a>

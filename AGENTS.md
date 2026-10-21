@@ -2,10 +2,9 @@
 
 ## Purpose
 
-This repository teaches algorithms and data structures in Go. Keep educational
-concept implementations under `concepts/`, the active exercise under
-`workbench/`, and standalone practice and completed judge-ready solutions
-under `problems/`.
+This repository teaches algorithms and data structures in Go. Keep the
+educational guide in `CONCEPTS.md`, the active exercise under `workbench/`, and
+standalone practice and completed judge-ready solutions under `problems/`.
 
 ## Code Generation Standard
 
@@ -146,8 +145,8 @@ file remains in place under `problems/`.
    deductions in both the problem analysis and final response. Explain what is
    correct, the first failing assumption or bottleneck, and how the relevant
    invariant guides the correction.
-3. Link the problem to existing pages under `concepts/`. Add or improve a
-   concept page when the necessary reference does not exist.
+3. Link the problem to existing material in `CONCEPTS.md`. Add or improve a
+   concept entry when the necessary reference does not exist.
 4. Implement three distinct correct approaches: a direct or brute-force
    approach, an improved approach, and the preferred approach. An educational
    approach may exceed judge limits, but it must still be correct for inputs it
@@ -239,7 +238,7 @@ When the completed problem is in the workbench:
 
 ## Documentation Map
 
-- [`concepts/README.md`](concepts/README.md) is the learning guide for reusable
+- [`CONCEPTS.md`](CONCEPTS.md) is the learning guide for reusable
   algorithms, data structures, Go techniques, and problem-solving methods.
 - [`CONCEPTS_STANDARDS.md`](CONCEPTS_STANDARDS.md) defines how to maintain that
   guide.

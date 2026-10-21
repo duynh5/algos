@@ -272,7 +272,7 @@ Current attempt:
   memo[0]=0 is never reached for valid input, but if ways(w) means the number of
   sequences summing to w, the empty sequence convention would make ways(0)=1.
 - Relevant concept and invariant: This is dynamic programming over a one-
-  dimensional state; see ../concepts/README.md#dynamic-programming.
+  dimensional state; see ../CONCEPTS.md#dynamic-programming.
   The state ways(w) means exactly the number of ordered move sequences whose
   sum is w. Partitioning those sequences by their final move proves
   ways(w) = ways(w-1) + ways(w-2). After computeWays(w) returns, memo[w]

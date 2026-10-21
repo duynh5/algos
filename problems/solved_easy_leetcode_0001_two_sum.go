@@ -346,8 +346,8 @@ Current attempt:
   explicitly instead of returning an empty string if the input contract is
   violated. Use a complement map for expected O(n) time. The added regression
   cases make each of those changes repeatable.
-- Relevant concepts: concepts/README.md#hash-map-or-set for complement lookup
-  and concepts/README.md#two-pointers for sorted pair search.
+- Relevant concepts: ../CONCEPTS.md#hash-map-or-set for complement lookup and
+  ../CONCEPTS.md#two-pointers for sorted pair search.
 
 Solution 1 - Direct pair enumeration (solveByCheckingEveryPair):
 - Approach: Enumerate (first, second) with first < second and return immediately
