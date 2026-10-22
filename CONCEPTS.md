@@ -1,11 +1,14 @@
 # Algorithms and Data Structures in Go
 
-This is the repository's guide to understanding algorithms and data
-structures in Go. It is written for readers who know basic Go
-syntax--variables, loops, functions, slices, and maps--but are new to
-choosing algorithms and explaining why they work. The problem archives
-contain complete judge solutions; this guide teaches the reusable
-ideas behind those solutions.
+This guide explains algorithms and ways to organize data in Go. It is
+for readers who know basic Go, including variables, loops, functions,
+slices, and maps. It is for readers who are new to choosing a solution
+and explaining why it works.
+
+The files under `problems/` contain complete solutions to individual
+problems. This guide explains the ideas that can be reused across many
+problems. You do not need to read it from beginning to end before
+solving anything.
 
 ## Contents
 
@@ -82,17 +85,17 @@ ideas behind those solutions.
 
 ## How to use this guide
 
-Choose the path that matches the work you are doing:
+Choose the path that matches what you need now:
 
-- **First-time study:** Read foundations, then data structures, then
-  problem-solving methods. Read a Go technique when an entry links to
-  it.
-- **Choosing a solution:** Begin with the [method-selection
-  guide](#c1-problem-solving-method-selection-guide), name the shape
-  of the input and output, and follow its links to at most two likely
-  methods.
-- **Quick reference:** Jump to a named entry, replay its examples, and
-  check its "When not to use it" section before adapting its code.
+- **Learning from the beginning:** Read foundations, then ways to
+  store information, then ways to solve problems. Follow a link to a
+  Go technique when you need the language detail.
+- **Solving a problem:** Begin with the [method-selection
+  guide](#c1-problem-solving-method-selection-guide). Describe the
+  input and required answer. Then inspect no more than two methods
+  that seem to fit.
+- **Looking something up:** Jump to its entry, work through the
+  examples, and read "When not to use it" before using the code.
 
 Main parts use letters, and nested sections add numbers. For example,
 `C` identifies problem-solving methods, `C.1` identifies the
@@ -108,7 +111,7 @@ language, then introduces and defines the conventional name. A
 technical term should never be required to understand its own
 definition.
 
-### Entry contract
+### What every teaching entry contains
 
 Every teaching entry uses these headings in this order. A heading can
 be brief, but it is not omitted merely because the topic is small:
@@ -118,14 +121,14 @@ be brief, but it is not omitted merely because the topic is small:
 2.  **The idea in simple terms** gives a mental picture, then
     introduces and defines the formal name.
 3.  **How it works** states required input conditions and the exact
-    state the procedure keeps.
+    values or facts the procedure keeps while it runs.
 4.  **Step-by-step examples** traces an ordinary input and, when
-    behavior changes, a boundary or adversarial input.
+    behavior changes, a boundary or deliberately tricky input.
 5.  **Why it works** identifies what remains true, why each step is
-    safe, why the process finishes, and why the final state is the
-    requested result.
+    safe, why the process finishes, and why the final saved values
+    give the requested result.
 6.  **Go example** shows the smallest complete fragment or links to
-    the one owning reference implementation.
+    the complete reference implementation elsewhere in the guide.
 7.  **Work and memory** explains the costs in words before using
     notation such as `O(n)`.
 8.  **When to use it** lists clues visible in the problem or input.
@@ -133,8 +136,8 @@ be brief, but it is not omitted merely because the topic is small:
     out.
 10. **Common mistakes and edge cases** ties every warning to a
     concrete input, state change, or Go behavior.
-11. **Related material** links to the owner of prerequisite,
-    contrasting, and implementation details instead of repeating them.
+11. **Related material** links to prerequisite, contrasting, and
+    implementation details instead of repeating them.
 
 The labels are Markdown headings one level below the entry heading.
 For example, an `###` entry uses `#### The problem it solves`; a
@@ -143,7 +146,7 @@ deeply nested `#####` pattern card uses
 
 ### Forms used in every entry
 
-- **Trace:** Use a numbered list. For repeated state changes, give
+- **Trace:** Use a numbered list. For repeated changes, give
   each step labeled `Before`, `Decision`, `After`, and `Known correct`
   details. For comparisons or mappings, use concise bullets. Do not
   create Markdown tables.
@@ -159,60 +162,54 @@ deeply nested `#####` pattern card uses
   explanation.
 
 The contemporary interview evidence below gives context for what to
-practice; it is not a teaching entry and does not use the
-eleven-heading contract.
+practice; it is not a teaching entry, so it does not use those eleven
+headings.
 
-The coverage is cross-checked against LeetCode's [Top Interview
+The list of topics is checked against LeetCode's [Top Interview
 150](https://leetcode.com/studyplan/top-interview-150/), the [Grind 75
 study guidance](https://www.techinterviewhandbook.org/grind75/faq),
 and the [NeetCode roadmap](https://neetcode.io/roadmap). These lists
-determine breadth, but the material below is organized by reusable
-invariants rather than by problem title.
+help reveal missing common topics. The guide is organized by reusable
+ideas rather than by the title of a practice problem.
 
 ## Contemporary interview evidence
 
-Current official preparation material from
+Official preparation guides from
 [Amazon](CONCEPTS_LINKS.md#amazon-interview-topics),
 [Meta](CONCEPTS_LINKS.md#meta-interview-guide),
 and
 [Microsoft](CONCEPTS_LINKS.md#microsoft-technical-interviews)
-emphasizes applying fundamentals, comparing approaches, explaining
-complexity, writing clear code, and testing it. That is stronger
-evidence about the skills being assessed than any remembered list of
-exact questions.
+all describe skills such as understanding a problem, choosing and
+explaining an approach, writing clear code, and checking the result.
+They are better guides to preparation than a remembered list of exact
+questions.
 
-Recent public candidate reports are also sampled for changes in
-question style, including reports from [Amazon in
+Public candidate reports can show how one person's interview differed
+from the official outline. Examples include reports from [Amazon in
 2026](CONCEPTS_LINKS.md#amazon-2026-report),
 [Google in 2025](https://leetcode.com/discuss/post/6522571/),
 [Meta in 2025](CONCEPTS_LINKS.md#meta-2025-report),
 [Microsoft in 2025](https://leetcode.com/discuss/post/7227003/), and
 [Uber in 2025](https://leetcode.com/discuss/post/7327020/). Candidate
-reports are anecdotal and cannot prove that one exact question is
-common. This guide therefore incorporates only repeated, transferable
-signals:
+reports describe individual experiences. They do not prove that a
+question is common or that another candidate will receive it. The
+useful lessons are therefore general:
 
-- Expect a familiar structure with a changed constraint: duplicates, a
-  limited number of edits, streaming input, a value-distance
-  restriction, or a demand for lower memory.
-- Be able to move from a direct solution to a better one and explain
-  what repeated work, one-direction ordering, or data-structure
-  operation made the improvement possible.
-- Practice constructing a graph from relationships, converting a
-  rooted tree into an undirected graph when movement may go upward,
-  and recognizing when a range query accelerates a dynamic-programming
-  transition.
-- Know online combinations such as counts plus a queue, two heaps, a
-  heap over sorted streams, and a map plus linked list. The invariant
-  between the two structures matters more than memorizing a class
-  name.
-- Treat manual verification as part of the solution: trace one
-  ordinary case, one boundary case, and one adversarial case before
-  declaring the code done.
+- A familiar problem may change one input rule. It may allow duplicate
+  values, limit the number of edits, deliver values one at a time, or
+  require less memory.
+- Start with a direct solution that is correct. Then find work it
+  repeats and explain why the improved solution can avoid that work.
+- Sometimes the input does not look like a graph at first. People,
+  roads, dependencies, or cells may still form nodes and connections.
+- A solution may use two data structures together. State the rule that
+  keeps them in agreement after every change.
+- Check the code by tracing an ordinary input, a smallest or boundary
+  input, and an input designed to expose a likely mistake.
 
-Exact company question banks change and are often confidential. Use
-company tags to choose practice inputs, not as a substitute for the
-concepts below.
+Exact company questions change and may be confidential. Use company
+tags to choose extra practice, not as a substitute for understanding
+the ideas below.
 
 ## A. Foundations
 
@@ -221,10 +218,10 @@ concepts below.
 #### The problem it solves
 
 Two programs can return the same answer but require very different
-amounts of work or memory as the input grows. We need a
-machine-independent way to reject an approach that cannot finish
-within the input limits and to account for memory that is easy to
-overlook.
+amounts of work or memory as the input grows. We need a way to compare
+them without depending on the speed of one computer. That comparison
+should reveal an approach that cannot finish within the input limits
+and memory use that is easy to overlook.
 
 #### The idea in simple terms
 
@@ -235,10 +232,10 @@ the book doubles, not the exact number of nanoseconds on one computer.
 
 Let `n` mean an input amount, such as the number of slice elements.
 **Time complexity** describes how work grows with `n`. **Big-O
-notation** gives an upper growth bound, usually written with the
-tightest simple bound that is useful. **Auxiliary-space complexity**
-describes memory created by the method, normally excluding the given
-input and required returned output.
+notation** gives a useful upper bound on that growth. **Extra-memory
+complexity**, also called **auxiliary-space complexity**, describes
+memory created by the method. It normally excludes the given input
+and the required returned output.
 
 #### How it works
 
@@ -250,8 +247,8 @@ input and required returned output.
     `3n + 8` grows linearly and is written `O(n)`.
 4.  Analyze different input cases only when control flow changes their
     cost.
-5.  Separately count live allocations, unfinished calls,
-    preprocessing, and output construction.
+5.  Separately count new storage, unfinished function calls, setup
+    work, and output construction.
 
 Common growth classes are `O(1)` for bounded work, `O(log n)` for
 repeatedly shrinking by a fixed fraction, `O(n)` for a full pass,
@@ -261,37 +258,57 @@ repeatedly shrinking by a fixed fraction, `O(n)` for a full pass,
 #### Step-by-step examples
 
 Search for `9` in the sorted values `[1,3,5,7,9,11,13,15]`.
+The indexes run from `0` through `7`. Both methods should return
+`true`, but we will count how many values each method checks.
 
 1.  **Method and step: Linear check `0`**
-    - **Before:** Eight possible positions
+    - **Before:** Eight positions could contain the target.
     - **Decision:** `1 != 9`; advance one position.
-    - **After:** Seven unchecked positions
-    - **Work known so far:** 1 comparison
-2.  **Method and step: Linear checks `1..3`**
-    - **Before:** Positions `1..7` remain
-    - **Decision:** `3`, `5`, and `7` differ.
-    - **After:** Positions `4..7` remain
-    - **Work known so far:** 4 comparisons
-3.  **Method and step: Linear check `4`**
-    - **Before:** Value `9` is current
+    - **After:** Seven unchecked positions remain.
+    - **Known correct:** Index `0` is not the answer; this method has
+      made 1 comparison.
+2.  **Method and step: Linear check `1`**
+    - **Before:** Seven unchecked positions remain.
+    - **Decision:** `3 != 9`; advance one position.
+    - **After:** Six unchecked positions remain.
+    - **Known correct:** Indexes `0` and `1` are not the answer; this
+      method has made 2 comparisons.
+3.  **Method and step: Linear check `2`**
+    - **Before:** The current value is `5`.
+    - **Decision:** `5 != 9`; advance one position.
+    - **After:** Five unchecked positions remain.
+    - **Known correct:** Indexes `0` through `2` are not the answer;
+      this method has made 3 comparisons.
+4.  **Method and step: Linear check `3`**
+    - **Before:** The current value is `7`.
+    - **Decision:** `7 != 9`; advance one position.
+    - **After:** Four unchecked positions remain.
+    - **Known correct:** Indexes `0` through `3` are not the answer;
+      this method has made 4 comparisons.
+5.  **Method and step: Linear check `4`**
+    - **Before:** The current value is `9`.
     - **Decision:** Match and stop.
     - **After:** Return `true`.
-    - **Work known so far:** 5 comparisons; a miss could require all 8
-4.  **Method and step: Halving check `3`**
-    - **Before:** Search interval is `0..7`
-    - **Decision:** `7 < 9`; positions `0..3` cannot contain `9`.
-    - **After:** Interval becomes `4..7`.
-    - **Work known so far:** 1 comparison
-5.  **Method and step: Halving check `5`**
-    - **Before:** Interval is `4..7`
-    - **Decision:** `11 > 9`; positions `5..7` cannot contain `9`.
-    - **After:** Interval becomes `4..4`.
-    - **Work known so far:** 2 comparisons
-6.  **Method and step: Halving check `4`**
-    - **Before:** Interval is `4..4`
+    - **Known correct:** Index `4` contains the target; this method
+      made 5 comparisons. A miss could require all 8.
+6.  **Method and step: Halving check `3`**
+    - **Before:** Indexes `0` through `7` are possible.
+    - **Decision:** `7 < 9`; indexes `0` through `3` are too small.
+    - **After:** Indexes `4` through `7` remain possible.
+    - **Known correct:** No discarded index can contain `9`; this
+      method has made 1 comparison.
+7.  **Method and step: Halving check `5`**
+    - **Before:** Indexes `4` through `7` remain possible.
+    - **Decision:** `11 > 9`; indexes `5` through `7` are too large.
+    - **After:** Only index `4` remains possible.
+    - **Known correct:** No discarded index can contain `9`; this
+      method has made 2 comparisons.
+8.  **Method and step: Halving check `4`**
+    - **Before:** The only possible value is at index `4`.
     - **Decision:** `9 == 9`; stop.
     - **After:** Return `true`.
-    - **Work known so far:** 3 comparisons
+    - **Known correct:** Index `4` contains the target; this method
+      made 3 comparisons.
 
 For empty input, a scan performs zero element comparisons and a
 halving search also stops immediately. That best case does not change
@@ -335,12 +352,12 @@ func contains(values []int, target int) bool {
 
 #### Work and memory
 
-If the target is first, the function performs one comparison:
-best-case `O(1)` time. A typical successful position still grows with
-the slice, and a missing or last target requires `n` comparisons:
-average and worst-case `O(n)` time. It stores only the current value,
-so auxiliary space is `O(1)`. The input slice is borrowed and no
-output collection is allocated.
+Here `n` is the number of values. If the target is first, the function
+performs one comparison: best-case `O(1)` time. A missing or last
+target requires `n` comparisons, so the worst-case time is `O(n)`.
+A successful search can stop anywhere between those cases. The
+function stores only the current value, so extra memory is `O(1)`.
+The input slice is borrowed and no output collection is allocated.
 
 #### When to use it
 
@@ -374,8 +391,8 @@ has been defined as the total cell count.
 
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants)
   separates proving the answer from measuring its cost.
-- [A.3 Recursion and saved work](#a3-recursion-and-saved-work) owns
-  call-stack accounting.
+- [A.3 Recursion and saved work](#a3-recursion-and-saved-work)
+  explains how recursive calls use stack memory.
 - [A.7 Combinatorics and output
   size](#a7-combinatorics-and-output-size) shows why required output
   can dominate every other cost.
@@ -388,8 +405,9 @@ has been defined as the total cell count.
 
 A program can return the expected result for a few examples and still
 be wrong. To establish correctness, we need to connect every
-state-changing step to the required output and show that the process
-cannot skip an answer or run forever.
+step that changes remembered values to the required output and show
+that the process cannot skip an answer or run forever. Those
+remembered values at one moment are the program's **state**.
 
 #### The idea in simple terms
 
@@ -420,7 +438,9 @@ that state proves.
 Move the non-zero values in `values = [0, 5, 0, 2]` to the front
 without changing their order. The expected returned prefix is
 `[5, 2]`. `read` is the position being inspected, and `write` is the
-length of the correct prefix.
+length of the correct prefix. The slice expression `values[:write]`
+starts at index `0` and stops before index `write`, so it contains
+exactly that finished prefix.
 
 1.  **Step: Start**
     - **Before:** `values=[0,5,0,2]`, `write=0`
@@ -509,7 +529,7 @@ array.
 #### When to use it
 
 Use an invariant to reason about a loop, recursion, or data-structure
-update when the code builds an answer gradually, mutates state, or
+update when the code builds an answer gradually, changes state, or
 discards possible choices. It is especially useful when a problem asks
 you to prove that order, membership, a boundary, or a running total
 remains valid.
@@ -517,9 +537,9 @@ remains valid.
 #### When not to use it
 
 Do not force a loop-style invariant onto a direct calculation whose
-result follows immediately from a defined operation. For probabilistic
-or approximate algorithms, an absolute fact may also be the wrong
-claim; their argument may need a probability or error bound instead.
+result follows immediately from a defined operation. A method that
+allows uncertainty or approximation may need a probability or error
+limit instead of an absolute claim.
 
 #### Common mistakes and edge cases
 
@@ -541,8 +561,8 @@ that a loop terminates.
 - [A.1 Complexity and resource
   accounting](#a1-complexity-and-resource-accounting) explains how to
   account for the work after correctness is established.
-- [B.1.1 Moving values in place](#b11-moving-values-in-place) owns the
-  slice operation demonstrated here.
+- [B.1.1 Moving values in place](#b11-moving-values-in-place)
+  explains the slice operation demonstrated here.
 - [Remove
   Element](problems/solved_easy_leetcode_0027_remove_element.go)
   applies the same prefix invariant to a judge problem.
@@ -565,6 +585,10 @@ Each paused call is a **stack frame**, which remembers arguments,
 local values, and the return point. The number of frames alive at once
 is the **recursion depth**.
 
+The example uses a **factorial**. For a nonnegative whole number `n`,
+`n!` means multiplying every positive whole number from `n` down to
+`1`. Thus `4! = 4*3*2*1 = 24`, while `0!` is defined as `1`.
+
 #### How it works
 
 1.  Define a **base case**, an input whose answer is returned
@@ -573,42 +597,48 @@ is the **recursion depth**.
 3.  Call the function for that smaller input.
 4.  Combine the returned answer with the current call's work.
 
-The input must move toward the base case. For factorial, require
-`0 <= n <= 20` when using `int64`; `20!` fits and `21!` does not.
+The input must move toward the base case. For the factorial code
+below, require a value from `0` through `20`; `20!` fits in `int64`,
+while `21!` does not.
 
 #### Step-by-step examples
 
-For `factorial(4)`, the expected output is `24`.
+For `factorial(4)`, the expected result is `(24, true)`. The number is
+the factorial, and `true` says that the input was valid.
 
 1.  **Step: Call `4`**
-    - **Before:** `n=4`
+    - **Before:** `value=4`
     - **Decision:** Not a base case; save `4 *` and solve `3`.
-    - **After:** Frames wait for `4`, then call `3`.
+    - **After:** The call for `4` waits with multiplier `4`, then the
+      function is called with `3`.
     - **Known correct:** The answer is `4 * factorial(3)`.
 2.  **Step: Call `3`**
-    - **Before:** `n=3`
+    - **Before:** `value=3`
     - **Decision:** Save `3 *` and solve `2`.
-    - **After:** Frames wait for `4,3`, then call `2`.
+    - **After:** Calls wait with multipliers `4` and `3`, then the
+      function is called with `2`.
     - **Known correct:** The remaining input is smaller.
 3.  **Step: Call `2`**
-    - **Before:** `n=2`
+    - **Before:** `value=2`
     - **Decision:** Save `2 *` and solve `1`.
-    - **After:** Frames wait for `4,3,2`, then call `1`.
+    - **After:** Calls wait with multipliers `4`, `3`, and `2`, then
+      the function is called with `1`.
     - **Known correct:** The remaining input is smaller.
 4.  **Step: Call `1`**
-    - **Before:** `n=1`
-    - **Decision:** Base case; return `1`.
+    - **Before:** `value=1`
+    - **Decision:** Base case; return factorial value `1`.
     - **After:** The `2` frame resumes.
     - **Known correct:** `factorial(1)=1`.
 5.  **Step: Return**
     - **Before:** Saved multipliers are `2,3,4`
     - **Decision:** Apply them in reverse frame order.
-    - **After:** Results are `2`, `6`, then `24`.
+    - **After:** Results are `2`, `6`, then `(24, true)`.
     - **Known correct:** Each resumed call returns its factorial.
 
-For boundary input `0`, the function returns `1` immediately because
-there is one way to arrange no factors in a product. No recursive call
-is created.
+For boundary input `0`, the function returns `(1, true)` immediately
+because there is one way to arrange no factors in a product. No
+recursive call is created. Input `-1` or `21` returns `(0, false)`
+before recursion begins.
 
 #### Why it works
 
@@ -625,36 +655,45 @@ memory.
 #### Go example
 
 ```go
-func factorial(value int64) int64 {
+func factorial(value int64) (int64, bool) {
+	// Reject values whose factorial is undefined here or would exceed
+	// int64 before starting the recursive calls.
+	if value < 0 || value > 20 {
+		return 0, false
+	}
 	// Zero and one terminate the recursion and both have factorial value
 	// one.
 	if value <= 1 {
-		return 1
+		return 1, true
 	}
 	// Leave this call waiting with the current multiplier while the
-	// smaller subproblem computes the preceding factorial, then combine
+	// smaller input computes the preceding factorial, then combine
 	// both results.
-	return value * factorial(value-1)
+	smallerFactorial, valid := factorial(value - 1)
+	if !valid {
+		return 0, false
+	}
+	return value * smallerFactorial, true
 }
 ```
 
-The stated contract requires `0 <= value <= 20`; validation belongs at
-the caller or can be added as a separate checked boundary.
+The validity result prevents callers from confusing invalid input with
+the legitimate factorial value zero, which never occurs.
 
 #### Work and memory
 
-The function creates one call for each value from `n` down to `1`, so
-it does `O(n)` work in every valid case except the constant-time base
-cases. At most `n` calls are unfinished together, so the call stack
-uses `O(n)` auxiliary space. Go does not promise to replace this shape
-with a constant-space loop.
+For a valid input `n`, the function creates one call for each value
+from `n` down to `1`, so it does `O(n)` work except for the
+constant-time base cases. At most `n` calls are unfinished together,
+so the call stack uses `O(n)` extra memory. Go does not promise to
+replace this shape with a constant-space loop.
 
 #### When to use it
 
-Use recursion when the input is naturally nested, when each subproblem
-has the same contract as the whole problem, and when the maximum depth
-is safely bounded. Trees, divide-and-conquer ranges, and choice
-exploration often have this shape.
+Use recursion when the input is naturally nested, when each smaller
+problem asks for the same kind of answer as the whole problem, and
+when the maximum depth is safely bounded. Trees, split ranges, and
+choice exploration often have this shape.
 
 #### When not to use it
 
@@ -665,25 +704,24 @@ processed in a chosen order.
 
 #### Common mistakes and edge cases
 
-> **Warning:** A broad base case can hide invalid input. Calling the
-> example with `-1` returns `1` even though negative factorial is
-> outside its contract; enforce the nonnegative precondition at the
-> boundary.
+> **Warning:** A base case such as `value <= 1` is not input
+> validation by itself. Without the preceding range check, `-1`
+> would incorrectly return the factorial value `1`.
 
 > **Warning:** Count paused calls as memory. `factorial(20)` creates
 > about 20 live frames at its deepest point even though it allocates
 > no slice.
 
-Repeated recursive calls can also redo the same subproblem. Save
+Repeated recursive calls can also redo the same smaller problem. Save
 repeated answers as described by [dynamic
 programming](#c1310-dynamic-programming), or replace a one-branch
-recurrence with a loop.
+rule with a loop.
 
 #### Related material
 
 - [A.1 Complexity and resource
-  accounting](#a1-complexity-and-resource-accounting) defines
-  auxiliary-space accounting.
+  accounting](#a1-complexity-and-resource-accounting) explains how
+  to count extra memory.
 - [C.1.3.11 Divide and conquer](#c1311-divide-and-conquer) uses
   several smaller independent calls.
 - [D.8 Replacing recursion with a
@@ -774,21 +812,22 @@ func appendDecimalDigit(value, digit, limit int64) (int64, bool) {
 
 The function performs a fixed number of comparisons and arithmetic
 operations, so its work is `O(1)`. It stores no collection or
-recursive state, so auxiliary space is `O(1)`.
+recursive state, so extra memory is `O(1)`.
 
 #### When to use it
 
-Use a precondition check whenever input constraints can approach an
-integer limit, especially while parsing digits, accumulating products,
-calculating midpoints, or converting between integer widths.
+Check before the operation whenever allowed inputs can approach an
+integer limit. This matters especially while reading digits, building
+a product, calculating a middle index, or converting between integer
+widths.
 
 #### When not to use it
 
-Do not merely switch to a wider type when the mathematical result is
-allowed to grow without a fixed bound; use an arbitrary-precision
-representation such as `math/big`. Do not apply this nonnegative
-formula unchanged to signed subtraction or negative digit
-accumulation.
+Do not merely switch to a wider type when the mathematical result may
+grow without a fixed bound. Use an integer representation that grows
+as needed, such as `math/big`. Do not apply this nonnegative formula
+unchanged to signed subtraction or to building a negative number from
+digits.
 
 #### Common mistakes and edge cases
 
@@ -802,7 +841,7 @@ accumulation.
 > Handle that value explicitly instead of applying `-value` blindly.
 
 The width of `int` depends on the target architecture. Use `int32`,
-`int64`, `uint32`, or `uint64` when the contract requires an exact
+`int64`, `uint32`, or `uint64` when the problem requires an exact
 width.
 
 #### Related material
@@ -815,7 +854,7 @@ width.
 - [A.8 Integer Digit Processing](#integer-digit-processing) applies
   the precheck while reversing digits.
 - [E.6 Overflow-safe integer
-  reversal](#e6-overflow-safe-integer-reversal) owns the complete
+  reversal](#e6-overflow-safe-integer-reversal) provides the complete
   `int64` reversal implementation.
 
 ### A.5 Bit manipulation
@@ -823,21 +862,28 @@ width.
 #### The problem it solves
 
 A program may need to store many independent yes/no choices compactly,
-inspect a fixed-width binary value, or use a cancellation identity
+inspect a fixed-width binary value, or use a cancellation rule
 promised by the input. We need operations that change or test one
 binary position without disturbing the others.
 
 #### The idea in simple terms
 
-Picture a row of 64 light switches. Switch `k` records one choice. An
-integer used this way is a **bitmask**. The operators AND (`&`), OR
-(`|`), exclusive OR (`^`), and Go's bit clear (`&^`) combine switches
-according to simple yes/no rules.
+Picture a row of 64 light switches. Each binary position is called a
+**bit** and is either `0` (off) or `1` (on). Switch `k` records one
+choice. An integer used as a group of switches is a **bitmask**.
+
+The operators AND (`&`), OR (`|`), exclusive OR (`^`), and Go's bit
+clear (`&^`) combine matching switch positions. AND keeps a switch on
+only when both inputs have it on. OR keeps it on when either input has
+it on. Exclusive OR, usually called **XOR**, keeps it on when exactly
+one input has it on. Bit clear turns off positions selected by the
+second input.
 
 #### How it works
 
-For `0 <= k < 64`, `uint64(1) << k` creates a mask with only switch
-`k` on.
+For a position `k` from `0` through `63`, `uint64(1) << k` moves one
+on bit left by `k` positions and creates a mask with only switch `k`
+on.
 
 - `x & mask != 0` tests bit `k`.
 - `x | mask` sets bit `k`.
@@ -847,12 +893,15 @@ For `0 <= k < 64`, `uint64(1) << k` creates a mask with only switch
 - `a ^ a` is zero and `a ^ 0` is `a`, so equal pairs cancel under XOR.
 
 Use an unsigned fixed-width type when right shifts must add zeroes on
-the left and when the number of positions is part of the contract.
+the left and when the problem fixes the number of positions.
 
 #### Step-by-step examples
 
 Let bits `0`, `1`, and `2` mean read, write, and execute permission.
-Start with read and execute enabled: binary `101`, decimal `5`.
+Start with read and execute enabled: binary `101`, which is decimal
+`5`. The three displayed digits correspond to bits `2`, `1`, and `0`
+from left to right. Leading zeroes in masks keep all three positions
+visible.
 
 1.  **Step: Test write**
     - **Before:** `flags=101`, mask `010`
@@ -877,15 +926,15 @@ cancels and produces `0`.
 
 #### Why it works
 
-The one-bit mask is zero at every position except `k`, so each
-operator's truth table can affect only that position. OR with one
+The one-bit mask is zero at every position except `k`, so an operation
+with that mask can change or test only that position. OR with one
 makes it one; bit clear with one makes it zero; AND reveals whether
-both operands contain one there.
+both inputs contain one there.
 
-XOR is associative and commutative, so input order does not matter.
-Pairing equal values yields zero, and zero leaves the unpaired value
-unchanged. That argument is valid only when the occurrence promise
-supplies exactly those pairs.
+XOR gives the same result when values are regrouped or reordered, so
+input order does not matter. Two equal values produce zero when XORed,
+and XOR with zero leaves the other value unchanged. That argument is
+valid only when the input promise supplies exactly those pairs.
 
 #### Go example
 
@@ -920,7 +969,7 @@ func clearBit(flags uint64, bitPosition uint) (uint64, bool) {
 #### Work and memory
 
 Each operation on one `uint64` performs bounded machine-word work and
-uses no growing storage, so it takes `O(1)` time and `O(1)` auxiliary
+uses no growing storage, so it takes `O(1)` time and `O(1)` extra
 space. Repeating `x &= x-1` takes one step per set bit. Enumerating
 all `n`-bit masks still visits `2^n` subsets, and copying each chosen
 subset adds output work.
@@ -929,7 +978,7 @@ subset adds output work.
 
 Use bit operations when the problem defines a fixed-width bit pattern,
 when a small bounded set of flags needs compact membership, or when an
-identity such as pair cancellation exactly matches the input promise.
+rule such as pair cancellation exactly matches the input promise.
 
 #### When not to use it
 
@@ -954,7 +1003,7 @@ exponential enumeration.
 
 #### Related material
 
-- [A.4 Integer limits and bits](#a4-integer-limits-and-bits) owns
+- [A.4 Integer limits and bits](#a4-integer-limits-and-bits) explains
   integer width and overflow rules.
 - [A.7 Combinatorics and output
   size](#a7-combinatorics-and-output-size) accounts for all `2^n`
@@ -991,8 +1040,8 @@ rewrite is called **normalization**, and its unique result is a
     comparing it.
 4.  Check that every intermediate operation fits its integer type.
 
-The child entries below own the rules for divisors, fractions, slopes,
-remainders, factor counts, and oversized decimal input.
+The sections below explain divisors, fractions, slopes, remainders,
+factor counts, and oversized decimal input.
 
 #### Step-by-step examples
 
@@ -1006,7 +1055,8 @@ Add prices `$1.20`, `$2.35`, and `$0.45`. The expected exact total is
     - **Known correct:** The first price is exact.
 2.  **Price: `$2.35`**
     - **Before:** `total=120`
-    - **Decision:** Add integer `235`, not a rounded binary decimal.
+    - **Decision:** Add integer `235`, not a floating-point value that
+      may be rounded inside the computer.
     - **After:** `total=355`
     - **Known correct:** The first two prices total `$3.55`.
 3.  **Price: `$0.45`**
@@ -1018,7 +1068,7 @@ Add prices `$1.20`, `$2.35`, and `$0.45`. The expected exact total is
 The boundary value `$0.00` becomes zero cents and changes nothing. A
 price with more precision than the chosen unit, such as `$0.005`, must
 be rejected or rounded by an explicit business rule; silently dropping
-the half-cent would break the representation contract.
+the half-cent would break the chosen representation.
 
 #### Why it works
 
@@ -1029,6 +1079,9 @@ cannot accidentally compare two different encodings of the same
 accepted amount.
 
 #### Go example
+
+The code accepts prices that are already stored as cents and requires
+their total to fit in `int64`.
 
 ```go
 // Cents gives every stored price the same exact integer unit.
@@ -1047,13 +1100,10 @@ func addPrices(prices []Cents) Cents {
 }
 ```
 
-The caller must validate precision and check that the sum fits
-`int64`.
-
 #### Work and memory
 
 Adding `n` already-normalized prices reads each once, so it takes
-`O(n)` time in every case and `O(1)` auxiliary space. Parsing,
+`O(n)` time in every case and `O(1)` extra memory. Parsing,
 reduction, or output formatting must be counted separately when the
 boundary representation is not already available.
 
@@ -1065,9 +1115,9 @@ unit, ratio, direction, or remainder.
 
 #### When not to use it
 
-Do not invent a scaled integer when the input has unbounded precision
-or when the required rounding rule is unknown. Use an
-arbitrary-precision decimal or rational type, or clarify the contract
+Do not invent a scaled integer when the input can contain any number
+of decimal places or when the required rounding rule is unknown. Use
+a decimal or fraction type that grows as needed, or clarify the rule
 first.
 
 #### Common mistakes and edge cases
@@ -1115,6 +1165,9 @@ Repeatedly replacing the larger question with the leftover part is
 
 ##### How it works
 
+The Go expression `a % b` is the remainder left after dividing `a`
+by `b`. For example, `18 % 12` is `6`.
+
 For nonnegative `a` and `b`:
 
 1.  While `b` is not zero, replace `(a,b)` with `(b,a%b)`.
@@ -1155,18 +1208,20 @@ convention GCD `0`.
 
 ##### Why it works
 
-Write `a = q*b + r`, where `r = a%b`. A number divides both `a` and
-`b` exactly when it divides both `b` and `r`, so replacing `(a,b)`
-with `(b,r)` preserves all common divisors. Each nonzero remainder is
-smaller than `b`, so the process finishes. At `(g,0)`, every positive
-divisor of both values divides `g`, and `g` itself divides both,
-making it greatest.
+Dividing `a` by `b` gives some whole-number quotient `q` and remainder
+`r`, so `a = q*b + r`. A number divides both `a` and `b` exactly when
+it divides both `b` and `r`. Replacing `(a,b)` with `(b,r)` therefore
+keeps every shared divisor. Each nonzero remainder is smaller than
+`b`, so the process finishes. At `(g,0)`, `g` is the largest divisor
+that the original values share.
 
 For positive inputs, `a*b` contains the shared factors twice. Dividing
 one operand by the GCD removes one shared copy, producing the smallest
 value that contains the factors needed by both inputs.
 
 ##### Go example
+
+The functions below require nonnegative inputs.
 
 ```go
 import "math"
@@ -1200,14 +1255,13 @@ func lcm(firstValue, secondValue int64) (int64, bool) {
 }
 ```
 
-The functions require nonnegative inputs.
-
 ##### Work and memory
 
-Euclid's algorithm takes `O(log(min(a,b)))` remainder steps in the
-worst case and `O(1)` auxiliary space. LCM adds constant work and no
-growing storage after the GCD. These bounds treat fixed-width integer
-operations as constant time.
+Euclid's algorithm takes a number of remainder steps proportional to
+the logarithm of the smaller input. This is written
+`O(log(min(a,b)))`. It uses `O(1)` extra memory. LCM adds a fixed
+amount of work and no growing storage after the GCD. These bounds
+treat fixed-width integer operations as constant time.
 
 ##### When to use it
 
@@ -1217,9 +1271,10 @@ positive cycles must meet again.
 
 ##### When not to use it
 
-Do not use LCM as a product shortcut without an overflow check. For a
-list of all factors or all primes, use factor enumeration or a sieve
-instead.
+Do not use LCM as a product shortcut without an overflow check. To
+list factors or prime numbers instead, use the methods in
+[A.6.6 Factors and prime
+sieves](#a66-factors-and-prime-sieves).
 
 ##### Common mistakes and edge cases
 
@@ -1227,7 +1282,7 @@ instead.
 > final value fits. Divide first, as in `a/gcd(a,b)*b`.
 
 > **Warning:** The example code requires nonnegative values. Passing
-> `-18` changes remainder signs and violates its result contract;
+> `-18` changes remainder signs and breaks the stated input rule;
 > normalize signs at the boundary, taking care with the smallest
 > signed integer.
 
@@ -1237,8 +1292,8 @@ can still reject an LCM too large for `int64`.
 ##### Related material
 
 - [A.6 Keeping arithmetic values exact and
-  consistent](#a6-keeping-arithmetic-values-exact-and-consistent) owns
-  the normalization rule.
+  consistent](#a6-keeping-arithmetic-values-exact-and-consistent)
+  explains the normalization rule.
 - [A.6.2 Normalized fractions and
   ratios](#a62-normalized-fractions-and-ratios) uses GCD to create
   unique ratio keys.
@@ -1256,8 +1311,10 @@ produce the same integer pair without floating-point rounding.
 
 ##### The idea in simple terms
 
-Cancel shared pieces and keep the minus sign in one agreed place. The
-result is a **normalized fraction**: its numerator and denominator
+In a fraction such as `3/4`, the top number `3` is the
+**numerator**, and the bottom number `4` is the **denominator**.
+Cancel factors shared by both numbers and keep the minus sign in one
+agreed place. The result is a **normalized fraction**: its two numbers
 share no positive factor greater than one, and its denominator is
 positive.
 
@@ -1307,6 +1364,9 @@ fractions reach the same pair.
 
 ##### Go example
 
+The function requires neither input to equal `math.MinInt64`. The
+positive magnitude of that one value cannot be stored in `int64`.
+
 ```go
 func normalizeFraction(
 	numerator, denominator int64,
@@ -1349,14 +1409,11 @@ func normalizeFraction(
 }
 ```
 
-The function requires neither input to equal `math.MinInt64`, whose
-magnitude does not fit in `int64`.
-
 ##### Work and memory
 
-Sign handling is constant work. GCD takes
-`O(log(min(|numerator|, |denominator|)))` remainder steps in the worst
-case. The function uses `O(1)` auxiliary space and returns two
+Sign handling takes a fixed amount of work. GCD takes a number of
+remainder steps proportional to the logarithm of the smaller input
+magnitude. The function uses `O(1)` extra memory and returns two
 integers without allocating a collection.
 
 ##### When to use it
@@ -1367,9 +1424,10 @@ bound.
 
 ##### When not to use it
 
-Do not use it for a zero denominator, for approximate measured data
-whose tolerance is part of equality, or when intermediate subtraction
-has already overflowed before the pair reaches this function.
+Do not use it for a zero denominator or when measured values may count
+as equal within an allowed difference. Do not use it when earlier
+subtraction has already overflowed before the pair reaches this
+function.
 
 ##### Common mistakes and edge cases
 
@@ -1409,7 +1467,13 @@ orientation without dividing into a rounded decimal slope.
 Treat movement as an integer arrow `(changeX,changeY)`. Shorten the
 arrow by its greatest shared factor and choose one of the two opposite
 signs as the agreed representation. The shortened pair is an exact
-**direction key** for an undirected line through the starting point.
+**direction key** for a line through the starting point. Here the line
+is **undirected**: moving along it in either direction counts as the
+same orientation.
+
+A line's **slope** is its vertical change divided by its horizontal
+change. Storing the two changes as an integer pair avoids that
+division and the rounding it can cause.
 
 ##### How it works
 
@@ -1527,23 +1591,24 @@ The boolean result reports a duplicate point.
 
 ##### Work and memory
 
-Coordinate subtraction is constant work. GCD takes logarithmic
-remainder steps in the smaller change magnitude, so normalization is
-`O(log(min(|dx|,|dy|)))` time in the worst case and `O(1)` auxiliary
-space. A caller grouping `n` points also pays for its map storage and
-lookups.
+Coordinate subtraction takes a fixed amount of work. The GCD takes a
+number of remainder steps proportional to the logarithm of the
+smaller horizontal or vertical change. Normalizing one direction uses
+`O(1)` extra memory. A caller grouping `n` points must also count its
+map storage and lookups.
 
 ##### When to use it
 
-Use reduced direction keys when points must be grouped by exact
-collinearity on undirected lines through one chosen start and
-coordinates are integers within safe bounds.
+Use reduced direction keys when integer-coordinate points must be
+grouped by the exact straight line they share with one chosen start.
+Use this sign rule only when opposite directions count as the same
+line.
 
 ##### When not to use it
 
 Do not use a rounded floating-point slope as an equality key. Do not
 use this undirected sign rule when opposite rays must remain
-different; keep their signs distinct for that contract.
+different; keep their signs distinct for that requirement.
 
 ##### Common mistakes and edge cases
 
@@ -1560,8 +1625,8 @@ tests.
 ##### Related material
 
 - [A.6.1 Shared divisors and
-  multiples](#a61-shared-divisors-and-multiples-gcd-and-lcm) owns
-  Euclid's algorithm.
+  multiples](#a61-shared-divisors-and-multiples-gcd-and-lcm)
+  explains Euclid's algorithm.
 - [A.6.2 Normalized fractions and
   ratios](#a62-normalized-fractions-and-ratios) explains canonical
   reduced pairs.
@@ -1591,8 +1656,8 @@ division**; Go instead truncates toward zero.
 For positive modulus or divisor `m`:
 
 1.  Calculate Go's quotient `x/m` and remainder `x%m`.
-2.  For a remainder in `0..m-1`, add `m` once when the remainder is
-    negative.
+2.  To produce a remainder from `0` through `m-1`, add `m` once when
+    Go's remainder is negative.
 3.  For floor division, subtract one from the truncated quotient when
     the remainder is negative.
 
@@ -1612,8 +1677,8 @@ floor quotient should be `-3`.
     - **Before:** `remainder=-1`
     - **Decision:** Add positive modulus `3`.
     - **After:** `2`
-    - **Known correct:** The result is in `0..2` and differs from `-7`
-      by a multiple of `3`.
+    - **Known correct:** The result is from `0` through `2` and
+      differs from `-7` by a multiple of `3`.
 3.  **Result: Floor quotient**
     - **Before:** `quotient=-2`, remainder negative
     - **Decision:** Move one whole step downward.
@@ -1625,12 +1690,12 @@ Boundary input `x=-6,m=3` has remainder zero. Its exact quotient is
 
 ##### Why it works
 
-Go's remainder has magnitude smaller than positive `m`. Therefore a
-negative remainder lies in `-(m-1)..-1`, and adding `m` moves it
-exactly into `1..m-1` without changing its equivalence class. For
+Go's remainder is always closer to zero than positive `m`. A negative
+remainder is therefore between `-(m-1)` and `-1`. Adding `m` moves it
+between `1` and `m-1` without changing its clock position. For
 division, truncation and floor differ only when a negative result has
-a fractional part; a negative remainder detects exactly that case for
-positive `m`, so subtracting one reaches the next lower integer.
+a fractional part. With positive `m`, a negative remainder identifies
+exactly that case, so subtracting one reaches the next lower integer.
 
 ##### Go example
 
@@ -1667,18 +1732,18 @@ func floorDivide(value, divisor int64) (int64, bool) {
 ##### Work and memory
 
 Each function performs a fixed number of integer operations, so it
-takes `O(1)` time and `O(1)` auxiliary space.
+takes `O(1)` time and `O(1)` extra memory.
 
 ##### When to use it
 
-Use normalized remainders for circular indexes, equivalence classes,
-and problem statements that require `0 <= result < modulus`. Use floor
-division when intervals or coordinates are defined by rounding
-downward.
+Use normalized remainders for circular indexes, groups of values that
+share the same remainder, and problems that require
+`0 <= result < modulus`. Use floor division when ranges or coordinates
+are defined by rounding downward.
 
 ##### When not to use it
 
-Do not add the correction when the required contract is Go's
+Do not add the correction when the required behavior is Go's
 truncation toward zero. The formulas above also deliberately require a
 positive divisor; derive and test a different rule before accepting
 negative divisors.
@@ -1692,17 +1757,17 @@ negative divisors.
 > divisions. `-6/3` is already `-2`; adjust only when the remainder is
 > negative.
 
-Reject zero modulus or divisor before the operator executes. Keep the
-smallest signed value divided by `-1` out of generalized variants
-because that quotient does not fit the signed type.
+Reject zero modulus or divisor before the operator executes. If a
+different version permits divisor `-1`, it must reject the smallest
+signed value because its positive quotient does not fit the type.
 
 ##### Related material
 
 - [A.4 Integer limits and bits](#a4-integer-limits-and-bits) explains
   why operator inputs must also fit their type.
 - [A.6 Keeping arithmetic values exact and
-  consistent](#a6-keeping-arithmetic-values-exact-and-consistent) owns
-  the rule for choosing one representation.
+  consistent](#a6-keeping-arithmetic-values-exact-and-consistent)
+  explains how to choose one representation.
 - [A.6.7 Numbers too large for an integer
   type](#a67-numbers-too-large-for-an-integer-type) updates a
   remainder while reading decimal text.
@@ -1763,13 +1828,15 @@ loop does no work and returns `0`.
 
 Every trailing zero uses one factor of `2` and one factor of `5`. In a
 factorial, each multiple of `5` supplies one `5`, each multiple of
-`25` supplies one more, and higher powers supply further layers. The
-sum `floor(n/5)+floor(n/25)+...` therefore counts every factor of `5`
-exactly once per occurrence. Factors of `2` are never fewer and are
-more frequent once a factor of `5` appears, so the number of pairs is
-exactly the number of counted `5`s.
+`25` supplies one more, and higher powers supply further layers. Add
+the whole-number results of dividing `n` by `5`, `25`, `125`, and so
+on. This counts every factor of `5` once per occurrence. Factors of
+`2` are more common, so the number of pairs is exactly the number of
+counted `5`s.
 
 ##### Go example
+
+The function requires `value >= 0`.
 
 ```go
 func trailingZeroes(value int64) int64 {
@@ -1784,19 +1851,17 @@ func trailingZeroes(value int64) int64 {
 }
 ```
 
-The function requires `value >= 0`.
-
 ##### Work and memory
 
 Each pass divides `n` by `5`, so there are `O(log_5 n)` passes,
 conventionally written `O(log n)`. The function stores two integers
-and uses `O(1)` auxiliary space. It never allocates or constructs
+and uses `O(1)` extra memory. It never allocates or constructs
 `n!`.
 
 ##### When to use it
 
-Use factor-layer counting when a question asks about factors inside a
-factorial product, especially trailing zeroes in a known base.
+Use repeated factor counting when a question asks about factors inside
+a factorial product, especially trailing zeroes in a known base.
 
 ##### When not to use it
 
@@ -1842,14 +1907,15 @@ are `1` and itself.
 
 ##### How it works
 
-For one `n >= 2`, test divisors `2,3,...` while
-`divisor <= n/divisor`; the division form avoids overflow from
-`divisor*divisor`. The first divisor found is the smallest factor. If
-none is found, `n` is prime.
+For one `n` of at least `2`, test divisors starting at `2` and
+increasing by one. Stop after `divisor > n/divisor`; the division form
+avoids overflow from calculating `divisor*divisor`. The first divisor
+found is the smallest factor. If none is found, `n` is prime.
 
 For all primes through `limit`:
 
-1.  Create a boolean marker for `0..limit`.
+1.  Create one true-or-false marker for every value from `0` through
+    `limit`.
 2.  Starting at `2`, keep an unmarked value as prime.
 3.  Cross out its multiples beginning at its square; smaller multiples
     were crossed out by earlier primes.
@@ -1857,9 +1923,40 @@ For all primes through `limit`:
 
 ##### Step-by-step examples
 
-Trial division for `91` checks `2` through `7`. Values `2..6` leave
-nonzero remainders; `91%7=0`, so the smallest factor is `7` and the
-paired factor is `13`.
+For trial division with `value=91`, the expected smallest factor is
+`7`.
+
+1.  **Step: Try divisor `2`**
+    - **Before:** No divisor has been found.
+    - **Decision:** `91%2=1`, so `2` does not divide `91`.
+    - **After:** Advance to divisor `3`.
+    - **Known correct:** No divisor from `2` through `2` works.
+2.  **Step: Try divisor `3`**
+    - **Before:** Divisors below `3` have failed.
+    - **Decision:** `91%3=1`.
+    - **After:** Advance to divisor `4`.
+    - **Known correct:** No divisor from `2` through `3` works.
+3.  **Step: Try divisor `4`**
+    - **Before:** Divisors below `4` have failed.
+    - **Decision:** `91%4=3`.
+    - **After:** Advance to divisor `5`.
+    - **Known correct:** No divisor from `2` through `4` works.
+4.  **Step: Try divisor `5`**
+    - **Before:** Divisors below `5` have failed.
+    - **Decision:** `91%5=1`.
+    - **After:** Advance to divisor `6`.
+    - **Known correct:** No divisor from `2` through `5` works.
+5.  **Step: Try divisor `6`**
+    - **Before:** Divisors below `6` have failed.
+    - **Decision:** `91%6=1`.
+    - **After:** Advance to divisor `7`.
+    - **Known correct:** No divisor from `2` through `6` works.
+6.  **Step: Try divisor `7`**
+    - **Before:** Divisors below `7` have failed.
+    - **Decision:** `91%7=0`, so `7` divides `91`.
+    - **After:** Return `7`; its paired factor is `91/7=13`.
+    - **Known correct:** Ascending order makes `7` the smallest
+      factor.
 
 For a sieve through `10`:
 
@@ -1888,10 +1985,10 @@ performs no candidate checks and reports `2` itself as prime.
 
 ##### Why it works
 
-If composite `n=a*b` had both factors larger than its square root,
-their product would exceed `n`. Therefore checking through the square
-root cannot miss a composite. In the sieve, every composite has a
-smallest prime factor `p`; when `p` is processed, the composite is
+If a non-prime value `n=a*b` had both factors larger than its square
+root, their product would exceed `n`. Therefore checking through the
+square root cannot miss a factor. In the sieve, every non-prime value
+has a smallest prime factor `p`; when `p` is processed, that value is
 marked. Starting at `p*p` is safe because any smaller multiple of `p`
 has another factor smaller than `p` and was already marked.
 
@@ -1956,11 +2053,12 @@ func primesThrough(limit int) []int {
 
 ##### Work and memory
 
-Trial division uses `O(sqrt(n))` remainder checks in the worst case
-and `O(1)` auxiliary space. The sieve takes `O(limit log log limit)`
-marking work and `O(limit)` marker memory; collecting primes adds
-`O(limit)` scan work and an output slice proportional to the number of
-primes.
+Trial division checks at most the integers through the square root of
+`n`. This is written `O(sqrt(n))`; it uses `O(1)` extra memory. The
+sieve crosses out multiples of each discovered prime. Its standard
+bound is `O(limit log log limit)` marking work and `O(limit)` marker
+memory. Collecting the answers adds one `O(limit)` scan and an output
+slice with one element per returned prime.
 
 ##### When to use it
 
@@ -1970,9 +2068,9 @@ range is needed.
 
 ##### When not to use it
 
-Do not allocate a sieve up to an enormous sparse limit for a handful
-of queries. Do not repeatedly trial-divide every value in a dense
-range when one sieve can share the work.
+Do not allocate a marker for every value up to an enormous limit when
+only a handful of values will be queried. Likewise, do not test every
+number separately when one sieve can handle the whole range together.
 
 ##### Common mistakes and edge cases
 
@@ -2007,7 +2105,7 @@ property such as its remainder after division.
 
 Read the number the way long division does: carry only the unfinished
 remainder into the next digit. The full number stays as text, and the
-state never needs to grow with its magnitude.
+remembered remainder never needs to grow with the full number.
 
 ##### How it works
 
@@ -2016,13 +2114,14 @@ For a nonempty string containing only the one-byte digit characters
 Interchange (ASCII), and positive modulus `m`:
 
 1.  Start `remainder=0`.
-2.  Convert the next byte from `'0'..'9'` to its digit value.
+2.  Convert the next byte from `'0'` through `'9'` to its digit value.
 3.  Update `remainder=(remainder*10+digit)%m`.
 4.  Reject any nondigit and return the final remainder after all
     digits.
 
-The example code also requires `m <= 922337203685477579`, which
-ensures the intermediate `10*(m-1)+9` fits in `int64`.
+The example code also requires `m <= 922337203685477580`, which
+ensures the largest intermediate value, `10*(m-1)+9`, fits in
+`int64`.
 
 ##### Step-by-step examples
 
@@ -2063,7 +2162,7 @@ the prefix is the complete input.
 ##### Go example
 
 ```go
-const maxSafeDecimalModulus int64 = 922337203685477579
+const maxSafeDecimalModulus int64 = 922337203685477580
 
 func decimalRemainder(digits string, modulus int64) (int64, bool) {
 	// The modulus bound ensures remainder*10+digit fits before the next
@@ -2092,20 +2191,20 @@ func decimalRemainder(digits string, modulus int64) (int64, bool) {
 
 For `d` input digits, the function performs one update per digit, so
 it takes `O(d)` time in every valid case. It stores one remainder and
-indexes the input without copying it, so auxiliary space is `O(1)`.
+indexes the input without copying it, so extra memory is `O(1)`.
 
 ##### When to use it
 
-Use streaming remainder updates when the input is an exact decimal
-string and only divisibility, a remainder, or another bounded
-left-to-right state is needed.
+Use left-to-right remainder updates when the input is an exact decimal
+string and only divisibility, a remainder, or another small remembered
+value is needed.
 
 ##### When not to use it
 
 Do not use this method when later work needs the complete large value
-or arbitrary arithmetic on it; use `math/big.Int`. Do not accept a
-modulus that can overflow the update unless the implementation uses a
-wider or explicitly overflow-safe modular operation.
+or arithmetic on it. Use Go's `big.Int`, an integer type that grows as
+needed. Do not accept a modulus that can overflow the update unless
+the implementation uses a wider or explicitly checked operation.
 
 ##### Common mistakes and edge cases
 
@@ -2114,15 +2213,15 @@ wider or explicitly overflow-safe modular operation.
 > fit in `int64`.
 
 > **Warning:** Validate every byte. Treating `'x'-'0'` as a digit
-> silently corrupts the state for `"12x"`.
+> silently corrupts the remembered remainder for `"12x"`.
 
 Choose and document rules for a leading sign, whitespace, and empty
 input. The example accepts leading zeroes but digits only.
 
 ##### Related material
 
-- [A.4 Integer limits and bits](#a4-integer-limits-and-bits) owns the
-  intermediate-range check.
+- [A.4 Integer limits and bits](#a4-integer-limits-and-bits) explains
+  the check that keeps intermediate values in range.
 - [A.6.4 Modular arithmetic and negative
   division](#a64-modular-arithmetic-and-negative-division) defines
   normalized remainders for signed values.
@@ -2141,9 +2240,10 @@ cost.
 #### The idea in simple terms
 
 If every input value independently has an "in" or "out" switch, `n`
-values create `2^n` switch settings. No implementation can return all
-those groups without visiting and storing the requested answers.
-**Combinatorics** is the study of counting such choices.
+values create `2^n` switch settings: multiply by `2` once for each
+value. No implementation can return all those groups without visiting
+and storing the requested answers. **Combinatorics** is the study of
+counting such choices.
 
 #### How it works
 
@@ -2152,7 +2252,8 @@ First identify what makes two outputs different:
 - A **subset** chooses any number of distinct input positions; order
   does not matter. There are `2^n` subsets.
 - A **permutation** arranges all `n` positions; order matters. There
-  are `n!`, where `n! = n*(n-1)*...*1`.
+  are `n!`, found by multiplying `n`, `n-1`, and every positive whole
+  number down through `1`.
 - A **size-`k` combination** chooses exactly `k` positions without
   order. Its count is `C(n,k)`, read "`n` choose `k`."
 
@@ -2162,49 +2263,62 @@ the number of result rows.
 
 #### Step-by-step examples
 
-Generate subsets of `[A,B,C]`. At each position, first exclude and
-then include the current value.
+Generate subsets of `[A,B]`. At each position, first exclude and then
+include the current value. The expected output order is
+`[[],[B],[A],[A,B]]`.
 
 1.  **Position and choice: Start**
     - **Before:** `currentSubset=[]`, index `0`
     - **Decision:** Explore both choices for `A`.
-    - **After:** Exclude branch, then include branch
-    - **Known correct:** Every subset belongs to exactly one branch.
-2.  **Position and choice: Exclude `A`, branch on `B,C`**
-    - **Before:** `[]`
-    - **Decision:** Repeat the two choices.
-    - **After:** `[]`, `[C]`, `[B]`, `[B,C]`
-    - **Known correct:** These are exactly the subsets without `A`.
-3.  **Position and choice: Include `A`, branch on `B,C`**
-    - **Before:** `[A]`
-    - **Decision:** Repeat the same choices.
-    - **After:** `[A]`, `[A,C]`, `[A,B]`, `[A,B,C]`
-    - **Known correct:** These are exactly the subsets with `A`.
-4.  **Position and choice: Finish**
-    - **Before:** Eight outputs
-    - **Decision:** Both top-level groups are disjoint and complete.
-    - **After:** Return all eight.
-    - **Known correct:** Every switch setting appears once.
+    - **After:** First continue without `A`.
+    - **Known correct:** Subsets without `A` will be completed before
+      subsets with `A`.
+2.  **Position and choice: Exclude `B`**
+    - **Before:** `currentSubset=[]`, index `1`
+    - **Decision:** Continue without `B`.
+    - **After:** Reach the end and save `[]`.
+    - **Known correct:** The subset containing neither value is saved.
+3.  **Position and choice: Include `B`**
+    - **Before:** Return to index `1` with `currentSubset=[]`.
+    - **Decision:** Append `B`, then reach the end.
+    - **After:** Save `[B]`, then remove `B` from the working subset.
+    - **Known correct:** Both subsets without `A` are now saved.
+4.  **Position and choice: Include `A`**
+    - **Before:** Return to index `0` with `currentSubset=[]`.
+    - **Decision:** Append `A` and continue to index `1`.
+    - **After:** `currentSubset=[A]`.
+    - **Known correct:** Every later result in this branch contains
+      `A`.
+5.  **Position and choice: Exclude `B` after `A`**
+    - **Before:** `currentSubset=[A]`, index `1`.
+    - **Decision:** Continue without `B`.
+    - **After:** Reach the end and save `[A]`.
+    - **Known correct:** The subset containing only `A` is saved.
+6.  **Position and choice: Include `B` after `A`**
+    - **Before:** Return to index `1` with `currentSubset=[A]`.
+    - **Decision:** Append `B`, then reach the end.
+    - **After:** Save `[A,B]` and return all four subsets.
+    - **Known correct:** Every include-or-exclude choice appears once.
 
 For empty input, there is one subset--the empty subset--so the output
 is `[[]]`, not an empty list of answers.
 
 #### Why it works
 
-Before processing `currentIndex`, `currentSubset` contains exactly the
-values selected from earlier positions. Every subset either excludes
-the current position or includes it, never both, so the two recursive
-branches are disjoint and cover all possibilities. When `currentIndex`
-reaches the input length, the choices for every position are fixed and
-one complete subset is copied. Because each level advances
-`currentIndex`, the process finishes.
+Before processing `currentIndex`, `currentSubset` contains exactly
+the values selected from earlier positions. Every subset either
+excludes the current position or includes it, but never both. The two
+calls therefore do not repeat an answer, and together they cover every
+choice. When `currentIndex` reaches the input length, the choices for
+every position are fixed and one complete subset is copied. Because
+each call advances `currentIndex`, the process finishes.
 
 #### Go example
 
 ```go
 func subsets(values []string) [][]string {
 	// currentSubset holds the choices on the active recursion path;
-	// result owns copies so later backtracking cannot mutate saved
+	// result owns copies so later choices cannot mutate saved
 	// subsets.
 	result := make([][]string, 0)
 	currentSubset := make([]string, 0, len(values))
@@ -2230,12 +2344,13 @@ func subsets(values []string) [][]string {
 
 #### Work and memory
 
-There are `2^n` returned subsets. Copying their elements costs
-`n*2^(n-1)` total element copies for `n>0`, so time and required
-output space are `O(n*2^n)`. The recursion and `currentSubset` slice
-use `O(n)` auxiliary space, excluding returned output. A permutation
-generator similarly cannot beat its `n!` output count, and storing all
-size-`k` combinations requires `O(k*C(n,k))` output space.
+There are `2^n` returned subsets. Each of the `n` input values appears
+in half of them, so copying the contents requires `n*2^(n-1)` element
+copies when `n>0`. Time and required output space are therefore
+`O(n*2^n)`. The unfinished calls and `currentSubset` use `O(n)` extra
+memory, excluding returned output. A permutation generator likewise
+cannot beat its `n!` output count. Storing all size-`k` combinations
+requires `O(k*C(n,k))` output space.
 
 #### When to use it
 
@@ -2256,7 +2371,8 @@ search that stops after one result may avoid the full output cost.
 > hold 12 values in total.
 
 > **Warning:** The empty input has one subset and one permutation--the
-> empty choice. Returning no answers breaks recursive composition.
+> empty choice. Returning no answers breaks the include-or-exclude
+> rule used by a larger call.
 
 Repeated values require a definition of distinct output: positions may
 be distinct even when their values compare equal.
@@ -2265,55 +2381,67 @@ be distinct even when their values compare equal.
 
 - [A.1 Complexity and resource
   accounting](#a1-complexity-and-resource-accounting) defines output
-  and auxiliary-space accounting.
+  and extra-memory accounting.
 - [A.7.1 Counting combinations without large
   factorials](#a71-counting-combinations-without-large-factorials)
   computes `C(n,k)` exactly.
 - [A.7.2 Repeated input values](#a72-repeated-input-values)
   distinguishes position choices from value choices.
-- [C.1.3.19 Backtracking](#c1319-backtracking) owns the general
+- [C.1.3.19 Backtracking](#c1319-backtracking) explains the general
   choose-and-undo method.
 
 #### A.7.1 Counting combinations without large factorials
 
 ##### The problem it solves
 
-We need the exact number of size-`k` groups chosen from `n` distinct
-positions, but calculating three full factorials can overflow before
-their quotient is small enough to use.
+Suppose there are `n` distinct items and we must choose exactly `k` of
+them. We need the number of possible groups, but we do not need the
+groups themselves. Calculating several full factorials can overflow
+even when the final count is small enough to use.
 
 ##### The idea in simple terms
 
-Build only the factors that survive cancellation. The count `C(n,k)`,
-read "`n` choose `k`," is the same as choosing the `k` kept positions
-or the `n-k` omitted positions, so use the smaller side.
+Build the count a little at a time instead of calculating full
+factorials. The number of groups is written `C(n,k)` and read "`n`
+choose `k`." Choosing the `k` items to keep gives the same count as
+choosing the `n-k` items to leave out, so use whichever number is
+smaller.
 
 ##### How it works
 
-For `0 <= k <= n`, replace `k` by `min(k,n-k)`, start `result=1`, and
-for `i=1..k` update:
+The input is valid when `n` and `k` are not negative and `k` is no
+larger than `n`.
+
+1.  Replace `k` with the smaller of `k` and `n-k`.
+2.  Start `result=1`.
+3.  For each whole number `i` from `1` through `k`, update:
 
 ```text
 result = result * (n-k+i) / i
 ```
 
-Each complete step is an integer. When the result can exceed
-fixed-width integers, use `big.Int` so both the intermediate product
-and answer remain exact.
+Each complete step divides evenly. Go's `big.Int` stores an integer
+that can grow beyond `int64`, so it keeps both the temporary product
+and the answer exact.
 
-An alternative for many related counts is **Pascal's recurrence**:
-`C(n,k)=C(n-1,k-1)+C(n-1,k)`, with boundary values `C(n,0)=C(n,n)=1`.
+When many nearby counts are needed, split the groups into two cases
+using one marked item. Groups that contain it choose their remaining
+`k-1` items from the other `n-1`; groups that omit it choose all `k`
+items from those `n-1`. This rule is called **Pascal's recurrence**:
+`C(n,k)=C(n-1,k-1)+C(n-1,k)`. Choosing no items or every item has
+exactly one answer, so `C(n,0)=C(n,n)=1`.
 
 ##### Step-by-step examples
 
 For `C(5,2)`, the expected result is `10`.
 
-1.  **Step: Symmetry**
+1.  **Step: Choose the shorter calculation**
     - **Before:** `n=5`, `k=2`
-    - **Decision:** `min(2,3)=2`; two loop steps are enough.
-    - **After:** `result=1`
-    - **Known correct:** Counting kept and omitted positions is
-      symmetric.
+    - **Decision:** Keeping `2` items is shorter than naming the `3`
+      omitted items, so two loop steps are enough.
+    - **After:** Effective `k=2`, `result=1`
+    - **Known correct:** Every kept pair identifies one omitted group
+      of three, and the reverse is also true.
 2.  **Step: `i=1`**
     - **Before:** `result=1`
     - **Decision:** Multiply by `4`, divide by `1`.
@@ -2326,19 +2454,24 @@ For `C(5,2)`, the expected result is `10`.
     - **Known correct:** This is `C(5,2)`.
 
 Pascal's recurrence reaches the same answer by marking `E` in
-`[A,B,C,D,E]`: four pairs include `E`, while six exclude it, so
-`C(5,2)=C(4,1)+C(4,2)=4+6=10`.
+`[A,B,C,D,E]`. A pair containing `E` chooses one partner from the
+other four, giving `4` pairs. A pair without `E` chooses both members
+from those four, giving `6` pairs. The two nonoverlapping cases total
+`4+6=10`.
 
-For boundary `k=0` or `k=n`, the loop performs zero iterations after
-symmetry and returns `1`. Invalid `k<0` or `k>n` returns failure.
+For boundary `k=0` or `k=n`, choosing the smaller side gives zero loop
+iterations and the function returns `1`. Invalid `k<0` or `k>n`
+returns failure.
 
 ##### Why it works
 
-After iteration `i`, `result` equals `C(n-k+i,i)`. The claim begins at
-`C(n-k,0)=1`. The update multiplies by the next available numerator
-and divides by the new chosen count, which is exactly the algebraic
-relationship between consecutive combination counts. Therefore after
-`k` steps it equals `C(n,k)`.
+After step `i`, `result` counts ways to choose `i` items from
+`n-k+i` items. The numerator factors count choices where the order of
+the chosen items matters. The divisor factors `1` through `i` remove
+the different orders of each same group. The quotient is therefore a
+whole-number group count. Before any step, the one size-zero group is
+the empty group. After step `k`, `n-k+k` is `n`, so the result counts
+ways to choose the requested `k` items from all `n` items.
 
 Pascal's recurrence is correct because every size-`k` group either
 includes a marked value or excludes it. Those cases cannot overlap and
@@ -2383,18 +2516,19 @@ func combinationCount(numItems, numChosen int64) (*big.Int, bool) {
 
 ##### Work and memory
 
-The loop performs `min(k,n-k)` big-integer multiplications and exact
-divisions. That is `O(min(k,n-k))` arithmetic operations; their
-bit-level cost grows with the number of bits in `C(n,k)`. The result
-and temporaries use `O(log C(n,k))` bits of magnitude storage. A
-Pascal table for many counts uses `O(nk)` arithmetic operations and
-can use `O(k)` big integers when only the previous row is kept.
+The loop runs once for the smaller of `k` and `n-k`. This is
+`O(min(k,n-k))` large-integer operations. An operation becomes more
+expensive as the stored number gains digits. The result and temporary
+values need enough memory to hold the digits of `C(n,k)`. A table
+built with Pascal's rule calculates up to `n*k` entries. Keeping only
+the previous row reduces its working storage to about `k` large
+integers.
 
 ##### When to use it
 
-Use the multiplicative formula for one exact combination count. Use
-Pascal's recurrence when many nearby counts or a constraint-modulo
-version are needed.
+Use the multiply-then-divide loop for one exact combination count. Use
+Pascal's rule when many nearby counts are needed or when the problem
+asks only for each count's remainder after division by a fixed value.
 
 ##### When not to use it
 
@@ -2427,71 +2561,79 @@ Define invalid inputs and preserve `C(n,0)=C(n,n)=1`.
 
 ##### The problem it solves
 
-When input values repeat, different position choices can produce
-identical value outputs. We need to state which notion of distinctness
-the result uses and, when required, generate each value combination
-once.
+When an input contains repeated values, choosing different positions
+can produce the same visible answer. We need to decide whether
+positions or displayed values make answers different. This entry
+generates each displayed group once.
 
 ##### The idea in simple terms
 
-Label equal positions temporarily: `[1a,1b,2]` has three position
-pairs, but `[1a,2]` and `[1b,2]` both display as `[1,2]`. Sort equal
-values together, then skip a repeated value only when it would make
-the same choice at the same output depth.
+Temporarily label the two `1` values by their positions. Input
+`[1a,1b,2]` has three pairs of positions, but pairs `[1a,2]` and
+`[1b,2]` both display as `[1,2]`. Put equal values next to each other,
+then allow only the first equal value to begin a particular part of
+the search. A later equal value may still be chosen after the first;
+otherwise `[1,1]` would disappear.
 
 ##### How it works
 
-For distinct size-`k` value combinations:
+For unique value groups containing exactly `k` items:
 
 1.  Copy and sort the input so equal values are adjacent.
-2.  Build `currentCombination` from left to right using increasing
-    indexes.
-3.  At one recursive depth, skip `sorted[candidateIndex]` when
-    `candidateIndex>startIndex` and it equals the immediately previous
-    value.
-4.  After choosing a value, recurse with `candidateIndex+1`; this
-    still permits another equal value at the next depth.
+2.  Build `currentCombination` from left to right. After choosing an
+    index, consider only indexes to its right.
+3.  One call of `build` fills one position in the output group. In
+    that call, skip an equal value when the immediately previous value
+    was another candidate for that same position.
+4.  After choosing a value, call `build` for the next output position.
+    Starting after the chosen index still allows the next equal value.
 5.  Copy `currentCombination` when its length reaches
     `combinationLength`.
 
 ##### Step-by-step examples
 
-For values `[1a,1b,2]` and `k=2`, the expected value outputs are
-`[[1,1],[1,2]]`.
+For the actual input `values=[1,1,2]` and `k=2`, the expected value
+outputs are `[[1,1],[1,2]]`. The labels `1a` and `1b` below refer only
+to the first and second input positions; both stored values are `1`.
 
-1.  **Choice: First `1`**
+1.  **Choice: First value in the group**
     - **Before:** `startIndex=0`, `currentCombination=[]`
-    - **Decision:** Choose index `0`.
+    - **Decision:** Choose index `0`, the first `1`.
     - **After:** `currentCombination=[1]`, next start index `1`
     - **Known correct:** Every result in this branch begins with `1`.
-2.  **Choice: Second `1`**
+2.  **Choice: Fill the second position with `1`**
     - **Before:** `startIndex=1`, `currentCombination=[1]`
-    - **Decision:** At a new depth, equal value is allowed.
+    - **Decision:** This call fills a new output position, so choose
+      the second `1`.
     - **After:** Emit `[1,1]`
     - **Known correct:** The two positions can both be used.
-3.  **Choice: `2`**
-    - **Before:** Same depth after undo
-    - **Decision:** Choose index `2`.
+3.  **Choice: Fill the second position with `2`**
+    - **Before:** Remove the second `1`; combination is `[1]` again.
+    - **Decision:** In the same call, next choose index `2`.
     - **After:** Emit `[1,2]`
-    - **Known correct:** The other distinct suffix is included.
-4.  **Choice: First-depth index `1`**
-    - **Before:** `startIndex=0`, prior value was `1`
-    - **Decision:** Skip equal `1`; it would repeat both outputs
-      above.
-    - **After:** Continue to `2`
-    - **Known correct:** No distinct value output is lost.
+    - **Known correct:** The other displayed pair beginning with `1`
+      is included.
+4.  **Choice: Try the second `1` first**
+    - **Before:** Remove the first chosen `1`; combination is empty.
+    - **Decision:** The first call already tried an equal `1` for this
+      output position, so skip index `1`.
+    - **After:** Continue to index `2`; it cannot fill a pair alone.
+    - **Known correct:** Starting with the second `1` would repeat
+      `[1,2]`, while `[1,1]` was already created in step 2.
 
 For `k=0`, the one valid combination is empty. For `k>len(values)`, no
-branch can reach length `k`, so the output is empty.
+sequence of choices can reach length `k`, so the output is empty.
 
 ##### Why it works
 
-Increasing indexes ensure one input position is used at most once. At
-any depth, adjacent equal candidates would create the same next value
-and leave equivalent remaining suffixes, so keeping only the first
-removes duplicates without losing a value sequence. The skip is
-depth-local: after one `1` is in `currentCombination`, the next depth
-may choose the other position, which preserves `[1,1]`.
+Increasing indexes ensure that one input position is never used
+twice. Within one call, two adjacent equal candidates would place the
+same value in the same output position. Choosing the later one cannot
+create a new displayed group, because it leaves fewer remaining
+positions than choosing the earlier one. Keeping the first therefore
+loses nothing. The next call fills a different output position, so it
+may choose another copy of the value and preserve `[1,1]`. Every call
+starts farther right, so the search finishes.
 
 ##### Go example
 
@@ -2503,7 +2645,7 @@ func uniqueCombinations(values []int, combinationLength int) [][]int {
 		return nil
 	}
 	// Sort a copy so equal values become adjacent without changing the
-	// caller's slice. Adjacency makes duplicate branches easy to skip.
+	// caller's slice. Adjacency makes duplicate choices easy to skip.
 	sorted := append([]int(nil), values...)
 	sort.Ints(sorted)
 	result := make([][]int, 0)
@@ -2511,8 +2653,8 @@ func uniqueCombinations(values []int, combinationLength int) [][]int {
 	var build func(int)
 	build = func(startIndex int) {
 		if len(currentCombination) == combinationLength {
-			// Save an independent copy because the active combination is
-			// reused during backtracking.
+			// Save an independent copy because later search steps reuse the
+			// active combination.
 			result = append(result, append([]int{}, currentCombination...))
 			return
 		}
@@ -2521,12 +2663,12 @@ func uniqueCombinations(values []int, combinationLength int) [][]int {
 			candidateIndex++ {
 			if candidateIndex > startIndex &&
 				sorted[candidateIndex] == sorted[candidateIndex-1] {
-				// At one recursion depth, choosing the next equal value would
-				// create the same combination as choosing the previous one.
+				// This call already tried the same value for this output
+				// position, so trying it again would repeat answers.
 				continue
 			}
-			// Choose this value, recurse using only later positions, then undo
-			// the choice so the next candidate starts from the same prefix.
+			// Choose this value, fill later positions, then remove it so
+			// the next candidate starts with the same earlier choices.
 			currentCombination = append(
 				currentCombination,
 				sorted[candidateIndex],
@@ -2542,30 +2684,32 @@ func uniqueCombinations(values []int, combinationLength int) [][]int {
 
 ##### Work and memory
 
-Sorting takes `O(n log n)` time and the copied slice uses `O(n)`
-auxiliary space. If `U` distinct outputs are returned, copying them
-costs `O(kU)` time and output space. The search can visit up to
-`sum(C(n,d), d=0..k)` states before duplicate pruning; recursion and
-`currentCombination` uses `O(k)` additional space.
+Sorting `n` values takes `O(n log n)` time, and the sorted copy uses
+`O(n)` extra memory. If `U` unique groups are returned, each has `k`
+items, so copying the answers costs `O(k*U)` time and output space.
+Before repeated choices are skipped, the search may visit every
+partial group of size zero through `k`. The unfinished calls and
+`currentCombination` hold at most `k` choices and use `O(k)` more
+memory.
 
 ##### When to use it
 
-Use depth-local duplicate skipping when outputs are value sequences,
-input positions may be used once, and equal values should not create
-repeated rows.
+Use same-call duplicate skipping when answers are groups of displayed
+values, input positions may be used once, and equal input values
+should not create repeated rows.
 
 ##### When not to use it
 
-Do not deduplicate when labeled positions are supposed to produce
-distinct answers. Do not use this exact rule for unlimited reuse,
-ordered sequences, or frequency-only counting without deriving the
-matching state rules.
+Do not remove duplicates when labeled positions are supposed to
+produce distinct answers. Do not use this exact rule when a value may
+be reused without limit, when order matters, or when only a count is
+needed; those problems need different choice rules.
 
 ##### Common mistakes and edge cases
 
-> **Warning:** Skipping every equal value globally loses `[1,1]` from
-> `[1,1,2]`. Skip only equal candidates competing for the same output
-> depth.
+> **Warning:** Skipping every equal value everywhere loses `[1,1]`
+> from `[1,1,2]`. Skip equal candidates only when the same call is
+> choosing the same output position.
 
 > **Warning:** Sorting the caller's slice in place changes observable
 > input. The example copies before sorting.
@@ -2575,10 +2719,10 @@ Test all-equal input, `k=0`, `k=n`, and invalid `k`.
 ##### Related material
 
 - [A.7 Combinatorics and output
-  size](#a7-combinatorics-and-output-size) owns output-size
+  size](#a7-combinatorics-and-output-size) explains output-size
   accounting.
-- [C.1.3.19 Backtracking](#c1319-backtracking) owns choose, recurse,
-  and undo.
+- [C.1.3.19 Backtracking](#c1319-backtracking) explains how to choose,
+  recurse, and undo.
 - [D.3 Sorting without unexpected
   mutation](#d3-sorting-without-unexpected-mutation) explains the
   copy-before-sort boundary.
@@ -2589,28 +2733,31 @@ Test all-equal input, `k=0`, `k=n`, and invalid `k`.
 
 #### The problem it solves
 
-We need to inspect or rearrange the decimal digits of an integer that
-already fits in memory, without converting it to text and without
-overflowing while building a result.
+We need to inspect or rearrange the decimal digits of a nonnegative
+integer that already fits in memory. We want to avoid converting it to
+text and must not build a result above a given upper limit.
 
 <a id="a81-mental-model"></a>
 
 #### The idea in simple terms
 
-Peel digits from the right like cards from the top of a pile. For a
-nonnegative integer, `value%10` extracts the last decimal digit and
-`value/10` removes it. Repeated extraction is **integer digit
+Peel digits from the right like cards from the top of a pile. Dividing
+by `10` leaves a remainder from `0` through `9`; that remainder is the
+last decimal digit. Whole-number division by `10` then removes the
+last digit. Repeating those operations is **integer digit
 processing**.
 
 <a id="a84-preventing-integer-overflow"></a>
 
 #### How it works
 
-For reversal with a fixed upper `limit`:
+The example accepts `value` and the largest allowed result, `limit`.
+Both must be nonnegative.
 
-1.  Require a nonnegative input; a minus sign is not a digit.
+1.  Reject a negative input or limit; a minus sign is not a digit.
 2.  Extract `digit := value%10`.
-3.  Before appending, reject when `reversed > (limit-digit)/10`.
+3.  Before appending, first reject `digit > limit`. Otherwise reject
+    when `reversed > (limit-digit)/10`.
 4.  Set `reversed = reversed*10+digit` and remove the source digit
     with `value /= 10`.
 5.  Stop when `value` is zero. Input zero returns zero without
@@ -2620,7 +2767,7 @@ For reversal with a fixed upper `limit`:
 
 #### Step-by-step examples
 
-Reverse `120`; the expected integer result is `21`.
+For `value=120` and `limit=127`, the expected result is `(21,true)`.
 
 1.  **Step: Extract `0`**
     - **Before:** `value=120`, `reversed=0`
@@ -2640,39 +2787,67 @@ Reverse `120`; the expected integer result is `21`.
     - **Known correct:** Every digit has moved in reverse order.
 
 An integer cannot retain a leading zero, so the result is `21`, not
-`021`. For an overflow boundary with limit `127`, appending digit `8`
-to `reversed=12` is rejected because `12>(127-8)/10`, or `12>11`; the
-unsafe value `128` is never evaluated.
+`021`. For the separate input `821` with limit `127`, the first two
+steps produce `reversed=12`. Appending the final digit `8` is rejected
+because `(127-8)/10` is `11` and `12` is larger. The unsafe value
+`128` is never evaluated.
 
 <a id="a83-invariant-fact-that-remains-true"></a>
 
 #### Why it works
 
-After `k` passes, `value` is the original number with its last `k`
-digits removed, while `reversed` contains those removed digits in
-opposite order. Extraction and append move exactly one digit and
-preserve that fact. Each pass divides nonzero `value` by `10`, so the
-process finishes. At zero, all digits have moved and the invariant
-describes the complete reversal.
+After every pass, `value` is the original number with the processed
+ending digits removed. At the same time, `reversed` contains those
+removed digits in opposite order. Extraction and append move exactly
+one digit and preserve both facts. Each pass divides nonzero `value`
+by `10`, so the process finishes. At zero, all digits have moved and
+`reversed` is the complete answer.
 
-The precheck is equivalent to `reversed*10+digit <= limit`, so every
-performed append remains representable.
+When `digit` is no larger than `limit`, subtracting it is safe. The
+second check is the rearranged form of requiring
+`reversed*10+digit` to be no larger than `limit`. It checks the same
+condition without first calculating the possibly excessive result.
+Therefore every performed append stays within the allowed range.
 
 #### Go example
 
-The complete implementation is owned by [E.6 Overflow-safe integer
-reversal](#e6-overflow-safe-integer-reversal). Its variables `value`,
-`digit`, and `reversed` match the trace, it accepts zero, and it
-rejects negative or overflowing inputs.
+```go
+func reverseDigits(value, limit int64) (int64, bool) {
+	// This entry treats the minus sign as invalid rather than as a
+	// decimal digit.
+	if value < 0 || limit < 0 {
+		return 0, false
+	}
+
+	var reversed int64
+	for value > 0 {
+		// Remainder gives the rightmost digit. Whole-number division
+		// below removes that same digit.
+		digit := value % 10
+		// digit > limit handles a negative subtraction result. The
+		// second comparison checks the append before multiplying.
+		if digit > limit || reversed > (limit-digit)/10 {
+			return 0, false
+		}
+		reversed = reversed*10 + digit
+		value /= 10
+	}
+	return reversed, true
+}
+```
+
+Calls matching the examples are `reverseDigits(120,127)`, which
+returns `(21,true)`, and `reverseDigits(821,127)`, which returns
+`(0,false)`. Input zero returns `(0,true)` without entering the loop.
 
 <a id="a85-work-and-memory"></a>
 
 #### Work and memory
 
-For a value with `d` decimal digits, the loop performs `d` extraction
+If `value` has `d` decimal digits, the loop performs `d` extraction
 and append steps, so it takes `O(d)` time. It stores the remaining
-value, one digit, and the result, so auxiliary space is `O(1)`. No
-string or digit slice is allocated.
+value, one digit, the limit, and the result. That fixed amount of
+storage is `O(1)` extra memory. No string or digit slice is allocated.
 
 #### When to use it
 
@@ -2693,7 +2868,7 @@ without defining it.
 > `127`, constructing `128` first defeats the guard.
 
 > **Warning:** A loop written only as `for value>0` still needs an
-> explicit contract for zero and negative input. The reference returns
+> explicit rule for zero and negative input. The example returns
 > `(0,true)` for zero and failure for negatives.
 
 Trailing zeroes disappear from the displayed reversal, palindromes
@@ -2710,8 +2885,8 @@ positive in the same type.
   type](#a67-numbers-too-large-for-an-integer-type) handles digit text
   that cannot first become an integer.
 - [E.6 Overflow-safe integer
-  reversal](#e6-overflow-safe-integer-reversal) owns the complete Go
-  implementation.
+  reversal](#e6-overflow-safe-integer-reversal) provides the complete
+  Go implementation.
 - [Palindrome
   Number](problems/solved_easy_leetcode_0009_palindrome_number.go)
   compares full reversal with reversing only half the digits.
@@ -2724,20 +2899,20 @@ positive in the same type.
 
 #### The problem it solves
 
-Programs often need numbered storage: read or replace a value by
-position, keep values in order, or expose only a consecutive part of a
-larger sequence. The important Go-specific question is whether two
-sequence values share the same storage, because a write through one
-can then change the other.
+Programs often need numbered storage. They may read or replace a value
+by position, keep values in order, or work with only one consecutive
+part of a larger sequence. In Go, two slices can share storage. A
+write through one slice can then change what the other slice sees.
 
 #### The idea in simple terms
 
 Picture a row of numbered lockers. An **array** owns a fixed number of
-lockers. A **slice** is a movable window onto consecutive lockers; it
+lockers. A **slice** is a movable window onto consecutive lockers. It
 records where the window begins, how many lockers are visible, and how
-far the storage continues. Two slices may therefore look separate
-while sharing lockers underneath. A Go **string** is a read-only
-sequence of bytes.
+many lockers it may reach before the array ends. The array seen
+through the window is called the slice's **underlying array**. Two
+slices may look separate while sharing that array. A Go **string** is
+a read-only sequence of bytes.
 
 #### How it works
 
@@ -2756,9 +2931,11 @@ sequence of bytes.
 
 #### Step-by-step examples
 
-Start with `base := []int{10, 20, 30, 40}` and `middle := base[1:3]`.
-The expected final values are `base == [10, 99, 30, 50]` and
-`middle == [7, 30, 50, 60]`.
+Start with `base := []int{10, 20, 30, 40}`. The expression
+`base[1:3]` includes index `1` and stops before index `3`, so
+`middle := base[1:3]` initially shows `[20, 30]`. After the writes and
+appends below, the expected values are
+`base == [10, 99, 30, 50]` and `middle == [7, 30, 50, 60]`.
 
 1.  **Step: Create view**
     - **Before:** `base=[10,20,30,40]`
@@ -2786,9 +2963,10 @@ The expected final values are `base == [10, 99, 30, 50]` and
     - **After:** `middle=[7,30,50,60]`; `base=[10,99,30,50]`
     - **Known correct:** The two slices no longer share storage
 
-Boundary example: input values `[2, 1, 2]` with promised range `0..2`
-produce frequency slice `[0, 1, 2]`. Value `-1` or `3` breaks that
-promise and cannot be used as an index into a length-3 slice.
+Boundary example: input values `[2, 1, 2]`, where every value must be
+between `0` and `2`, produce frequency slice `[0, 1, 2]`. Value `-1`
+or `3` breaks that promise and cannot be used as an index into a
+length-3 slice.
 
 #### Why it works
 
@@ -2831,18 +3009,22 @@ necessarily a complete visible character.
 
 #### Work and memory
 
-Indexing and taking a subslice do constant work and allocate no
-element copy: `O(1)` time and `O(1)` auxiliary space. Copying `n`
-values takes `O(n)` time and `O(n)` result space. One `append` is
-usually `O(1)` but can copy all current values, so a sequence of
-appends is `O(1)` amortized time per value. A frequency slice for
-range size `r` uses `O(r)` memory and counting `n` values takes
-`O(n + r)` time when initialization or a full readout is included.
+Indexing and taking a subslice do a fixed amount of work and copy no
+elements. They take `O(1)` time and `O(1)` extra memory. If `n` is
+the number of copied values, copying takes `O(n)` time and `O(n)`
+result space. One `append` usually takes constant time, but a growth
+step can copy every current value. Across many appends, those
+occasional copies average to `O(1)` time per appended value. This
+average across a sequence of operations is called **amortized time**.
+
+If `r` is the number of possible values, a frequency slice uses
+`O(r)` memory. Counting `n` input values and preparing or reading all
+`r` count positions takes `O(n + r)` time.
 
 #### When to use it
 
 - Positions are meaningful and direct indexed access is needed.
-- Values must remain in order or occupy contiguous storage.
+- Values must remain in order or sit next to one another in memory.
 - The input range is small enough for a frequency slice.
 - A cheap view of consecutive existing values is safe and useful.
 
@@ -2878,7 +3060,7 @@ range size `r` uses `O(r)` memory and counting `n` values takes
 - [Moving values in place](#b11-moving-values-in-place) changes
   existing slice storage deliberately.
 - [Slice storage and retained
-  memory](#d9-slice-storage-and-retained-memory) owns the detailed Go
+  memory](#d9-slice-storage-and-retained-memory) explains the Go
   allocation discussion.
 - [Bytes, runes, and visible
   characters](#d6-bytes-runes-and-visible-characters) explains text
@@ -2899,23 +3081,23 @@ become the output.
 
 Move furniture within one room instead of renting another room. An
 algorithm works **in place** when it reuses the input's storage and
-needs only a fixed amount of separate state. Reversing ranges can
-place a rotated sequence without building another sequence.
+needs only a fixed number of separate variables. Reversing parts of a
+slice can rotate its values without building another slice.
 
 ##### How it works
 
 To rotate a nonempty slice of length `n` right by a nonnegative `k`
 positions:
 
-1.  Replace `k` by `k % n`, which names the same rotation within one
-    cycle.
+1.  Divide `k` by `n` and keep the remainder, written `k % n`. Every
+    complete set of `n` moves returns the slice to its starting order.
 2.  Reverse the whole slice.
 3.  Reverse the first `k` values.
 4.  Reverse the remaining values.
 
-Other in-place methods use one read and one write position, or
-maintain classified regions around a comparison value called a
-**pivot**.
+Other in-place methods use one position for reading and another for
+writing. Some split the slice into groups below, equal to, and above a
+chosen comparison value called a **pivot**.
 
 ##### Step-by-step examples
 
@@ -2924,26 +3106,26 @@ Rotate `[1, 2, 3, 4, 5]` right by `7`; the expected output is
 
 1.  **Step: Normalize**
     - **Before:** `k=7`, `n=5`
-    - **Decision:** Rotations repeat every five moves
+    - **Decision:** Rotations repeat every five moves.
     - **After:** `k=2`
-    - **Known correct:** The requested result is unchanged
+    - **Known correct:** The requested result is unchanged.
 2.  **Step: Reverse all**
     - **Before:** `[1,2,3,4,5]`
     - **Decision:** Bring the final two values to the front in reverse
-      order
+      order.
     - **After:** `[5,4,3,2,1]`
-    - **Known correct:** The two result groups occupy the right
-      regions
+    - **Known correct:** The two result groups are now on the correct
+      sides, although their internal orders are reversed.
 3.  **Step: Reverse prefix**
     - **Before:** `[5,4 | 3,2,1]`
-    - **Decision:** Restore the moved group's order
+    - **Decision:** Restore the moved group's order.
     - **After:** `[4,5 | 3,2,1]`
-    - **Known correct:** Output positions 0 and 1 are final
+    - **Known correct:** Output positions 0 and 1 are final.
 4.  **Step: Reverse suffix**
     - **Before:** `[4,5 | 3,2,1]`
-    - **Decision:** Restore the other group's order
+    - **Decision:** Restore the other group's order.
     - **After:** `[4,5,1,2,3]`
-    - **Known correct:** Every output position is final
+    - **Known correct:** Every output position is final.
 
 Boundary example: rotating `[]` by any number of positions leaves it
 empty. The function must return before `numPositions %= len(values)`,
@@ -2955,12 +3137,12 @@ greater.
 
 ##### Why it works
 
-Before reversal, the sequence is `A B`, where `B` is the final `k`
-values. Reversing everything gives `reverse(B) reverse(A)`; reversing
-each group gives `B A`, exactly the right rotation. Each reversal
-moves its two positions inward, so it finishes. For partitioning, the
-fact that remains true is that every classified region satisfies its
-label and the unclassified region shrinks after each step.
+Call the first `n-k` values group `A` and the final `k` values group
+`B`. The slice starts as `A B`. Reversing everything produces the
+values of `B` backward followed by the values of `A` backward.
+Reversing those two parts separately restores each part's original
+order and leaves `B A`, exactly the requested rotation. Each swap
+moves the two active positions inward, so every reversal finishes.
 
 ##### Go example
 
@@ -2993,7 +3175,7 @@ func rotateRight(values []int, numPositions int) {
 
 Each value participates in a constant number of swaps, so rotating `n`
 values takes `O(n)` time in best, usual, and worst cases. The indices
-and temporary swap value use `O(1)` auxiliary space. The input itself
+and temporary swap value use `O(1)` extra memory. The input itself
 holds the result.
 
 ##### When to use it
@@ -3001,24 +3183,25 @@ holds the result.
 - The caller permits input mutation.
 - Extra memory must stay constant while values are rearranged.
 - The output contains the same values in a new order, called a
-  permutation, or is a filtered prefix of the input.
+  **permutation**, or is a filtered prefix of the input.
 
 ##### When not to use it
 
 - Do not mutate when callers still need the original order; allocate a
   result.
-- Do not claim an operation is in place when recursion can retain
-  `O(n)` calls.
-- Prefer a stable copy-based method if equal values must keep their
-  relative order and the in-place method does not preserve it.
+- Do not call an operation constant-memory when recursive calls can
+  leave `O(n)` unfinished calls on the call stack.
+- Prefer a copy-based method when equal values must remain in their
+  original relative order and the in-place method does not preserve
+  that order. Preserving it is called **stability**.
 
 ##### Common mistakes and edge cases
 
 > **Warning:** On an empty slice, `numPositions %= len(values)`
 > divides by zero. Test the length first.
 
-- Normalize a negative `numPositions` separately if the input contract
-  permits it; Go's remainder keeps the dividend's sign.
+- Normalize a negative `numPositions` separately if the input rules
+  permit it; Go's remainder keeps the dividend's sign.
 - Reversing `[left, right]` requires inclusive endpoints; mixing that
   with a half-open range can skip or repeat an element.
 - During three-way partitioning, every branch must grow a classified
@@ -3026,10 +3209,10 @@ holds the result.
 
 ##### Related material
 
-- [Arrays, slices, and strings](#b1-arrays-slices-and-strings) owns
-  the storage and storage-sharing rules used here.
-- [Two pointers](#two-pointers) owns read/write positions and inward
-  movement as a problem-solving method.
+- [Arrays, slices, and strings](#b1-arrays-slices-and-strings)
+  explains the storage-sharing rules used here.
+- [Two pointers](#two-pointers) explains read/write positions and
+  inward movement as a problem-solving method.
 - [Sorting without unexpected
   mutation](#d3-sorting-without-unexpected-mutation) explains when to
   copy before an in-place library operation.
@@ -3054,9 +3237,10 @@ index.
 #### The idea in simple terms
 
 Think of a treasure hunt in which each note points to the next note. A
-**singly linked list** is a chain of nodes; each node stores one value
-and a link named `Next`. The first node is the **head**, and `nil`
-marks the end. A **doubly linked list** also links backward.
+**singly linked list** is a chain of nodes. Each node stores one value
+and a link named `Next`; the link holds the location of the following
+node. The first node is the **head**, and `nil` means there is no next
+node. A **doubly linked list** also has a link to the previous node.
 
 #### How it works
 
@@ -3065,8 +3249,9 @@ marks the end. A **doubly linked list** also links backward.
   without walking from the head.
 - Reconnect known nodes by changing links; no later values need to
   shift.
-- A **dummy head** is a temporary node before the real head. It gives
-  head insertion and middle insertion the same shape.
+- A **dummy head** is a temporary node placed before the real head.
+  It lets code attach every result node after an existing node,
+  including when the result was previously empty.
 - To reverse, keep `previous`, `current`, and a saved `next` node.
   Save before changing the only link to the unvisited remainder.
 
@@ -3111,16 +3296,36 @@ the loop finishes. When `current` is nil, no nodes remain outside
 
 #### Go example
 
-The [generic singly linked list
-reference](#e4-generic-singly-linked-list) owns complete `FromSlice`,
-`ToSlice`, and `Reverse` implementations. Its `Reverse` method uses
-the same `previous`, `current`, and `next` state as the trace above.
+```go
+type listNode struct {
+	Value int
+	Next  *listNode
+}
+
+func reverseList(head *listNode) *listNode {
+	var previous *listNode
+	current := head
+	for current != nil {
+		// Save the only route to the unvisited nodes before replacing
+		// current.Next.
+		next := current.Next
+		current.Next = previous
+		previous = current
+		current = next
+	}
+	return previous
+}
+```
+
+For nodes linked as `1 -> 2 -> 3 -> nil`, `reverseList` returns the
+node containing `3`. Following `Next` from that returned head produces
+`3 -> 2 -> 1 -> nil`, exactly as in the trace.
 
 #### Work and memory
 
-Visiting or searching `n` nodes takes `O(n)` time and `O(1)` auxiliary
+Visiting or searching `n` nodes takes `O(n)` time and `O(1)` extra
 space. Inserting after a node already in hand takes `O(1)` time.
-Loop-based reversal takes `O(n)` time and `O(1)` auxiliary space.
+Loop-based reversal takes `O(n)` time and `O(1)` extra memory.
 Copying all values to or from a slice uses `O(n)` time and `O(n)`
 result space. A recursive walk can also retain `O(n)` unfinished
 calls.
@@ -3129,17 +3334,18 @@ calls.
 
 - Nodes at known positions must be inserted, removed, or reconnected
   often.
-- Stable node identity matters even while order changes.
+- Other code holds links to particular nodes and those same node
+  objects must survive while their order changes.
 - Sequential access is sufficient and direct indexing is unnecessary.
 
 #### When not to use it
 
-- Use a slice when direct position lookup, cache-friendly scanning, or
-  compact storage matters.
+- Use a slice when code must jump directly to a numbered position or
+  when tightly packed storage and fast sequential reading matter.
 - Do not use a plain linear walk on an input that may contain a cycle
   unless the walk tracks or detects repeated nodes.
-- Prefer a loop over recursion when the list can be longer than safe
-  call-stack depth.
+- Prefer a loop when the list could create too many unfinished
+  recursive calls for the call stack.
 
 #### Common mistakes and edge cases
 
@@ -3157,8 +3363,8 @@ calls.
 
 #### Related material
 
-- [Generic singly linked list](#e4-generic-singly-linked-list) owns
-  the complete reusable Go implementation.
+- [Generic singly linked list](#e4-generic-singly-linked-list)
+  provides the complete reusable Go implementation.
 - [Fast and slow pointers](#c1332-fast-and-slow-pointers) uses
   different speeds to detect a cycle or locate a middle node.
 - [Add Two
@@ -3189,34 +3395,47 @@ enter or leave at either end.
   front.
 - With a Go slice, keep a `head` index naming the next unread value
   instead of shifting all unread values.
-- A circular buffer wraps positions back to the start of fixed
-  storage.
+- A **circular buffer** uses fixed storage and returns to index zero
+  after reaching the final index.
 - Two stacks can implement a queue: push into an input stack and pop
   from an output stack; transfer only when the output stack is empty.
 - A deque additionally supports front insertion and back removal.
 
 #### Step-by-step examples
 
-Suppose `S` connects to `A` and `B`, `A` to `C`, and `B` to `D`. A
-queue-based search begins with `(S,0)`, where the number is distance
-from `S`.
+Use vertices numbered `0` through `4`. Vertex `0` connects to `1` and
+`2`, vertex `1` to `3`, and vertex `2` to `4`. The exact neighbor-list
+input is `[[1,2],[3],[4],[],[]]`, the start is `0`, and the expected
+visit order is `[0,1,2,3,4]`. The explanation states each vertex's
+distance, but the queue stores only vertex numbers, like the code.
 
-1.  **Step: Visit `S`**
-    - **Before:** `[(S,0)]`
+1.  **Step: Visit `0`**
+    - **Before:** Queue `[0]`; output is empty.
     - **Decision:** Remove oldest; append its unseen neighbors
-    - **After:** `[(A,1),(B,1)]`
-    - **Known correct:** No distance-0 item remains
-2.  **Step: Visit `A`**
-    - **Before:** `[(A,1),(B,1)]`
-    - **Decision:** Append `(C,2)` behind existing distance-1 work
-    - **After:** `[(B,1),(C,2)]`
-    - **Known correct:** `A` has the fewest-edge distance 1
-3.  **Step: Visit `B`**
-    - **Before:** `[(B,1),(C,2)]`
-    - **Decision:** Append `(D,2)`
-    - **After:** `[(C,2),(D,2)]`
+    - **After:** Queue `[1,2]`; output is `[0]`.
+    - **Known correct:** No distance-0 item remains.
+2.  **Step: Visit `1`**
+    - **Before:** Queue `[1,2]`; output is `[0]`.
+    - **Decision:** Append `3` behind existing distance-1 work.
+    - **After:** Queue `[2,3]`; output is `[0,1]`.
+    - **Known correct:** Vertex `1` has the fewest-link distance 1.
+3.  **Step: Visit `2`**
+    - **Before:** Queue `[2,3]`; output is `[0,1]`.
+    - **Decision:** Append `4`.
+    - **After:** Queue `[3,4]`; output is `[0,1,2]`.
     - **Known correct:** Every distance-1 item leaves before distance
-      2
+      2.
+4.  **Step: Visit `3`**
+    - **Before:** Queue `[3,4]`; output is `[0,1,2]`.
+    - **Decision:** Vertex `3` has no neighbor to add.
+    - **After:** Queue `[4]`; output is `[0,1,2,3]`.
+    - **Known correct:** The other distance-2 vertex remains next.
+5.  **Step: Visit `4`**
+    - **Before:** Queue `[4]`; output is `[0,1,2,3]`.
+    - **Decision:** Vertex `4` has no neighbor to add.
+    - **After:** Queue is empty; output is `[0,1,2,3,4]`.
+    - **Known correct:** Every reachable vertex appears once in
+      increasing distance order.
 
 Two-stack boundary trace, with the stack top at the right: add `A`,
 `B`, `C` to get input `[A,B,C]`. The first removal transfers to output
@@ -3228,10 +3447,11 @@ report failure rather than index outside either stack.
 
 The queue's defining fact is that unread items remain in arrival
 order. Adding only at the back and moving the front only forward
-preserves it. In the two-stack form, transfer reverses the input order
-once, putting its oldest item on top of the output stack. Delaying
-another transfer until that stack empties prevents newer items from
-passing older ones.
+preserves that fact. In the two-stack form, transfer reverses the
+input order once, putting its oldest item on top of the output stack.
+Delaying another transfer until that stack empties prevents newer
+items from passing older ones. Each removal reduces the unread queue,
+so processing finishes when no new items can be added.
 
 #### Go example
 
@@ -3266,25 +3486,29 @@ func breadthFirstOrder(start int, neighbors [][]int) []int {
 
 This example requires `start` and every stored neighbor to be valid
 indices in `neighbors`. Marking on insertion ensures a node enters the
-queue at most once.
+queue at most once. The traced call is
+`breadthFirstOrder(0,[][]int{{1,2},{3},{4},{},{}})`.
 
 #### Work and memory
 
-For a slice queue, advancing `head` is `O(1)` and appending is `O(1)`
-amortized. The backing array uses `O(n)` memory for `n` queued values
-and may retain read positions. In a two-stack queue, each value is
-pushed, transferred at most once, and popped once: `m` operations take
-`O(m)` total time, or `O(1)` amortized per operation, although one
-removal can take `O(n)`. A graph traversal also spends `O(V + E)` time
-on `V` vertices and `E` stored neighbor links.
+For a slice queue, advancing `head` takes `O(1)` time. Across many
+appends, the average append takes `O(1)` time, although an occasional
+append copies the whole backing array. That array uses `O(n)` memory
+for `n` queued values and may retain already-read positions. In a
+two-stack queue, each value is pushed, transferred at most once, and
+popped once. Therefore `m` queue operations do `O(m)` total work,
+even though one removal may transfer `O(n)` values. A graph traversal
+also takes `O(V+E)` time: `V` is the number of vertices and `E` is the
+number of stored neighbor links.
 
 #### When to use it
 
 - Work must happen oldest first.
 - A search must process all items at one distance before the next
   distance.
-- A sliding candidate set needs expiration from the front; use a deque
-  when the back must also discard dominated candidates.
+- A changing range of candidates must remove expired values from the
+  front. Use a deque when the back must also remove values that can no
+  longer become an answer.
 
 #### When not to use it
 
@@ -3305,12 +3529,14 @@ on `V` vertices and `E` stored neighbor links.
   enqueue the same node; mark when adding it.
 - A circular buffer must distinguish full from empty even when head
   and tail positions match.
-- Worst-case operation time and amortized time are different promises.
+- One operation can be slow even when the average cost across many
+  operations is constant. This sequence-wide average is called an
+  **amortized** cost.
 
 #### Related material
 
-- [Breadth-first search](#c1321-breadth-first-search) owns the full
-  search method and shortest-edge correctness argument.
+- [Breadth-first search](#c1321-breadth-first-search) explains the
+  full search method and shortest-edge correctness argument.
 - [Monotonic deque](#c1329-monotonic-deque) removes expired and
   dominated candidates from opposite ends.
 - [Stack](#c1313-stack) provides the most-recent-first component of
@@ -3345,22 +3571,24 @@ Picture an upside-down family tree:
      2   6  10  14
 ```
 
-`8` is the **root**. `4` and `12` are its children; everything below
-`4` is the subtree rooted at `4`. A **tree** has no cycles and only
-one route between two nodes. A **binary tree** allows at most two
-children per node.
+`8` is the **root**, the starting node. Nodes `4` and `12` are its
+**children**. Node `8` is their **parent**. A node together with every
+node below it is a **subtree**, so `4`, `2`, and `6` form the subtree
+rooted at `4`. A **tree** never links back in a cycle, and a **binary
+tree** gives each node at most two children, named left and right.
 
-This example is a **binary-search tree (BST)**: every value in a
-node's left subtree is smaller and every value in its right subtree is
-larger.
+This example is a **binary-search tree (BST)**: for every node, every
+value anywhere in its left subtree is smaller and every value anywhere
+in its right subtree is larger.
 
 ##### How it works
 
-Start at the root. Return success when the current value equals the
-target. Go left for a smaller target and right for a larger target.
-Stop with failure at a `nil` link. This procedure requires the
-ordering rule to hold for whole subtrees, not merely for direct
-children.
+The input is the root node and the value to find, called `target`.
+Start at the root. Return `true` when the current value equals the
+target. Follow the left link for a smaller target and the right link
+for a larger target. Return `false` at a `nil` link. This procedure
+requires the ordering rule to hold for whole subtrees, not merely for
+direct children.
 
 ##### Step-by-step examples
 
@@ -3397,10 +3625,17 @@ leaves no possible node.
 
 ##### Go example
 
+The example uses this node shape and forbids duplicate values:
+
 ```go
+type TreeNode struct {
+	Value int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
 func containsBST(root *TreeNode, target int) bool {
-	// The current subtree contains every remaining possible match under
-	// the binary-search-tree ordering invariant.
+	// The current subtree contains every value that could still match.
 	for root != nil {
 		if target == root.Value {
 			return true
@@ -3419,20 +3654,20 @@ func containsBST(root *TreeNode, target int) bool {
 }
 ```
 
-Here `TreeNode` has `Value int` and `Left, Right *TreeNode` fields.
-
 ##### Work and memory
 
-Search follows at most the tree height `h`, so it takes `O(h)` time
-and `O(1)` auxiliary space. A balanced `n`-node BST has
-`h = O(log n)`; a one-sided chain has `h = O(n)`. The best case finds
-the target at the root in `O(1)` time.
+The **height** `h` is the number of nodes on the longest route from
+the root down to an ending node. Search visits at most one node on
+each level, so it takes `O(h)` time and `O(1)` extra memory. When an
+`n`-node tree stays roughly even on both sides, its height is
+`O(log n)`. A one-sided chain has height `n`, so search takes `O(n)`
+time. The best case finds the target at the root in `O(1)` time.
 
 ##### When to use it
 
 - Values remain ordered under the stated whole-subtree rule.
-- The environment supplies a balanced ordered structure or tree shape
-  matters.
+- The environment keeps the tree roughly even on both sides, or the
+  exact parent-child shape matters.
 - A lookup can reject an entire side after one comparison.
 
 ##### When not to use it
@@ -3468,16 +3703,16 @@ the target at the root in `O(1)` time.
 
 ##### The problem it solves
 
-A tree has no single left-to-right storage order. An operation must
-choose when to handle a node relative to its children or its distance
-from the root.
+A tree has no single left-to-right storage order. We must choose when
+to record a node relative to its children, or whether to process nodes
+by their distance from the root.
 
 ##### The idea in simple terms
 
-Walking through a house can record a room before entering its
-branches, between branches, after both branches, or one floor at a
-time. These choices are called **preorder**, **inorder**,
-**postorder**, and **level order** traversal.
+Walking through a house can record a room before entering its two
+wings, between the wings, after both wings, or one floor at a time.
+Visiting every node this way is a **traversal**. The four orders are
+called **preorder**, **inorder**, **postorder**, and **level order**.
 
 ##### How it works
 
@@ -3492,41 +3727,49 @@ order adds a child only after proving it exists.
 
 ##### Step-by-step examples
 
-For the tree in B.4.1, preorder is expected to be
-`[8, 4, 2, 6, 12, 10, 14]`.
+Use a tree with root `2`, left child `1`, and right child `3`.
+Preorder should return `[2,1,3]`.
 
-1.  **Step: Root**
-    - **Before:** At `8`
+1.  **Step: Record the root**
+    - **Before:** Current node is `2`; output is empty.
     - **Decision:** Preorder handles node before children
-    - **After:** Output `[8]`; enter `4`
-    - **Known correct:** `8` precedes both subtrees
-2.  **Step: Left**
-    - **Before:** At subtree `4,2,6`
-    - **Decision:** Apply the same node-left-right rule
-    - **After:** Output `[8,4,2,6]`
-    - **Known correct:** Entire left subtree is complete
-3.  **Step: Right**
-    - **Before:** At subtree `12,10,14`
-    - **Decision:** Apply the same rule
-    - **After:** Output `[8,4,2,6,12,10,14]`
-    - **Known correct:** Every node appears once
+    - **After:** Output is `[2]`; next call receives node `1`.
+    - **Known correct:** Root `2` appears before both child subtrees.
+2.  **Step: Record the left child**
+    - **Before:** Current node is `1`; output is `[2]`.
+    - **Decision:** Record `1`; its two child links are `nil`, so both
+      child calls return without adding a value.
+    - **After:** Output is `[2,1]`; return to node `2`.
+    - **Known correct:** The complete left subtree follows its parent.
+3.  **Step: Record the right child**
+    - **Before:** Current node is `3`; output is `[2,1]`.
+    - **Decision:** Record `3`; both of its child links are `nil`.
+    - **After:** Output is `[2,1,3]`; traversal ends.
+    - **Known correct:** Every node appears once in node-left-right
+      order.
 
-The same tree gives inorder `[2,4,6,8,10,12,14]`, postorder
-`[2,6,4,10,14,12,8]`, and level order `[8,4,12,2,6,10,14]`. An empty
-tree produces an empty result in every order.
+The same tree gives inorder `[1,2,3]`, postorder `[1,3,2]`, and level
+order `[2,1,3]`. An empty tree produces an empty result in every
+order.
 
 ##### Why it works
 
-Each recursive call owns exactly one subtree. It visits that subtree's
-root and delegates each child subtree once in the order promised by
-the traversal name. The nil case stops at missing children. Thus every
+Each recursive call handles exactly one subtree. It visits that
+subtree's root and handles each child subtree once in the order named
+by the traversal. The nil case stops at missing children. Thus every
 reachable node appears once and relative order follows the placement
-of the root action. FIFO queue order similarly keeps every shallower
-level ahead of nodes it discovers.
+of the root action. A level-order queue keeps first-added nodes first,
+so every shallower level stays ahead of the deeper nodes it discovers.
 
 ##### Go example
 
 ```go
+type TreeNode struct {
+	Value int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
 func preorder(root *TreeNode) []int {
 	order := []int{}
 	var visit func(*TreeNode)
@@ -3549,10 +3792,13 @@ func preorder(root *TreeNode) []int {
 
 ##### Work and memory
 
-Every node is handled once, so all four traversals take `O(n)` time. A
-depth-first recursion uses `O(h)` call-stack space for height `h`; the
-returned order uses `O(n)` result space. Level order uses a queue
-holding up to the tree's maximum width, `O(w)`, plus `O(n)` output.
+For `n` nodes, every traversal handles each node once and takes
+`O(n)` time. A depth-first recursive traversal can leave one
+unfinished call per tree level. For height `h`, that is `O(h)`
+call-stack space. The returned order contains `n` values and uses
+`O(n)` result space.
+Level order uses a queue holding up to `w` nodes, where `w` is the
+largest number of nodes on one level, plus the `O(n)` output.
 
 ##### When to use it
 
@@ -3578,13 +3824,13 @@ holding up to the tree's maximum width, `O(w)`, plus `O(n)` output.
 - Decide whether nil roots return nil or a non-nil empty slice when
   output representation matters.
 - Mark graph-like nodes when queued if parent links can create cycles.
-- Account for output storage separately from auxiliary traversal
+- Account for output storage separately from extra traversal
   storage.
 
 ##### Related material
 
-- [Queues and deques](#b3-queues-and-deques) owns FIFO mechanics for
-  level order.
+- [Queues and deques](#b3-queues-and-deques) explains FIFO mechanics
+  for level order.
 - [Recursive return contracts](#b43-recursive-return-contracts) uses
   postorder to combine child answers.
 - [Binary Tree Level Order Traversal](
@@ -3596,17 +3842,17 @@ holding up to the tree's maximum width, `O(w)`, plus `O(n)` output.
 
 ##### The problem it solves
 
-A tree answer often depends on answers from smaller child trees.
-Without a precise meaning for each return value, code can confuse a
-path continuing to a parent with an answer that joins both children.
+A tree answer often depends on answers from its two smaller child
+trees. Without one precise meaning for every return value, code can
+accidentally combine child answers that cannot belong to one path.
 
 ##### The idea in simple terms
 
-Give every recursive call the same small job and promise. A
-**recursive return contract** states exactly what a call returns for
-the subtree rooted at its argument. For height, the promise is "number
-of nodes on the longest downward path from this node," with a nil
-subtree returning zero.
+Give every recursive call the same small job and promise. Write down
+exactly what one call returns for the subtree starting at its input
+node. This promise is called a **recursive return contract**. For
+height, the promise is "return the number of nodes on the longest path
+from this node down to an ending node." A `nil` subtree returns zero.
 
 ##### How it works
 
@@ -3620,31 +3866,39 @@ For height, return `1 + max(leftHeight, rightHeight)`.
 
 ##### Step-by-step examples
 
-On the B.4.1 tree, the expected height is `3`.
+Use a tree whose root is `2`, whose left child is `1`, and whose right
+side is the chain `2 -> 3 -> 4`. The expected height is `3`.
 
-1.  **Step: Leaves**
-    - **Before:** Children of `2,6,10,14` are nil
-    - **Decision:** Nil height is 0
-    - **After:** Each leaf returns 1
-    - **Known correct:** Each leaf contract is satisfied
-2.  **Step: Nodes `4`,`12`**
-    - **Before:** Child heights are 1 and 1
-    - **Decision:** Take longer child and add current node
-    - **After:** Each returns 2
-    - **Known correct:** Both height-2 subtrees are correct
-3.  **Step: Root `8`**
-    - **Before:** Child heights are 2 and 2
-    - **Decision:** Add root to a longest child path
-    - **After:** Return 3
-    - **Known correct:** The full-tree height is correct
+1.  **Step: Return from leaf `1`**
+    - **Before:** Both child calls receive `nil` and return `0`.
+    - **Decision:** Take the larger child height, `0`, and add node
+      `1`.
+    - **After:** The call for node `1` returns `1`.
+    - **Known correct:** The only downward path contains node `1`.
+2.  **Step: Return from leaf `4`**
+    - **Before:** Both child heights are `0`.
+    - **Decision:** Add node `4`.
+    - **After:** The call for node `4` returns `1`.
+    - **Known correct:** The only downward path contains node `4`.
+3.  **Step: Return from node `3`**
+    - **Before:** Left height is `0`; right height is `1` from node
+      `4`.
+    - **Decision:** Take `1` and add node `3`.
+    - **After:** The call for node `3` returns `2`.
+    - **Known correct:** Its longest path is `3 -> 4`.
+4.  **Step: Return from root `2`**
+    - **Before:** Left height is `1`; right height is `2`.
+    - **Decision:** Take `2` and add root `2`.
+    - **After:** Return `3`.
+    - **Known correct:** The longest full-tree path is `2 -> 3 -> 4`.
 
 Boundary example: a nil root returns `0`. A one-sided `1 -> 2 -> 3`
 chain returns `3`, not `2`; every node on the path counts.
 
 ##### Why it works
 
-The nil result satisfies the contract for an empty subtree. Assuming
-both child calls satisfy it, every downward path from the current node
+Zero is the promised answer for an empty subtree. Assuming both child
+calls keep the same promise, every downward path from the current node
 continues through exactly one child, so the longer child height plus
 one is the longest current path. Each call moves to a smaller subtree
 and ends at nil.
@@ -3652,6 +3906,12 @@ and ends at nil.
 ##### Go example
 
 ```go
+type TreeNode struct {
+	Value int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
 func treeHeight(root *TreeNode) int {
 	// An empty subtree contributes zero levels.
 	if root == nil {
@@ -3670,10 +3930,11 @@ func treeHeight(root *TreeNode) int {
 
 ##### Work and memory
 
-Every node contributes constant work, so time is `O(n)`. The call
-stack holds one unfinished call per level: `O(h)`, which is `O(log n)`
-for a balanced tree and `O(n)` for a chain. No collection result is
-allocated.
+For `n` nodes, every node contributes a fixed amount of work, so time
+is `O(n)`. The call stack holds one unfinished call per level. For
+height `h`, that is `O(h)` memory: `O(log n)` for a roughly even tree
+and `O(n)` for a one-sided chain. The function allocates no result
+collection.
 
 ##### When to use it
 
@@ -3683,17 +3944,18 @@ allocated.
 
 ##### When not to use it
 
-- Use separate global or returned state when the final answer may join
-  both children but the value passed upward must follow only one.
+- Return two clearly named values when the final answer may join paths
+  from both children but the path offered to the parent may follow
+  only one child.
 - Use an explicit stack when depth may exhaust the call stack.
-- Do not force a tree contract onto a graph with cycles without
-  reached-state tracking.
+- Do not use this tree rule on links that can form a cycle unless the
+  algorithm records which nodes it has already reached.
 
 ##### Common mistakes and edge cases
 
 > **Warning:** Returning `leftHeight + rightHeight + 1` for height
-> incorrectly gives `7` on the seven-node balanced example; one
-> downward path cannot take both children.
+> incorrectly gives `4` at root `2` in the example; one downward path
+> cannot take both children.
 
 - Define whether height counts nodes or edges before choosing the nil
   value.
@@ -3702,13 +3964,13 @@ allocated.
 
 ##### Related material
 
-- [Recursion and saved work](#a3-recursion-and-saved-work) owns call
-  structure and memoization.
+- [Recursion and saved work](#a3-recursion-and-saved-work) explains
+  call structure and how to save repeated answers.
 - [Traversal order](#b42-traversal-order) explains why child-first
   work is postorder.
 - [Maximum Depth of Binary
   Tree](problems/easy_leetcode_0104_maximum_depth_of_binary_tree.go)
-  uses this exact contract.
+  uses this exact return promise.
 
 #### B.4.4 BST validation and costs
 
@@ -3720,18 +3982,19 @@ ancestor restriction to each descendant.
 
 ##### The idea in simple terms
 
-Each turn down a search tree narrows an allowed number interval. Carry
-that interval with the node. A value outside it breaks the
-**binary-search-tree invariant**, the fact that every left-subtree
-value is smaller and every right-subtree value is larger than every
-relevant ancestor boundary.
+Each move down a search tree narrows the allowed values. Carry the
+current lower and upper limits with the node. The rule that must stay
+true is called the **binary-search-tree invariant**: a node must be
+larger than every lower limit created by its ancestors and smaller
+than every upper limit they created.
 
 ##### How it works
 
-Start with bounds wider than every `int` value. At each node, reject a
-value not strictly between its bounds. The left child inherits the
-lower bound and uses the current value as its upper bound; the right
-child does the opposite.
+Start with no lower or upper limit. At each node, reject a value that
+is not strictly between its existing limits. The left child keeps the
+lower limit and uses the current value as its new upper limit. The
+right child uses the current value as its new lower limit and keeps
+the upper limit.
 
 ##### Step-by-step examples
 
@@ -3746,24 +4009,25 @@ This tree is invalid:
 ```
 
 1.  **Step: Root `8`**
-    - **Before:** Bounds `(-infinity,+infinity)`
-    - **Decision:** `8` is inside
-    - **After:** Right bound state becomes `(8,+infinity)`
-    - **Known correct:** Root satisfies all restrictions
+    - **Before:** No lower limit and no upper limit.
+    - **Decision:** `8` violates neither limit.
+    - **After:** Its right child must be larger than `8`.
+    - **Known correct:** Root `8` satisfies every restriction.
 2.  **Step: Node `10`**
-    - **Before:** Bounds `(8,+infinity)`
-    - **Decision:** `10` is inside
-    - **After:** Its left child gets `(8,10)`
-    - **Known correct:** Path through `10` remains valid
+    - **Before:** Lower limit `8`; no upper limit.
+    - **Decision:** `10` is larger than `8`.
+    - **After:** Its left child must be above `8` and below `10`.
+    - **Known correct:** The path through `10` remains valid.
 3.  **Step: Node `4`**
-    - **Before:** Bounds `(8,10)`
-    - **Decision:** `4 <= 8`
-    - **After:** Return `false`
-    - **Known correct:** A descendant violates ancestor `8`
+    - **Before:** Lower limit `8`; upper limit `10`.
+    - **Decision:** `4` is not larger than `8`.
+    - **After:** Return `false`.
+    - **Known correct:** A descendant violates the limit from ancestor
+      `8`.
 
-An empty tree is valid because it contains no violation. If duplicates
-are allowed, the input contract must say which comparisons are
-inclusive.
+An empty tree is valid because it contains no violation. If
+duplicates are allowed, the input rules must say which comparisons
+allow equality.
 
 ##### Why it works
 
@@ -3777,6 +4041,12 @@ finishes at nil children.
 ##### Go example
 
 ```go
+type TreeNode struct {
+	Value int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
 func validBST(root *TreeNode) bool {
 	// Each call carries optional exclusive bounds imposed by all
 	// ancestors, not merely by the node's direct parent.
@@ -3826,11 +4096,12 @@ a late violation requires `O(n)` time.
 
 ##### When not to use it
 
-- An inorder monotonicity check may be simpler when only ordering
-  matters.
+- Reading values in inorder and checking that each value is larger
+  than the preceding one may be simpler when only ordering matters.
 - Adjust the method when duplicates have an allowed side or keys use a
   custom comparison.
-- Do not use fixed sentinels equal to valid endpoint values.
+- Do not use a fixed minimum or maximum marker that is also a valid
+  node value. Optional bounds, as in the example, avoid that conflict.
 
 ##### Common mistakes and edge cases
 
@@ -3871,35 +4142,55 @@ values into the two child regions.
 ##### How it works
 
 The input must contain the same unique values in both traversals.
-Build a map from each inorder value to its index. Keep `nextPreorder`
-and recursively own a half-open inorder range `[left,right)`. An empty
-range returns nil; otherwise consume one root, split at its inorder
-index, then build left before right.
+Build a map from each inorder value to its index. `nextPreorder` names
+the next root value. Each call receives two inorder indexes, `left`
+and `right`; it includes `left` but excludes `right`. This convention
+is called a **half-open range** and is written `[left,right)`. Equal
+indexes mean the range is empty. Otherwise consume one root, split at
+its inorder index, then build the left side before the right side.
 
 ##### Step-by-step examples
 
-Input:
+Exact input:
 
 ```text
-preorder: [8, 4, 2, 6, 12, 10, 14]
-inorder:  [2, 4, 6, 8, 10, 12, 14]
+preorder: [2, 1, 3]
+inorder:  [1, 2, 3]
 ```
 
-1.  **Call: `build(0,7)`**
-    - **Before:** Next preorder is `8`
-    - **Decision:** Inorder index 3 splits root regions
-    - **After:** Left `[0,3)`, right `[4,7)`
-    - **Known correct:** Root and subtree sizes are fixed
-2.  **Call: `build(0,3)`**
-    - **Before:** Next preorder is `4`
-    - **Decision:** Index 1 splits its region
-    - **After:** `[0,1)` and `[2,3)`
-    - **Known correct:** Root `4` has children `2`,`6`
-3.  **Call: `build(4,7)`**
-    - **Before:** After left side, next is `12`
-    - **Decision:** Index 5 splits its region
-    - **After:** `[4,5)` and `[6,7)`
-    - **Known correct:** Root `12` has children `10`,`14`
+The expected tree has root `2`, left child `1`, and right child `3`.
+
+1.  **Call: `build(0,3)`**
+    - **Before:** `nextPreorder=0`, whose value is `2`.
+    - **Decision:** Inorder index `1` is the root position.
+    - **After:** Create `2`; build `[0,1)` before `[2,3)`.
+    - **Known correct:** Inorder places `1` left of `2` and `3` right
+      of it.
+2.  **Call: `build(0,1)`**
+    - **Before:** `nextPreorder=1`, whose value is `1`.
+    - **Decision:** Its inorder index is `0`.
+    - **After:** Create `1`; build `[0,0)` and `[1,1)`.
+    - **Known correct:** Neither side contains a value.
+3.  **Call: `build(0,0)`**
+    - **Before:** `left` equals `right`.
+    - **Decision:** The range contains no value.
+    - **After:** Return `nil` for node `1`'s left link.
+    - **Known correct:** No preorder value is consumed.
+4.  **Call: `build(1,1)`**
+    - **Before:** `left` again equals `right`.
+    - **Decision:** The range contains no value.
+    - **After:** Return `nil` for node `1`'s right link.
+    - **Known correct:** Node `1` is now a complete leaf.
+5.  **Call: `build(2,3)`**
+    - **Before:** `nextPreorder=2`, whose value is `3`.
+    - **Decision:** Its inorder index is `2`.
+    - **After:** Create `3`; build `[2,2)` and `[3,3)`.
+    - **Known correct:** This range is the right subtree of `2`.
+6.  **Calls: `build(2,2)` and `build(3,3)`**
+    - **Before:** Each call has equal indexes.
+    - **Decision:** Both ranges are empty.
+    - **After:** Return two `nil` links for node `3`.
+    - **Known correct:** Node `3` is a leaf, and the tree is complete.
 
 Boundary example: two empty traversals produce nil. Duplicate
 traversals `preorder=[1,1]`, `inorder=[1,1]` can describe either a
@@ -3918,6 +4209,12 @@ stop.
 ##### Go example
 
 ```go
+type TreeNode struct {
+	Value int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
 func buildTree(preorderValues, inorderValues []int) *TreeNode {
 	// Map each unique value to its inorder position so subtree splits
 	// are O(1).
@@ -3966,7 +4263,7 @@ space. Repeatedly scanning inorder instead makes worst-case time
 - Preorder and inorder contain the same unique node identifiers.
 - The task requires the explicit tree, not only a property of the
   traversals.
-- Linear expected-time map lookup is acceptable.
+- A map from values to inorder positions fits the input constraints.
 
 ##### When not to use it
 
@@ -3979,7 +4276,7 @@ space. Repeatedly scanning inorder instead makes worst-case time
 ##### Common mistakes and edge cases
 
 > **Warning:** Building the right subtree before the left consumes
-> preorder in the wrong order; for `[8,4,2,6,12,10,14]`, value `4`
+> preorder in the wrong order. For preorder `[2,1,3]`, value `1`
 > belongs to the left side.
 
 - Keep half-open boundaries consistent; the right range starts at
@@ -4010,23 +4307,25 @@ links must be made available without revisiting nodes forever.
 
 ##### The idea in simple terms
 
-Add a temporary "came from" address for every child. The tree can then
-be viewed as a graph where a node's neighbors are its left child,
-right child, and parent. A reached set prevents walking back and forth
+Record a temporary parent link for every child. Then each node can
+move in three possible directions: to its left child, right child, or
+parent. This turns the tree into an undirected graph for the query. A
+set of already reached node locations prevents walking back and forth
 over the same link.
 
 ##### How it works
 
-Require the target to belong to the tree rooted at `root`. First
-traverse from the root and map each child pointer to its parent
-pointer. Then run breadth-first search from the target. Mark node
-identities when they enter the queue. One completed queue layer adds
-one link of distance.
+The input promise requires `target` to belong to the tree starting at
+`root`. First visit from the root and map each child's pointer to its
+parent's pointer. Then search from the target with a queue. Mark a
+node when it enters the queue. Processing every node currently in the
+queue moves the search one link farther from the target.
 
 ##### Step-by-step examples
 
-Find nodes two links from target `4` in the B.4.1 tree; expected
-output is `[12]`.
+Use a tree with root `8`; children `4` and `12`; children `2` and `6`
+under `4`; and children `10` and `14` under `12`. Find nodes two links
+from target node `4`. The expected output is `[12]`.
 
 1.  **Distance: 0**
     - **Before:** Queue `[4]`, seen `{4}`
@@ -4050,15 +4349,22 @@ as a real node.
 
 ##### Why it works
 
-After the parent map is built, its edges exactly restore the downward
-links in reverse. Breadth-first layers contain precisely the unseen
-nodes at that many links from the target. Marking at insertion
-prevents the parent-child pair from adding each other again. Finite
-nodes and one insertion per node guarantee termination.
+After the parent map is built, every child-to-parent entry supplies
+the reverse of an existing parent-to-child link. The queue therefore
+has all three possible moves. After one complete queue layer, the
+queued nodes are exactly one link farther away. Marking on insertion
+prevents a parent and child from adding each other again. The tree
+has finitely many nodes and each enters once, so the search finishes.
 
 ##### Go example
 
 ```go
+type TreeNode struct {
+	Value int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
 func nodesAtDistance(
 	root, target *TreeNode,
 	targetDistance int,
@@ -4103,8 +4409,8 @@ func nodesAtDistance(
 		// one edge of distance from target.
 		numNodesInCurrentLayer := len(queue)
 		if numNodesInCurrentLayer == 0 {
-			// No frontier remains, so no node exists at this or any greater
-			// distance.
+			// No queued node remains, so no node exists at this or any
+			// greater distance.
 			break
 		}
 		// Only remove the nodes that were present when this layer began.
@@ -4116,8 +4422,8 @@ func nodesAtDistance(
 			node := queue[0]
 			queue = queue[1:]
 			// Treat left child, right child, and parent as the node's
-			// undirected neighbors so the search can move away from target in
-			// every direction.
+			// neighbors so the search can move away from target in every
+			// direction.
 			neighbors := []*TreeNode{
 				node.Left,
 				node.Right,
@@ -4126,8 +4432,8 @@ func nodesAtDistance(
 			for _, neighboringNode := range neighbors {
 				if neighboringNode != nil && !seen[neighboringNode] {
 					// Mark before enqueueing: another neighbor in this layer may
-					// also point to this node, but it must enter the next frontier
-					// only once.
+					// also point to this node, but it must enter the next queue
+					// layer only once.
 					seen[neighboringNode] = true
 					queue = append(queue, neighboringNode)
 				}
@@ -4138,8 +4444,7 @@ func nodesAtDistance(
 	// After the requested number of complete layers, the queue contains
 	// exactly the nodes at targetDistance.
 	values := make([]int, len(queue))
-	// Convert the node frontier to the value representation promised by
-	// the API.
+	// Convert the final queue layer to the promised value slice.
 	for nodeIndex, node := range queue {
 		values[nodeIndex] = node.Value
 	}
@@ -4150,7 +4455,7 @@ func nodesAtDistance(
 ##### Work and memory
 
 Parent mapping and search each visit at most `n` nodes. The search
-also stops when its frontier becomes empty, so total time is `O(n)`,
+also stops when its queue becomes empty, so total time is `O(n)`,
 even when `targetDistance` is larger than the tree's height. The
 parent map, reached set, queue, and output together use `O(n)` memory;
 the recursive mapping also uses `O(h)` call-stack space within that
@@ -4173,8 +4478,8 @@ bound.
 ##### Common mistakes and edge cases
 
 > **Warning:** If `4` queues parent `8` and nodes are marked only when
-> removed, `8` can queue `4` again, turning the temporary graph into
-> repeated work.
+> removed, `8` can queue `4` again. The two nodes can keep adding each
+> other instead of finishing.
 
 - Map pointers, not values; two distinct nodes may both store `7`.
 - Reject or separately define a target outside the root's tree; this
@@ -4186,9 +4491,9 @@ bound.
 
 - [Graphs and grids](#b5-graphs-and-grids) explains the temporary
   graph view.
-- [Breadth-first search](#c1321-breadth-first-search) owns layer
-  correctness.
-- [Queues and deques](#b3-queues-and-deques) owns FIFO queue
+- [Breadth-first search](#c1321-breadth-first-search) explains why
+  layer-by-layer search is correct.
+- [Queues and deques](#b3-queues-and-deques) explains FIFO queue
   mechanics.
 
 ### B.5 Graphs and grids
@@ -4209,10 +4514,10 @@ stored as edge records.
 
 #### How it works
 
-- An **adjacency list** stores each vertex beside its neighbors.
-- An **adjacency matrix** stores one cell for every possible ordered
-  pair.
-- An **edge list** stores the edges directly.
+- An **adjacency list** gives each vertex a list of its neighbors.
+- An **adjacency matrix** gives every possible ordered pair one cell
+  that says whether an edge exists.
+- An **edge list** stores one record per edge.
 - For an undirected edge, add both directions; for a directed edge,
   add only its stated direction. A vertex's **indegree** counts
   incoming directed edges.
@@ -4222,49 +4527,50 @@ stored as edge records.
 
 #### Step-by-step examples
 
-For two-way roads `A-B`, `A-C`, and `C-D`, the adjacency list is:
+Use vertices `0` through `3` and two-way roads `0-1`, `0-2`, and
+`2-3`. The adjacency list is:
 
 ```text
-A: [B, C]
-B: [A]
-C: [A, D]
-D: [C]
+0: [1, 2]
+1: [0]
+2: [0, 3]
+3: [2]
 ```
 
-1.  **Step: Add `A-B`**
+1.  **Step: Add `0-1`**
     - **Before:** Empty lists
     - **Decision:** Road is two-way
-    - **After:** `A:[B]`, `B:[A]`
+    - **After:** `0:[1]`, `1:[0]`
     - **Known correct:** Both allowed moves exist
-2.  **Step: Add `A-C`**
+2.  **Step: Add `0-2`**
     - **Before:** Above lists
     - **Decision:** Add both directions
-    - **After:** `A:[B,C]`, `C:[A]`
-    - **Known correct:** `A` has both neighbors
-3.  **Step: Add `C-D`**
-    - **Before:** `C:[A]`, no `D`
+    - **After:** `0:[1,2]`, `2:[0]`
+    - **Known correct:** Vertex `0` has both neighbors
+3.  **Step: Add `2-3`**
+    - **Before:** `2:[0]`, no neighbors for `3`
     - **Decision:** Add both directions
-    - **After:** `C:[A,D]`, `D:[C]`
+    - **After:** `2:[0,3]`, `3:[2]`
     - **Known correct:** Every road is represented twice
 
-A search from `A` schedules `B` and `C`, then reaches `D` through `C`.
-Boundary example: adding isolated vertex `E` creates another
-component. A search started only at `A` must not claim to have visited
+A search from `0` schedules `1` and `2`, then reaches `3` through `2`.
+Boundary example: adding isolated vertex `4` creates another
+component. A search started only at `0` must not claim to have visited
 the whole graph.
 
-For vertex order `A,B,C,D`, the same graph's adjacency matrix is:
+For vertex order `0,1,2,3`, the same graph's adjacency matrix is:
 
 ```text
-    A B C D
-A   0 1 1 0
-B   1 0 0 0
-C   1 0 0 1
-D   0 0 1 0
+    0 1 2 3
+0   0 1 1 0
+1   1 0 0 0
+2   1 0 0 1
+3   0 0 1 0
 ```
 
-Reading row `C`, column `D` returns `1`, so edge `C-D` exists in
-constant time; row `A`, column `D` returns `0`. The edge-list form is
-`[(A,B),(A,C),(C,D)]`.
+Reading row `2`, column `3` returns `1`, so edge `2-3` exists in a
+fixed amount of time. Row `0`, column `3` returns `0`. The edge-list
+form is `[(0,1),(0,2),(2,3)]`.
 
 #### Why it works
 
@@ -4293,8 +4599,10 @@ func undirectedGraph(vertexCount int, edges [][2]int) [][]int {
 }
 ```
 
-This compact builder requires `vertexCount >= 0` and every endpoint to
-be in `0..vertexCount-1`.
+The traced call is
+`undirectedGraph(4,[][2]int{{0,1},{0,2},{2,3}})`. This compact
+builder requires a nonnegative `vertexCount`. Every endpoint must be
+from `0` through `vertexCount-1`.
 
 #### Work and memory
 
@@ -4315,15 +4623,15 @@ edge, still `O(V + E)`.
 
 - A tree is simpler when the input guarantees no cycles and one parent
   route.
-- A dense adjacency matrix is wasteful for a **sparse graph**, one in
-  which few of all possible vertex pairs have edges.
+- An adjacency matrix stores every possible pair, so it wastes space
+  for a **sparse graph**, where only a few pairs have edges.
 - Unweighted breadth-first search does not minimize differing edge
   weights.
 
 #### Common mistakes and edge cases
 
-> **Warning:** For an undirected road `A-B`, adding only `A -> B`
-> makes a search from `B` unable to reach `A`.
+> **Warning:** For an undirected road `0-1`, adding only `0 -> 1`
+> makes a search from `1` unable to reach `0`.
 
 - Key clone maps by original node identity, not stored value; two
   nodes can both contain `7`.
@@ -4335,7 +4643,7 @@ edge, still `O(V + E)`.
 #### Related material
 
 - [Breadth-first search](#c1321-breadth-first-search) and [depth-first
-  search](#c1320-depth-first-search) own traversal choices.
+  search](#c1320-depth-first-search) explain the main visit orders.
 - [Bellman-Ford](#c1324-bellman-ford-shortest-paths) naturally
   consumes an edge list.
 - [Clone Graph](problems/medium_leetcode_0133_clone_graph.go) requires
@@ -4361,11 +4669,12 @@ slices**, whose rows have different lengths.
 
 #### How it works
 
-Check `0 <= row < len(matrix)` first, then check
-`0 <= column < len(matrix[row])`. State separately whether an
-operation requires a rectangle or square. For four-direction movement,
-add `(-1,0)`, `(1,0)`, `(0,-1)`, and `(0,1)` and validate each
-candidate.
+First require `row` to be at least zero and smaller than the number of
+rows. Only then inspect that row. Require `column` to be at least zero
+and smaller than that particular row's length. State separately
+whether an operation requires a rectangle or square. For movement in
+four directions, try one row up, one row down, one column left, and
+one column right, checking every resulting position.
 
 #### Step-by-step examples
 
@@ -4373,7 +4682,8 @@ For `[[1,2,3],[4,5,6]]`, query neighbors of `(0,2)`.
 
 1.  **Candidate: `(-1,2)`**
     - **Before:** Row `-1`
-    - **Decision:** Row is outside `0..1`
+    - **Decision:** Valid row indexes run from `0` through `1`, so
+      row `-1` is outside them.
     - **After:** Reject
     - **Known correct:** No read occurred outside storage
 2.  **Candidate: `(1,2)`**
@@ -4400,9 +4710,9 @@ would panic.
 
 Every valid cell belongs to an existing row and an existing position
 in that specific row. Testing in that order proves both conditions
-before indexing. Direction offsets generate each intended adjacent
-coordinate exactly once; bounds checks remove only coordinates outside
-storage.
+before indexing. Adding the four direction changes creates each
+intended adjacent position once; the checks reject only positions
+outside storage.
 
 #### Go example
 
@@ -4424,7 +4734,7 @@ the code does not evaluate `matrix[row]` for an invalid row.
 One bounds check takes `O(1)` time and space. Visiting every cell
 takes time proportional to the total number of cells, `O(cells)`,
 which is `O(rows*cols)` for a rectangle. A returned copy needs
-`O(cells)` result memory; in-place visits may use `O(1)` auxiliary
+`O(cells)` result memory; in-place visits may use `O(1)` extra
 state unless traversal adds a stack or queue.
 
 #### When to use it
@@ -4452,7 +4762,7 @@ state unless traversal adds a stack or queue.
 
 #### Related material
 
-- [Graphs and grids](#b5-graphs-and-grids) owns implicit neighbor
+- [Graphs and grids](#b5-graphs-and-grids) explains implicit neighbor
   edges.
 - [Rows, columns, and shrinking
   boundaries](#b61-rows-columns-and-shrinking-boundaries) applies
@@ -4472,8 +4782,9 @@ one-row or one-column remainders are emitted twice.
 ##### The idea in simple terms
 
 Peel the outer frame from a picture, then repeat on the smaller
-picture. Four inclusive positions named `top`, `bottom`, `left`, and
-`right` describe the unread rectangle.
+picture. Four positions named `top`, `bottom`, `left`, and `right`
+describe the unread rectangle. The cells at those positions are still
+included, so the boundaries are called **inclusive**.
 
 ##### How it works
 
@@ -4561,14 +4872,14 @@ func spiralOrder(matrix [][]int) []int {
 ##### Work and memory
 
 Every cell is appended once, so time is `O(rows*cols)`. Boundary
-variables use `O(1)` auxiliary space, and the returned order uses
+variables use `O(1)` extra memory, and the returned order uses
 `O(rows*cols)` result space.
 
 ##### When to use it
 
 - Input is a validated rectangle.
 - Output follows successive outer layers.
-- Four monotonically shrinking boundaries describe unread work.
+- Four boundaries that move only inward describe unread work.
 
 ##### When not to use it
 
@@ -4585,13 +4896,13 @@ variables use `O(1)` auxiliary space, and the returned order uses
 - Handle an empty matrix before reading `matrix[0]`.
 - Use the column count from the validated rectangular row, not the row
   count.
-- Output allocation is not auxiliary space, but it still consumes
-  memory.
+- Output allocation is not counted as extra working memory, but it
+  still consumes memory.
 
 ##### Related material
 
 - [Matrix traversal and in-place
-  state](#b6-matrix-traversal-and-in-place-state) owns shape and
+  state](#b6-matrix-traversal-and-in-place-state) explains shape and
   coordinate rules.
 - [Spiral Matrix](problems/medium_leetcode_0054_spiral_matrix.go) is
   the representative boundary exercise.
@@ -4606,9 +4917,10 @@ moved yet.
 
 ##### The idea in simple terms
 
-First reflect the square across its main diagonal, then mirror each
-row. The first operation is a **transpose**, which moves
-`(row,column)` to `(column,row)`; the second completes a clockwise
+First reflect the square across the diagonal running from its top-left
+corner to its bottom-right corner, then reverse every row. The first
+operation is a **transpose**: a value at a given row and column moves
+to that column and row. The row reversal completes a clockwise
 quarter turn.
 
 ##### How it works
@@ -4630,8 +4942,8 @@ Rotate `[[1,2],[3,4]]`; expected output is `[[3,1],[4,2]]`.
     - **Before:** `[[1,3],[2,4]]`
     - **Decision:** Mirror each row
     - **After:** `[[3,1],[4,2]]`
-    - **Known correct:** `(r,c)` reached clockwise destination
-      `(c,n-1-r)`
+    - **Known correct:** A value from row `r`, column `c` reaches row
+      `c`, column `n-1-r`, its clockwise destination.
 
 Boundary example: a 1-by-1 matrix remains unchanged. A 2-by-3
 rectangle cannot be rotated in place into the same row layout because
@@ -4639,11 +4951,13 @@ its output shape is 3-by-2.
 
 ##### Why it works
 
-Transpose sends `(r,c)` to `(c,r)`. Reversing the destination row
-sends its column `r` to `n-1-r`. The composition is
-`(r,c) -> (c,n-1-r)`, exactly a clockwise rotation. Swapping only
-`column > row` covers each off-diagonal pair once; row reversal covers
-every destination once.
+Call an original row `r` and column `c`. Transpose moves that value to
+row `c`, column `r`. Reversing its new row changes column `r` to
+column `n-1-r`, where `n` is the side length. The two operations
+together move `(r,c)` to `(c,n-1-r)`, exactly its clockwise
+destination. Swapping only when `column > row` handles each pair on
+opposite sides of the diagonal once. Row reversal handles every final
+position once.
 
 ##### Go example
 
@@ -4672,9 +4986,9 @@ func rotateSquare(matrix [][]int) {
 
 ##### Work and memory
 
-Transpose and row reversal each touch `O(n^2)` cells, so total time is
-`O(n^2)`. Loop indices and swap temporaries use `O(1)` auxiliary
-space.
+For side length `n`, the matrix contains `n*n` cells. Transpose and
+row reversal each touch that many cells, so total time is `O(n^2)`.
+Loop indexes and temporary swap values use `O(1)` extra memory.
 
 ##### When to use it
 
@@ -4686,7 +5000,7 @@ space.
 
 - Allocate a differently shaped result for a non-square rectangle.
 - Do not mutate when callers retain the original matrix.
-- Use a direct copy when clarity matters more than constant auxiliary
+- Use a direct copy when clarity matters more than constant extra
   space.
 
 ##### Common mistakes and edge cases
@@ -4703,8 +5017,8 @@ space.
 
 ##### Related material
 
-- [Moving values in place](#b11-moving-values-in-place) owns the
-  mutation tradeoff.
+- [Moving values in place](#b11-moving-values-in-place) explains the
+  tradeoff of changing the input.
 - [Rotate Image](problems/medium_leetcode_0048_rotate_image.go)
   exercises the transpose-and-reverse mapping.
 
@@ -4747,12 +5061,18 @@ original           markers recorded       final
     - **Decision:** Record row 1 at `(1,0)` and column 2 at `(0,2)`
     - **After:** Marker cells become zero
     - **Known correct:** The affected row and column are remembered
-2.  **Step: Apply interior**
-    - **Before:** All originals inspected
-    - **Decision:** Read markers, not new zeros
-    - **After:** Row 1 and column 2 interior cells become zero
-    - **Known correct:** No generated zero creates a new marker
-3.  **Step: Finish borders**
+2.  **Step: Apply marker to `(1,1)`**
+    - **Before:** Row marker `(1,0)` is zero.
+    - **Decision:** Cell `(1,1)` shares the marked row.
+    - **After:** Change its value from `5` to `0`.
+    - **Known correct:** Original row `1` contained a zero.
+3.  **Step: Apply marker to row `2`**
+    - **Before:** Row marker `(2,0)` is `7`.
+    - **Decision:** Keep `(2,1)=8`; column marker `(0,2)` is zero, so
+      change `(2,2)` from `9` to `0`.
+    - **After:** Interior row is `[8,0]`.
+    - **Known correct:** Only column `2` was marked for this row.
+4.  **Step: Finish borders**
     - **Before:** Original flags are false
     - **Decision:** Apply saved border decisions
     - **After:** Final matrix shown
@@ -4835,13 +5155,13 @@ func setZeroes(matrix [][]int) {
 
 The passes inspect `rows*columns` cells a constant number of times, so
 time is `O(rows*columns)`. Two booleans and loop positions use `O(1)`
-auxiliary space; the matrix stores its own markers.
+extra memory; the matrix stores its own markers.
 
 ##### When to use it
 
 - The input is a mutable nonempty rectangle.
 - Marker values can safely occupy reserved existing cells.
-- Constant auxiliary space is required.
+- Extra memory must stay constant.
 
 ##### When not to use it
 
@@ -4863,7 +5183,7 @@ auxiliary space; the matrix stores its own markers.
 ##### Related material
 
 - [Matrix traversal and in-place
-  state](#b6-matrix-traversal-and-in-place-state) owns
+  state](#b6-matrix-traversal-and-in-place-state) explains
   rectangular-shape checks.
 - [Set Matrix
   Zeroes](problems/medium_leetcode_0073_set_matrix_zeroes.go) is the
@@ -4875,21 +5195,22 @@ auxiliary space; the matrix stores its own markers.
 
 In a simultaneous grid update, every next value must be decided from
 the same old grid. Replacing cells one by one can make later decisions
-read a mixture of old and new rounds.
+read a mixture of the old round and the new round.
 
 ##### The idea in simple terms
 
 Write the old and new status on the same sticky note. If inputs use
 `0` and `1`, reserve `2` for "was 0, becomes 1" and `3` for "was 1,
-becomes 0." Reads decode the old status; a final pass keeps only the
-new status.
+becomes 0." Reads recover the old status; a final pass keeps only the
+new status. Storing both meanings temporarily in each input cell is
+an **in-place state encoding**.
 
 ##### How it works
 
-Define every temporary state's old and new meanings first. During the
+Define every temporary value's old and new meanings first. During the
 decision pass, count a neighbor as formerly live when its value is `1`
-or `3`. Encode changes but leave unchanged cells as `0` or `1`. During
-the final pass, convert `2` to `1` and `3` to `0`.
+or `3`. Record changes but leave unchanged cells as `0` or `1`.
+During the final pass, convert `2` to `1` and `3` to `0`.
 
 ##### Step-by-step examples
 
@@ -4898,25 +5219,31 @@ neighbor is live. Input `[1,1,0]` should simultaneously become
 `[1,1,1]`.
 
 1.  **Step: Cell 0**
-    - **Before:** `[1,1,0]`
-    - **Decision:** One old live neighbor; stays 1
-    - **After:** `[1,1,0]`
-    - **Known correct:** Cell 0 next state is encoded
+    - **Before:** The encoded row is `[1,1,0]`.
+    - **Decision:** Cell 0 has one old live neighbor, so it stays
+      live.
+    - **After:** The encoded row remains `[1,1,0]`.
+    - **Known correct:** Cell 0's next status is recorded.
 2.  **Step: Cell 1**
-    - **Before:** `[1,1,0]`
-    - **Decision:** One old live neighbor; stays 1
-    - **After:** `[1,1,0]`
-    - **Known correct:** Cells 0 and 1 are encoded
+    - **Before:** The encoded row is `[1,1,0]`.
+    - **Decision:** Cell 1 has one old live neighbor, so it stays
+      live.
+    - **After:** The encoded row remains `[1,1,0]`.
+    - **Known correct:** Cells 0 and 1 have their next status
+      recorded.
 3.  **Step: Cell 2**
-    - **Before:** `[1,1,0]`
-    - **Decision:** Old neighbor 1 is live
-    - **After:** `[1,1,2]`
-    - **Known correct:** `2` preserves old 0 and new 1
+    - **Before:** The encoded row is `[1,1,0]`.
+    - **Decision:** Cell 2 has one old live neighbor, so it becomes
+      live.
+    - **After:** The encoded row becomes `[1,1,2]`.
+    - **Known correct:** Code `2` preserves old value 0 and records
+      new value 1.
 4.  **Step: Finalize**
-    - **Before:** `[1,1,2]`
-    - **Decision:** Keep only new meanings
-    - **After:** `[1,1,1]`
-    - **Known correct:** All cells show the same next round
+    - **Before:** The encoded row is `[1,1,2]`.
+    - **Decision:** Replace every temporary code with its new value.
+    - **After:** The final row is `[1,1,1]`.
+    - **Known correct:** Every cell now shows the result for the same
+      next round.
 
 Boundary example: an empty grid performs neither pass. If input may
 already contain `2` or `3`, these temporary codes are ambiguous and
@@ -4980,22 +5307,23 @@ func updateRow(values []int) {
 
 With a fixed number of neighbors, each of `n` cells takes constant
 work, so time is `O(n)`; for a matrix, `n = rows*columns`. Temporary
-codes and counters use `O(1)` auxiliary space. A clearer separate
+codes and counters use `O(1)` extra memory. A clearer separate
 next-state grid would use `O(n)` additional space.
 
 ##### When to use it
 
 - Updates are logically simultaneous.
 - The input value range leaves unambiguous temporary codes.
-- Mutation is allowed and auxiliary memory must stay constant.
+- Changing the input is allowed and extra memory must stay constant.
 
 ##### When not to use it
 
 - Use a separate next-state grid when clarity or unrestricted input
   values matter more than memory.
 - Do not encode before documenting how every temporary value decodes.
-- Concurrent writers need synchronization beyond this single-threaded
-  method.
+- If several parts of a program can write the grid at the same time,
+  they need a separate coordination rule; this example uses one
+  execution thread.
 
 ##### Common mistakes and edge cases
 
@@ -5010,10 +5338,10 @@ next-state grid would use `O(n)` additional space.
 ##### Related material
 
 - [Matrix traversal and in-place
-  state](#b6-matrix-traversal-and-in-place-state) owns coordinate and
-  shape checks.
-- [Moving values in place](#b11-moving-values-in-place) discusses
-  mutation contracts.
+  state](#b6-matrix-traversal-and-in-place-state) explains coordinate
+  and shape checks.
+- [Moving values in place](#b11-moving-values-in-place) discusses when
+  changing the input is allowed.
 - [Game of Life](problems/medium_leetcode_0289_game_of_life.go)
   applies this encoding to eight neighbors.
 
@@ -5034,14 +5362,15 @@ agreement.
 
 #### How it works
 
-Choose one structure per required operation, then state a
-cross-structure fact:
+Choose one structure per required operation, then state the rule that
+keeps their views in agreement:
 
-- A slice plus map supports random indexing and value-to-index lookup.
+- A slice plus map supports choosing any numbered slice position and
+  finding the position of a particular value.
 - A map plus doubly linked list supports direct lookup and recency
   order for a **least-recently-used (LRU) cache**, which evicts the
-  item unused for the longest time. A permanent dummy end node, called
-  a **sentinel**, removes end special cases.
+  item unused for the longest time. Permanent placeholder nodes at the
+  ends, called **sentinels**, remove end special cases.
 - A max-heap, which exposes the largest value, and a min-heap, which
   exposes the smallest, keep lower and upper halves for a streaming
   median.
@@ -5052,9 +5381,11 @@ Update every affected view before the public operation returns.
 
 #### Step-by-step examples
 
-A random-access set stores `values=[10,20,30]` and
+A structure for fast removal and random choice stores
+`values=[10,20,30]` and
 `indexByValue={10:0,20:1,30:2}`. Delete `20`; expected retained values
-are `[10,30]` with map `{10:0,30:1}`.
+are `[10,30]` with map `{10:0,30:1}`. This set requires its stored
+values to be unique.
 
 1.  **Step: Locate**
     - **Before:** Map says `20 -> 1`
@@ -5078,13 +5409,14 @@ valid.
 
 #### Why it works
 
-The fact that remains true between operations is
-`indexByValue[values[i]] == i` for every retained position. Lookup
-identifies the only hole. Moving the last value fills it without
-shifting other values, and repairing that one map entry restores
-agreement for the moved value. Shrinking removes the duplicate slot
-and deleting the removed key completes the invariant. Each operation
-changes only a fixed number of positions.
+Between operations, every slice value's map entry must name that
+value's current slice position. In symbols,
+`indexByValue[values[i]] == i` for every retained position `i`.
+Lookup identifies the only hole. Moving the last value fills it
+without shifting other values, and repairing that one map entry
+restores agreement for the moved value. Shrinking removes the
+duplicate slot, and deleting the removed key restores the complete
+rule. Each operation changes only a fixed number of positions.
 
 #### Go example
 
@@ -5093,6 +5425,19 @@ changes only a fixed number of positions.
 type RandomSet struct {
 	values       []int
 	indexByValue map[int]int
+}
+
+func newRandomSet(initialValues []int) RandomSet {
+	// The input promise requires unique values. Copy them so later
+	// changes do not modify the caller's slice.
+	set := RandomSet{
+		values:       append([]int(nil), initialValues...),
+		indexByValue: make(map[int]int, len(initialValues)),
+	}
+	for valueIndex, value := range set.values {
+		set.indexByValue[value] = valueIndex
+	}
+	return set
 }
 
 func (set *RandomSet) Remove(value int) bool {
@@ -5118,6 +5463,10 @@ func (set *RandomSet) Remove(value int) bool {
 }
 ```
 
+The traced operation is
+`set := newRandomSet([]int{10,20,30}); set.Remove(20)`. It returns
+`true` and leaves the two internal views exactly as shown above.
+
 #### Work and memory
 
 Map lookup, one slice replacement, and map updates take expected
@@ -5129,7 +5478,7 @@ use `O(n)` total storage and `O(log n)` time per insertion.
 #### When to use it
 
 - Required operations have conflicting access-order needs.
-- A clear invariant can relate the structures after every operation.
+- A clear rule can relate the structures after every operation.
 - The memory for multiple views is justified by repeated faster
   operations.
 
@@ -5157,9 +5506,9 @@ use `O(n)` total storage and `O(log n)` time per insertion.
 
 - [Map presence and
   sets](#d4-map-presence-and-sets)
-  owns Go map lookup behavior.
-- [Heap or priority queue](#c1327-heap-or-priority-queue) owns heap
-  operations.
+  explains Go map lookup behavior.
+- [Heap or priority queue](#c1327-heap-or-priority-queue) explains
+  heap operations.
 - [LRU Cache](problems/medium_leetcode_0146_lru_cache.go) combines a
   map and doubly linked list.
 - [Insert Delete GetRandom
@@ -5176,18 +5525,18 @@ all earlier values may exceed time or memory limits.
 
 #### The idea in simple terms
 
-Keep a small scoreboard and update it when each event arrives. An
+Keep a small scoreboard and update it when each value arrives. An
 **online algorithm** maintains a valid answer without assuming future
 input. A **prefix** is everything received so far. A **batch
 algorithm** waits for the complete input before beginning.
 
 #### How it works
 
-Define what the state means after every prefix and when old
+Define what the remembered data means after every prefix and when old
 information can be discarded. For the first non-repeating item, keep a
-count map and a FIFO queue of first occurrences. Increment the new
-item's count, enqueue it only on its first occurrence, then remove
-repeated candidates from the front.
+count map and a first-in, first-out queue of first occurrences.
+Increment the new item's count, add it only on its first occurrence,
+then remove repeated candidates from the front.
 
 Other summaries pair a recent-window queue with counts, two heaps for
 a running median, a size-`k` heap for top items, or one next candidate
@@ -5195,8 +5544,8 @@ per sorted stream.
 
 #### Step-by-step examples
 
-For stream `a, b, a`, report the first non-repeating letter after each
-arrival; expected reports are `a, a, b`.
+For stream `a, b, a, a, b`, report the first non-repeating letter
+after each arrival; expected reports are `a, a, b, b, no value`.
 
 1.  **Arrival: `a`**
     - **Before:** Counts `{}`, queue `[]`
@@ -5213,6 +5562,16 @@ arrival; expected reports are `a, a, b`.
     - **Decision:** Count becomes 2; discard repeated front
     - **After:** `{a:2,b:1}`, `[b]`, report `b`
     - **Known correct:** Queue front is again earliest unique item
+4.  **Arrival: `a`**
+    - **Before:** `{a:2,b:1}`, `[b]`
+    - **Decision:** Count becomes 3; do not enqueue a repeated value
+    - **After:** `{a:3,b:1}`, `[b]`, report `b`
+    - **Known correct:** Removed `a` stays out; unique `b` stays first
+5.  **Arrival: `b`**
+    - **Before:** `{a:3,b:1}`, `[b]`
+    - **Decision:** Count becomes 2; discard repeated front
+    - **After:** `{a:3,b:2}`, `[]`, report no value
+    - **Known correct:** No received letter occurs exactly once
 
 Boundary example: stream `a, a` reports `a`, then no value. The queue
 becomes empty after the second arrival; code must represent "none"
@@ -5230,12 +5589,12 @@ removed only once.
 #### Go example
 
 ```go
-func firstUniqueReports(stream []byte) []int {
+func firstUniqueReports(stream []byte) []string {
 	// counts determines uniqueness; queue preserves first-arrival order
 	// among values that have appeared at least once.
 	counts := map[byte]int{}
 	queue := []byte{}
-	reports := make([]int, 0, len(stream))
+	reports := make([]string, 0, len(stream))
 	for _, value := range stream {
 		counts[value]++
 		if counts[value] == 1 {
@@ -5247,34 +5606,38 @@ func firstUniqueReports(stream []byte) []int {
 		for len(queue) > 0 && counts[queue[0]] != 1 {
 			queue = queue[1:]
 		}
-		// Report the earliest still-unique value, or -1 when none remains.
+		// Report the earliest still-unique byte as a one-byte string. An
+		// empty string means no unique byte remains.
 		if len(queue) == 0 {
-			reports = append(reports, -1)
+			reports = append(reports, "")
 		} else {
-			reports = append(reports, int(queue[0]))
+			reports = append(reports, string(queue[0]))
 		}
 	}
 	return reports
 }
 ```
 
-The `-1` result is safe because a byte value cannot equal `-1` after
-conversion to `int`.
+For input `[]byte{'a','b','a','a','b'}`, the returned strings are
+`["a","a","b","b",""]`. The empty string means "no value" and
+cannot be confused with the one-byte string made from any input byte.
 
 #### Work and memory
 
-Each of `n` arrivals is enqueued at most once and removed at most
-once, so total time is `O(n)` and amortized time per arrival is
-`O(1)`. The count map and queue use `O(u)` and `O(u)` memory for up to
-`u` distinct candidates, bounded by `O(n)`. The report slice uses
-`O(n)` result memory. A bounded recent window can instead cap retained
-state by its window size.
+Each of `n` arrivals is added at most once and removed at most once,
+so total time is `O(n)`. Even if one arrival removes several items,
+the cost averages `O(1)` per arrival across the full stream. This is
+the amortized cost. The count map and queue each use `O(u)` memory for
+up to `u` distinct candidates, bounded by `O(n)`. The report slice
+uses `O(n)` result memory. A bounded recent window can instead cap
+retained state by its window size.
 
 #### When to use it
 
 - An answer is required after every arrival or input cannot be
   replayed.
-- State has a precise meaning for every received prefix.
+- The remembered data has a precise meaning after every received
+  prefix.
 - Old items can be summarized or safely expired.
 
 #### When not to use it
@@ -5289,11 +5652,11 @@ state by its window size.
 #### Common mistakes and edge cases
 
 > **Warning:** Returning byte `0` to mean "no unique item" is
-> ambiguous when the stream can contain the zero byte; use a separate
-> boolean or an out-of-range result such as `-1` after conversion.
+> ambiguous when the stream can contain the zero byte. Use a separate
+> boolean or a result type with an unambiguous "none" value.
 
-- One arrival may remove many candidates, but amortized analysis
-  counts each candidate removal only once.
+- One arrival may remove many candidates, but the average-over-time
+  analysis counts each candidate removal only once.
 - Advancing a slice queue can retain old backing storage in a
   long-lived stream.
 - A fixed recent window must undo the contribution of the item that
@@ -5301,7 +5664,7 @@ state by its window size.
 
 #### Related material
 
-- [Queues and deques](#b3-queues-and-deques) owns FIFO and
+- [Queues and deques](#b3-queues-and-deques) explains FIFO and
   retained-storage details.
 - [Composing data structures](#b7-composing-data-structures) explains
   paired state such as counts plus order or two heaps.
@@ -5318,142 +5681,211 @@ state by its window size.
 A problem may require lookup, ordering, removal, or connectivity with
 different costs. Choosing by a familiar structure name instead of the
 required operations can make the important operation too slow or the
-invariant impossible to keep.
+rule that keeps the structure correct impossible to maintain.
 
 #### The idea in simple terms
 
 Choose a toolbox drawer by the action you repeat most, not by the
 shape of the input alone. A **structure-selection guide** compares
 observable operation and ordering needs, then links to the entry that
-owns each structure's behavior.
+explains each structure's behavior.
 
 #### How it works
 
-Write down required operations, their frequency, ordering rule,
-mutation rules, and size limits. Then match the strongest need:
+Start by listing what the program needs to do most often. Note whether
+values must stay in a particular order, whether they can change, and
+how much data the program may need to store. Then choose based on the
+main task:
 
-- **Exact-key membership or lookup:** Hash map or set.
-- **Direct indexed position:** Slice.
-- **Reconnect a known node:** Linked list.
-- **Most-recent-first work:** Stack.
-- **Oldest-first work:** Queue.
-- **Remove at both ends:** Deque.
-- **Repeated next minimum or maximum:** Heap.
-- **Ordered keys under updates:** [Balanced search
-  tree](#b4-trees-and-binary-search-trees).
-- **Repeated string-prefix lookup:** Trie.
-- **Incremental group connectivity:** Disjoint-set union.
+- **Check whether a value exists or find it by name:** Use a hash map,
+  called a map in Go, or a set that records only presence.
+- **Read or replace a value at a numbered position:** Use a slice.
+- **Add or remove a value next to a node you already have:** Use a
+  linked list.
+- **Handle the newest waiting item first:** Use a stack.
+- **Handle the oldest waiting item first:** Use a queue.
+- **Add or remove items at both the front and back:** Use a deque.
+- **Repeatedly take the smallest or largest item:** Use a heap.
+- **Keep keys sorted while adding and removing them:** Use a
+  [balanced search tree](#b4-trees-and-binary-search-trees).
+- **Look up many strings by their beginning:** Use a trie.
+- **Join groups over time and ask whether two items share a group:**
+  Use a disjoint-set union.
 
 #### Step-by-step examples
 
-Requirement: accept numbers one at a time and report the largest three
-seen so far, without retaining every number.
+Suppose numbers arrive one at a time. Keep only the largest three seen
+so far. After `8, 2, 5, 9, 1`, the retained values should be
+`{5, 8, 9}`.
 
-1.  **Step: Name output**
-    - **Before:** Need top three, not full sorted order
-    - **Decision:** Only the smallest retained candidate must be easy
-      to remove
-    - **After:** Choose a min-heap capped at 3
-    - **Known correct:** Root is the cutoff candidate
+1.  **Step: Choose what to store**
+    - **Before:** No structure has been chosen.
+    - **Decision:** Only three values are needed, and the smallest of
+      those three must be easy to replace.
+    - **After:** Choose a min-heap that holds at most three values. A
+      min-heap keeps its smallest value at the top.
+    - **Known correct:** The structure supports the two needed jobs:
+      find the smallest retained value and replace it.
 2.  **Step: Process `8,2,5`**
-    - **Before:** Heap has room
-    - **Decision:** Insert all three
-    - **After:** Heap contains `{2,5,8}`
-    - **Known correct:** These are all values so far
+    - **Before:** The heap is empty and has room for three values.
+    - **Decision:** Keep all three values.
+    - **After:** The heap stores `{2,5,8}`, with `2` at the top.
+    - **Known correct:** Fewer than four values have arrived, so none
+      should be discarded.
 3.  **Step: Process `9`**
-    - **Before:** Root is `2`
-    - **Decision:** `9` is better; replace cutoff
-    - **After:** Heap contains `{5,8,9}`
-    - **Known correct:** Heap is exactly current top three
+    - **Before:** The smallest retained value is `2`.
+    - **Decision:** `9` is larger, so replace `2` with `9`.
+    - **After:** The heap stores `{5,8,9}`, with `5` at the top.
+    - **Known correct:** These are the largest three values seen.
 4.  **Step: Process `1`**
-    - **Before:** Root is `5`
-    - **Decision:** `1` cannot enter top three
-    - **After:** Heap unchanged
-    - **Known correct:** Discarding `1` is safe
+    - **Before:** The smallest retained value is `5`.
+    - **Decision:** `1` is smaller than all three retained values, so
+      discard it.
+    - **After:** The heap still stores `{5,8,9}`.
+    - **Known correct:** `1` cannot be one of the largest three.
 
-Boundary example: when `k=0`, retain nothing and avoid reading a heap
-root. If the requirement changes to report all values in sorted order,
-a size-`k` heap no longer owns enough information.
+Here, `k` means the number of values to keep. When `k=0`, the answer
+is empty, so do not read the heap's top. If the program must return
+every value in sorted order, a heap that keeps only `k` values has
+discarded information the answer needs. Sorting all values is a
+better fit.
 
 #### Why it works
 
-Selection is justified by an operation contract. In the example,
-keeping the best three and exposing their smallest member is
-sufficient: a new value no larger than that cutoff cannot belong to
-the top three, while a larger value replaces exactly the current
-weakest candidate. The chosen structure directly supports that needed
-comparison and replacement.
+After each arrival, the heap contains the largest three values seen so
+far, or every value if fewer than three have arrived. Once the heap is
+full, its top is the smallest retained value. A new value no larger
+than the top cannot enter the largest three. A larger value replaces
+that one smaller value. This keeps the same fact true after every
+arrival and gives the required answer when the input ends.
 
 #### Go example
 
-This comparison entry deliberately has no second copy of each
-implementation. Use the Go examples owned by [arrays and
-slices](#b1-arrays-slices-and-strings), [linked
-lists](#b2-linked-lists), [queues and deques](#b3-queues-and-deques),
-[map presence and
-sets](#d4-map-presence-and-sets),
-and [heap or priority queue](#c1327-heap-or-priority-queue).
+```go
+import (
+	"container/heap"
+	"sort"
+)
+
+type smallestHeap []int
+
+func (values smallestHeap) Len() int { return len(values) }
+func (values smallestHeap) Less(left, right int) bool {
+	return values[left] < values[right]
+}
+func (values smallestHeap) Swap(left, right int) {
+	values[left], values[right] = values[right], values[left]
+}
+func (values *smallestHeap) Push(value any) {
+	*values = append(*values, value.(int))
+}
+func (values *smallestHeap) Pop() any {
+	oldValues := *values
+	lastIndex := len(oldValues) - 1
+	value := oldValues[lastIndex]
+	*values = oldValues[:lastIndex]
+	return value
+}
+
+func largestValues(values []int, numToKeep int) []int {
+	if numToKeep <= 0 {
+		return []int{}
+	}
+	kept := &smallestHeap{}
+	heap.Init(kept)
+	for _, value := range values {
+		if kept.Len() < numToKeep {
+			heap.Push(kept, value)
+			continue
+		}
+		if value <= (*kept)[0] {
+			continue
+		}
+		// Replace the smallest retained value, then restore heap order.
+		(*kept)[0] = value
+		heap.Fix(kept, 0)
+	}
+	// Heap storage is not fully sorted, so sort a copy for the caller.
+	result := append([]int(nil), (*kept)...)
+	sort.Ints(result)
+	return result
+}
+```
+
+`largestValues([]int{8,2,5,9,1},3)` returns `[5,8,9]`. The function
+returns an empty slice when `numToKeep` is zero or negative.
 
 #### Work and memory
 
-Selection itself is constant planning work once requirements are
-known, but the chosen operation costs control the algorithm. Exact-key
-map lookup is expected `O(1)`; slice indexing is `O(1)`; linked-list
-search is `O(n)`; stack, queue, and deque end operations are typically
-`O(1)`; balanced-tree and heap updates are `O(log n)`. A size-`k`
-top-items heap processes `n` values in `O(n log k)` time and uses
-`O(k)` memory.
+Choosing a structure is a planning step. The running cost comes from
+the structure ultimately used. A map usually finds a key in constant
+time, written expected `O(1)`, and a slice reads a known position in
+`O(1)`. Searching a linked list of `n` nodes may inspect all of them,
+so it takes `O(n)`. Adding or removing at the intended end of a stack,
+queue, or deque usually takes `O(1)`. Adding to or removing from a
+balanced tree or heap takes `O(log n)`.
+
+For the example, let `n` be the number of arriving values and `k` be
+the number to keep. Updating a heap of at most `k` values takes up to
+`O(log k)` time per arrival. The full process therefore takes
+`O(n log k)` time. Sorting the returned copy adds `O(k log k)` time.
+The heap and returned copy each store at most `k` values, so working
+memory and result memory are both `O(k)`.
 
 #### When to use it
 
-- Before implementing a problem whose operations suggest several
-  structures.
-- When constraints require comparing time and memory explicitly.
-- When a composed design might be needed for conflicting operations.
+- Before writing code when several structures seem possible.
+- When the largest allowed input makes speed or memory important.
+- When no single structure makes every required job fast; two
+  structures may need to work together.
 
 #### When not to use it
 
-- Do not treat the comparison list as a keyword matcher; prove the
-  chosen invariant.
-- Do not choose a BST merely because input is a tree, or two pointers
-  merely because input is an array.
-- Revisit the choice when mutation, duplicates, ordering, or output
-  needs differ from the candidate's assumptions.
+- Do not choose from one matching word alone. Check that the structure
+  supports every operation the problem requires.
+- The input's appearance does not decide the answer: tree-shaped input
+  does not automatically require a binary search tree, and an array
+  does not automatically require two pointers.
+- Reconsider the choice when values may repeat, the input cannot be
+  changed, order matters, or the output needs information the
+  structure does not keep.
 
 #### Common mistakes and edge cases
 
-> **Warning:** A heap exposes only its next-priority value. Using it
-> for repeated exact lookup of arbitrary keys can require an `O(n)`
-> scan; choose a map or compose the structures when both operations
-> matter.
+> **Warning:** A heap quickly provides only the smallest, largest, or
+> highest-priority value it was built to expose. Finding some other
+> exact value may require checking all `n` stored values. If both jobs
+> must be fast, pair the heap with a map and keep them in agreement.
 
-- Include preprocessing and output construction when comparing total
-  cost.
-- Go has a standard heap interface but no standard balanced ordered
-  map.
-- Duplicate handling differs across sets, collections that preserve
-  duplicate counts, heaps, and search trees.
-- Empty removal and `k=0` require explicit guards.
+- Count setup work, such as sorting, and the work needed to build the
+  output when comparing total cost.
+- Go's standard library supports heaps, but it does not provide a map
+  that automatically keeps its keys sorted.
+- Decide what repeated values mean. A set removes repeats, while a
+  heap or search tree may keep them.
+- Check for an empty structure before removing a value. For top-`k`
+  problems, also handle `k=0` before reading the heap's top.
 
 #### Related material
 
 - [Problem-solving method selection
-  guide](#c1-problem-solving-method-selection-guide) continues from
-  storage choice to algorithm choice.
-- [Composing data structures](#b7-composing-data-structures) handles
-  operation sets that one structure cannot satisfy.
+  guide](#c1-problem-solving-method-selection-guide) helps choose the
+  algorithm after choosing how to store the data.
+- [Composing data structures](#b7-composing-data-structures) explains
+  how two structures can support jobs that one cannot handle alone.
 - [Hash map or set](#c134-hash-map-or-set), [stack](#c1313-stack),
   [heap](#c1327-heap-or-priority-queue), [trie](#c1333-trie), and
-  [disjoint-set union](#c1325-disjoint-set-union) own their
-  problem-solving patterns.
+  [disjoint-set union](#c1325-disjoint-set-union) explain when each
+  structure fits a problem.
 
 <a id="c-problem-solving-patterns"></a>
 
 ## C. Ways to solve problems
 
-This section turns observations about an input into a justified
-solution plan. A pattern name is only a label; the deciding evidence
-is the condition that makes each skipped possibility safe to ignore.
+This section turns what you notice about an input into a solution plan
+you can explain and trust. A method's name is only a label. What
+matters is why that method may safely ignore work that cannot affect
+the answer.
 
 ### C.1 Problem-solving method selection guide
 
@@ -5463,13 +5895,18 @@ Before choosing a method, answer five questions in plain language:
     stream, or choices?
 2.  What must the output contain: a value, position, path, order, one
     answer, or every answer?
-3.  Must order, adjacency, or original positions be preserved?
+3.  Must the original order, neighboring relationships, or positions
+    stay unchanged?
 4.  May the input be changed, and does all of it exist before
     processing starts?
 5.  What time and memory can the largest valid input afford?
 
-Treat the links below as hypotheses. Confirm a card's required
-condition and correctness argument before implementing it.
+Treat the links below as possible starting points. Before writing
+code, confirm that the method's requirements match the problem and
+that its explanation of correctness makes sense for this input.
+You do not need to memorize every method name. Start with a concrete
+question, follow one promising link, and reject the method if its
+required conditions are absent.
 
 <a id="c11-quick-decision-tree"></a>
 
@@ -5483,9 +5920,10 @@ proves a method.
 
 ##### The idea in simple terms
 
-Classify the input, result, mutation rules, and limits before naming
-an algorithm. A **decision tree** is a sequence of questions whose
-answers remove methods that cannot meet those facts.
+Describe the input, the required result, whether the input may change,
+and the size limits before naming an algorithm. A **decision tree** is
+a series of questions. Each answer rules out methods that do
+not fit the problem.
 
 ##### How it works
 
@@ -5495,75 +5933,100 @@ answers remove methods that cannot meet those facts.
 3.  Identify the relationship that drives the work.
 4.  Reject methods whose worst-case work or memory exceeds the
     constraints.
-5.  Open at most two matching cards and verify their required
-    invariant.
+5.  Open at most two matching cards and check the key fact that each
+    method needs to keep true while it runs.
 
 Use these observable clues:
 
-- **Connections:** dependency order suggests [topological
-  sort](#c1322-topological-sort); equal-cost routes suggest
-  [breadth-first search (BFS)](#c1321-breadth-first-search);
-  non-negative varying costs suggest
-  [Dijkstra](#c1323-dijkstra-shortest-paths); negative costs suggest
-  [Bellman-Ford](#c1324-bellman-ford-shortest-paths); added
-  connections suggest [disjoint-set union](#c1325-disjoint-set-union);
-  cheapest total network suggests a [minimum spanning
-  tree](#c1326-minimum-spanning-tree); and complete branch exploration
-  suggests [depth-first search (DFS)](#c1320-depth-first-search).
-- **Choices:** a provably permanent choice suggests
-  [greedy](#c1318-greedy); repeated smaller questions suggest [dynamic
-  programming](#c1310-dynamic-programming); choices that must be tried
-  and undone suggest [backtracking](#c1319-backtracking); independent
-  halves suggest [divide and conquer](#c1311-divide-and-conquer).
+The bold words describe what the problem asks you to do. The linked
+names are labels to learn only after that clue matches.
+
+- **Connections:** If work must happen in a required order, consider
+  [topological sort](#c1322-topological-sort). If every step has the
+  same cost, consider [breadth-first search
+  (BFS)](#c1321-breadth-first-search). For different costs that are
+  never negative, consider
+  [Dijkstra](#c1323-dijkstra-shortest-paths). If any cost is negative,
+  consider [Bellman-Ford](#c1324-bellman-ford-shortest-paths). When
+  connections are added over time, consider [disjoint-set
+  union](#c1325-disjoint-set-union). To connect everything as cheaply
+  as possible, consider a [minimum spanning
+  tree](#c1326-minimum-spanning-tree). To explore one route fully
+  before another, consider [depth-first search
+  (DFS)](#c1320-depth-first-search).
+- **Choices:** If one choice can be proved safe forever, consider a
+  [greedy method](#c1318-greedy). If the same smaller questions appear
+  repeatedly, consider [dynamic
+  programming](#c1310-dynamic-programming). If choices must be tried
+  and then undone, consider [backtracking](#c1319-backtracking). If
+  separate halves can be solved and combined, consider [divide and
+  conquer](#c1311-divide-and-conquer).
 - **Lookup:** exact presence, counts, partners, or groups suggest a
   [hash map or set](#c134-hash-map-or-set); shared word beginnings
   suggest a [trie](#c1333-trie); several coupled operations may
   require [composed structures](#b7-composing-data-structures).
-- **Ranges:** overlap suggests [intervals](#c1330-intervals); active
-  event counts suggest a [sweep line](#c1331-sweep-line); fixed-data
-  range totals suggest [prefix sums](#c1315-prefix-sums); collected
-  range additions suggest [difference
-  arrays](#c1316-difference-arrays); interleaved updates and queries
-  suggest [Fenwick or segment
+- **Ranges:** Overlapping ranges suggest
+  [intervals](#c1330-intervals). Events that start and stop at
+  different positions suggest a [sweep line](#c1331-sweep-line).
+  Repeated totals over unchanged data suggest [prefix
+  sums](#c1315-prefix-sums). Many saved range additions suggest
+  [difference arrays](#c1316-difference-arrays). When updates and
+  total queries alternate, consider [Fenwick or segment
   trees](#c1317-fenwick-and-segment-trees).
-- **Sequences:** aligned beginnings suggest a [common-prefix
-  scan](#c131-common-prefix-scan); neighbor-dependent meaning a
-  [directional scan](#c132-directional-scan); prescribed transitions
-  [simulation](#c133-simulation); reorderable relationships [sorting
-  or selection](#c135-sorting-and-selection); a changing yes/no
-  boundary [binary search](#c136-binary-search); safe coordinated
-  movement [two pointers](#c139-two-pointers); one consecutive range a
-  [sliding window](#c1314-sliding-window); exact repeated text [string
-  matching](#c137-string-matching); phased input [parsing and state
-  machines](#c138-parsing-and-state-machines); a best consecutive sum
-  [Kadane's algorithm](#c1312-kadanes-algorithm-best-subarray-scan);
-  and linked cycles, middles, or gaps [fast and slow
+- **Sequences:** Compare aligned beginnings with a [common-prefix
+  scan](#c131-common-prefix-scan). If one value changes how a neighbor
+  should be handled, use a [directional
+  scan](#c132-directional-scan). Follow a detailed set of changing
+  rules with [simulation](#c133-simulation). If order may change, try
+  [sorting or selection](#c135-sorting-and-selection). Search an
+  ordered yes-or-no boundary with [binary
+  search](#c136-binary-search). Move related positions with [two
+  pointers](#c139-two-pointers). Track one consecutive range with a
+  [sliding window](#c1314-sliding-window). Find exact repeated text
+  with [string matching](#c137-string-matching). Read input whose
+  meaning changes by phase with [parsing and state
+  machines](#c138-parsing-and-state-machines). Find the best
+  consecutive sum with [Kadane's
+  algorithm](#c1312-kadanes-algorithm-best-subarray-scan). Find a
+  linked-list cycle, middle, or gap with [fast and slow
   pointers](#c1332-fast-and-slow-pointers).
-- **Waiting order:** newest first suggests a [stack](#c1313-stack);
-  smallest, largest, or most urgent first a
-  [heap](#c1327-heap-or-priority-queue); nearest greater or smaller a
-  [monotonic stack](#c1328-monotonic-stack); and a moving-window
-  extreme a [monotonic deque](#c1329-monotonic-deque).
+- **Waiting order:** Use a [stack](#c1313-stack) when the newest item
+  comes out first. For the smallest, largest, or most urgent item, use
+  a [heap](#c1327-heap-or-priority-queue). Use a
+  [monotonic stack](#c1328-monotonic-stack) to find the nearest larger
+  or smaller value. Use a [monotonic
+  deque](#c1329-monotonic-deque) to keep the smallest or largest value
+  in a moving range.
 
 ##### Step-by-step examples
 
 For sorted values `[1, 2, 4, 7, 11]`, target `9`, and a request for
 any pair of values, the expected output may be `[2, 7]`.
 
-1.  **Check: Output.** **Before:** no method is chosen. **Decision:**
-    only values, not original positions, are required. **After:**
-    reordering would be allowed, though the input is already sorted.
-    **Known correct:** index preservation is not a constraint.
-2.  **Check: Shape.** **Before:** the input is a sorted sequence.
-    **Decision:** a sum that is too small can be increased by moving
-    the left position; a sum that is too large can be decreased by
-    moving the right one. **After:** two pointers is a candidate.
-    **Known correct:** sorted order can justify each discard.
-3.  **Check: Limits.** **Before:** a pair-by-pair scan would take
-    quadratic work. **Decision:** for `n=100,000`, reject that scan
-    and retain the linear two-pointer method. **After:** open its card
-    and verify the invariant. **Known correct:** the candidate fits
-    the input limit.
+1.  **Check: Output**
+    - **Before:** No method is chosen.
+    - **Decision:** Only values, not original positions, are required.
+    - **After:** Reordering would be allowed, though the input is
+      already sorted.
+    - **Known correct:** Original positions are not part of the
+      requested answer.
+2.  **Check: Shape**
+    - **Before:** The input is a sorted sequence.
+    - **Decision:** A sum that is too small can be increased by moving
+      the left position; a sum that is too large can be decreased by
+      moving the right position.
+    - **After:** Keeping one position at each end is a possible
+      method.
+    - **Known correct:** Sorted order can justify discarding pairs
+      after each move.
+3.  **Check: Limits**
+    - **Before:** Checking every pair can take about `n*n` checks.
+    - **Decision:** With `n=100,000`, that could be about ten billion
+      checks, so reject it. Moving each end position only inward takes
+      at most one pass.
+    - **After:** Open the two-pointer card and verify why each move is
+      safe.
+    - **Known correct:** The remaining method can fit the input size.
 
 For unsorted `[2, 7, 11, 15]` when original indices are required,
 sorting would hide the requested positions unless pairs are copied.
@@ -5572,28 +6035,27 @@ map](#c134-hash-map-or-set), which preserves scan positions.
 
 ##### Why it works
 
-The guide never proves an algorithm merely by naming it. It preserves
-the fact that every surviving candidate still matches the stated
-input, output, mutation, and resource conditions. The chosen card must
-then supply the algorithm-specific proof. Each answered question
-removes at least one unknown, so the selection process finishes; if no
-card's assumptions hold, returning to the direct method is the correct
-outcome.
+Naming an algorithm does not prove that it works. Each question keeps
+only methods that still match the input, required output, permission
+to change data, and available time and memory. The chosen card must
+then explain why that specific method gives the right answer. If none
+of the cards fit, use the simple direct method instead.
 
 ##### Go example
 
-Selection produces a plan rather than reusable code. After the example
-above, the complete Go implementation belongs to [E.9 Sorted
-two-pointer pair search](#e9-sorted-two-pointer-pair-search); an
-index-preserving version would instead use the map behavior in [D.4
-Map presence and sets](#d4-map-presence-and-sets).
+Selection produces a plan rather than reusable code. For the example
+above, see [E.9 Sorted two-pointer pair
+search](#e9-sorted-two-pointer-pair-search). A version needing the
+original positions would use the map behavior explained in
+[D.4 Map presence and sets](#d4-map-presence-and-sets).
 
 ##### Work and memory
 
-Answering the questions is constant-sized planning work. It does not
-change the selected algorithm's cost. Count preprocessing such as
-sorting, retained maps or queues, recursion, and output separately
-when comparing candidates.
+Answering these few questions is a planning step, not part of the
+algorithm's running time. When comparing methods, count setup work
+such as sorting, extra storage such as maps or queues, unfinished
+function calls from recursion, and the work needed to build the
+output.
 
 ##### When to use it
 
@@ -5612,15 +6074,16 @@ may be the right fit.
 > `[1, 3, 4]` and target `6` defeat "always take the largest coin":
 > `4+1+1` loses to `3+3`.
 
-Empty input, streaming input, immutable input, duplicate values,
-negative values, and output that may itself be exponential can each
-change which branch is feasible.
+An empty input, values that arrive over time, an input that cannot be
+changed, repeated or negative values, and an extremely large output
+can each change which method is practical.
 
 ##### Related material
 
 - [C.1.2 Derive a direction before naming a
   pattern](#c12-derive-a-direction-before-naming-a-pattern) starts
-  from a direct solution when no branch is obvious.
+  from a direct solution when the first questions do not select a
+  clear method.
 - [C.1.4 Choosing among overlapping
   methods](#c14-choosing-among-overlapping-methods) compares methods
   that survive the first questions.
@@ -5632,26 +6095,27 @@ change which branch is feasible.
 
 ##### The problem it solves
 
-When no method is obvious, guessing names encourages an unjustified
-solution. The useful starting point is a correct direct process and
-the work it repeats.
+When no method stands out, guessing algorithm names does not explain
+why a solution works. Start with the simplest correct process and
+look for work that it repeats.
 
 ##### The idea in simple terms
 
-Solve a tiny input by hand, describe the simplest correct algorithm,
-and mark repeated calculations or discarded information. Those
-observations give a direction before a formal pattern name does.
+Solve a tiny input by hand. Describe the simplest correct algorithm,
+then mark calculations it repeats or information it throws away. Those
+details point toward an improvement before you need to recall a formal
+method name.
 
 ##### How it works
 
 1.  State the direct method and why it covers every answer.
 2.  Trace it on a tiny input.
-3.  Circle work performed more than once or state rebuilt from
-    scratch.
+3.  Mark work performed more than once or remembered information
+    rebuilt from scratch.
 4.  Ask whether that work can be updated, saved, ordered, or safely
     skipped.
-5.  Select at most two cards and test their assumptions on the same
-    input.
+5.  Select at most two cards and check their requirements against the
+    same input.
 
 During timed practice: write the direct method in the first five
 minutes, use the guide at five minutes, inspect a relevant card at ten
@@ -5660,47 +6124,56 @@ then read a full explanation if still blocked.
 
 ##### Step-by-step examples
 
-For `[2, 4, 1, 3]`, suppose many queries ask for the sum from `left`
-through `right`; one query asks for indices `1..3`, whose expected
-result is `8`.
+For `[2,4,1,3]`, suppose many queries ask for the sum from index
+`left` through index `right`, including both ends. One query uses
+`left=1` and `right=3`, so it asks for `4+1+3` and should return `8`.
 
-1.  **Direct attempt.** **Before:** no saved totals exist.
-    **Decision:** add `4+1+3`. **After:** return `8`. **Known
-    correct:** every value in the range was counted once.
-2.  **Repeated work.** **Before:** a later query asks for `0..2`.
-    **Decision:** notice that `2+4+1` repeats additions used by the
-    first query. **After:** the repeated prefix is identified. **Known
-    correct:** the direct method works but rebuilds overlapping
-    totals.
-3.  **Direction.** **Before:** totals always begin at index `0`.
-    **Decision:** save `[0,2,6,7,10]` and recover `1..3` as `10-2`.
-    **After:** prefix sums is a justified candidate. **Known
-    correct:** subtraction removes exactly the values before `left`.
+1.  **Step: Direct attempt**
+    - **Before:** No saved totals exist.
+    - **Decision:** Add values at indexes `1`, `2`, and `3`:
+      `4+1+3`.
+    - **After:** Return `8`.
+    - **Known correct:** Every value in the requested range was
+      counted once.
+2.  **Step: Notice repeated work**
+    - **Before:** A later query asks for indexes `0` through `2`.
+    - **Decision:** Adding `2+4+1` repeats additions that the first
+      query already used.
+    - **After:** The overlapping work is identified.
+    - **Known correct:** The direct method still works, but every
+      query rebuilds totals from individual values.
+3.  **Step: Save totals from the beginning**
+    - **Before:** No running totals are stored.
+    - **Decision:** Store `[0,2,6,7,10]`. Entry `i` is the sum of all
+      values before index `i`.
+    - **After:** The total through index `3` is `10`; the total before
+      index `1` is `2`; subtracting gives `8`.
+    - **Known correct:** Subtraction removes exactly the values before
+      `left`, leaving indexes `1` through `3`.
 
-For one query only, preprocessing may cost as much as the direct scan.
+For one query only, the setup may cost as much as the direct scan.
 The observation then does not justify extra storage.
 
 ##### Why it works
 
-The direct method is the coverage baseline: every proposed
-optimization must produce the same answer while removing only proven
-repetition. The fact that remains true is that each transformation
-preserves the direct method's set of considered answers. The process
-ends after a bounded list of observations; if none yields a safe
-improvement, retain the direct solution.
+The direct method checks every possible answer, so any faster method
+must still consider the same possibilities or prove why some can be
+ignored. Each proposed change must return the same result while
+removing only work known to be unnecessary. If no safe improvement is
+clear, keep the direct solution.
 
 ##### Go example
 
-The derived prefix representation and its Go boundary conventions are
-owned by [C.1.3.15 Prefix sums](#c1315-prefix-sums). This selection
-procedure itself does not add runtime code.
+The [prefix sums](#c1315-prefix-sums) entry explains the saved totals
+and their Go index rules. This planning process itself does not add
+runtime code.
 
 ##### Work and memory
 
-Tracing a small example is constant-sized planning work. The selected
-method's analysis must include any setup introduced to avoid
-repetition; in the example, building prefixes costs linear time and
-memory before constant-time queries.
+Tracing a small example is planning work. The final cost must include
+any setup added to avoid repetition. In this example, building the
+saved totals takes work and memory proportional to the input size;
+each later range query then takes constant time.
 
 ##### When to use it
 
@@ -5719,8 +6192,9 @@ failure modes without useful savings.
 > loops may process disjoint items, while one nested loop may
 > repeatedly rebuild the same range sum.
 
-Check zero queries, one query, empty input, output-size lower bounds,
-and whether saved state becomes invalid after updates.
+Check zero queries, one query, empty input, the unavoidable size of
+the output, and whether saved information becomes invalid after
+updates.
 
 ##### Related material
 
@@ -5736,11 +6210,11 @@ and whether saved state becomes invalid after updates.
 
 #### C.1.3 Pattern cards
 
-Each card is the complete conceptual reference for its method: what to
-picture, when it fits, how to begin, why it is safe, and when to
-reject it. The cards are deliberately method-level rather than
-problem-specific, so they help produce a first attempt without
-revealing a judge solution.
+Each card explains one method: what to picture, when to use it, how to
+start, why it works, and when to choose something else. The cards
+describe reusable methods rather than answers to individual problems,
+so they can guide a first attempt without giving away a judge
+solution.
 
 Jump directly to a card:
 
@@ -5798,7 +6272,7 @@ prefix**; checking it from left to right is a **common-prefix scan**.
 For strings treated as bytes:
 
 1.  If there are no strings, return the empty string.
-2.  Use the first string as the candidate. For each `column` in that
+2.  Use the first string as the reference. For each `column` in that
     string, remember its byte as `expected`.
 3.  For every later `row`, first check that the string reaches
     `column`, then compare its byte with `expected`.
@@ -5824,7 +6298,7 @@ For `strs = ["flower", "flow", "flight"]`, the expected output is
     - **Before:** `expected='f'`
     - **Decision:** `"flow"[0]` is `'f'`, so continue.
     - **After:** Row advances to `2`.
-    - **Known correct:** Rows `0..1` match at column `0`.
+    - **Known correct:** Rows `0` and `1` match at column `0`.
 3.  **Check: Row `2`, column `0`**
     - **Before:** `expected='f'`
     - **Decision:** `"flight"[0]` is `'f'`; the whole column matches.
@@ -5834,7 +6308,7 @@ For `strs = ["flower", "flow", "flight"]`, the expected output is
     - **Before:** `expected='l'`
     - **Decision:** `"flow"[1]` is `'l'`, so continue.
     - **After:** Row advances to `2`.
-    - **Known correct:** Rows `0..1` match at column `1`.
+    - **Known correct:** Rows `0` and `1` match at column `1`.
 5.  **Check: Row `2`, column `1`**
     - **Before:** `expected='l'`
     - **Decision:** `"flight"[1]` is `'l'`; the whole column matches.
@@ -5844,7 +6318,7 @@ For `strs = ["flower", "flow", "flight"]`, the expected output is
     - **Before:** `expected='o'`
     - **Decision:** `"flow"[2]` is `'o'`, so continue.
     - **After:** Row advances to `2`.
-    - **Known correct:** Rows `0..1` match at column `2`.
+    - **Known correct:** Rows `0` and `1` match at column `2`.
 7.  **Check: Row `2`, column `2`**
     - **Before:** `expected='o'`
     - **Decision:** `"flight"[2]` is `'i'`, a mismatch.
@@ -5860,7 +6334,7 @@ choosing a candidate.
 ###### Why it works
 
 Before each `column`, every string shares exactly the already-proven
-candidate `strs[0][:column]`. This fact is true initially because
+part `strs[0][:column]`. This fact is true initially because
 every string has the empty prefix. If every row reaches the column and
 matches `expected`, appending that byte preserves the fact. If a row
 ends or differs, a prefix containing that column cannot be shared, and
@@ -5874,9 +6348,9 @@ exist because the first string itself ends there.
 
 ###### Go example
 
-The complete implementation is owned by [E.7 Common-prefix
+The complete implementation is in [E.7 Common-prefix
 scan](#e7-common-prefix-scan). Its variables `column`, `row`, and
-`expected` match the trace above, and its contract states that it
+`expected` match the trace above. Its documented rules say that it
 compares byte prefixes and returns `""` for empty input.
 
 ###### Work and memory
@@ -5924,7 +6398,7 @@ not for arbitrary input order.
 
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants)
   explains the proof structure used by the proven prefix.
-- [E.7 Common-prefix scan](#e7-common-prefix-scan) owns the complete
+- [E.7 Common-prefix scan](#e7-common-prefix-scan) provides a complete
   Go implementation.
 - [D.6 Bytes, runes, and visible
   characters](#d6-bytes-runes-and-visible-characters) explains how to
@@ -5950,21 +6424,29 @@ habit.
 
 ###### How it works
 
-State which neighbor controls the rule, start at that edge, process
-the first item explicitly, and retain only the neighbor information
-required by the next position.
+State which neighbor controls the rule. Start at the edge that lets
+us know that neighbor, process the edge item explicitly, and remember
+only the neighbor information required by the next position.
 
 ###### Step-by-step examples
 
-For Roman values `[1, 5]` (`IV`), the expected total is `4`.
+In the Roman numeral `IV`, `I` has value `1` and `V` has value `5`.
+A smaller value immediately before a larger value is subtracted, so
+the input values `[1,5]` should produce `4`. Scanning from right to
+left makes the right neighbor available.
 
-1.  **Position `1`.** **Before:** `total=0`, no right value.
-    **Decision:** add the rightmost `5`. **After:** `total=5`,
-    `right=5`. **Known correct:** the processed suffix has value `5`.
-2.  **Position `0`.** **Before:** current `1`, `right=5`.
-    **Decision:** subtract `1` because it is smaller than the value to
-    its right. **After:** `total=4`, `right=1`. **Known correct:** the
-    whole input is valued correctly.
+1.  **Position `1`**
+    - **Before:** `total=0`; there is no value to the right.
+    - **Decision:** Add the rightmost value `5`.
+    - **After:** `total=5`, `right=5`.
+    - **Known correct:** The processed ending part has value `5`.
+2.  **Position `0`**
+    - **Before:** Current value is `1`; `right=5`.
+    - **Decision:** Subtract `1` because it is smaller than the value
+      immediately to its right.
+    - **After:** `total=4`, `right=1`.
+    - **Known correct:** Every input value has been processed under
+      the Roman numeral rule.
 
 For one value `[5]`, add it directly; a nonexistent neighbor must not
 be read.
@@ -6008,7 +6490,7 @@ should subtract.
 
 ###### Related material
 
-- [E.8 Directional scan](#e8-directional-scan) owns the Go
+- [E.8 Directional scan](#e8-directional-scan) explains the Go
   implementation.
 - [Roman to
   Integer](problems/solved_easy_leetcode_0013_roman_to_integer.go) is
@@ -6023,36 +6505,48 @@ should subtract.
 ###### The problem it solves
 
 The statement gives an ordered process: movement, rounds, formatting,
-or board updates, and asks for the state or output after those rules
-run.
+or board updates. It asks for the complete current description or the
+output after those rules run.
 
 ###### The idea in simple terms
 
-Write down only what the process currently needs, then apply one rule
-at a time. This direct execution is called **simulation**.
+Write down only what the process currently needs, such as a position
+and direction, then apply one rule at a time. The stored current
+description is called the **state**. Directly executing the rules is
+called **simulation**.
 
 ###### How it works
 
-Name every state field, define one transition, preserve old state when
-updates are simultaneous, and choose a progress measure such as unread
-commands. The robot example accepts only `move` and `right`;
-unsupported commands must be rejected at the input boundary rather
-than treated as movement.
+Name every stored field and define how one command changes those
+fields. One such change is a **transition**. Preserve the old values
+when updates are simultaneous, and choose something that always moves
+toward completion, such as the number of unread commands. The robot
+example accepts only `move` and `right`; it rejects any other command
+instead of treating it as movement.
 
 ###### Step-by-step examples
 
 A robot begins at `(0,0)` facing north. For `move, right, move`,
 expect position `(1,1)` facing east.
 
-1.  **First `move`.** **Before:** `(0,0,north)`. **Decision:** north
-    adds one to `y`. **After:** `(0,1,north)`. **Known correct:** one
-    command is simulated.
-2.  **`right`.** **Before:** `(0,1,north)`. **Decision:** rotate
-    without moving. **After:** `(0,1,east)`. **Known correct:** two
-    commands are simulated.
-3.  **Final `move`.** **Before:** `(0,1,east)`. **Decision:** east
-    adds one to `x`. **After:** `(1,1,east)`. **Known correct:** all
-    commands are simulated.
+1.  **Command: First `move`**
+    - **Before:** Position `(0,0)`, facing north.
+    - **Decision:** Moving north adds one to `y`.
+    - **After:** Position `(0,1)`, facing north.
+    - **Known correct:** The stored values match the process after one
+      command.
+2.  **Command: `right`**
+    - **Before:** Position `(0,1)`, facing north.
+    - **Decision:** Turn east without changing either coordinate.
+    - **After:** Position `(0,1)`, facing east.
+    - **Known correct:** The stored values match the process after two
+      commands.
+3.  **Command: Final `move`**
+    - **Before:** Position `(0,1)`, facing east.
+    - **Decision:** Moving east adds one to `x`.
+    - **After:** Position `(1,1)`, facing east.
+    - **Known correct:** All three commands have been applied in
+      order.
 
 With no commands, the starting state is also the final state.
 
@@ -6097,8 +6591,8 @@ func runRobot(commands []string) (robot, bool) {
 }
 ```
 
-Direction values `0..3` mean north, east, south, and west. The boolean
-is false when a command is neither `move` nor `right`.
+Direction values `0` through `3` mean north, east, south, and west.
+The boolean is false when a command is neither `move` nor `right`.
 
 ###### Work and memory
 
@@ -6118,7 +6612,7 @@ safe jump to a later state.
 
 ###### Common mistakes and edge cases
 
-> **Warning:** A simultaneous update must read the old snapshot.
+> **Warning:** A simultaneous update must read the old values.
 > Updating one cell early can make a later cell observe the wrong
 > round.
 
@@ -6150,20 +6644,28 @@ with values; a **set** stores only whether each key exists.
 
 ###### How it works
 
-Define the key and stored meaning, decide whether to query before
-insertion, and specify whether duplicates keep the first position,
-last position, count, or a collection.
+Define the key and what is stored under it. Decide whether lookup must
+happen before insertion. Specify whether a repeated key keeps its
+first position, last position, count, or a collection of values. In a
+pair-sum problem, the **complement** of `value` is `target-value`, the
+other value needed to reach the target.
 
 ###### Step-by-step examples
 
 For `[2,7,11,15]` and target `9`, expect indices `[0,1]`.
 
-1.  **Index `0`.** **Before:** `seen={}`. **Decision:** complement `7`
-    is absent; store `2 -> 0`. **After:** `seen={2:0}`. **Known
-    correct:** no earlier pair ends at index `0`.
-2.  **Index `1`.** **Before:** value `7`, `seen={2:0}`. **Decision:**
-    complement `2` exists at `0`. **After:** return `[0,1]`. **Known
-    correct:** those values sum to `9` and use distinct positions.
+1.  **Index `0`**
+    - **Before:** Current value is `2`; `seen={}`.
+    - **Decision:** Needed value `9-2=7` is absent, so store `2 -> 0`.
+    - **After:** `seen={2:0}`.
+    - **Known correct:** No earlier position exists, so no pair can
+      end at index `0`.
+2.  **Index `1`**
+    - **Before:** Current value is `7`; `seen={2:0}`.
+    - **Decision:** Needed value `9-7=2` exists at index `0`.
+    - **After:** Return `[0,1]`.
+    - **Known correct:** Values `2` and `7` total `9`, and their
+      positions are distinct.
 
 For `[3,3]`, querying before insertion lets the second `3` find the
 first while preventing index `0` from pairing with itself.
@@ -6199,8 +6701,11 @@ func pairIndices(values []int, target int) (int, int, bool) {
 
 ###### Work and memory
 
-The scan takes expected `O(n)` time and up to `O(n)` extra memory.
-Individual hash operations are not promised worst-case constant time.
+The scan performs one lookup and at most one insertion per input
+value. For ordinary, non-adversarial keys, Go maps usually make each
+operation take a fixed amount of time. This gives expected `O(n)`
+total time, but it is not a worst-case promise for every operation.
+The map uses up to `O(n)` extra memory.
 
 ###### When to use it
 
@@ -6226,8 +6731,8 @@ cannot collapse into one target.
 
 ###### Related material
 
-- [D.4 Map presence and sets](#d4-map-presence-and-sets) owns Go map
-  behavior.
+- [D.4 Map presence and
+  sets](#d4-map-presence-and-sets) explains Go map behavior.
 - [Two Sum](problems/solved_easy_leetcode_0001_two_sum.go) is the
   representative problem.
 - [C.1.3.33 Trie](#c1333-trie) supports shared-prefix lookup.
@@ -6249,20 +6754,29 @@ requested rank such as the third smallest.
 
 ###### How it works
 
-Define a consistent comparison and tie rule, preserve original
-positions when needed, then either sort everything or partition around
-a pivot and continue only on the side containing the desired rank.
+Define how to compare items and how to order ties. Keep original
+positions when the answer needs them. Then either sort everything or
+choose one value, called a **pivot**, and place smaller values on one
+side and larger values on the other. Continue only on the side that
+contains the requested position. This partial rearrangement is called
+**partitioning**.
 
 ###### Step-by-step examples
 
 To detect a duplicate in `[4,1,4,2]`, expect `true`.
 
-1.  **Sort.** **Before:** equal `4`s are separated. **Decision:**
-    order values. **After:** `[1,2,4,4]`. **Known correct:** equal
-    values are adjacent.
-2.  **Scan.** **Before:** positions `0..2` have no equal neighbors.
-    **Decision:** compare the final `4,4`. **After:** return `true`.
-    **Known correct:** a duplicate exists.
+1.  **Step: Sort**
+    - **Before:** Equal values `4` are separated.
+    - **Decision:** Put all values in increasing order.
+    - **After:** `[1,2,4,4]`.
+    - **Known correct:** Sorting places equal values next to each
+      other.
+2.  **Step: Compare neighbors**
+    - **Before:** Pairs `(1,2)` and `(2,4)` differ.
+    - **Decision:** Compare the final neighboring pair `(4,4)`.
+    - **After:** Return `true`.
+    - **Known correct:** Two separate input positions contain the same
+      value.
 
 For selection in `[4,1,3,2]`, partitioning around `3` may produce
 `[1,2 | 3 | 4]`; `3` is already the third-smallest value. Equal keys
@@ -6270,10 +6784,11 @@ require a defined rank convention and careful partition progress.
 
 ###### Why it works
 
-Sorting creates a monotonic relationship: after a scan proves a
-candidate too small, early, or disjoint, later ordered items cannot
-reverse that fact. Quickselect's pivot reaches its final rank, so the
-side not containing the requested rank can be discarded.
+Sorting creates a one-direction relationship: once a scan proves a
+value too small, too early, or separate from the current group, later
+ordered values cannot reverse that fact. Quickselect's pivot reaches
+its final position in sorted order, so the side not containing the
+requested rank can be discarded.
 
 ###### Go example
 
@@ -6298,11 +6813,12 @@ before sorting.
 
 ###### Work and memory
 
-Comparison sorting uses `O(n log n)` time; the copy above uses `O(n)`
-memory. Quickselect has expected `O(n)` time but `O(n^2)` worst-case
-time with poor pivots. Counting over a small key range `k` costs
-`O(n+k)` time and `O(k)` memory. Returning an ordered copy also needs
-`O(n)` output space.
+Comparison sorting uses `O(n log n)` time. The copied slice above uses
+`O(n)` memory. Quickselect usually performs work proportional to `n`,
+written expected `O(n)`, but repeatedly choosing a pivot near one end
+can cause `O(n^2)` work. Counting over a small range of `k` possible
+keys takes `O(n+k)` time and `O(k)` memory. Returning an ordered copy
+also needs `O(n)` output space.
 
 ###### When to use it
 
@@ -6319,8 +6835,8 @@ simpler.
 ###### Common mistakes and edge cases
 
 > **Warning:** `sort.Ints` and `sort.Slice` mutate their slices. Copy
-> when the caller's order must survive; use stable sorting when equal
-> records must keep their relative order.
+> when the caller's order must survive. Use **stable sorting** when
+> equal records must also remain in their original relative order.
 
 A comparator must be consistent and include required tie-breaking. A
 huge key range makes counting storage impractical.
@@ -6328,8 +6844,8 @@ huge key range makes counting storage impractical.
 ###### Related material
 
 - [D.3 Sorting without unexpected
-  mutation](#d3-sorting-without-unexpected-mutation) owns Go mutation
-  details.
+  mutation](#d3-sorting-without-unexpected-mutation) explains when Go
+  sorting changes the caller's slice.
 - [C.1.3.27 Heap or priority queue](#c1327-heap-or-priority-queue)
   compares streaming top-`k` work.
 - [C.1.3.30 Intervals](#c1330-intervals) uses sorted starts.
@@ -6353,36 +6869,55 @@ all failures followed by all successes.
 
 ###### How it works
 
-Define precisely what `left` and `right` include. A range written as
-`[left, right)` includes `left` but excludes `right`. For that kind of
-range, test `middle = left + (right-left)/2` and keep the half that
-can still contain the boundary. Decide which side retains an equal
-value based on whether the first or last valid position is required.
+Define precisely what `left` and `right` mean. A range written as
+`[left,right)` includes `left` but excludes `right`. Here it contains
+the positions not yet classified. Positions before `left` are known
+to fail the test. Position `right` and positions after it are known to
+pass, or `right` equals the position just after the slice. Test
+`middle = left+(right-left)/2`. A failed middle moves `left` past it;
+a successful middle becomes the new `right`. Equality belongs on the
+side required by the first-or-last-position question.
 
 ###### Step-by-step examples
 
 For `[1,3,3,5]`, find the first value at least `3`; expect index `1`.
 
-1.  **Range `[0,4)`.** **Before:** every possible boundary is
-    retained. **Decision:** middle `2` has value `3`, so keep `[0,2)`.
-    **After:** `right=2`. **Known correct:** positions `2..3` cannot
-    be the first valid position.
-2.  **Range `[0,2)`.** **Before:** positions `0..1` remain.
-    **Decision:** middle `1` is valid, so keep `[0,1)`. **After:**
-    `right=1`. **Known correct:** position `1` is still possible.
-3.  **Range `[0,1)`.** **Before:** only position `0` is unclassified.
-    **Decision:** value `1` is too small, so set `left=1`. **After:**
-    the range is empty at `1`. **Known correct:** index `1` is the
-    first valid position.
+1.  **Range: `[0,4)`**
+    - **Before:** Positions `0` through `3` are unchecked; position
+      `4` is the after-the-slice boundary.
+    - **Decision:** Middle position `2` has value `3`, so a first
+      valid position cannot be later than `2`. Set `right=2`.
+    - **After:** `left=0`, `right=2`.
+    - **Known correct:** Positions `0` and `1` remain unchecked;
+      position `2` is the earliest known success.
+2.  **Range: `[0,2)`**
+    - **Before:** Positions `0` and `1` are unchecked; position `2`
+      is known to succeed.
+    - **Decision:** Middle position `1` has value `3`, so set
+      `right=1`.
+    - **After:** `left=0`, `right=1`.
+    - **Known correct:** Position `0` remains unchecked; position `1`
+      is now the earliest known success.
+3.  **Range: `[0,1)`**
+    - **Before:** Position `0` is unchecked; position `1` is known to
+      succeed.
+    - **Decision:** Its value `1` is too small, so set `left=1`.
+    - **After:** `left=1`, `right=1`; no unchecked position remains.
+    - **Known correct:** Position `0` failed and position `1` is the
+      first valid position.
 
 For an empty slice, the same half-open bounds start and finish at `0`,
 the insertion position.
 
 ###### Why it works
 
-Before every test, the first acceptable position lies in
-`[left, right)`. Each update discards only positions proved too early
-or too late; when the range is empty, `left` is the boundary.
+Before every test, positions before `left` are known failures, while
+`right` is the earliest known success or the position after the
+slice. Only positions in `[left,right)` remain unchecked. A failed
+middle and everything before it can move left of `left`. A successful
+middle becomes the new earliest known success. Each update makes the
+unchecked range smaller. When it is empty, the failure and success
+boundaries meet, so `left` is the first acceptable position.
 
 In data such as `[4, 5, 6, 1, 2, 3]`, the whole range is not sorted,
 but at least one side of the middle is. Identify that side and use its
@@ -6406,8 +6941,10 @@ variables match this trace.
 
 ###### Work and memory
 
-Each test removes about half of the remaining positions, so a
-loop-based search takes `O(log n)` time and `O(1)` extra memory.
+Each test removes about half of the remaining positions. After `k`
+tests, roughly `n/2^k` positions remain, so the number of tests grows
+as `log n`. A loop-based search therefore takes `O(log n)` time and
+uses `O(1)` extra memory.
 
 ###### When to use it
 
@@ -6418,8 +6955,8 @@ not enough.
 
 ###### When not to use it
 
-Testing a later candidate can change from yes back to no, or the
-middle test cannot prove that one entire half is impossible.
+Testing a later value can change from yes back to no, or the middle
+test cannot prove that one entire half is impossible.
 
 ###### Common mistakes and edge cases
 
@@ -6429,7 +6966,7 @@ input; wrapped input needs the separate sorted-side rule.
 
 ###### Related material
 
-- [E.1 Binary search bounds](#e1-binary-search-bounds) owns the Go
+- [E.1 Binary search bounds](#e1-binary-search-bounds) explains the Go
   implementation.
 - [Search Insert Position](
   problems/solved_easy_leetcode_0035_search_insert_position.go
@@ -6450,7 +6987,9 @@ comparing text already understood.
 ###### The idea in simple terms
 
 Search a text for an exact pattern while remembering how much of the
-pattern is still useful after a mismatch.
+pattern is still useful after a mismatch. The
+**Knuth-Morris-Pratt algorithm (KMP)** prepares that reuse information
+from the pattern before scanning the text.
 
 ###### How it works
 
@@ -6459,13 +6998,15 @@ visible symbols; the example uses bytes. For a direct search, try
 every possible start and compare left to right until the pattern
 matches or one byte differs.
 
-For Knuth-Morris-Pratt (KMP), first build a table for the pattern. At
-each pattern position, the table records the length of the longest
-proper prefix that is also a suffix of the pattern ending there. While
-scanning the text, advance `matched` on equality. On a mismatch, use
-the table to shorten `matched` to the next possible reusable prefix
-without moving the text position backward. Define the empty-pattern
-result before the scan.
+A **prefix** begins at the pattern's first byte. A **suffix** ends at
+its last byte. A **proper prefix** is shorter than the whole piece.
+KMP first builds a table for the pattern. For each ending position,
+the table records the length of the longest proper prefix that is also
+a suffix there. During the text scan, `matched` is the number of
+starting pattern bytes that currently equal the ending bytes of the
+processed text. On a mismatch, the table shortens `matched` to the
+next possible reusable beginning without moving backward in the text.
+Decide what an empty pattern means before scanning.
 
 For a rolling hash, maintain a numeric fingerprint for each
 pattern-sized text window. Equal fingerprints select candidates, but
@@ -6474,38 +7015,41 @@ can collide.
 
 ###### Step-by-step examples
 
-Search for `abab` in `ababab`; expect index `0`.
+Search for pattern `"ababac"` in text `"abababac"`. The expected
+starting index is `2`.
 
-1.  **Start `0`.** **Before:** `matched=0`. **Decision:** compare `a`,
-    `b`, `a`, and `b`; all agree. **After:** `matched=4`. **Known
-    correct:** the pattern occurs at index `0`.
+1.  **Step: Prepare the pattern table**
+    - **Before:** Pattern is `"ababac"`.
+    - **Decision:** For every ending position, record the longest
+      shorter beginning that also appears at that ending.
+    - **After:** Table is `[0,0,1,2,3,0]`.
+    - **Known correct:** After matching `"ababa"`, a mismatch can
+      retain its ending `"aba"`, whose length is `3`.
+2.  **Step: Match the first five text bytes**
+    - **Before:** `textIndex=0`, `matched=0`.
+    - **Decision:** Text `"ababa"` equals the first five pattern
+      bytes.
+    - **After:** `textIndex=5`, `matched=5`.
+    - **Known correct:** The processed text ends with the matched
+      pattern prefix `"ababa"`.
+3.  **Step: Reuse after the mismatch**
+    - **Before:** Text byte `text[5]='b'` differs from
+      `pattern[5]='c'`.
+    - **Decision:** Use table entry `3`; keep the matching ending
+      `"aba"` and do not advance `textIndex`.
+    - **After:** `textIndex=5`, `matched=3`.
+    - **Known correct:** The kept three text bytes still equal the
+      first three pattern bytes.
+4.  **Step: Finish the reused match**
+    - **Before:** Remaining text is `"bac"`; unmatched pattern part
+      is also `"bac"`.
+    - **Decision:** Match all three bytes.
+    - **After:** `textIndex=8`, `matched=6`; return `8-6=2`.
+    - **Known correct:** Six consecutive text bytes starting at index
+      `2` equal the complete pattern.
 
-For pattern `abac` at start `0`, the first three bytes match and the
-fourth fails. A direct scan restarts at the next start; KMP instead
-keeps the longest matched suffix that is also a pattern prefix. An
-empty pattern needs an explicitly defined result.
-
-The Knuth-Morris-Pratt algorithm, usually called **KMP**, avoids
-restarting the pattern from zero after every mismatch. A **prefix**
-begins at the pattern's first character; a **suffix** ends at its last
-character. A **proper prefix** is shorter than the complete string. A
-piece that is both a prefix and suffix is sometimes called a
-**border**.
-
-For pattern `ababac` and text beginning `ababab`, the first five
-characters `ababa` match before pattern character `c` disagrees with
-text character `b`. The matched text ends with `aba`, which is also
-the pattern's first three characters. KMP keeps those three useful
-matches and continues instead of restarting at zero. A table prepared
-from the pattern records how many characters remain useful after each
-mismatch.
-
-KMP's invariant is that the first `matched` pattern bytes equal the
-ending of the text processed so far. On mismatch, the table shortens
-`matched` to the next possible border without moving the text position
-backward. Each text position advances once, so a text of length `n`
-and pattern of length `m` takes `O(n + m)` time and the table uses
-`O(m)` memory.
+An empty pattern returns index `0`. A pattern longer than the text
+returns `-1` after the text ends.
 
 A hash is a compact numeric fingerprint. Maintain the fingerprint for
 the current length-`m` text window by removing the outgoing
@@ -6535,17 +7079,46 @@ a collision.
 ###### Go example
 
 ```go
-func firstMatch(text, pattern string) int {
-	// strings.Index searches for the first exact byte substring and
-	// returns -1 when pattern does not occur; an empty pattern matches
-	// at index zero.
-	return strings.Index(text, pattern)
+func firstMatchKMP(text, pattern string) int {
+	if len(pattern) == 0 {
+		return 0
+	}
+
+	// prefixLengths[i] is the longest proper prefix of pattern that
+	// also ends at i.
+	prefixLengths := make([]int, len(pattern))
+	for current, matched := 1, 0; current < len(pattern); {
+		if pattern[current] == pattern[matched] {
+			matched++
+			prefixLengths[current] = matched
+			current++
+		} else if matched > 0 {
+			matched = prefixLengths[matched-1]
+		} else {
+			current++
+		}
+	}
+
+	for textIndex, matched := 0, 0; textIndex < len(text); {
+		if text[textIndex] == pattern[matched] {
+			textIndex++
+			matched++
+			if matched == len(pattern) {
+				return textIndex - matched
+			}
+		} else if matched > 0 {
+			// Reuse the longest possible matching ending without moving
+			// backward in the text.
+			matched = prefixLengths[matched-1]
+		} else {
+			textIndex++
+		}
+	}
+	return -1
 }
 ```
 
-This complete one-off byte search requires `import "strings"`. Use KMP
-when the exercise or worst-case guarantee requires its saved-border
-table.
+The code compares bytes. It needs no imports.
 
 ###### Work and memory
 
@@ -6600,6 +7173,10 @@ The parser is always in one of a small number of modes, and the
 current input symbol determines the next mode and any action. The mode
 summarizes exactly what prefixes are legal so far.
 
+A fixed collection of modes and rules for moving between them is a
+**state machine**. Here, the state includes the current parsing mode,
+number, and sign remembered so far.
+
 Here, a **grammar** is the set of arrangements the input permits. A
 **token** is one meaningful piece, such as a number, name, or
 operator. **Tokenization** splits characters into those pieces;
@@ -6625,21 +7202,39 @@ positive limit.
 Parse `"  -42x"` with the rule
 `space -> optional sign -> digits -> stop`; expect `-42`.
 
-1.  **Spaces.** **Before:** state is `leading space`. **Decision:**
-    consume two spaces. **After:** the next byte is `-`. **Known
-    correct:** the consumed prefix is legal.
-2.  **Sign.** **Before:** no digits were read. **Decision:** record a
-    negative sign and enter `digits`. **After:** value is `0`. **Known
-    correct:** another sign is no longer legal.
-3.  **Digits.** **Before:** value `0`. **Decision:** consume `4`, then
-    `2`. **After:** value `42`. **Known correct:** the numeric token
-    so far is `42`.
-4.  **Stop.** **Before:** next byte is `x`. **Decision:** stop under
-    this grammar and apply the sign. **After:** return `-42`. **Known
-    correct:** no invalid byte was consumed.
+1.  **Mode: Leading spaces**
+    - **Before:** `currentIndex=0`, `magnitude=0`.
+    - **Decision:** Consume the two allowed leading spaces.
+    - **After:** `currentIndex=2`; next byte is `'-'`.
+    - **Known correct:** The consumed beginning is legal.
+2.  **Mode: Optional sign**
+    - **Before:** No digit has been read.
+    - **Decision:** Record a negative sign and advance once.
+    - **After:** `currentIndex=3`, `negative=true`.
+    - **Known correct:** A second sign is no longer legal.
+3.  **Mode: Digits, first byte**
+    - **Before:** `magnitude=0`; current byte is `'4'`.
+    - **Decision:** Append digit `4` after checking the limit.
+    - **After:** `magnitude=4`, `currentIndex=4`.
+    - **Known correct:** The stored magnitude equals the parsed text
+      `"4"`.
+4.  **Mode: Digits, second byte**
+    - **Before:** `magnitude=4`; current byte is `'2'`.
+    - **Decision:** Append digit `2` after checking the limit.
+    - **After:** `magnitude=42`, `currentIndex=5`.
+    - **Known correct:** The stored magnitude equals parsed text
+      `"42"`.
+5.  **Mode: Stop**
+    - **Before:** Current byte is `'x'`, which is not a digit.
+    - **Decision:** This grammar accepts the longest numeric prefix,
+      so stop and apply the negative sign.
+    - **After:** Return `-42`.
+    - **Known correct:** Every accepted byte was interpreted once;
+      `'x'` was not consumed.
 
-For `"4-2"`, the `-` is not legal after digits; reject it or stop
-there according to the stated grammar.
+For `"4-2"`, the `-` is not legal after digits. This entry's
+stop-at-first-nondigit grammar returns `4`. A whole-input grammar
+would instead reject it.
 
 For arithmetic expressions, a stack handles nested parentheses, while
 operator precedence can be handled by operator/value stacks or by
@@ -6750,7 +7345,7 @@ valid prefix, as here, or make the whole input invalid.
 
 ###### Related material
 
-- [A.4 Integer limits and bits](#a4-integer-limits-and-bits) owns
+- [A.4 Integer limits and bits](#a4-integer-limits-and-bits) explains
   overflow bounds.
 - [C.1.3.13 Stack](#c1313-stack) supports nested delimiters and
   expression evaluation.
@@ -6769,7 +7364,9 @@ next move can safely rule out possibilities.
 Track two meaningful positions and move them in a coordinated way so
 the scan never needs to restart. Common forms move inward from both
 ends, merge two sorted inputs, use separate read and write positions,
-or expand outward from a possible center.
+or expand outward from a possible center. Here **pointer** means an
+index or position that moves through the data; it need not be a Go
+pointer value.
 
 ###### How it works
 
@@ -6785,18 +7382,25 @@ movement rule rather than copying this one.
 
 Find a pair totaling `9` in `[1,2,4,7,11]`; expect `[2,7]`.
 
-1.  **Ends `1` and `11`.** **Before:** every pair between the
-    positions remains. **Decision:** sum `12` is too large, so move
-    the right position left. **After:** ends are `1` and `7`. **Known
-    correct:** no pair using `11` can sum to `9` because `1` was the
-    smallest partner.
-2.  **Ends `1` and `7`.** **Before:** sum is `8`. **Decision:** move
-    the left position right. **After:** ends are `2` and `7`. **Known
-    correct:** no pair using `1` can reach `9` with an available right
-    value.
-3.  **Ends `2` and `7`.** **Before:** both positions remain possible.
-    **Decision:** sum is `9`. **After:** return the pair. **Known
-    correct:** the requested pair was found.
+1.  **Ends: `1` and `11`**
+    - **Before:** `left=0`, `right=4`; every pair inside those
+      positions remains possible.
+    - **Decision:** Sum `12` is too large, so move `right` left once.
+    - **After:** `left=0`, `right=3`; end values are `1` and `7`.
+    - **Known correct:** No pair using `11` can total `9`, because `1`
+      was its smallest available partner.
+2.  **Ends: `1` and `7`**
+    - **Before:** `left=0`, `right=3`; sum is `8`.
+    - **Decision:** The sum is too small, so move `left` right once.
+    - **After:** `left=1`, `right=3`; end values are `2` and `7`.
+    - **Known correct:** No pair using `1` can total `9`, because `7`
+      was its largest available partner.
+3.  **Ends: `2` and `7`**
+    - **Before:** `left=1`, `right=3`.
+    - **Decision:** Sum is `9`.
+    - **After:** Return values `[2,7]`.
+    - **Known correct:** The returned values are at distinct positions
+      and total the target.
 
 An empty or one-item input has no pair and must finish before indexing
 both ends.
@@ -6812,10 +7416,10 @@ then `2`, then `3`, and finally the remaining `4`. When merging into
 unused space at the end of the first input, work backward from the
 largest values so a write cannot overwrite unread input.
 
-Let `read` inspect every value and `write` mark where the next
-retained value belongs. The invariant is that the part before `write`
-contains exactly the retained values seen so far, in their required
-order. Because `write` never passes `read`, writing cannot destroy
+Let `read` inspect every value and `write` mark where the next kept
+value belongs. The part before `write` always contains exactly the
+kept values seen so far, in their required order. Because `write`
+never passes `read`, writing cannot destroy
 unread data. The [non-zero compaction
 trace](#a2-correctness-and-invariants) shows both positions changing
 on actual values.
@@ -6870,7 +7474,7 @@ character and gap centers for palindromes.
 ###### Related material
 
 - [E.9 Sorted two-pointer pair
-  search](#e9-sorted-two-pointer-pair-search) owns the Go
+  search](#e9-sorted-two-pointer-pair-search) explains the Go
   implementation.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants)
   traces read/write compaction.
@@ -6900,36 +7504,51 @@ reach the same smaller question.
 
 Dynamic programming (**DP**) starts with a search that tries choices.
 If different paths keep reaching the same smaller question, answer
-that question once and reuse the result.
+that question once and reuse the result. The few facts that identify
+one smaller question are called its **state**. For climbing stairs,
+the stair number alone identifies the smaller question.
 
 ###### How it works
 
-First write a rule that builds one answer from smaller answers; this
-rule is called a **recurrence**. Then write the smallest answers known
-without using that rule; these are the **base cases**. Finally, choose
-an order that calculates every smaller answer before something needs
-it. You can start from the requested answer and save results during
-recursive calls, or start from the smallest answers and build upward
+First write a rule that builds one answer from already solved smaller
+answers. This rule is called a **recurrence**. Then write the smallest
+answers known without using that rule; these are the **base cases**.
+Finally, choose an order that calculates every smaller answer before
+it is needed. You can begin at the requested answer and save each
+recursive result, or begin with the smallest answers and build upward
 with a loop.
 
 ###### Step-by-step examples
 
 Count ways to climb `4` stairs using steps of one or two; expect `5`.
 
-1.  **Base states.** **Before:** no larger answer exists.
-    **Decision:** set `ways[0]=1` and `ways[1]=1`. **After:** the two
-    smallest states are known. **Known correct:** there is one empty
-    route and one route to stair `1`.
-2.  **Stairs `2` and `3`.** **Before:** their required smaller states
-    are known. **Decision:** add the previous two answers. **After:**
-    `ways[2]=2`, `ways[3]=3`. **Known correct:** routes are grouped by
-    a final one-step or two-step move.
-3.  **Stair `4`.** **Before:** `ways[2]=2`, `ways[3]=3`. **Decision:**
-    compute `ways[4]=3+2`. **After:** return `5`. **Known correct:**
-    every route has been counted once by its final move.
+1.  **Step: Smallest known answers**
+    - **Before:** No answer has been stored.
+    - **Decision:** Set `ways[0]=1` and `ways[1]=1`.
+    - **After:** Ways are `[1,1]` through stair `1`.
+    - **Known correct:** There is one empty route to stair `0` and one
+      one-step route to stair `1`.
+2.  **Step: Stair `2`**
+    - **Before:** `ways[0]=1`, `ways[1]=1`.
+    - **Decision:** A final one-step move comes from stair `1`. A
+      final two-step move comes from stair `0`. Add both counts.
+    - **After:** `ways[2]=1+1=2`.
+    - **Known correct:** Routes `[1,1]` and `[2]` are counted once.
+3.  **Step: Stair `3`**
+    - **Before:** `ways[1]=1`, `ways[2]=2`.
+    - **Decision:** Add routes ending with a one-step move and routes
+      ending with a two-step move.
+    - **After:** `ways[3]=2+1=3`.
+    - **Known correct:** The two final-move groups do not overlap.
+4.  **Step: Stair `4`**
+    - **Before:** `ways[2]=2`, `ways[3]=3`.
+    - **Decision:** Calculate `ways[4]=3+2`.
+    - **After:** Return `5`.
+    - **Known correct:** Every route reaches stair `4` with exactly
+      one of the two allowed final moves.
 
-For `n=0`, the base value `1` represents the empty way; a different
-problem contract may define that boundary differently.
+For `n=0`, the base value `1` represents the empty way; another
+problem may define that boundary differently.
 
 ###### Why it works
 
@@ -7021,11 +7640,10 @@ All three conditions should hold:
 2.  A direct search answers the same smaller question more than once.
 3.  A small set of facts completely describes each smaller question.
 
-That small set of identifying facts is called the **state**. For
-climbing stairs, the current stair number is enough state because the
-choices available next do not depend on how you reached that stair.
-Describe the state in one sentence before choosing an array or map to
-store answers.
+For climbing stairs, the current stair number is enough state because
+the choices available next do not depend on how that stair was
+reached. Describe the state in one sentence before choosing an array
+or map to store answers.
 
 ###### When not to use it
 
@@ -7045,15 +7663,13 @@ can exceed the chosen integer type.
 ###### Related material
 
 - [E.2 Rolling dynamic programming](#e2-rolling-dynamic-programming)
-  owns the Go implementation.
+  provides the Go implementation.
 - [C.1.3.10.1 Preserve order (coordinate
-  compression)](#c13101-coordinate-compression) owns
+  compression)](#c13101-coordinate-compression) explains
   coordinate compression.
 - [Climbing
   Stairs](problems/solved_easy_leetcode_0070_climbing_stairs.go) is
   the representative problem.
-
-<a id="c1311-divide-and-conquer"></a>
 
 <a id="c13101-coordinate-compression"></a>
 
@@ -7080,18 +7696,23 @@ changing its order.
 
 For `[100,-5,100,20]`, expect ranks `[2,0,2,1]`.
 
-1.  **Sort distinct values.** **Before:** values are in input order.
-    **Decision:** sort and deduplicate. **After:** `[-5,20,100]`.
-    **Known correct:** every distinct value appears once in increasing
-    order.
-2.  **Assign ranks.** **Before:** no mapping exists. **Decision:** map
-    `-5 -> 0`, `20 -> 1`, and `100 -> 2`. **After:** every value has a
-    compact index. **Known correct:** smaller original values have
-    smaller ranks.
-3.  **Translate.** **Before:** original order is `[100,-5,100,20]`.
-    **Decision:** replace each value through the map. **After:**
-    `[2,0,2,1]`. **Known correct:** duplicates share a rank and input
-    positions remain in order.
+1.  **Step: Sort distinct values**
+    - **Before:** Values are in input order and may repeat.
+    - **Decision:** Sort a copy and keep one copy of each value.
+    - **After:** Distinct values are `[-5,20,100]`.
+    - **Known correct:** Every different input value appears once in
+      increasing order.
+2.  **Step: Assign ranks**
+    - **Before:** No value-to-rank map exists.
+    - **Decision:** Map `-5 -> 0`, `20 -> 1`, and `100 -> 2`.
+    - **After:** Every distinct value has a compact index.
+    - **Known correct:** Smaller original values have smaller ranks.
+3.  **Step: Translate the original order**
+    - **Before:** Original values are `[100,-5,100,20]`.
+    - **Decision:** Replace each value with its mapped rank.
+    - **After:** Result is `[2,0,2,1]`.
+    - **Known correct:** Equal values share rank `2`, and output
+      positions still correspond to the original input positions.
 
 For an empty input, both the distinct list and output are empty. Equal
 values must receive one rank rather than separate positions.
@@ -7163,15 +7784,18 @@ position.
 - [C.1.3.17 Fenwick and segment
   trees](#c1317-fenwick-and-segment-trees) query and update those
   ranks.
-- [C.1.3.5 Sorting and selection](#c135-sorting-and-selection) owns
-  the sort.
+- [C.1.3.5 Sorting and
+  selection](#c135-sorting-and-selection) explains the sort.
+
+<a id="c1311-divide-and-conquer"></a>
 
 ##### C.1.3.11 Split and combine (divide and conquer)
 
 ###### The problem it solves
 
-Split an input into smaller independent parts, solve each part by the
-same rule, and combine their results.
+Some large inputs become easier after splitting them into independent
+parts, but the final answer still needs a correct and affordable way
+to combine those part answers.
 
 ###### The idea in simple terms
 
@@ -7180,34 +7804,48 @@ the same rule, and combine their answers.
 
 ###### How it works
 
-Define the smallest input that can be answered directly, how the input
-is divided, and exactly what information the combine step needs. Then
-write a recurrence that includes both recursive work and the combine
-cost.
+Define the smallest input that can be answered directly, how every
+larger input is divided, and exactly what information the combine step
+needs. Also write an equation for the total work in terms of the work
+on smaller parts. Such an equation is called a **recurrence**, and it
+must include the cost of combining the answers.
 
 ###### Step-by-step examples
 
 Sort `[4,1,3,2]`; expect `[1,2,3,4]`.
 
-1.  **Split.** **Before:** one four-value problem. **Decision:**
-    divide it into `[4,1]` and `[3,2]`. **After:** two independent
-    halves remain. **Known correct:** together they contain every
-    original value.
-2.  **Solve halves.** **Before:** each half has two values.
-    **Decision:** split to one-value lists and merge. **After:**
-    halves are `[1,4]` and `[2,3]`. **Known correct:** each half is
-    sorted.
-3.  **Combine.** **Before:** two sorted halves. **Decision:**
-    repeatedly take the smaller front value. **After:** `[1,2,3,4]`.
-    **Known correct:** the output is sorted and contains every value.
+1.  **Step: Split the full input**
+    - **Before:** One problem contains `[4,1,3,2]`.
+    - **Decision:** Divide it into `[4,1]` and `[3,2]`.
+    - **After:** Two independent two-value problems remain.
+    - **Known correct:** The halves do not overlap. Together, they
+      contain every original value.
+2.  **Step: Solve the left half**
+    - **Before:** Left half is `[4,1]`.
+    - **Decision:** One-value lists are already sorted; merge `[4]`
+      and `[1]` by taking the smaller front value first.
+    - **After:** Left result is `[1,4]`.
+    - **Known correct:** Both left-half values appear in order.
+3.  **Step: Solve the right half**
+    - **Before:** Right half is `[3,2]`.
+    - **Decision:** Merge sorted one-value lists `[3]` and `[2]`.
+    - **After:** Right result is `[2,3]`.
+    - **Known correct:** Both right-half values appear in order.
+4.  **Step: Combine the two halves**
+    - **Before:** Sorted halves are `[1,4]` and `[2,3]`.
+    - **Decision:** Repeatedly take the smaller unread front value:
+      `1`, then `2`, then `3`, then `4`.
+    - **After:** Result is `[1,2,3,4]`.
+    - **Known correct:** The result is sorted and contains every input
+      value exactly once.
 
 An empty or one-value input is already solved and prevents endless
 splitting.
 
 For merge sort, each call sorts two halves, then merges them by
-repeatedly taking the smaller unread value. The invariant during
-merging is that the output prefix is sorted and contains exactly the
-smallest values consumed from both halves. The recurrence
+repeatedly taking the smaller unread value. During the merge, the
+output built so far is sorted and contains exactly the smallest values
+already read from both halves. The running-time rule
 `T(n) = 2T(n/2) + O(n)` gives `O(n log n)` time. The reason is
 concrete: repeatedly halving `n` creates about `log n` levels, and all
 merges on one level process `n` values in total. Multiplying the
@@ -7305,14 +7943,15 @@ solving the original problem directly.
 > range again.
 
 An empty or one-value input is the base case. During merge, copy the
-remainder of either half after the other empties, and preserve a
-declared tie rule for equal values when stable order matters.
+remainder of either half after the other empties. When equal values
+must remain in their original relative order, called stable order,
+declare and preserve a tie rule.
 
 ###### Related material
 
 - [C.1.3.10 Dynamic programming](#c1310-dynamic-programming) handles
   overlapping rather than independent subproblems.
-- [C.1.3.9 Two pointers](#c139-two-pointers) owns sorted merging.
+- [C.1.3.9 Two pointers](#c139-two-pointers) explains sorted merging.
 - [A.3 Recursion and saved work](#a3-recursion-and-saved-work) counts
   call-stack memory.
 
@@ -7323,7 +7962,8 @@ declared tie rule for equal values when stable order matters.
 ###### The problem it solves
 
 Find the largest sum of one non-empty consecutive section without
-trying every pair of boundaries.
+trying every pair of boundaries. A consecutive section is also called
+a **subarray**.
 
 ###### The idea in simple terms
 
@@ -7331,7 +7971,8 @@ At each position, keep the best consecutive section that must end
 here. It either extends the best section ending one position earlier
 or starts fresh at the current value.
 
-For value `x`, update:
+For value `x`, `max(a,b)` means choose the larger of `a` and `b`.
+Update:
 
 ```text
 endingHere = max(x, endingHere + x)
@@ -7350,17 +7991,36 @@ the new `endingHere`.
 
 For `[-2,3,-1,4,-5]`, expect sum `6` from `[3,-1,4]`.
 
-1.  **Value `-2`.** **Before:** no section exists. **Decision:**
-    initialize both tracked sums to `-2`. **After:** `endingHere=-2`,
-    `bestOverall=-2`. **Known correct:** both describe the only
-    section seen.
-2.  **Value `3`.** **Before:** extending gives `1`. **Decision:**
-    start at `3` instead. **After:** both sums are `3`. **Known
-    correct:** `3` is the best section ending here and overall.
-3.  **Values `-1,4,-5`.** **Before:** best overall is `3`.
-    **Decision:** extend in order, producing ending sums `2,6,1`.
-    **After:** `bestOverall=6`. **Known correct:** every possible
-    ending position was represented.
+1.  **Value: `-2`**
+    - **Before:** No nonempty section has been processed.
+    - **Decision:** Initialize both tracked sums from the first value.
+    - **After:** `endingHere=-2`, `bestOverall=-2`.
+    - **Known correct:** `[-2]` is the only available section.
+2.  **Value: `3`**
+    - **Before:** Extending gives `-2+3=1`; starting fresh gives `3`.
+    - **Decision:** Start a new section at `3`.
+    - **After:** `endingHere=3`, `bestOverall=3`.
+    - **Known correct:** `[3]` is best at this ending position and
+      among all positions processed so far.
+3.  **Value: `-1`**
+    - **Before:** Extending gives `3-1=2`; starting fresh gives `-1`.
+    - **Decision:** Extend the section.
+    - **After:** `endingHere=2`, `bestOverall=3`.
+    - **Known correct:** `[3,-1]` is best ending here, while `[3]`
+      remains best overall.
+4.  **Value: `4`**
+    - **Before:** Extending gives `2+4=6`; starting fresh gives `4`.
+    - **Decision:** Extend the section and update the overall best.
+    - **After:** `endingHere=6`, `bestOverall=6`.
+    - **Known correct:** `[3,-1,4]` is best ending here and best
+      overall.
+5.  **Value: `-5`**
+    - **Before:** Extending gives `6-5=1`; starting fresh gives `-5`.
+    - **Decision:** Extend the section, but keep the previous overall
+      best.
+    - **After:** `endingHere=1`, `bestOverall=6`.
+    - **Known correct:** Every possible ending position has been
+      represented, and the largest sum is `6`.
 
 For `[-4,-2]`, initializing from the first value returns `-2`;
 initializing to zero would wrongly allow an empty section.
@@ -7450,7 +8110,7 @@ when an accepted value range can make `endingHere+value` exceed `int`.
 - [C.1.3.14 Sliding window](#c1314-sliding-window) handles ranges
   whose validity can be repaired by moving boundaries.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants)
-  explains the ending-here invariant.
+  explains why the best section ending at each position stays correct.
 
 <a id="c1313-stack"></a> <a id="stack"></a>
 
@@ -7464,7 +8124,8 @@ must be completed first.
 ###### The idea in simple terms
 
 Add and remove only at the top, so the most recently added item is the
-first removed. This is last in, first out.
+first removed. A structure with this rule is a **stack**. The rule is
+also called **last in, first out**.
 
 ###### How it works
 
@@ -7480,17 +8141,32 @@ distinguishes that default value from a successful removal.
 
 ###### Step-by-step examples
 
-Validate `([])`; expect `true`.
+Validate the four-character input `([])`; expect `true`. In the stack
+shown below, the rightmost item is the top.
 
-1.  **Open `(` and `[`.** **Before:** stack is empty. **Decision:**
-    push each opener. **After:** stack is `['(', '[']`. **Known
-    correct:** it contains exactly the unmatched openers.
-2.  **Close `]`.** **Before:** top is `[`. **Decision:** pop the
-    matching opener. **After:** stack is `['(']`. **Known correct:**
-    the inner pair is valid.
-3.  **Close `)`.** **Before:** top is `(`. **Decision:** pop it.
-    **After:** stack is empty. **Known correct:** every closer matched
-    the newest opener.
+1.  **Read `(`**
+    - **Before:** Stack is empty.
+    - **Decision:** This is an opener, so push it.
+    - **After:** Stack is `['(']`.
+    - **Known correct:** The stack contains the only opener not yet
+      matched.
+2.  **Read `[`**
+    - **Before:** Stack is `['(']`.
+    - **Decision:** Push the new opener.
+    - **After:** Stack is `['(', '[']`.
+    - **Known correct:** The newest unmatched opener, `[`, is on top.
+3.  **Read `]`**
+    - **Before:** The stack's top is `[`.
+    - **Decision:** `]` matches `[`, so pop the top.
+    - **After:** Stack is `['(']`.
+    - **Known correct:** The inner pair is complete; `(` is still
+      unmatched.
+4.  **Read `)`**
+    - **Before:** The stack's top is `(`.
+    - **Decision:** `)` matches `(`, so pop the top.
+    - **After:** Stack is empty; return `true`.
+    - **Known correct:** Every closer matched the newest unmatched
+      opener, and no opener remains.
 
 For `([)]`, `)` does not match top `[`, so reject immediately. Empty
 input is valid only if the problem defines an empty sequence as
@@ -7499,7 +8175,9 @@ balanced.
 ###### Why it works
 
 The stack contains exactly the opened items not yet completed. The top
-is the most recent unfinished item and must be completed first.
+is the most recent unfinished item and must be completed first. Each
+input item is read once, so the scan finishes. An empty stack at the
+end proves that no opener was left unmatched.
 
 A stack can also compress adjacent runs. Store `(value, count)` for
 each run; merge a new value with the top when equal, and pop when a
@@ -7545,7 +8223,8 @@ unsafe or direct control is needed.
 
 ###### Related material
 
-- [E.5 Generic stack](#e5-generic-stack) owns the Go implementation.
+- [E.5 Generic stack](#e5-generic-stack) provides the Go
+  implementation.
 - [C.1.3.20 Depth-first search](#c1320-depth-first-search) can replace
   recursive calls with an explicit stack.
 - [Valid Parentheses](
@@ -7569,7 +8248,8 @@ either boundary moves.
 Put a movable fence around one consecutive portion of the input. The
 fence always contains neighboring items with no gaps. Extend the right
 side to consider new values and move the left side when earlier values
-must leave.
+must leave. The portion inside the fence is called a **window**;
+moving both ends forward is the **sliding-window** method.
 
 ###### How it works
 
@@ -7581,24 +8261,81 @@ again. Record the answer at the moment required by the problem.
 A common form gives the window a budget of at most `k` violations,
 such as zeros that may be flipped or characters that may be replaced.
 Track the number of violations or the amount required to repair the
-window. Shrink while the budget is exceeded; afterward the window is
-the longest valid one ending at the current right position under that
-invariant.
+window. Shrink while the budget is exceeded; afterward the current
+range is the longest valid one ending at the right position.
 
 ###### Step-by-step examples
 
 Find the shortest positive-value range totaling at least `7` in
 `[2,3,1,2,4,3]`; expect length `2`.
 
-1.  **Grow.** **Before:** the window is empty. **Decision:** extend
-    through the first `2`, giving `[2,3,1,2]` with sum `8`. **After:**
-    best length is `4`. **Known correct:** it is the first valid
-    window ending there.
-2.  **Shrink and continue.** **Before:** positive values make removal
-    decrease the sum. **Decision:** remove left values while the sum
-    remains at least `7`, then keep growing. **After:** later window
-    `[4,3]` has length `2`. **Known correct:** every shorter window
-    ending at each right boundary was tested.
+1.  **Add index `0`, value `2`**
+    - **Before:** Window is empty; `left=0`, `sum=0`.
+    - **Decision:** Move the right edge through index `0`.
+    - **After:** Window is `[2]`; `sum=2`.
+    - **Known correct:** The sum is below `7`, so no valid window ends
+      here.
+2.  **Add index `1`, value `3`**
+    - **Before:** Window is `[2]`; `sum=2`.
+    - **Decision:** Move the right edge through index `1`.
+    - **After:** Window is `[2,3]`; `sum=5`.
+    - **Known correct:** No valid window ends at index `1`.
+3.  **Add index `2`, value `1`**
+    - **Before:** Window is `[2,3]`; `sum=5`.
+    - **Decision:** Move the right edge through index `2`.
+    - **After:** Window is `[2,3,1]`; `sum=6`.
+    - **Known correct:** No valid window ends at index `2`.
+4.  **Add index `3`, value `2`**
+    - **Before:** `left=0`, `sum=6`.
+    - **Decision:** Add `2`. The sum becomes `8`, so record length
+      `4`.
+    - **After:** Window is `[2,3,1,2]`; `sum=8`, `best=4`.
+    - **Known correct:** This is the first valid window ending at
+      index `3`.
+5.  **Shrink once at right index `3`**
+    - **Before:** Window is valid with `left=0`, `sum=8`.
+    - **Decision:** Remove the leftmost `2` and increment `left`.
+    - **After:** Window is `[3,1,2]`; `left=1`, `sum=6`.
+    - **Known correct:** Removing another positive value cannot raise
+      the sum back to `7`.
+6.  **Add index `4`, value `4`**
+    - **Before:** Window is `[3,1,2]`; `sum=6`, `best=4`.
+    - **Decision:** Add `4`; sum `10` is valid, so compare length `4`
+      with the best length.
+    - **After:** Window is `[3,1,2,4]`; `sum=10`, `best=4`.
+    - **Known correct:** The best is the shortest valid length seen so
+      far.
+7.  **Shrink past value `3`**
+    - **Before:** `left=1`, `sum=10`.
+    - **Decision:** Remove `3` and increment `left`; sum stays valid
+      at `7`, so record the shorter length `3`.
+    - **After:** Window is `[1,2,4]`; `left=2`, `sum=7`, `best=3`.
+    - **Known correct:** Both starts `1` and `2` for this right edge
+      have now been tested.
+8.  **Shrink past value `1`**
+    - **Before:** `left=2`, `sum=7`.
+    - **Decision:** Remove `1` and increment `left`.
+    - **After:** Window is `[2,4]`; `left=3`, `sum=6`, `best=3`.
+    - **Known correct:** Further removal cannot restore validity.
+9.  **Add index `5`, value `3`**
+    - **Before:** Window is `[2,4]`; `sum=6`.
+    - **Decision:** Add `3`; sum `9` is valid, so compare length `3`
+      with the best.
+    - **After:** Window is `[2,4,3]`; `sum=9`, `best=3`.
+    - **Known correct:** Length `3` is the first valid length ending
+      at index `5`.
+10. **Shrink past value `2`**
+    - **Before:** `left=3`, `sum=9`.
+    - **Decision:** Remove `2`; sum stays valid at `7`, so record
+      length `2`.
+    - **After:** Window is `[4,3]`; `left=4`, `best=2`.
+    - **Known correct:** `[4,3]` is the shortest valid window tested
+      so far.
+11. **Shrink past value `4`**
+    - **Before:** `left=4`, `sum=7`.
+    - **Decision:** Remove `4` and increment `left`.
+    - **After:** Window is `[3]`; `sum=3`, `best=2`.
+    - **Known correct:** The scan is finished, so return `2`.
 
 Mixed negative values break this shrinking rule because removing a
 negative value can increase the sum.
@@ -7695,24 +8432,54 @@ adding the same prefix repeatedly.
 
 Store a summary of everything before each position, and when useful a
 second summary of everything after it, so later answers do not repeat
-the same work.
+the same work. A list of these running totals is a **prefix-sum
+array**.
 
 ###### How it works
 
-Let `prefix[i]` mean "the total of the first `i` values." Include
-`prefix[0] = 0`. The sum from `left` through `right` is then
+Let `prefix[i]` mean "the total of the first `i` values." The square
+brackets select one stored position. Include `prefix[0] = 0`, the
+total before any value. If both endpoints are included, the sum from
+index `left` through index `right` is
 `prefix[right+1] - prefix[left]`.
 
 ###### Step-by-step examples
 
-For `[2,4,1,3]`, query indices `1..3`; expect `8`.
+For values `[2,4,1,3]`, query the inclusive range from index `1`
+through index `3`; expect `4+1+3=8`.
 
-1.  **Build.** **Before:** `prefix=[0]`. **Decision:** append each
-    running total. **After:** `[0,2,6,7,10]`. **Known correct:**
-    `prefix[i]` is the sum of the first `i` values.
-2.  **Query.** **Before:** `prefix[4]=10` includes indices `0..3`.
-    **Decision:** subtract `prefix[1]=2`. **After:** `10-2=8`. **Known
-    correct:** exactly index `0` was removed.
+1.  **Start with no values**
+    - **Before:** No running total exists.
+    - **Decision:** Store zero for the total before index `0`.
+    - **After:** `prefix=[0]`.
+    - **Known correct:** The first zero is the sum of zero values.
+2.  **Read value `2` at index `0`**
+    - **Before:** Latest total is `0`.
+    - **Decision:** Add `2` and store the result.
+    - **After:** `prefix=[0,2]`.
+    - **Known correct:** `prefix[1]` totals the first one value.
+3.  **Read value `4` at index `1`**
+    - **Before:** Latest total is `2`.
+    - **Decision:** Add `4` and store `6`.
+    - **After:** `prefix=[0,2,6]`.
+    - **Known correct:** `prefix[2]` totals the first two values.
+4.  **Read value `1` at index `2`**
+    - **Before:** Latest total is `6`.
+    - **Decision:** Add `1` and store `7`.
+    - **After:** `prefix=[0,2,6,7]`.
+    - **Known correct:** `prefix[3]` totals the first three values.
+5.  **Read value `3` at index `3`**
+    - **Before:** Latest total is `7`.
+    - **Decision:** Add `3` and store `10`.
+    - **After:** `prefix=[0,2,6,7,10]`.
+    - **Known correct:** `prefix[4]` totals all four values.
+6.  **Answer the range query**
+    - **Before:** `prefix[4]=10` totals indexes `0` through `3`.
+    - **Decision:** Subtract `prefix[1]=2`, which is the total before
+      index `1`.
+    - **After:** `10-2=8`.
+    - **Known correct:** Only index `0` was removed, leaving indexes
+      `1`, `2`, and `3`.
 
 An empty range needs a defined convention; using a leading zero makes
 a range beginning at index `0` require no special subtraction case.
@@ -7721,9 +8488,11 @@ a range beginning at index `0` require no special subtraction case.
 
 Both stored totals begin at index `0`. Subtracting the total before
 `left` removes exactly the values that are outside the requested
-range.
+range. Building the array reads one new value on every step, so it
+finishes after the last value. A query then uses two existing totals
+and performs one subtraction.
 
-The same preprocessing idea works beyond sums when the combination
+The same setup idea works beyond sums when the combination
 rule supports the required query. For `Product of Array Except Self`,
 a left-to-right pass stores the product before each position, then a
 right-to-left running product multiplies in everything after it. Zeros
@@ -7731,8 +8500,9 @@ need no division special case, and the output slice can hold the
 prefix values while only one suffix product uses extra memory.
 
 Prefix frequencies can answer how many times a character appears in a
-range. Prefix XOR works for range XOR because equal prefixes cancel. A
-prefix minimum can answer "smallest value seen so far" but cannot
+range. Prefix bitwise XOR works for range XOR because applying XOR to
+the same bits twice cancels them. A prefix minimum can answer
+"smallest value seen so far" but cannot
 generally be subtracted to recover an arbitrary range minimum; use a
 monotonic deque for moving ranges or a range-query structure for
 arbitrary updates and queries.
@@ -7760,7 +8530,7 @@ func rangeSum(prefixTotals []int, left, right int) int {
 ```
 
 The caller must provide `0 <= left <= right` and
-`right+1 < len(prefix)`.
+`right+1 < len(prefixTotals)`.
 
 ###### Work and memory
 
@@ -7786,9 +8556,9 @@ subtracting two previously stored smallest values.
 > `values=[2,4]`, the range `0..0` must use `prefix[1]-prefix[0]=2`,
 > not read a position before the slice.
 
-Reject `left > right`, negative indexes, and `right+1 >= len(prefix)`.
-Use a wider sum type or checked addition when valid inputs can
-overflow `int`.
+Reject `left > right`, negative indexes, and
+`right+1 >= len(prefixTotals)`. Use a wider sum type or checked
+addition when valid inputs can overflow `int`.
 
 ###### Related material
 
@@ -7811,6 +8581,7 @@ after every update is known.
 
 When many updates affect whole ranges, record where each change starts
 and stops instead of modifying every covered position immediately.
+The marker list is called a **difference array**.
 
 ###### How it works
 
@@ -7822,25 +8593,60 @@ left to right while keeping a running total of the changes.
 
 ###### Step-by-step examples
 
-Start with four zeroes and add `3` to indices `1..3`; expect
-`[0,3,3,3]`.
+Start with four zeroes and add `3` to every index from `1` through
+`3`, including both endpoints. Expect `[0,3,3,3]`.
 
-1.  **Mark boundaries.** **Before:** `diff=[0,0,0,0,0]`. **Decision:**
-    add `3` at `1` and subtract `3` at `4`. **After:**
-    `diff=[0,3,0,0,-3]`. **Known correct:** the update's lifetime is
-    encoded.
-2.  **Rebuild.** **Before:** running change is `0`. **Decision:**
-    accumulate positions `0..3`. **After:** `[0,3,3,3]`. **Known
-    correct:** every covered position receives the update once.
+1.  **Create the markers**
+    - **Before:** The result length is `4`.
+    - **Decision:** Create five zero markers so index `4` can mark a
+      change that occurs just after the result ends.
+    - **After:** `difference=[0,0,0,0,0]`.
+    - **Known correct:** Every possible start and stop position has a
+      marker slot.
+2.  **Mark where `+3` starts**
+    - **Before:** The update begins at index `1`.
+    - **Decision:** Add `3` to `difference[1]`.
+    - **After:** `difference=[0,3,0,0,0]`.
+    - **Known correct:** A left-to-right running total becomes `3` at
+      index `1`.
+3.  **Mark where `+3` stops**
+    - **Before:** The update includes index `3` and stops before index
+      `4`.
+    - **Decision:** Subtract `3` at `difference[4]`.
+    - **After:** `difference=[0,3,0,0,-3]`.
+    - **Known correct:** The running total remains `3` through index
+      `3` and returns to zero afterward.
+4.  **Rebuild index `0`**
+    - **Before:** `runningTotal=0`.
+    - **Decision:** Add marker `difference[0]=0`.
+    - **After:** `result[0]=0`.
+    - **Known correct:** The update has not started.
+5.  **Rebuild index `1`**
+    - **Before:** `runningTotal=0`.
+    - **Decision:** Add marker `difference[1]=3`.
+    - **After:** `runningTotal=3`, `result[1]=3`.
+    - **Known correct:** The update is active at index `1`.
+6.  **Rebuild index `2`**
+    - **Before:** `runningTotal=3`, `difference[2]=0`.
+    - **Decision:** Add the zero marker and store `3`.
+    - **After:** `result=[0,3,3]` so far.
+    - **Known correct:** The update remains active at index `2`.
+7.  **Rebuild index `3`**
+    - **Before:** `runningTotal=3`, `difference[3]=0`.
+    - **Decision:** Add the zero marker and store `3`.
+    - **After:** `result=[0,3,3,3]`.
+    - **Known correct:** Every included position receives `3` once.
 
-The extra sentinel position permits an update ending at the last
-result index without an out-of-range write.
+The extra final position allows an update to end at the last result
+index without writing outside the array.
 
 ###### Why it works
 
 The running change increases when an update begins and decreases
 immediately after that update ends. Every position between those
-points receives the update exactly once.
+points receives the update exactly once. Recording consumes one
+finite update at a time, and rebuilding advances through each result
+position once, so both phases finish.
 
 ###### Go example
 
@@ -7888,7 +8694,7 @@ rather than after the updates have been collected.
 
 > **Warning:** Allocating only `length` difference positions makes an
 > update ending at `length-1` write `difference[length]` out of
-> bounds. Reserve the extra sentinel position.
+> bounds. Reserve one extra position at the end.
 
 Require `length >= 0` and validate every update before writing either
 marker. An empty result accepts no nonempty update, and accumulated
@@ -7896,7 +8702,7 @@ deltas must fit the chosen integer type.
 
 ###### Related material
 
-- [C.1.3.15 Prefix sums](#c1315-prefix-sums) owns the accumulating
+- [C.1.3.15 Prefix sums](#c1315-prefix-sums) explains the accumulating
   rebuild.
 - [C.1.3.17 Fenwick and segment
   trees](#c1317-fenwick-and-segment-trees) handles interleaved updates
@@ -7915,38 +8721,77 @@ every prefix after each change.
 
 Imagine marble boxes with trusted totals for useful groups. A query
 combines a few group totals; changing one box repairs only groups that
-contain it.
+contain it. A **range-query tree** stores those group totals so an
+update does not require rebuilding every earlier total.
 
 ###### How it works
 
-A segment tree stores one summary per represented range. A point
-update changes the leaf and recomputes only its ancestors; a query
-splits into disjoint stored ranges whose summaries combine to the
-answer. A Fenwick tree stores selected suffixes of prefixes in a
-one-based array. Adding `i & -i` visits every stored range containing
-a changed position, while subtracting it decomposes a prefix into
-disjoint stored ranges. Public zero-based indexes must be validated
-before converting them to one-based positions.
+A **segment tree** visibly divides the input into halves. Each stored
+node summarizes one range. Changing one value repairs its one-value
+node, then each larger range containing it. A query combines stored
+ranges that cover the request without overlap.
+
+A **Fenwick tree**, also called a binary indexed tree, stores selected
+ending pieces of running totals in one slice. Its stored positions
+start at `1`, even when the public input indexes start at `0`. For a
+positive stored position `i`, the expression `i & -i` returns the
+value of its lowest `1` bit. In this structure, that value is the
+number of input items summarized at position `i`. For example,
+position `4` stores four items, while position `3` stores one.
+
+During an update, adding this range size jumps to the next stored
+group containing the changed value. During a running-total query,
+subtracting it removes the group just counted. Validate public indexes
+before converting them to stored positions.
 
 ###### Step-by-step examples
 
-For `[2,1,5,3]`, query indices `1..2`, then change index `2` to `6`;
-expect query `6` and total `12`.
+Build a Fenwick tree for `[2,1,5,3]`. Query public indexes `1` through
+`2`, then change index `2` from `5` to `6`. Expect query result `6`
+and final total `12`. The stored slice has an unused position `0`.
 
-1.  **Query.** **Before:** tree ranges summarize the original values.
-    **Decision:** combine singleton ranges `[1]=1` and `[2]=5`.
-    **After:** result is `6`. **Known correct:** the requested range
-    is covered once.
-2.  **Update.** **Before:** index `2` contributes `5`. **Decision:**
-    add `1` to every stored range containing it. **After:** `[2..3]`
-    becomes `9` and `[0..3]` becomes `12`; `[0..1]` stays `3`. **Known
-    correct:** every summary again equals its range.
+1.  **Add public index `0`, value `2`**
+    - **Before:** Stored positions `1` through `4` contain zero.
+    - **Decision:** Start at stored position `1`; add `2` at positions
+      `1`, `2`, and `4` by making the jumps `1 -> 2 -> 4`.
+    - **After:** Stored sums are `[2,2,0,2]` at positions `1..4`.
+    - **Known correct:** Those are exactly the stored groups that
+      contain public index `0`.
+2.  **Add public index `1`, value `1`**
+    - **Before:** Its stored position is `2`.
+    - **Decision:** Add `1` at positions `2` and `4`.
+    - **After:** Stored sums are `[2,3,0,3]`.
+    - **Known correct:** Position `2` totals public indexes `0..1`.
+3.  **Add public index `2`, value `5`**
+    - **Before:** Its stored position is `3`.
+    - **Decision:** Add `5` at positions `3` and `4`.
+    - **After:** Stored sums are `[2,3,5,8]`.
+    - **Known correct:** Position `3` stores index `2` alone, and
+      position `4` totals indexes `0..3` so far.
+4.  **Add public index `3`, value `3`**
+    - **Before:** Its stored position is `4`.
+    - **Decision:** Add `3` at position `4`.
+    - **After:** Stored sums are `[2,3,5,11]`.
+    - **Known correct:** Position `4` now totals all four values.
+5.  **Query indexes `1` through `2`**
+    - **Before:** The total through index `2` uses stored positions
+      `3` and `2`: `5+3=8`.
+    - **Decision:** Subtract the total before index `1`. Stored
+      position `1` holds it: `8-2`.
+    - **After:** The range result is `6`.
+    - **Known correct:** Subtraction removes index `0` and leaves
+      values `1+5`.
+6.  **Change index `2` from `5` to `6`**
+    - **Before:** The change amount is `+1`.
+    - **Decision:** Call the update with index `2` and delta `1`,
+      repairing stored positions `3` and `4`.
+    - **After:** Stored sums are `[2,3,6,12]`; total is `12`.
+    - **Known correct:** Only groups containing index `2` changed.
 
-For no values, queries must be rejected or return the operation's
-identity according to the API contract.
+When there are no values, a query must either report an error or
+return the result promised by the public method for an empty range.
 
-Detailed segment-tree representation for `[2, 1, 5, 3]`: its single
-values, half sums, and whole sum form this hierarchy:
+A segment tree stores the same values in a more visible hierarchy:
 
 ```text
                  [0..3] = 11
@@ -7956,9 +8801,9 @@ values, half sums, and whole sum form this hierarchy:
        [0] = 2 [1] = 1  [2] = 5 [3] = 3
 ```
 
-This is a **segment tree**: each node stores one range's sum. Query
-`1..2` by combining `[1] = 1` and `[2] = 5`, giving `6`. Changing
-index `2` from `5` to `6` repairs only ranges containing it:
+Each node stores one range's sum. Query `1..2` by combining
+`[1] = 1` and `[2] = 5`, giving `6`. Changing index `2` from `5` to
+`6` repairs only ranges containing it:
 
 ```text
 [2] = 6 -> [2..3] = 9 -> [0..3] = 12
@@ -7971,28 +8816,19 @@ cannot change the result, as `(2 + 1) + 5 = 2 + (1 + 5)`. It also
 needs an **identity**, a neutral value for unused ranges. Sum uses
 `0`; minimum uses positive infinity.
 
-A **Fenwick tree**, or binary indexed tree, stores overlapping prefix
-sums more compactly. For the same values and one-based positions:
-
-- **Position `1`:** `1 & -1` is `1`, so it summarizes range `1..1` and
-  stores sum `2`.
-- **Position `2`:** `2 & -2` is `2`, so it summarizes range `1..2` and
-  stores sum `3`.
-- **Position `3`:** `3 & -3` is `1`, so it summarizes range `3..3` and
-  stores sum `5`.
-- **Position `4`:** `4 & -4` is `4`, so it summarizes range `1..4` and
-  stores sum `11`.
-
-`i & -i` gives the stored range size. Prefix `1..3` uses entries `3`
-and `2`: `5 + 3 = 8`. Changing position `3` by `+1` updates entries
-`3` and `4`; entries `1` and `2` stay unchanged. Subtract two prefix
-sums to get any range sum.
-
 ###### Why it works
 
-Every stored summary equals its range after all updates. Fenwick trees
-follow low bits; segment trees follow parent and child ranges. Both
-touch `O(log n)` summaries.
+Every stored summary equals its assigned range after all updates. A
+segment-tree query covers the requested range with non-overlapping
+stored ranges. A Fenwick running-total query repeatedly counts one
+ending group and jumps to the position just before it. Those groups do
+not overlap and together cover the requested beginning. Subtracting
+two such totals removes everything before the range.
+
+Each segment-tree move changes to a parent or child range about twice
+as large or small. Each Fenwick jump clears or advances one binary
+place. Therefore both reach the end after a number of moves that grows
+with the number of times the input length can be halved.
 
 For range updates, **lazy propagation** delays child updates. Adding
 `3` to `[5, 3]` changes that node from `8` to `14` and the root from
@@ -8053,8 +8889,11 @@ one-based.
 
 ###### Work and memory
 
-Both use `O(n)` memory. Segment-tree construction is `O(n)`;
-compatible queries and updates on either tree are `O(log n)`.
+For `n` values, both structures store a number of summaries
+proportional to `n`, so memory is `O(n)`. Segment-tree construction
+visits that many summaries and is `O(n)`. Each compatible query or
+update visits one summary per halving-sized level, so it is
+`O(log n)`.
 
 ###### When to use it
 
@@ -8075,8 +8914,8 @@ is clearer and fast enough.
 > method.
 
 Likewise require `0 <= left <= right < length` for `rangeSum`. Choose
-the operation's correct identity, preserve association order for
-noncommutative operations, and account for sum overflow.
+the operation's correct identity, preserve combination order when
+changing the order changes the result, and account for sum overflow.
 
 ###### Related material
 
@@ -8093,12 +8932,14 @@ noncommutative operations, and account for sum overflow.
 
 ###### The problem it solves
 
-Build an optimum result through choices that never need to be undone.
+Build the best possible result through choices that never need to be
+undone. A best possible result is also called an **optimal** result.
 
 ###### The idea in simple terms
 
 Make one choice now and never undo it because you can prove that it
-does not reduce the best result still possible.
+does not reduce the best result still possible. This permanent-choice
+method is called **greedy**.
 
 ###### How it works
 
@@ -8118,39 +8959,42 @@ choice gains now and what it leaves possible later.
 ###### Step-by-step examples
 
 Choose the most non-overlapping meetings from
-`(1,9),(2,4),(5,7),(8,10)`; expect three meetings.
+`(1,9),(2,4),(5,7),(8,10)`; expect three meetings. One meeting may
+start exactly when the previous meeting ends.
 
-1.  **Choose `(2,4)`.** **Before:** no meeting is selected.
-    **Decision:** it finishes earliest. **After:** `lastEnd=4`.
-    **Known correct:** replacing any optimal first meeting with this
-    one cannot remove a later option.
-2.  **Choose `(5,7)`.** **Before:** it starts after `4`. **Decision:**
-    accept it. **After:** `lastEnd=7`. **Known correct:** the same
-    replacement argument applies to the remaining meetings.
-3.  **Finish.** **Before:** `(1,9)` conflicts and `(8,10)` fits.
-    **Decision:** skip the former and accept the latter. **After:**
-    three meetings are selected. **Known correct:** no optimal
-    schedule needs an earlier rejected finish.
+1.  **Sort by ending time**
+    - **Before:** Meetings are in input order.
+    - **Decision:** Put earlier ending times first.
+    - **After:** Order is `(2,4),(5,7),(1,9),(8,10)`.
+    - **Known correct:** The scan will always see the compatible
+      meeting that leaves the most time first.
+2.  **Inspect `(2,4)`**
+    - **Before:** Nothing is selected; `lastEnd` is `math.MinInt`, a
+      value no valid start can be smaller than.
+    - **Decision:** Its start is allowed, so select it.
+    - **After:** Selected is `[(2,4)]`; `lastEnd=4`.
+    - **Known correct:** Finishing at `4` leaves at least as much room
+      as any other possible first meeting.
+3.  **Inspect `(5,7)`**
+    - **Before:** `5 >= lastEnd`.
+    - **Decision:** Select the meeting.
+    - **After:** Selected is `[(2,4),(5,7)]`; `lastEnd=7`.
+    - **Known correct:** It does not overlap either selected meeting.
+4.  **Inspect `(1,9)`**
+    - **Before:** `1 < lastEnd`.
+    - **Decision:** Skip it because it overlaps selected time.
+    - **After:** The selected list and `lastEnd=7` do not change.
+    - **Known correct:** A meeting ending at `9` would leave no more
+      future room than the selected meeting ending at `7`.
+5.  **Inspect `(8,10)`**
+    - **Before:** `8 >= lastEnd`.
+    - **Decision:** Select it.
+    - **After:** Return `[(2,4),(5,7),(8,10)]`, whose length is `3`.
+    - **Known correct:** The new meeting starts after the previous one
+      ends.
 
-Coins `[1,3,4]` and target `6` defeat "take the largest": `4+1+1`
-loses to `3+3`.
-
-Full exchange argument: suppose one meeting may start when another
-ends. To attend the maximum number of meetings from `(1, 9)`,
-`(2, 4)`, `(5, 7)`, and `(8, 10)`, sort by end time, set `lastEnd` to
-negative infinity, and accept the next compatible meeting:
-
-1.  **Meeting `(2, 4)`:** `2 >= -infinity`, so select it and set
-    `lastEnd` to `4`.
-2.  **Meeting `(5, 7)`:** `5 >= 4`, so select it and set `lastEnd` to
-    `7`.
-3.  **Meeting `(1, 9)`:** `1 < 7`, so skip it and leave `lastEnd` at
-    `7`.
-4.  **Meeting `(8, 10)`:** `8 >= 7`, so select it and set `lastEnd` to
-    `10`.
-
-The trace selects three meetings. To prove the rule for every input,
-let `E` be the compatible meeting with the earliest end and let `F` be
+To prove the rule for every input, let `E` be the compatible meeting
+with the earliest end and let `F` be
 the first meeting in any optimal remaining schedule. Because
 `E.end <= F.end`, every meeting that can follow `F` can also follow
 `E`. Replacing `F` with `E` preserves both validity and the number of
@@ -8173,7 +9017,8 @@ verify it; the first pass produces only a candidate.
 After every choice, some optimal complete answer is still reachable,
 and the remaining work obeys the same rule. A successful trace on one
 input is not enough; the exchange, stays-ahead, or cut argument must
-justify every permanent discard.
+justify every permanent discard. The scan then examines one meeting
+per iteration, so it finishes after the finite sorted list ends.
 
 ###### Go example
 
@@ -8253,7 +9098,10 @@ eliminate all alternatives.
 
 Walk through a tree of decisions while carrying one partial answer. At
 each branch, make a choice, explore what it can lead to, and undo the
-choice before trying its sibling branch.
+choice before trying the alternative beside it. Each possible choice
+is a **branch**; alternatives from the same partial answer are
+**sibling branches**. This make-explore-undo method is called
+**backtracking**.
 
 ###### How it works
 
@@ -8278,42 +9126,60 @@ it. This early stopping is called **pruning**.
 ###### Step-by-step examples
 
 Generate all subsets of `[a,b]`; expect `[a,b]`, `[a]`, `[b]`, and
-`[]`.
+`[]`, in that order. Here `path` holds included values, and `index`
+names the value whose include/exclude choice comes next.
 
-1.  **Include path.** **Before:** path is `[]`. **Decision:** include
-    `a`, then `b`. **After:** save `[a,b]`. **Known correct:** that
-    branch represents both inclusions.
-2.  **Undo `b`.** **Before:** path is `[a,b]`. **Decision:** restore
-    `[a]`, exclude `b`, and save `[a]`. **After:** the `a` branch is
-    complete. **Known correct:** both choices for `b` were covered.
-3.  **Undo `a`.** **Before:** path is `[a]`. **Decision:** restore
-    `[]` and explore `b` included and excluded. **After:** save `[b]`
-    and `[]`. **Known correct:** every two-choice path was visited
-    once.
+1.  **Include `a` at index `0`**
+    - **Before:** `index=0`, `path=[]`.
+    - **Decision:** Append `a` and visit index `1`.
+    - **After:** `path=[a]`.
+    - **Known correct:** This branch represents subsets containing
+      `a`.
+2.  **Include `b` at index `1`**
+    - **Before:** `index=1`, `path=[a]`.
+    - **Decision:** Append `b` and visit index `2`.
+    - **After:** The path is complete; save a copy `[a,b]`.
+    - **Known correct:** Both input values were included once.
+3.  **Undo `b`, then exclude it**
+    - **Before:** `path=[a,b]` after the recursive call returns.
+    - **Decision:** Remove the last value, restoring `[a]`, then visit
+      index `2` without appending `b`.
+    - **After:** Save a copy `[a]`.
+    - **Known correct:** Both choices for `b` under the include-`a`
+      branch are complete.
+4.  **Undo `a`, then exclude it**
+    - **Before:** Control has returned to index `0`; `path=[a]`.
+    - **Decision:** Remove `a`, restoring `[]`, then visit index `1`
+      without appending `a`.
+    - **After:** `index=1`, `path=[]`.
+    - **Known correct:** The new branch contains no choice left over
+      from the include-`a` branch.
+5.  **Include `b`**
+    - **Before:** `index=1`, `path=[]`.
+    - **Decision:** Append `b`, visit index `2`, and save a copy.
+    - **After:** Saved result is `[b]`.
+    - **Known correct:** This is the branch excluding `a` and
+      including `b`.
+6.  **Undo and exclude `b`**
+    - **Before:** `path=[b]` after the call returns.
+    - **Decision:** Remove `b`, visit index `2` without it, and save a
+      copy.
+    - **After:** Saved result is `[]`; all four results are complete.
+    - **Known correct:** Every value had exactly one include or
+      exclude decision on each completed path.
 
-Saving the path without copying is a boundary error: later undo steps
-would mutate all saved results.
-
-Undo sequence in full: generate every subset of `[a, b]`. At each
-position, branch into including the current value or excluding it:
-
-1.  Start with `[]`; include `a`, producing `[a]`.
-2.  Include `b`, producing the complete subset `[a, b]`; save a copy.
-3.  Undo the inclusion of `b`, returning to `[a]`; exclude `b` and
-    save `[a]`.
-4.  Undo the inclusion of `a`, returning to `[]`; exclude `a`.
-5.  Include `b` and save `[b]`; undo it, exclude it, and save `[]`.
-
-The crucial detail is that undoing `b` restores exactly `[a]`, and
-undoing `a` restores exactly `[]`. Each sibling branch therefore
-begins with only the choices made on its own path.
+Saving `path` without copying would be wrong because later undo steps
+would mutate the storage used by earlier results.
 
 ###### Why it works
 
 At the start of each recursive call, the partial answer and its
 supporting facts describe exactly the choices on the path to that
 call. After the call returns, undoing its choice restores exactly what
-the caller had before trying that branch.
+the caller had before trying that branch. At each level, the include
+and exclude calls cover both possibilities without overlap. The index
+increases on every call, so it eventually reaches the finite input
+length and recursion finishes.
 
 ###### Go example
 
@@ -8363,7 +9229,7 @@ manageable number of constructions. Input rules often let you stop
 exploring a branch as soon as its partial answer cannot become valid
 or cannot beat the best answer already found.
 
-Backtracking is a candidate when all of these are true:
+Backtracking is a good fit when all of these are true:
 
 1.  A complete answer can be represented as a sequence of choices.
 2.  From a partial answer, you can enumerate the choices allowed next.
@@ -8382,7 +9248,7 @@ Backtracking is a candidate when all of these are true:
   search tree.
 - Use ordinary **[depth-first search
   (DFS)](#c1320-depth-first-search)** when traversing an existing
-  graph or tree without constructing and undoing a candidate answer.
+  graph or tree without building and undoing a possible answer.
 - Avoid exhaustive backtracking when there are too many possibilities
   and no useful early-stopping rule or repeated smaller question
   exists.
@@ -8421,7 +9287,8 @@ without requiring the fewest-move path first.
 
 Depth-first search (**DFS**) follows one route as far as possible.
 When that route ends, return to the most recent place that had another
-route available.
+route available. A location in a network is a **vertex**; a direct
+connection from one vertex to another is an **edge**.
 
 ###### How it works
 
@@ -8435,17 +9302,36 @@ your own stack to remember where to return.
 Traverse edges `A-B`, `A-C`, and `B-D` from `A`; one valid DFS order
 is `A,B,D,C`.
 
-1.  **Visit `A`.** **Before:** all vertices are unseen. **Decision:**
-    mark `A`, then follow neighbor `B`. **After:** active route is
-    `A,B`. **Known correct:** `A` cannot be scheduled again through a
-    cycle.
-2.  **Finish `B`.** **Before:** `B` has unseen child `D`.
-    **Decision:** visit and finish `D`, then return. **After:** `B` is
-    complete. **Known correct:** its reachable branch was fully
-    explored.
-3.  **Return to `A`.** **Before:** `C` remains unseen. **Decision:**
-    visit `C`. **After:** order is `A,B,D,C`. **Known correct:** every
-    reachable vertex was visited once.
+1.  **Enter `A`**
+    - **Before:** Every vertex is unseen; order is empty.
+    - **Decision:** Mark `A` and append it to the order.
+    - **After:** Order is `[A]`; the active route ends at `A`.
+    - **Known correct:** A later edge back to `A` cannot schedule it
+      again.
+2.  **Follow edge `A-B`**
+    - **Before:** `B` is `A`'s first unseen neighbor.
+    - **Decision:** Enter `B`, mark it, and append it.
+    - **After:** Order is `[A,B]`; active route is `A-B`.
+    - **Known correct:** Both entered vertices appear exactly once.
+3.  **Follow edge `B-D`**
+    - **Before:** `D` is unseen.
+    - **Decision:** Enter `D`, mark it, and append it.
+    - **After:** Order is `[A,B,D]`; active route is `A-B-D`.
+    - **Known correct:** Every explored edge from `B` has led to its
+      unseen destination.
+4.  **Return from `D`, then `B`**
+    - **Before:** `D` has no unseen neighbor.
+    - **Decision:** Return to `B`; after `B` also has no unseen
+      neighbor, return to `A`.
+    - **After:** `A` resumes its neighbor loop.
+    - **Known correct:** Every route beginning through `B` is fully
+      explored.
+5.  **Follow edge `A-C`**
+    - **Before:** `C` is `A`'s remaining unseen neighbor.
+    - **Decision:** Enter and mark `C`; it has no unseen neighbor.
+    - **After:** Order is `[A,B,D,C]`; return from `A`.
+    - **Known correct:** Every vertex reachable from `A` was entered
+      once.
 
 In a directed cycle `A->B->C->A`, an edge to an active vertex proves a
 cycle; an edge to a finished vertex does not.
@@ -8495,10 +9381,11 @@ when a valid path may be too deep for recursion.
 
 ###### Work and memory
 
-With an adjacency list, a complete traversal takes `O(V + E)` time
-because it visits each vertex and examines each edge a constant number
-of times. Reached state and the explicit or recursive stack use `O(V)`
-extra memory in the worst case.
+With an adjacency list, which stores each location's neighbors, a
+complete search takes `O(V + E)` time because it visits each of the
+`V` locations and examines each of the `E` connections a constant
+number of times. Reached state and the explicit or recursive stack use
+`O(V)` extra memory in the worst case.
 
 For cycle detection, one permanent `visited` flag is not always
 enough. In a directed graph, use three states: unseen, currently on
@@ -8529,12 +9416,12 @@ very deep inputs.
 
 ###### Related material
 
-- [B.5 Graphs and grids](#b5-graphs-and-grids) owns graph
+- [B.5 Graphs and grids](#b5-graphs-and-grids) explains graph
   representation.
 - [C.1.3.21 Breadth-first search](#c1321-breadth-first-search) finds
   fewest equal-cost moves.
-- [C.1.3.19 Backtracking](#c1319-backtracking) adds and undoes
-  candidate choices during DFS order.
+- [C.1.3.19 Backtracking](#c1319-backtracking) adds and undoes choices
+  while following depth-first order.
 
 <a id="c1321-breadth-first-search"></a>
 
@@ -8549,6 +9436,8 @@ the same cost.
 
 Breadth-first search (**BFS**) explores outward in layers: first
 everything one move away, then everything two moves away, and so on.
+A **layer** contains all locations at the same number of moves from
+the start.
 
 ###### How it works
 
@@ -8561,16 +9450,38 @@ distance.
 
 On path `A-B-C-D`, find the distance from `A` to `D`; expect `3`.
 
-1.  **Layer `0`.** **Before:** queue contains `A`. **Decision:**
-    remove `A`, mark and enqueue `B` at distance `1`. **After:** queue
-    is `[B]`. **Known correct:** no unseen vertex is closer than `B`.
-2.  **Layers `1` and `2`.** **Before:** queue order is by discovery
-    distance. **Decision:** process `B`, then `C`, enqueueing the next
-    unseen vertex. **After:** `D` is enqueued at distance `3`. **Known
-    correct:** all shorter layers were exhausted first.
-3.  **Reach `D`.** **Before:** no route shorter than `3` remains
-    unprocessed. **Decision:** return `3`. **After:** search ends.
-    **Known correct:** this is the fewest-move route.
+1.  **Initialize the start**
+    - **Before:** All distances are `-1`, meaning undiscovered.
+    - **Decision:** Set `distance[A]=0` and enqueue `A`.
+    - **After:** Queue is `[A]`.
+    - **Known correct:** The start is zero moves from itself.
+2.  **Remove `A`**
+    - **Before:** `A` is the oldest queued vertex.
+    - **Decision:** Discover `B`, set `distance[B]=1`, and enqueue it.
+    - **After:** Queue is `[B]`.
+    - **Known correct:** Every route from `A` to `B` needs at least
+      one edge.
+3.  **Remove `B`**
+    - **Before:** `B` has distance `1`; `A` is already discovered.
+    - **Decision:** Skip `A`. Discover `C` at distance `2` and enqueue
+      it.
+    - **After:** Queue is `[C]`.
+    - **Known correct:** Every distance-1 vertex was processed before
+      `C` received distance `2`.
+4.  **Remove `C`**
+    - **Before:** `C` has distance `2`.
+    - **Decision:** Skip discovered `B`. Discover `D` at distance `3`
+      and enqueue it.
+    - **After:** Queue is `[D]`; `distance[D]=3`.
+    - **Known correct:** Every route with fewer than three edges has
+      already been considered.
+5.  **Remove `D`**
+    - **Before:** `D` is the only queued vertex.
+    - **Decision:** Its only neighbor is already discovered, so add
+      nothing.
+    - **After:** The queue is exhausted; return the distance array.
+    - **Known correct:** The fewest-move distance from `A` to `D` is
+      `3`.
 
 With several sources, enqueue all at distance zero before starting.
 With no source, the queue stays empty and no position is reachable.
@@ -8643,8 +9554,10 @@ Validate `start`; `-1` means unreachable.
 
 ###### Work and memory
 
-With an adjacency list, ordinary BFS takes `O(V + E)` time and `O(V)`
-extra memory for its queue, distances, and reached state.
+With an adjacency list, which stores each location's neighbors,
+ordinary BFS takes `O(V + E)` time and `O(V)` extra memory for its
+queue, distances, and reached state. Here, `V` counts locations and
+`E` counts connections.
 
 ###### When to use it
 
@@ -8661,7 +9574,7 @@ are zero or greater.
 
 > **Warning:** Marking only when a vertex is removed lets two vertices
 > in the same layer enqueue it twice. Mark at insertion so the first,
-> shortest discovery owns the queue entry.
+> shortest discovery is the only one that adds it to the queue.
 
 Validate the start and every neighbor index. Empty graphs have no
 valid start, and unreachable vertices retain the declared `-1`
@@ -8669,7 +9582,8 @@ distance.
 
 ###### Related material
 
-- [B.3 Queues and deques](#b3-queues-and-deques) owns FIFO behavior.
+- [B.3 Queues and deques](#b3-queues-and-deques) explains FIFO
+  behavior.
 - [C.1.3.20 Depth-first search](#c1320-depth-first-search) explores
   one route first.
 - [C.1.3.23 Dijkstra shortest paths](#c1323-dijkstra-shortest-paths)
@@ -8687,6 +9601,8 @@ that depends on it.
 ###### The idea in simple terms
 
 Repeatedly perform tasks whose prerequisites are already satisfied.
+An ordering that places every prerequisite before the tasks it unlocks
+is a **topological order**.
 
 ###### How it works
 
@@ -8694,23 +9610,36 @@ For every prerequisite rule, record which later task it unlocks. Count
 each task's unfinished prerequisites. Add every task with a count of
 zero to a first-in, first-out queue. When one task finishes, subtract
 one from the count of every task that depended on it.
-
 ###### Step-by-step examples
 
 For `Shop -> Cook -> Eat`, expect `[Shop,Cook,Eat]`.
 
-1.  **Initialize.** **Before:** unfinished prerequisite counts are
-    `0,1,1`. **Decision:** enqueue `Shop`, the only zero-count task.
-    **After:** queue is `[Shop]`. **Known correct:** every queued task
-    is ready.
-2.  **Release `Cook`.** **Before:** removing `Shop` completes one
-    prerequisite. **Decision:** decrement `Cook` to zero and enqueue
-    it. **After:** output is `[Shop]`. **Known correct:** `Cook` now
-    follows its prerequisite.
-3.  **Release `Eat`.** **Before:** `Cook` is ready. **Decision:**
-    output it and decrement `Eat`. **After:** output becomes
-    `[Shop,Cook,Eat]`. **Known correct:** every dependency is
-    respected.
+1.  **Count unfinished prerequisites**
+    - **Before:** No counts or ready queue exist.
+    - **Decision:** Count incoming rules for each task.
+    - **After:** Counts are `Shop=0`, `Cook=1`, and `Eat=1`; ready
+      queue is `[Shop]`.
+    - **Known correct:** `Shop` is the only task ready immediately.
+2.  **Complete `Shop`**
+    - **Before:** `Shop` is the oldest ready task.
+    - **Decision:** Remove it, append it to the output, and reduce
+      `Cook`'s unfinished count from `1` to `0`.
+    - **After:** Output is `[Shop]`; queue is `[Cook]`.
+    - **Known correct:** `Cook` enters the queue only after its sole
+      prerequisite appears in the output.
+3.  **Complete `Cook`**
+    - **Before:** `Cook` is ready; `Eat` has one unfinished
+      prerequisite.
+    - **Decision:** Output `Cook` and reduce `Eat`'s count to zero.
+    - **After:** Output is `[Shop,Cook]`; queue is `[Eat]`.
+    - **Known correct:** Both output tasks follow every prerequisite.
+4.  **Complete `Eat`**
+    - **Before:** `Eat` is the final ready task.
+    - **Decision:** Output it; it unlocks nothing else.
+    - **After:** Output is `[Shop,Cook,Eat]`; all three tasks were
+      processed.
+    - **Known correct:** Every arrow points from an earlier output
+      position to a later one.
 
 Adding `Eat -> Shop` leaves no zero-count task; processing fewer than
 all tasks proves a cycle blocks any valid order.
@@ -8724,7 +9653,7 @@ prerequisite count reaches zero.
 If the queue becomes empty before every task is processed, the graph
 of unprocessed tasks contains a dependency cycle, such as `A` needing
 `B` while `B` also needs `A`. Some other unprocessed tasks may not be
-part of that cycle; they can simply be waiting on a task that is. No
+part of that cycle; they may instead be waiting on a task that is. No
 valid order exists.
 
 An alternative uses DFS with the three states described above. After
@@ -8777,8 +9706,8 @@ func topologicalOrder(graph [][]int) ([]int, bool) {
 			}
 		}
 	}
-	// A cycle leaves at least one positive indegree, so not every vertex
-	// is emitted.
+	// A cycle leaves a positive unfinished-prerequisite count, so not
+	// every vertex is emitted.
 	return order, len(order) == len(graph)
 }
 ```
@@ -8788,8 +9717,10 @@ order.
 
 ###### Work and memory
 
-Both forms take `O(V + E)` time and `O(V)` extra memory with adjacency
-lists, not counting the stored graph itself.
+Both forms take `O(V + E)` time and `O(V)` extra memory. Here, `V`
+counts tasks and `E` counts prerequisite rules. An adjacency list
+stores the tasks unlocked by each task; the stored graph itself is not
+included in the extra-memory count.
 
 ###### When to use it
 
@@ -8806,17 +9737,18 @@ valid dependency order.
 
 > **Warning:** Reversing an edge changes the prerequisite meaning. If
 > `A` must finish before `B`, store `A -> B` and increment
-> `indegree[B]`, not `indegree[A]`.
+> `B`'s unfinished-prerequisite count, not `A`'s.
 
-Validate every destination index. Duplicate stored edges count as
-duplicate prerequisites unless they are deduplicated consistently in
-both the adjacency list and indegree counts. An empty graph has the
-valid empty order.
+Validate every destination index. Repeated stored connections count as
+repeated prerequisites unless they are removed from both the neighbor
+lists and the unfinished-prerequisite counts. An empty task list has
+the valid empty order.
 
 ###### Related material
 
-- [C.1.3.21 Breadth-first search](#c1321-breadth-first-search) owns
-  queue-layer traversal.
+- [C.1.3.21 Breadth-first
+  search](#c1321-breadth-first-search) explains processing one
+  distance layer at a time.
 - [C.1.3.20 Depth-first search](#c1320-depth-first-search) provides
   the postorder alternative.
 - [B.5 Graphs and grids](#b5-graphs-and-grids) defines directed edges.
@@ -8833,41 +9765,64 @@ zero or greater.
 ###### The idea in simple terms
 
 On a map with travel costs, always process the unvisited location with
-the cheapest known route from the starting location.
+the cheapest known route from the starting location. This is
+**Dijkstra's algorithm**. A known cost that may still improve is
+**tentative**; a cost proved minimal is **finalized**.
 
 ###### How it works
 
 Record cost `0` for the starting location and "unknown" for all
-others. Use a priority queue that removes the route with the smallest
-cost first. When traveling through the current location gives a
-neighbor a cheaper route, store that new cost and add the route to the
-queue.
+others. Repeatedly choose the unfinished location with the smallest
+tentative cost and finalize it. For each outgoing connection, add its
+cost to the finalized route. If that produces a cheaper route to the
+destination, replace the destination's tentative cost. The code below
+finds the next location by scanning all locations; a priority queue is
+faster on sparse, large graphs.
 
 ###### Step-by-step examples
 
 Let `A->B=4`, `A->C=1`, and `C->B=2`; from `A`, expect `B=3`.
 
-1.  **Expand `A`.** **Before:** `A=0`, others unknown. **Decision:**
-    offer `B=4` and `C=1`. **After:** the heap exposes `C=1`. **Known
-    correct:** these are the cheapest discovered routes.
-2.  **Expand `C`.** **Before:** `C=1` is cheapest. **Decision:**
-    improve `B` to `1+2=3`. **After:** both `B=3` and stale `B=4`
-    entries may remain queued. **Known correct:** stored `B=3` is the
-    best discovered route.
-3.  **Finalize `B`.** **Before:** heap removes `B=3`. **Decision:**
-    accept it and later ignore `B=4`. **After:** `B` is final at `3`.
-    **Known correct:** non-negative edges cannot produce a cheaper
-    later route.
+1.  **Initialize**
+    - **Before:** No route cost is known.
+    - **Decision:** Store `A=0`; store `infinity` for `B` and `C` to
+      mean they have not been reached.
+    - **After:** Costs are `A=0`, `B=infinity`, `C=infinity`.
+    - **Known correct:** The empty route reaches `A` at cost zero.
+2.  **Finalize `A`**
+    - **Before:** `A=0` is the cheapest unfinished cost.
+    - **Decision:** Follow `A->B` to offer cost `4`, then follow
+      `A->C` to offer cost `1`.
+    - **After:** Costs are `A=0`, `B=4`, `C=1`; `A` is final.
+    - **Known correct:** `B=4` and `C=1` are the cheapest routes found
+      so far.
+3.  **Finalize `C`**
+    - **Before:** `C=1` is cheaper than unfinished `B=4`.
+    - **Decision:** Following `C->B` offers `1+2=3`, which replaces
+      `B=4`.
+    - **After:** Costs are `A=0`, `B=3`, `C=1`; `C` is final.
+    - **Known correct:** Every unfinished route must already cost at
+      least `1`, and no non-negative edge can lower it below `1`.
+4.  **Finalize `B`**
+    - **Before:** `B=3` is the only unfinished reachable location.
+    - **Decision:** Mark `B` final. It has no outgoing edge to
+      improve.
+    - **After:** Final cost to `B` is `3`.
+    - **Known correct:** Any later route would start at cost at least
+      `3` and can only add a non-negative amount.
 
 A negative edge invalidates that finalization argument even when this
 particular trace happens to work.
 
 ###### Why it works
 
-Suppose the queue removes a route costing `5`, and `5` is still the
-cheapest known cost for that location. Every untried route already
-costs at least `5` before taking another connection. Because a
-connection cannot subtract cost, none can produce a route below `5`.
+Suppose the next chosen route costs `5`, and `5` is still the cheapest
+known cost for that location. Every untried route already costs at
+least `5` before taking another connection. Because a connection
+cannot subtract cost, none can produce a route below `5`. A priority
+queue and the dense scan make the same cheapest-unfinished choice.
+Each outer iteration finalizes one location or stops when no
+unfinished location is reachable, so at most `V` iterations run.
 
 ###### Go example
 
@@ -8875,11 +9830,9 @@ connection cannot subtract cost, none can produce a route below `5`.
 type weightedEdge struct{ to, cost int }
 
 func dijkstraDense(graph [][]weightedEdge, start int) []int {
-	// ^uint(0) has every unsigned bit set. Shifting right clears the top
-	// bit, so converting the result to int produces its largest positive
-	// value. This infinity sentinel marks vertices not yet reached;
-	// finalized marks final distances.
-	const infinity = int(^uint(0) >> 1)
+	// MaxInt is an infinity marker for vertices not yet reached;
+	// finalized marks costs already proved minimal.
+	const infinity = math.MaxInt
 	distanceByVertex := make([]int, len(graph))
 	finalized := make([]bool, len(graph))
 	// Begin with every vertex unreachable, then give start its
@@ -8920,15 +9873,24 @@ func dijkstraDense(graph [][]weightedEdge, start int) []int {
 }
 ```
 
-This compact scan is `O(V^2+E)` and requires non-negative costs. A
-heap changes selection to the `O((V+E) log V)` form analyzed above.
+This complete fragment requires `import "math"`, a valid start and
+endpoints, non-negative costs, and route sums that fit in `int`. Its
+dense scan is `O(V^2+E)`. A heap changes selection to the
+`O((V+E) log V)` form analyzed below.
 
 ###### Work and memory
 
-With adjacency lists and a **binary heap**, a priority queue organized
-as a tree with at most two children per position, the usual
-implementation takes `O((V + E) log V)` time and `O(V + E)` storage
-including the graph. Some priority queues support **decrease-key**,
+The shown dense version performs up to `V` selections, and each one
+scans `V` locations. Together with examining `E` connections, that is
+`O(V^2 + E)` time. Its distance and finalized slices use `O(V)` extra
+memory beyond the graph.
+
+An adjacency list stores each location's outgoing connections. With
+these lists and a **binary heap**, a priority queue arranged like a
+tree with at most two children per position, the usual implementation
+takes `O((V + E) log V)` time and `O(V + E)` storage including the
+graph. Here, `V` counts locations and `E` counts connections. Some
+priority queues support **decrease-key**,
 which edits the priority of an entry already stored. When that
 operation is unavailable, push a new improved entry and later discard
 any popped entry whose cost no longer equals the stored best cost.
@@ -8958,7 +9920,8 @@ heap entries, and guard route-cost addition before evaluating it.
   simpler for equal costs.
 - [C.1.3.24 Bellman-Ford](#c1324-bellman-ford-shortest-paths) permits
   negative edges.
-- [D.5 Priority queues](#d5-priority-queues) owns Go heap behavior.
+- [D.5 Priority queues](#d5-priority-queues) explains Go heap
+  behavior.
 
 <a id="c1324-bellman-ford-shortest-paths"></a>
 
@@ -8987,30 +9950,61 @@ smaller. This attempt to lower a stored cost is often called
 ###### Step-by-step examples
 
 Let `A->B=4`, `A->C=7`, and `C->B=-5`; from `A`, expect `B=2`.
+Scan the edges in the order shown.
 
-1.  **First edges.** **Before:** only `A=0` is known. **Decision:**
-    set `B=4` and `C=7`. **After:** both destinations are reachable.
-    **Known correct:** these costs use one edge.
-2.  **Negative edge.** **Before:** `C=7`, `B=4`. **Decision:** lower
-    `B` through `C` to `7-5=2`. **After:** `B=2`. **Known correct:**
-    the two-edge route has propagated.
-3.  **Extra pass.** **Before:** up to `V-1` passes are complete.
-    **Decision:** scan once more. **After:** no cost falls, so no
-    reachable negative cycle is detected. **Known correct:** every
-    finite simple route was covered.
+1.  **Initialize**
+    - **Before:** Every cost is unknown.
+    - **Decision:** Set `A=0`; use `infinity` for `B` and `C`.
+    - **After:** Costs are `A=0`, `B=infinity`, `C=infinity`.
+    - **Known correct:** The start reaches itself with no edge.
+2.  **First pass, edge `A->B=4`**
+    - **Before:** `A=0`, `B=infinity`.
+    - **Decision:** Candidate `0+4=4` is cheaper, so store `B=4`.
+    - **After:** `B` has a known one-edge route.
+    - **Known correct:** That route is exactly `A->B`.
+3.  **First pass, edge `A->C=7`**
+    - **Before:** `A=0`, `C=infinity`.
+    - **Decision:** Store candidate `0+7=7` for `C`.
+    - **After:** `C=7`.
+    - **Known correct:** The stored route is exactly `A->C`.
+4.  **First pass, edge `C->B=-5`**
+    - **Before:** `C=7`, `B=4`.
+    - **Decision:** Candidate `7-5=2` is cheaper than `4`, so replace
+      `B`'s cost.
+    - **After:** `B=2`.
+    - **Known correct:** The stored route is `A->C->B` and costs `2`.
+5.  **Second pass**
+    - **Before:** Costs are `A=0`, `B=2`, `C=7`.
+    - **Decision:** Try all three edges again; none produces a smaller
+      cost.
+    - **After:** Stop the main passes early because nothing changed.
+    - **Known correct:** Repeating the same comparisons cannot create
+      a new route cost without an earlier improvement.
+6.  **Cycle-check pass**
+    - **Before:** Every simple route has had enough passes to spread.
+    - **Decision:** Scan every edge one more time.
+    - **After:** No cost falls; return `true` with `B=2`.
+    - **Known correct:** No reachable negative cycle can keep reducing
+      a cost.
 
 For `B->C=1` and `C->B=-2`, an extra pass still lowers a cost and
 proves no finite minimum exists for affected vertices.
 
 ###### Why it works
 
-A finite shortest route never needs to repeat a location; removing any
-repeated non-negative cycle cannot make it more expensive, while a
-repeated negative cycle would mean there is no finite shortest route.
+A finite shortest route never needs to repeat a location. When no
+reachable negative cycle exists, any repeated cycle has cost zero or
+greater, so removing it cannot make the route more expensive. A
+repeated negative cycle would instead mean there is no finite shortest
+route.
+
 A route without repeated locations uses at most `V - 1` edges. After
 pass `k`, every shortest route using at most `k` edges has had a
 chance to propagate its cost. Therefore `V - 1` passes cover every
 finite shortest route.
+
+There are at most `V-1` main passes and one cycle-check pass. Each
+scans the finite edge list, so the algorithm always stops.
 
 Make one additional pass. If a reachable connection can still lower a
 cost, the route can loop and become cheaper every time around. There
@@ -9110,9 +10104,11 @@ affected by that cycle.
 
 ###### Common mistakes and edge cases
 
-> **Warning:** The sentinel check does not prevent ordinary addition
-> overflow. If `distance[from]=math.MinInt64` and `cost=-1`,
-> constructing the candidate is invalid; enforce the stated route-sum
+> **Warning:** Checking the special value alone does not stop
+> ordinary addition from overflowing. If
+> `distance[from]=math.MinInt64` and
+> `cost=-1`,
+> constructing the possible distance is invalid; enforce the route-sum
 > bound or use checked arithmetic.
 
 Validate `vertices`, `start`, and every endpoint before indexing. An
@@ -9124,7 +10120,7 @@ distances from this start.
 
 - [C.1.3.23 Dijkstra shortest paths](#c1323-dijkstra-shortest-paths)
   is faster for non-negative edges.
-- [B.5 Graphs and grids](#b5-graphs-and-grids) owns graph storage.
+- [B.5 Graphs and grids](#b5-graphs-and-grids) explains graph storage.
 - [A.4 Integer limits and bits](#a4-integer-limits-and-bits) covers
   safe bounds.
 
@@ -9142,7 +10138,8 @@ same connected group.
 Imagine that every connected group has one shared group leader. To
 check whether two items are connected, find each item's leader and
 compare them. To connect two different groups, make one leader report
-to the other.
+to the other. This structure is a **disjoint-set union (DSU)**. It is
+also called **union-find**, after its two main operations.
 
 ###### How it works
 
@@ -9154,18 +10151,35 @@ other.
 
 ###### Step-by-step examples
 
-Connect `1-2`, then `2-3`; expect `1` and `3` to be connected.
+Create three items, connect `0-1`, then `1-2`; expect `0` and `2` to
+be connected. In each shown pair, `item:parent` names an item and its
+stored parent.
 
-1.  **Initialize.** **Before:** parents are `[1:1,2:2,3:3]`.
-    **Decision:** each item begins as its own group. **After:** three
-    leaders exist. **Known correct:** no connection has been added.
-2.  **Union `1,2`.** **Before:** leaders differ. **Decision:** point
-    leader `2` to `1`. **After:** `2->1`. **Known correct:** exactly
-    `1` and `2` share a group.
-3.  **Union `2,3`.** **Before:** `find(2)` reaches `1`, while `3`
-    leads itself. **Decision:** attach `3` to `1`. **After:** both
-    `find(1)` and `find(3)` return `1`. **Known correct:** all added
-    connections are represented.
+1.  **Initialize three groups**
+    - **Before:** The parent and size slices have just been allocated.
+    - **Decision:** Make every item its own parent with size `1`.
+    - **After:** Parents are `[0:0,1:1,2:2]`; sizes are `[1,1,1]`.
+    - **Known correct:** No connection exists, so each item is its own
+      one-item group.
+2.  **Union `0` and `1`**
+    - **Before:** `find(0)=0`, `find(1)=1`; both groups have size `1`.
+    - **Decision:** Attach root `1` below root `0` and add its size.
+    - **After:** Parents are `[0:0,1:0,2:2]`; root `0` has size `2`.
+    - **Known correct:** Exactly items `0` and `1` share a leader.
+3.  **Find leaders for union `1` and `2`**
+    - **Before:** Item `1` points to `0`; item `2` points to itself.
+    - **Decision:** `find(1)` follows its parent and returns `0`;
+      `find(2)` returns `2`.
+    - **After:** The two group roots are `0` and `2`.
+    - **Known correct:** The roots differ, so the new edge joins two
+      separate groups.
+4.  **Join the two groups**
+    - **Before:** Root `0` has size `2`; root `2` has size `1`.
+    - **Decision:** Attach smaller root `2` below root `0` and add its
+      size.
+    - **After:** Parents are `[0:0,1:0,2:0]`; root `0` has size `3`.
+    - **Known correct:** `find(0)` and `find(2)` both return `0`, so
+      all added connections are represented.
 
 Unioning already-connected items changes nothing and can signal that a
 new undirected edge would form a cycle.
@@ -9182,6 +10196,11 @@ parent links reaches the same leader. Path compression changes only
 intermediate links to that same leader, and union by size changes only
 which leader becomes the parent, so neither optimization changes
 membership.
+
+Each `find` step moves from an item toward a root. Union by size keeps
+those paths finite and parent links never form a cycle, so `find`
+reaches a self-parenting root. Each union performs two such searches.
+It then changes one parent or reports that no change is needed.
 
 While finding a leader, make each visited item point closer to that
 leader so later searches take fewer steps. This is called **path
@@ -9291,14 +10310,17 @@ recorded group size.
 
 ###### The problem it solves
 
-Choose undirected weighted edges that connect every vertex with
-minimum total edge cost and no cycle.
+Choose two-way connections that link every location, have the lowest
+possible total cost, and do not form a loop.
 
 ###### The idea in simple terms
 
-Choose enough weighted edges to connect every vertex without forming a
-cycle, while minimizing their total cost. The result spans all
-vertices and has exactly `V - 1` edges when the graph is connected.
+Think of locations joined by two-way connections with prices. In graph
+terms, a location is a **vertex** and a connection is an **edge**.
+Choose enough edges to connect every vertex without creating a loop,
+while keeping their total cost as small as possible. This result is a
+**minimum spanning tree**. If `V` is the number of vertices, a
+nonempty connected result has exactly `V - 1` edges.
 
 Do not confuse a minimum spanning tree with shortest paths. A spanning
 tree minimizes the total cost of the selected network; paths from a
@@ -9307,49 +10329,63 @@ paths in the original graph.
 
 ###### How it works
 
-For Kruskal's algorithm, sort all undirected edges by increasing cost.
-Start with each vertex in a separate disjoint-set group. Scan the
-edges in order, accepting one only when its endpoints have different
-leaders, and stop after accepting `V-1` edges. If the scan ends
-sooner, report that no spanning tree exists. For Prim's algorithm,
-instead grow one connected region and repeatedly remove its cheapest
-edge to an unseen vertex from a min-heap.
+**Kruskal's algorithm** sorts all two-way connections from cheapest to
+most expensive. Each vertex starts in a separate group. Accept a
+connection only when its two ends belong to different groups, and stop
+after accepting `V - 1` edges. If the scan ends sooner, not every
+vertex can be connected. During the scan, the accepted edges form a
+**forest**: one or more separate trees with no loops.
+
+**Prim's algorithm** starts from one vertex and grows a connected
+region. Repeatedly take the cheapest connection from that region to a
+vertex not yet included.
 
 ###### Step-by-step examples
 
 For `A-B=1`, `B-C=2`, and `A-C=5`, expect total cost `3`.
 
-1.  **Edge `A-B`.** **Before:** three separate components.
-    **Decision:** accept the cheapest edge joining two components.
-    **After:** `{A,B}` and `{C}` remain. **Known correct:** the
-    accepted forest can extend to a minimum tree.
-2.  **Edge `B-C`.** **Before:** its endpoints are separate.
-    **Decision:** accept cost `2`. **After:** all vertices are
-    connected with two edges. **Known correct:** the tree has `V-1`
-    edges and total `3`.
-3.  **Edge `A-C`.** **Before:** its endpoints already share a
-    component. **Decision:** reject it. **After:** the tree stays
-    unchanged. **Known correct:** accepting it would create a cycle
-    and add cost.
+1.  **Sort the edges**
+    - **Before:** Edges may be in any input order.
+    - **Decision:** Sort from smallest to largest cost.
+    - **After:** Order is `A-B=1`, `B-C=2`, `A-C=5`.
+    - **Known correct:** Every later unexamined edge costs at least as
+      much as the current edge.
+2.  **Inspect `A-B=1`**
+    - **Before:** Groups are `{A}`, `{B}`, and `{C}`.
+    - **Decision:** Its ends are in different groups, so accept it and
+      join their groups.
+    - **After:** Accepted edges are `[A-B]`; groups are `{A,B}` and
+      `{C}`.
+    - **Known correct:** The accepted forest has no loop.
+3.  **Inspect `B-C=2`**
+    - **Before:** `B` and `C` have different group leaders.
+    - **Decision:** Accept the edge and join the groups.
+    - **After:** Accepted edges are `[A-B,B-C]`; total cost is `3`.
+    - **Known correct:** Three vertices are connected by `V-1=2`
+      edges, so the result is a tree.
+4.  **Stop**
+    - **Before:** The algorithm has accepted `V-1` edges.
+    - **Decision:** Break without examining `A-C=5`.
+    - **After:** Return total `3` and success.
+    - **Known correct:** Any additional edge would create a loop and
+      cannot be part of a tree on these vertices.
 
 If fewer than `V-1` edges can be accepted, the graph is disconnected
 and has only a minimum spanning forest.
 
-Sort edges by weight. Scan from cheapest to most expensive and accept
-an edge exactly when its endpoints are currently in different
-disjoint-set components. The invariant is that the accepted edges form
-a **forest**, meaning a collection of separate trees with no cycles,
-that can still be extended to some minimum spanning tree. The **cut
-property** says that if the vertices are split into two groups, a
-cheapest edge crossing between those groups can be included in some
-minimum spanning tree. That is why Kruskal can safely accept the next
-cheapest edge that joins two current components. Sorting dominates the
-work at `O(E log E)`; disjoint-set operations are nearly constant
-amortized time with path compression and union by size.
+Why is the next accepted edge safe? Consider one group containing an
+endpoint of that edge and all vertices outside the group. Any final
+connected tree must use some edge across that split. Every cheaper
+edge was already examined; if one could cross the split, it would
+already have joined the groups. The current edge is therefore a
+cheapest available crossing edge. Replacing another answer's crossing
+edge with this one cannot raise total cost. This reasoning is the
+**cut property**.
 
-Begin from any vertex and keep the cheapest edge leaving the connected
-portion in a min-heap. Repeatedly take the cheapest edge reaching an
-unseen vertex. In the same office example, starting at `A` adds
+Prim begins from any vertex and keeps the cheapest connections leaving
+the connected part in a min-heap. It repeatedly takes the cheapest
+connection that reaches a new vertex. In the same office example,
+starting at `A` adds
 `A-B = 1` and `A-C = 5` to the heap. Taking `A-B` adds `B-C = 2`;
 taking `B-C` next connects `C` for the same total cost `3`, so the
 unused `A-C` entry is skipped. With adjacency lists and a binary heap,
@@ -9358,16 +10394,12 @@ destination has already been added.
 
 ###### Why it works
 
-Kruskal's accepted edges always form a forest because an edge whose
-endpoints already share a component is rejected. Consider the cut
-separating one current component from the others. The scanned
-acceptable edge is a cheapest remaining edge across such a cut; the
-cut property says it can replace the crossing edge in some minimum
-spanning tree without increasing total cost. Thus after every
-acceptance, the forest can still be extended to a minimum spanning
-tree. Each accepted edge reduces the number of components, so `V-1`
-accepted edges form a minimum-cost spanning tree. If the scan cannot
-reach that count, the input is disconnected.
+Kruskal never creates a loop because it rejects a connection whose
+ends are already in the same group. The cut-property argument above
+shows that each accepted connection can belong to a minimum-cost tree.
+Each acceptance also joins two groups, so `V - 1` accepted edges leave
+one connected tree. If the scan cannot reach that count, some vertices
+cannot be connected to the others.
 
 ###### Go example
 
@@ -9435,7 +10467,8 @@ undirected connection problem.
 
 > **Warning:** Accepting an edge whose endpoints already share a
 > leader creates a cycle. In the triangle `A-B=1`, `B-C=2`, `A-C=5`,
-> the last edge must be rejected even though it appears in the input.
+> the last edge must never be accepted. The shown implementation stops
+> as soon as the first two edges complete the tree.
 
 Validate nonnegative vertex count and every endpoint. Copy the edge
 slice when the caller's order must survive, and use checked or wider
@@ -9463,7 +10496,9 @@ while items continue to change.
 ###### The idea in simple terms
 
 Keep the next item you need (the smallest, largest, or most urgent)
-easy to remove without fully sorting everything after each change.
+easy to remove without fully sorting everything after each change. A
+**priority queue** removes items by priority rather than arrival time.
+A **heap** is a compact tree-shaped way to implement one.
 
 ###### How it works
 
@@ -9475,28 +10510,53 @@ one.
 
 ###### Step-by-step examples
 
-Insert job priorities `5`, `2`, and `8` into a min-heap; expect
-removals `2,5,8`.
+Insert job priorities `5`, `2`, and `8` into a min-heap, where a
+smaller number means a more urgent job. Expect removals `2,5,8`. The
+slice displays the tree one level at a time, with its root first.
 
-1.  **Insert.** **Before:** heap is empty. **Decision:** add all three
-    priorities while repairing parent-child order. **After:** `2` is
-    at the top. **Known correct:** the top is the smallest stored
-    item; the rest need not be globally sorted.
-2.  **Remove `2`.** **Before:** three jobs wait. **Decision:** replace
-    the top with the last item and repair downward. **After:** `5` is
-    exposed. **Known correct:** `2` was the required next job.
-3.  **Finish.** **Before:** `5` and `8` remain. **Decision:** remove
-    the top twice. **After:** output is `2,5,8`. **Known correct:**
-    every removal returned the current minimum.
+1.  **Insert `5`**
+    - **Before:** Heap is empty.
+    - **Decision:** Append `5`; it has no parent to compare with.
+    - **After:** Heap is `[5]`.
+    - **Known correct:** The only value is the minimum.
+2.  **Insert `2`**
+    - **Before:** Heap is `[5]`.
+    - **Decision:** Append `2`, then swap it with parent `5` because
+      `2` is smaller.
+    - **After:** Heap is `[2,5]`.
+    - **Known correct:** The parent is no greater than its child.
+3.  **Insert `8`**
+    - **Before:** Heap is `[2,5]`.
+    - **Decision:** Append `8`; its parent `2` is already smaller.
+    - **After:** Heap is `[2,5,8]`.
+    - **Known correct:** Root `2` is smaller than both children.
+4.  **Remove `2`**
+    - **Before:** Root is `2`; last value is `8`.
+    - **Decision:** Save `2`, move `8` to the root, then swap it with
+      smaller child `5`.
+    - **After:** Return `2`; heap is `[5,8]`.
+    - **Known correct:** The removed value was the minimum, and root
+      `5` is the new minimum.
+5.  **Remove `5`**
+    - **Before:** Heap is `[5,8]`.
+    - **Decision:** Save `5` and move the last value `8` to the root.
+    - **After:** Return `5`; heap is `[8]`.
+    - **Known correct:** The only remaining value is the new minimum.
+6.  **Remove `8`**
+    - **Before:** Heap is `[8]`.
+    - **Decision:** Remove the sole value.
+    - **After:** Return `8`; heap is empty; output is `[2,5,8]`.
+    - **Known correct:** Every removal returned the smallest value
+      stored at that time.
 
-Peeking or removing an empty heap requires an explicit failure
-contract.
+Before reading or removing from an empty heap, decide how the function
+will report that no value exists.
 
 ###### Why it works
 
 The heap contains exactly the items still under consideration, and
-every parent has at least as much priority as its children. Any path
-from the root therefore cannot reach an item that should precede the
+in a min-heap every parent value is no greater than either child. Any
+path from the root therefore cannot reach a value smaller than the
 root. Push and pop repair this parent-child rule along one
 root-to-leaf path, so the root is again the required next item after
 each update. Each repair crosses at most the heap's height and
@@ -9504,9 +10564,10 @@ therefore terminates.
 
 ###### Go example
 
-[D.5 Priority queues](#d5-priority-queues) owns Go's `heap.Interface`
-mechanics. For top `k`, keep at most `k` items and replace the root
-only when a new candidate belongs in the retained set.
+[D.5 Priority queues](#d5-priority-queues) explains Go's
+`heap.Interface` mechanics. For top `k`, keep at most `k` items and
+replace the root
+only when a new value belongs in the retained set.
 
 ###### Work and memory
 
@@ -9551,7 +10612,7 @@ reading its root.
 
 ###### Related material
 
-- [D.5 Priority queues](#d5-priority-queues) owns the Go
+- [D.5 Priority queues](#d5-priority-queues) explains the Go
   implementation pattern.
 - [C.1.3.5 Sorting and selection](#c135-sorting-and-selection) is
   simpler when every item must be ordered once.
@@ -9584,17 +10645,37 @@ answer. Then add the new item, whose own answer is still unknown.
 
 For `[2,1,4]`, find each next greater value; expect `[4,4,none]`.
 
-1.  **Values `2,1`.** **Before:** stack is empty. **Decision:** push
-    positions `0` and `1` because neither answer is known. **After:**
-    stored values decrease as `[2,1]`. **Known correct:** both still
-    await a greater later value.
-2.  **Value `4`.** **Before:** stack top is `1`. **Decision:** pop
-    `1`, then `2`, and assign `4` to both. **After:** push position
-    `2`. **Known correct:** `4` is the first later greater value for
-    both popped positions.
-3.  **End.** **Before:** position `2` remains. **Decision:** assign no
-    answer. **After:** results are `[4,4,none]`. **Known correct:** no
-    later value exists for it.
+1.  **Read index `0`, value `2`**
+    - **Before:** Stack is empty; every result is `none`.
+    - **Decision:** No earlier position can be resolved, so push index
+      `0`.
+    - **After:** Stack indexes are `[0]`; their values are `[2]`.
+    - **Known correct:** Index `0` still awaits a greater later value.
+2.  **Read index `1`, value `1`**
+    - **Before:** Top value is `2`.
+    - **Decision:** `1` is not greater than `2`, so push index `1`.
+    - **After:** Stack indexes are `[0,1]`; values are `[2,1]`.
+    - **Known correct:** Neither stored position has seen a greater
+      later value.
+3.  **Use value `4` to resolve index `1`**
+    - **Before:** At index `2`, value `4` is greater than top value
+      `1`.
+    - **Decision:** Pop index `1` and set its result to `4`.
+    - **After:** Stack indexes are `[0]`; result is `[none,4,none]`.
+    - **Known correct:** `4` is the first greater value after index
+      `1`.
+4.  **Use value `4` to resolve index `0`**
+    - **Before:** New top value is `2`, also smaller than `4`.
+    - **Decision:** Pop index `0` and set its result to `4`.
+    - **After:** Stack is empty; result is `[4,4,none]`.
+    - **Known correct:** Index `1` was not greater than `2`, so `4` is
+      also the first valid answer for index `0`.
+5.  **Store index `2` and finish**
+    - **Before:** The current index has not been pushed.
+    - **Decision:** Push index `2`; after the input ends, leave its
+      result as `none`.
+    - **After:** Final result is `[4,4,none]`.
+    - **Known correct:** No later value exists for the last position.
 
 With equal values, choose `<` or `<=` according to whether "greater"
 is strict; the wrong rule changes duplicate answers.
@@ -9604,6 +10685,8 @@ is strict; the wrong rule changes duplicate answers.
 Every stored item is still waiting for an answer, and the stored
 values remain sorted in one direction. An item is removed only when
 the current value is the first later value that answers its question.
+Each input position is pushed once and popped at most once, so the
+finite scan and every inner removal loop finish.
 
 ###### Go example
 
@@ -9665,9 +10748,10 @@ input returns an empty result.
 
 ###### Related material
 
-- [C.1.3.13 Stack](#c1313-stack) owns stack behavior.
+- [C.1.3.13 Stack](#c1313-stack) explains stack behavior.
 - [C.1.3.29 Monotonic deque](#c1329-monotonic-deque) also removes
-  dominated values but supports expiration at the front.
+  older values made useless by newer ones, and it can remove expired
+  positions from the front.
 
 <a id="c1329-monotonic-deque"></a>
 
@@ -9680,9 +10764,12 @@ rescanning each window.
 
 ###### The idea in simple terms
 
-Keep only candidates that could still become the minimum or maximum of
-a current or future window. The front is the answer for the current
-window; the back is where dominated candidates are removed.
+Keep only positions that could still provide the smallest or largest
+value in the current window or a later one. The front gives the answer
+for the current window. At the back, remove older positions made
+useless by a newer, better value. A **deque** allows removal from both
+the front and back. **Monotonic** means its candidate values stay
+ordered in one direction.
 
 For a moving-window maximum, store positions whose values decrease
 from front to back:
@@ -9706,14 +10793,43 @@ position holds its maximum.
 
 For `[1,3,2,5]` with window size `3`, expect maxima `[3,5]`.
 
-1.  **Read `1,3,2`.** **Before:** deque begins empty. **Decision:**
-    `3` removes older smaller `1`; `2` remains behind `3`. **After:**
-    stored values are `[3,2]`. **Known correct:** front `3` is the
-    first window maximum.
-2.  **Read `5`.** **Before:** deque holds candidates `3,2`.
-    **Decision:** remove both because newer `5` is no smaller and
-    expires later. **After:** deque is `[5]`. **Known correct:** `5`
-    is the next window maximum.
+1.  **Read index `0`, value `1`**
+    - **Before:** Deque is empty.
+    - **Decision:** Append index `0` at the back.
+    - **After:** Deque indexes are `[0]`; values are `[1]`.
+    - **Known correct:** Index `0` is the only maximum candidate.
+2.  **Read index `1`, value `3`**
+    - **Before:** Back value is `1`.
+    - **Decision:** Remove index `0` from the back because newer value
+      `3` is larger, then append index `1`.
+    - **After:** Deque indexes are `[1]`; values are `[3]`.
+    - **Known correct:** While both positions could share a window,
+      older value `1` can never beat `3`.
+3.  **Read index `2`, value `2`**
+    - **Before:** Back value `3` is larger than `2`.
+    - **Decision:** Keep index `1` and append index `2`.
+    - **After:** Deque indexes are `[1,2]`; values are `[3,2]`.
+    - **Known correct:** The first full window is indexes `0..2`, and
+      its maximum is front value `3`; append `3` to the output.
+4.  **Check expiration at index `3`**
+    - **Before:** A width-3 window now covers indexes `1..3`.
+    - **Decision:** Keep front index `1` because it is still inside
+      that window.
+    - **After:** Deque remains `[1,2]`.
+    - **Known correct:** No expired position remains at the front.
+5.  **Prune with new value `5`**
+    - **Before:** Back values are `2`, then `3`.
+    - **Decision:** Remove index `2`, then index `1`, because both
+      values are no larger than newer value `5`.
+    - **After:** Deque is empty.
+    - **Known correct:** Both removed positions expire earlier and can
+      never beat `5` in a later shared window.
+6.  **Append index `3` and report**
+    - **Before:** Deque is empty; current value is `5`.
+    - **Decision:** Append index `3`; read its value from the front.
+    - **After:** Deque indexes are `[3]`; output is `[3,5]`.
+    - **Known correct:** Front value `5` is the maximum of indexes
+      `1..3`.
 
 Store positions, not only values, so duplicates and expiration are
 distinguishable. Window size zero is invalid and size one returns
@@ -9721,9 +10837,11 @@ every input value.
 
 ###### Why it works
 
-Positions remain in increasing time order, values remain monotonic,
-and every removed position is either expired or dominated by a later
-candidate that will remain available for at least as long.
+Positions remain in arrival order, and their values stay ordered in
+one direction. Every removed position has either left the window or
+has been replaced by a later value that is at least as useful and will
+remain available longer. Each position enters once and can leave only
+once, so all removal loops and the finite outer scan terminate.
 
 ###### Go example
 
@@ -9771,9 +10889,10 @@ are processed in `O(n)` time with `O(window size)` memory. Store
 positions rather than values when expiration depends on location or
 duplicate values exist.
 
-Use a heap when priorities change independently or arbitrary items
-remain eligible; use a monotonic deque when eligibility expires in
-sequence order and new values permanently dominate older ones.
+Use a heap when priorities change independently or items stop being
+valid in no predictable order. Use a monotonic deque when positions
+leave in sequence order and a newer value can make an older one
+permanently unnecessary.
 
 ###### When to use it
 
@@ -9782,8 +10901,8 @@ rescanning each window.
 
 ###### When not to use it
 
-Candidates do not expire in input order, or a newer value cannot be
-proved to make an older value permanently irrelevant.
+Positions do not leave in input order, or a newer value cannot be
+proved to make an older value permanently unnecessary.
 
 ###### Common mistakes and edge cases
 
@@ -9797,9 +10916,9 @@ is safe because it expires later.
 
 ###### Related material
 
-- [B.3 Queues and deques](#b3-queues-and-deques) owns deque
+- [B.3 Queues and deques](#b3-queues-and-deques) explains deque
   operations.
-- [C.1.3.14 Sliding window](#c1314-sliding-window) owns boundary
+- [C.1.3.14 Sliding window](#c1314-sliding-window) explains boundary
   movement.
 - [C.1.3.27 Heap or priority queue](#c1327-heap-or-priority-queue)
   handles priorities that do not expire in sequence order.
@@ -9816,12 +10935,15 @@ under an explicit endpoint rule.
 ###### The idea in simple terms
 
 Each interval covers everything between a start and an end. Sort
-intervals by start so overlaps appear next to one another.
+intervals by start so overlaps appear next to one another. An
+**interval** means that start-and-end range. This entry includes
+both endpoints, so `[1,3]` contains `1`, `2`, and `3`.
 
 ###### How it works
 
-Sort by start and keep one current interval. Compare the next start
-with the current end using the problem's rule for touching endpoints.
+Require every interval to have `start <= end`. Sort by start and keep
+one current interval. Compare the next start with the current end
+using the problem's rule for touching endpoints.
 If they overlap, extend the current end when necessary. If a gap
 separates them, save the current interval and begin a new one.
 
@@ -9829,17 +10951,26 @@ separates them, save the current interval and begin a new one.
 
 Merge `[5,7]`, `[1,3]`, and `[2,6]`; expect `[1,7]`.
 
-1.  **Sort.** **Before:** possible overlaps are separated.
-    **Decision:** order by start. **After:** `[1,3],[2,6],[5,7]`.
-    **Known correct:** any interval that can extend the current one
-    appears before a later gap.
-2.  **Merge `[2,6]`.** **Before:** current is `[1,3]`. **Decision:**
-    start `2` is within the current end, so extend to `6`. **After:**
-    current is `[1,6]`. **Known correct:** both ranges are covered.
-3.  **Merge `[5,7]`.** **Before:** current ends at `6`. **Decision:**
-    `5` overlaps, so extend to `7`. **After:** save `[1,7]`. **Known
-    correct:** every input point is represented once in the merged
-    coverage.
+1.  **Sort by start**
+    - **Before:** Input order is `[5,7],[1,3],[2,6]`.
+    - **Decision:** Put the smallest start first.
+    - **After:** Order is `[1,3],[2,6],[5,7]`; current is `[1,3]`.
+    - **Known correct:** A possible overlap with the current interval
+      now appears before any later gap.
+2.  **Read `[2,6]`**
+    - **Before:** Current merged interval is `[1,3]`.
+    - **Decision:** Start `2` is no greater than end `3`, so the
+      intervals overlap. Extend the end to `6`.
+    - **After:** Current merged interval is `[1,6]`.
+    - **Known correct:** It covers exactly everything covered by the
+      first two sorted intervals.
+3.  **Read `[5,7]`**
+    - **Before:** Current merged interval is `[1,6]`.
+    - **Decision:** Start `5` is no greater than end `6`. Extend the
+      end to `7`.
+    - **After:** Result is `[1,7]`.
+    - **Known correct:** It covers every point covered by any input
+      interval, with no duplicate output range.
 
 Whether `[1,2]` and `[2,3]` overlap depends on whether endpoints are
 inclusive or half-open; decide before comparing.
@@ -9848,6 +10979,8 @@ inclusive or half-open; decide before comparing.
 
 Once a gap appears, every remaining interval starts even later because
 the input is sorted. None can overlap the interval you just saved.
+Every loop iteration consumes one sorted interval, so the scan
+finishes after the finite input ends.
 
 ###### Go example
 
@@ -9882,7 +11015,8 @@ func mergeIntervals(intervals []interval) []interval {
 }
 ```
 
-This version uses inclusive endpoints and requires `import "sort"`.
+This version uses inclusive endpoints, requires `start <= end`, and
+requires `import "sort"`.
 
 ###### Work and memory
 
@@ -9903,8 +11037,9 @@ relationships between ranges.
 
 ###### Common mistakes and edge cases
 
-The problem must define whether `[1, 2]` and `[2, 3]` overlap. If both
-ending points are included, the ranges share `2`. If an end marks the
+Validate that every start is no greater than its end. The problem must
+define whether `[1, 2]` and `[2, 3]` overlap. If both ending points
+are included, the ranges share `2`. If an end marks the
 first excluded value, the first range stops immediately before `2`, so
 they do not overlap.
 
@@ -9924,10 +11059,11 @@ Different interval objectives require different rules:
 
 ###### Related material
 
-- [C.1.3.5 Sorting and selection](#c135-sorting-and-selection) owns
+- [C.1.3.5 Sorting and
+  selection](#c135-sorting-and-selection) explains
   ordering.
 - [C.1.3.31 Sweep line](#c1331-sweep-line) counts simultaneous ranges.
-- [C.1.3.18 Greedy](#c1318-greedy) owns earliest-finish selection.
+- [C.1.3.18 Greedy](#c1318-greedy) explains earliest-finish selection.
 
 <a id="c1331-sweep-line"></a>
 
@@ -9935,106 +11071,182 @@ Different interval objectives require different rules:
 
 ###### The problem it solves
 
-Count active ranges or another quantity that changes only at range
-starts and ends.
+Several bookings, jobs, or occupied ranges can overlap. We need to
+find the largest number that are happening at the same time without
+checking every moment individually.
 
 ###### The idea in simple terms
 
-Move from left to right across a timeline or number line. Record only
-the positions where something starts or ends, because nothing changes
-between those positions.
+Imagine reading a calendar from earliest to latest. The number of busy
+rooms changes only when a booking starts or ends. Record those change
+times, put them in order, and keep a running count of busy rooms.
+
+A recorded start or end is called an **event**, and its time is a
+**change point**. Moving through the ordered change points is called a
+**sweep line**. The name suggests moving a vertical line across a
+picture, but the code only moves through sorted times or positions.
 
 ###### How it works
 
-Turn each range into two events. A start event adds one to the active
-count, and an end event subtracts one. Sort the events by position and
-update the count in that order.
+This entry treats a booking's start time as included and its end time
+as excluded. A booking from time `1` until time `4` is active at `1`
+but no longer active at `4`. This range is written `[1,4)`: the square
+bracket includes `1`, and the parenthesis excludes `4`.
+
+1.  For each booking, record `+1` at its start time and `-1` at its
+    end time. The number is the change in busy rooms.
+2.  If several changes happen at the same time, add them together.
+3.  Sort the distinct change times from earliest to latest.
+4.  Start `activeRooms` and `maximumRooms` at zero.
+5.  At each time, add its change to `activeRooms`, then update
+    `maximumRooms` if the new active count is larger.
 
 ###### Step-by-step examples
 
-Bookings `[1,4)` and `[3,5)` need at most two rooms.
+One booking uses a room from time `1` until time `4`. Another uses a
+room from time `3` until time `5`. The input is `[1,4)` and `[3,5)`,
+and the expected maximum is `2` busy rooms.
 
-1.  **Create events.** **Before:** ranges are stored whole.
-    **Decision:** emit `+1@1`, `+1@3`, `-1@4`, and `-1@5`. **After:**
-    only change positions remain. **Known correct:** activity is
-    constant between events.
-2.  **Sweep.** **Before:** active count is `0`. **Decision:** apply
-    events in position order. **After:** counts are `1,2,1,0`; maximum
-    is `2`. **Known correct:** each count equals the ranges active
-    after its event.
+1.  **Step: Record the first booking**
+    - **Before:** No changes are recorded.
+    - **Decision:** The room becomes busy at `1` and free at `4`.
+    - **After:** Changes are `1: +1` and `4: -1`.
+    - **Known correct:** The first booking contributes one busy room
+      from `1` until, but not including, `4`.
+2.  **Step: Record the second booking**
+    - **Before:** Changes are `1: +1` and `4: -1`.
+    - **Decision:** The second room becomes busy at `3` and free at
+      `5`.
+    - **After:** Changes are `1: +1`, `3: +1`, `4: -1`, `5: -1`.
+    - **Known correct:** Every start and end is now represented.
+3.  **Step: Visit time `1`**
+    - **Before:** `activeRooms=0`, `maximumRooms=0`.
+    - **Decision:** Apply the change `+1`.
+    - **After:** `activeRooms=1`, `maximumRooms=1`.
+    - **Known correct:** One booking is active after time `1`.
+4.  **Step: Visit time `3`**
+    - **Before:** `activeRooms=1`, `maximumRooms=1`.
+    - **Decision:** Apply the change `+1`.
+    - **After:** `activeRooms=2`, `maximumRooms=2`.
+    - **Known correct:** Both bookings are active after time `3`.
+5.  **Step: Visit time `4`**
+    - **Before:** `activeRooms=2`, `maximumRooms=2`.
+    - **Decision:** Apply the change `-1` because the first booking
+      has ended.
+    - **After:** `activeRooms=1`, `maximumRooms=2`.
+    - **Known correct:** Only the second booking remains active.
+6.  **Step: Visit time `5`**
+    - **Before:** `activeRooms=1`, `maximumRooms=2`.
+    - **Decision:** Apply the change `-1`.
+    - **After:** `activeRooms=0`; return `maximumRooms=2`.
+    - **Known correct:** No booking remains, and the largest count
+      seen was two.
 
-For `[1,4)` and `[4,5)`, process the end at `4` before the start at
-`4`; otherwise the sweep wrongly reports two simultaneous rooms.
+For a boundary example, use bookings `[1,4)` and `[4,5)`. The first
+ends exactly when the second starts, so the expected maximum is `1`.
+At time `4`, the changes `-1` and `+1` add to zero. The running count
+therefore stays at one instead of briefly and incorrectly becoming
+two.
 
 ###### Why it works
 
-After processing all events at a position, the running count equals
-the number of ranges active immediately after that position.
+Before the first change, no booking is active. At each change time,
+every booking that starts contributes one and every booking that ends
+removes one. After their combined change is applied, `activeRooms`
+therefore equals the number of bookings active immediately after that
+time. Nothing starts or ends between two recorded times, so the count
+cannot change there.
+
+The loop visits every distinct change time once and then finishes.
+Because `maximumRooms` remembers the largest correct active count seen
+at any time, it is the largest number of simultaneous bookings.
 
 ###### Go example
 
 ```go
-type sweepEvent struct{ position, delta int }
+import "sort"
 
-func maximumOverlap(events []sweepEvent) int {
-	// Sort the supplied event slice in place, changing the caller's
-	// order. At a tie, process negative end deltas before positive start
-	// deltas to model half-open intervals [start,end).
-	sort.Slice(events, func(leftIndex, rightIndex int) bool {
-		if events[leftIndex].position == events[rightIndex].position {
-			return events[leftIndex].delta < events[rightIndex].delta
+type booking struct {
+	start int
+	end   int
+}
+
+func maximumSimultaneousBookings(bookings []booking) (int, bool) {
+	// Combine all room-count changes that happen at the same time. This
+	// makes an ending and a start at one time cancel each other.
+	changeByTime := make(map[int]int, len(bookings)*2)
+	for _, currentBooking := range bookings {
+		// A half-open booking must contain at least one moment. Report an
+		// invalid range instead of silently changing its meaning.
+		if currentBooking.start >= currentBooking.end {
+			return 0, false
 		}
-		return events[leftIndex].position < events[rightIndex].position
-	})
-	// active is the overlap immediately after applying each ordered
-	// boundary; best records the largest such count.
-	active, best := 0, 0
-	for _, event := range events {
-		// Start events increase the active count and end events decrease
-		// it.
-		active += event.delta
-		if active > best {
-			// Preserve the largest overlap reached after any boundary update.
-			best = active
+		changeByTime[currentBooking.start]++
+		changeByTime[currentBooking.end]--
+	}
+
+	// Map iteration has no promised order, so collect and sort the
+	// distinct times before sweeping through them.
+	times := make([]int, 0, len(changeByTime))
+	for changeTime := range changeByTime {
+		times = append(times, changeTime)
+	}
+	sort.Ints(times)
+
+	// activeRooms is correct immediately after each visited time.
+	// maximumRooms remembers the largest such count.
+	activeRooms, maximumRooms := 0, 0
+	for _, changeTime := range times {
+		activeRooms += changeByTime[changeTime]
+		if activeRooms > maximumRooms {
+			maximumRooms = activeRooms
 		}
 	}
-	return best
+	return maximumRooms, true
 }
 ```
 
-Negative end events sort before positive start events at the same
-position, matching non-empty half-open ranges; this requires
-`import "sort"`. Ignore or reject an empty range before creating its
-start and end events.
+The function returns `false` when any booking has `start >= end`.
+Empty input is valid and returns `(0, true)`. The code requires
+`import "sort"` and does not reorder the caller's bookings.
 
 ###### Work and memory
 
-Creating and sorting two events per range takes `O(n log n)` time and
-`O(n)` event storage. The sweep itself is linear after sorting.
+Let `n` be the number of bookings. Recording their changes takes
+`O(n)` time. There are at most `2n` distinct change times, so sorting
+them takes `O(n log n)` time. Visiting the sorted times takes
+`O(n)` more time. The map and time slice together use `O(n)` extra
+memory.
 
 ###### When to use it
 
-You need the maximum number of simultaneous bookings, the number of
-active ranges at each position, or another result that changes only
-when a range starts or ends.
+Use this method when the answer changes only at known starts and ends.
+Typical requests ask for the maximum number of simultaneous bookings,
+people in a building, running jobs, or overlapping ranges.
 
 ###### When not to use it
 
-Values change continuously between event positions, or events arrive
-online and must be answered before they can be collected and sorted.
+If every possible position belongs to a small fixed integer range, a
+difference array may be simpler. If bookings arrive one at a time and
+each one needs an immediate answer before all bookings are known, use
+a structure that maintains ordered changes instead of sorting once at
+the end.
 
 ###### Common mistakes and edge cases
 
-Events at the same position need an explicit rule. If a booking ending
-at `4` frees its room before another starts at `4`, process the ending
-before the new start.
+> **Warning:** Applying a start before an end at the same time can
+> invent an overlap. For `[1,4)` and `[4,5)`, combine `-1` and `+1`
+> at time `4`, or otherwise make the end take effect first.
+
+Reject a booking whose start is not earlier than its end. Decide
+whether end times are included or excluded before creating changes;
+the rule changes how touching bookings behave.
 
 ###### Related material
 
-- [C.1.3.30 Intervals](#c1330-intervals) owns overlap and endpoint
-  conventions.
-- [C.1.3.16 Difference arrays](#c1316-difference-arrays) is a discrete
-  sweep over a small fixed coordinate range.
+- [C.1.3.30 Intervals](#c1330-intervals) explains start and end rules.
+- [C.1.3.16 Difference arrays](#c1316-difference-arrays) records
+  changes when every possible position belongs to a small range.
 
 <a id="c1332-fast-and-slow-pointers"></a>
 
@@ -10049,7 +11261,9 @@ the end without storing the full path.
 
 Move two positions through the same linked list. Their speeds or the
 distance between them reveals a loop, the middle, or a node near the
-end.
+end. Here a **pointer** is a variable that refers to a list node. The
+two-pointer form that moves one slowly and one quickly is called the
+**fast-and-slow pointer** method.
 
 ###### How it works
 
@@ -10062,14 +11276,30 @@ first and then move both one node at a time.
 
 For `1->2->3->4->nil`, return the second middle `3`.
 
-1.  **First move.** **Before:** both pointers are at `1`.
-    **Decision:** move `slow` once and `fast` twice. **After:** they
-    are at `2` and `3`. **Known correct:** `fast` has traveled twice
-    as far.
-2.  **Second move.** **Before:** `fast` can advance toward the end.
-    **Decision:** move again. **After:** `slow` is at `3` and `fast`
-    reaches `nil`. **Known correct:** under this stopping rule, `slow`
-    is the second middle.
+1.  **Initialize**
+    - **Before:** No node has been examined.
+    - **Decision:** Point both `slow` and `fast` at node `1`.
+    - **After:** `slow=1`, `fast=1`.
+    - **Known correct:** Both have moved zero links.
+2.  **First loop iteration**
+    - **Before:** `fast=1` and its next node `2` both exist.
+    - **Decision:** Move `slow` one link to `2`; move `fast` two links
+      to `3`.
+    - **After:** `slow=2`, `fast=3`.
+    - **Known correct:** `fast` has moved twice as many links.
+3.  **Second loop iteration**
+    - **Before:** `fast=3` and its next node `4` both exist.
+    - **Decision:** Move `slow` one link to `3`; move `fast` through
+      `4` to `nil`.
+    - **After:** `slow=3`, `fast=nil`.
+    - **Known correct:** `slow` has moved two of the four links from
+      the head position through the end.
+4.  **Stop**
+    - **Before:** `fast` is `nil`, so the loop condition is false.
+    - **Decision:** Return `slow`.
+    - **After:** Returned node contains `3`.
+    - **Known correct:** Starting both pointers at the head selects
+      the later of the two middle nodes for an even-length list.
 
 For even lengths, a different loop condition can return the first
 middle. Check both `fast` and the next link before a two-step move;
@@ -10147,8 +11377,9 @@ moving both positions.
 
 ###### Related material
 
-- [B.2 Linked Lists](#b2-linked-lists) owns node and cycle behavior.
-- [C.1.3.9 Two pointers](#c139-two-pointers) owns the broader
+- [B.2 Linked Lists](#b2-linked-lists) explains node and cycle
+  behavior.
+- [C.1.3.9 Two pointers](#c139-two-pointers) explains the broader
   coordinated-position method.
 - [C.1.3.4 Hash map or set](#c134-hash-map-or-set) retains full
   visited membership when needed.
@@ -10165,7 +11396,8 @@ scanning every stored word.
 ###### The idea in simple terms
 
 Store words one character at a time. Words with the same beginning
-reuse the same initial steps.
+reuse the same initial steps. This tree of shared word beginnings is a
+**trie**. Its first node, before any character, is the **root**.
 
 ###### How it works
 
@@ -10179,20 +11411,55 @@ the end marker after the last character.
 Insert `car` and `cat`; expect prefix `ca` to exist but full word `ca`
 not to exist.
 
-1.  **Insert `car`.** **Before:** root has no children. **Decision:**
-    create `c->a->r` and mark `r` as a word end. **After:** one word
-    is stored. **Known correct:** its complete path spells `car`.
-2.  **Insert `cat`.** **Before:** `c->a` already exists. **Decision:**
-    reuse it, create child `t`, and mark that end. **After:** the
-    words share their prefix. **Known correct:** both full paths
-    exist.
-3.  **Query `ca`.** **Before:** both edges exist. **Decision:** prefix
-    lookup succeeds, but inspect the end marker for full-word lookup.
-    **After:** prefix is true and word is false. **Known correct:** a
-    stored beginning is not confused with a stored complete word.
+1.  **Insert byte `c` from `car`**
+    - **Before:** Root has no children.
+    - **Decision:** Create a `c` child and move to it.
+    - **After:** Path from root spells `c`.
+    - **Known correct:** The stored path equals the processed byte.
+2.  **Insert byte `a` from `car`**
+    - **Before:** Current path spells `c`.
+    - **Decision:** Create an `a` child and move to it.
+    - **After:** Path from root spells `ca`.
+    - **Known correct:** The path equals the first two input bytes.
+3.  **Insert byte `r` from `car`**
+    - **Before:** Current path spells `ca`.
+    - **Decision:** Create and follow child `r`, then mark its node as
+      a word end because the input word is finished.
+    - **After:** Path spells `car` and its last node is marked.
+    - **Known correct:** Exact lookup for `car` can follow every byte
+      and find the end marker.
+4.  **Reuse `c` while inserting `cat`**
+    - **Before:** Root already has a `c` child.
+    - **Decision:** Follow that existing child instead of creating
+      one.
+    - **After:** Current path spells `c`; no node was added.
+    - **Known correct:** Both words share the same stored beginning.
+5.  **Reuse `a` while inserting `cat`**
+    - **Before:** The `c` node already has an `a` child.
+    - **Decision:** Follow that existing child.
+    - **After:** Current path spells `ca`; no node was added.
+    - **Known correct:** The complete shared beginning was reused.
+6.  **Add `t` to finish `cat`**
+    - **Before:** Current path spells `ca`, with existing child `r`.
+    - **Decision:** Create child `t` and mark its node as a word end.
+    - **After:** Complete paths for `car` and `cat` exist.
+    - **Known correct:** Their shared `ca` nodes were reused, while
+      their final bytes have separate children.
+7.  **Query prefix `ca`**
+    - **Before:** Start at the root.
+    - **Decision:** Follow child `c`, then child `a`; do not require a
+      word-end marker for a prefix query.
+    - **After:** Prefix lookup returns `true`.
+    - **Known correct:** At least one stored word begins with `ca`.
+8.  **Query whole word `ca`**
+    - **Before:** The same path reaches the `a` node.
+    - **Decision:** Require that node's word-end marker.
+    - **After:** Whole-word lookup returns `false`.
+    - **Known correct:** `ca` is only a beginning, not an inserted
+      complete word.
 
-Empty-string insertion is represented by the root end marker if the
-contract allows it. A wildcard may branch to many children and lose
+Empty-string insertion is represented by the root end marker if empty
+strings are allowed. A wildcard may branch to many children and lose
 linear lookup time.
 
 Use a fixed child array for a small fixed alphabet and a map for a
@@ -10207,7 +11474,9 @@ branch immediately.
 
 The characters followed from the starting point always spell the
 beginning represented by the current step. A word exists only if the
-last step is marked as the end of a complete word.
+last step is marked as the end of a complete word. Insert and lookup
+advance one input byte per loop iteration, so both finish after the
+finite text ends or lookup encounters a missing child.
 
 ###### Go example
 
@@ -10283,7 +11552,7 @@ usually simpler and may use less memory.
 
 The methods require a non-nil root. Decide whether the empty string is
 allowed, and use runes or visible-symbol segmentation instead of bytes
-when the input contract requires those text units.
+when the problem requires those text units.
 
 ###### Related material
 
@@ -10299,14 +11568,15 @@ when the input contract requires those text units.
 
 ##### The problem it solves
 
-Several methods may fit the same input shape, but their discard rules,
-update support, or required output differ.
+Several methods may look suitable for the same input, but they differ
+in what work they may safely skip, whether they handle changing data,
+and what results they can return.
 
 ##### The idea in simple terms
 
-Compare the fact each candidate needs to remain true, not just their
-names or surface syntax. The first differing requirement usually
-decides the method.
+Compare the fact each possible method must keep true while it runs.
+Do not compare only names or similar-looking code. The first important
+requirement on which the methods differ usually decides the choice.
 
 ##### How it works
 
@@ -10314,69 +11584,83 @@ decides the method.
   updates a consecutive range predictably; use [prefix
   sums](#c1315-prefix-sums) when a fixed range answer comes from two
   saved totals.
-- Use prefix sums for immutable data; use [Fenwick or segment
-  trees](#c1317-fenwick-and-segment-trees) when updates and range
-  queries alternate.
+- Use prefix sums when the data does not change; use [Fenwick or
+  segment trees](#c1317-fenwick-and-segment-trees) when changes and
+  range questions alternate.
 - Use [two pointers](#c139-two-pointers) when coordinated moves
   discard possibilities; use [binary search](#c136-binary-search) when
   one middle test independently discards half.
 - Use [greedy](#c1318-greedy) after a safe permanent-choice proof;
-  [dynamic programming](#c1310-dynamic-programming) when competing
-  repeated states must remain; and [backtracking](#c1319-backtracking)
-  when individual constructions must be explored and undone.
+  [dynamic programming](#c1310-dynamic-programming) when several
+  competing smaller answers must be remembered; and
+  [backtracking](#c1319-backtracking) when individual constructions
+  must be explored and undone.
 - Use [divide and conquer](#c1311-divide-and-conquer) for independent
   parts and dynamic programming for overlapping parts.
-- DFS is an exploration order; backtracking adds and removes candidate
-  choices during that order. Use [DFS](#c1320-depth-first-search) for
-  complete branch exploration and [BFS](#c1321-breadth-first-search)
-  for nearest equal-cost results.
+- DFS describes the order of exploration. Backtracking uses that order
+  while also making and undoing choices. Use
+  [DFS](#c1320-depth-first-search) to finish one route before another,
+  and use [BFS](#c1321-breadth-first-search) to find the nearest
+  result when every move costs the same.
 - Use BFS for equal edge costs,
-  [Dijkstra](#c1323-dijkstra-shortest-paths) for unequal non-negative
+  [Dijkstra](#c1323-dijkstra-shortest-paths) for unequal nonnegative
   costs, and [Bellman-Ford](#c1324-bellman-ford-shortest-paths) for
-  negative edges or reachable negative-cycle detection.
+  negative edges or to detect a reachable loop whose total cost is
+  negative.
 - Fast/slow pointers specialize two pointers for linked cycles,
   middles, and fixed gaps.
-- Sort when every item is needed in order, use quickselect for one
-  rank in mutable batch data, and use a heap for streaming top-`k` or
-  repeated removal.
-- A monotonic stack resolves nearest relationships; a monotonic deque
-  maintains an extreme while window positions expire.
+- Sort when every item is needed in order. Use quickselect for the
+  item at one requested sorted position in mutable data that is fully
+  available. Use a heap for arriving top-`k` values or repeated
+  removal of the smallest or largest value.
+- A monotonic stack finds the nearest greater or smaller values. A
+  monotonic deque keeps the smallest or largest value while a moving
+  window drops old positions.
 
 ##### Step-by-step examples
 
 A road problem asks for cheapest routes from `A`.
 
-1.  **Equal costs.** **Before:** every edge costs one move.
-    **Decision:** choose BFS because FIFO layers are cost layers.
-    **After:** no heap is needed. **Known correct:** first discovery
-    has the fewest moves and lowest cost.
-2.  **Varying non-negative costs.** **Before:** edges cost `1`, `4`,
-    or `9`. **Decision:** choose Dijkstra and remove the cheapest
-    known route next. **After:** FIFO order is rejected. **Known
-    correct:** non-negative edges make finalization safe.
-3.  **Negative cost.** **Before:** one edge costs `-3`. **Decision:**
-    reject Dijkstra and choose Bellman-Ford. **After:** repeated
-    relaxation remains. **Known correct:** a later negative edge may
-    improve an earlier route.
+1.  **Equal costs**
+    - **Before:** Every edge costs one move.
+    - **Decision:** Choose BFS because first-in, first-out queue
+      layers are also cost layers.
+    - **After:** No heap is needed.
+    - **Known correct:** First discovery has the fewest moves and
+      therefore the lowest cost.
+2.  **Varying nonnegative costs**
+    - **Before:** Edges cost `1`, `4`, or `9`.
+    - **Decision:** Choose Dijkstra and remove the cheapest known
+      route next.
+    - **After:** Reject first-in, first-out order.
+    - **Known correct:** Costs never decrease after taking another
+      edge, which lets Dijkstra finalize the cheapest removed route.
+3.  **Negative cost**
+    - **Before:** One edge costs `-3`.
+    - **Decision:** Reject Dijkstra and choose Bellman-Ford.
+    - **After:** Repeatedly check every connection for a cheaper
+      route.
+    - **Known correct:** A later negative edge may improve a route
+      that looked finished earlier.
 
 ##### Why it works
 
-The comparison preserves every method whose assumptions still match
-the problem and removes one only when a required fact fails. Once one
-candidate's discard rule and resource bound both hold, its own card
-supplies the complete correctness proof.
+The comparison keeps every method whose requirements still match the
+problem. It removes a method only when one of those requirements
+fails. Once a method can safely skip work and also fits the time and
+memory limits, its own card explains why it is correct.
 
 ##### Go example
 
-This comparison produces an implementation choice rather than shared
-runtime code. Follow the selected card's Go boundary and its linked
-implementation owner.
+This comparison chooses an implementation rather than providing shared
+runtime code. Follow the selected card's Go input rules and its link
+to the complete implementation.
 
 ##### Work and memory
 
-Comparison is constant-sized planning work. The selected algorithm
-still owns all preprocessing, runtime, retained state, recursion, and
-output costs.
+This short comparison is planning work. The final cost must still
+include setup, the main processing, saved data, unfinished recursive
+calls, and construction of the output.
 
 ##### When to use it
 
@@ -10394,9 +11678,9 @@ requirements; the real method may be outside the apparent pair.
 > exist. The negative edge removes the proof that a popped distance is
 > final.
 
-Also distinguish batch from streaming input, immutable from changing
-data, one answer from every answer, and actual output cost from
-auxiliary memory.
+Also ask whether all input exists at the start or arrives over time,
+whether it may change, whether one or every answer is needed, and how
+much work is required just to produce the output.
 
 ##### Related material
 
@@ -10423,14 +11707,17 @@ its limits.
 
 ##### How it works
 
-- Around `n <= 10`, trying every ordering (`n!`) may be practical with
-  pruning.
-- Around `n <= 20`, trying every subset (`2^n`) may be practical.
-- Around `n <= 100`, cubic work may fit and pairwise work is often
-  reasonable.
-- Around `n <= 1,000`, quadratic work needs scrutiny.
-- Around `n <= 100,000`, target sorting (`O(n log n)`) or a few linear
-  passes.
+- When `n` is at most about `10`, trying every ordering may be
+  practical if hopeless choices can stop early. The number of
+  orderings is written `n!`.
+- When `n` is at most about `20`, trying every subset may be
+  practical. There are `2^n` subsets because every item has an
+  in-or-out choice.
+- When `n` is at most about `100`, work near `n*n*n` may fit, and
+  checking every pair with work near `n*n` is often reasonable.
+- When `n` is at most about `1,000`, work near `n*n` needs scrutiny.
+- When `n` is at most about `100,000`, aim for sorting, written
+  `O(n log n)`, or a few passes through all values.
 - At a million or more items, favor few passes and closely budget
   large maps or arrays.
 
@@ -10440,18 +11727,23 @@ These are rough interview checks, not machine-independent guarantees.
 
 For `n=100,000`, compare pairwise search with sorting.
 
-1.  **Pairwise candidate.** **Before:** roughly `n^2` pairs are
-    possible. **Decision:** estimate about ten billion checks.
-    **After:** reject it. **Known correct:** its growth is
-    incompatible with the input scale.
-2.  **Sorting candidate.** **Before:** `n log n` comparisons are
-    expected. **Decision:** retain it for further proof and memory
-    review. **After:** one plausible candidate remains. **Known
-    correct:** constraints have not ruled it out.
+1.  **Pairwise method**
+    - **Before:** Roughly `n*n` pairs are possible.
+    - **Decision:** For `100,000` values, estimate about ten billion
+      checks.
+    - **After:** Reject the method.
+    - **Known correct:** Its required number of checks is incompatible
+      with the input size.
+2.  **Sorting method**
+    - **Before:** Sorting uses about `n log n` comparisons.
+    - **Decision:** Retain it for correctness and memory review.
+    - **After:** One plausible method remains.
+    - **Known correct:** The input limit has not ruled it out.
 
-If the output requires all `2^n` subsets, writing the result already
-takes exponential work; no generator can make total runtime linear in
-`n`.
+If the output requires all `2^n` subsets, writing that many answers
+already takes work that doubles with every extra input item. No
+generator can make the total runtime grow only in direct proportion
+to `n`.
 
 ##### Why it works
 
@@ -10461,16 +11753,15 @@ only rejects; it does not prove the remaining algorithm correct.
 
 ##### Go example
 
-There is no runtime helper for this planning step. In Go, include
-meaningful allocations, integer sizes, recursion depth, and
-garbage-retained storage in the estimate before choosing a
-representation.
+There is no runtime helper for this planning step. For Go code, count
+large memory allocations, integer sizes, unfinished recursive calls,
+and memory kept alive by references before choosing how to store data.
 
 ##### Work and memory
 
-The estimate itself is constant planning work. Always count
-preprocessing, per-state transitions, output construction, recursion,
-and retained buffers in the candidate's actual bound.
+The estimate itself is planning work. For the chosen method, count
+setup, the choices checked from each saved state, output construction,
+unfinished recursive calls, and memory that remains in use.
 
 ##### When to use it
 
@@ -10488,14 +11779,15 @@ dominate.
 > **Warning:** An `O(n)` algorithm that stores a million large objects
 > may be less feasible than an in-place `O(n log n)` algorithm.
 
-Use the correct dimension: vertices plus edges for graphs, rows times
-columns for grids, reachable states times transitions for DP, and
-output size for generation.
+Count the quantities the method actually processes: locations plus
+connections for a graph, rows times columns for a grid, saved smaller
+results times the choices from each result, and the number of values
+produced by a generator.
 
 ##### Related material
 
 - [A.1 Complexity and resource
-  accounting](#a1-complexity-and-resource-accounting) owns growth
+  accounting](#a1-complexity-and-resource-accounting) explains growth
   notation and Go allocation accounting.
 - [A.7 Combinatorics and output
   size](#a7-combinatorics-and-output-size) explains factorial and
@@ -10505,25 +11797,26 @@ output size for generation.
 
 ##### The problem it solves
 
-A plausible method still needs a precise state meaning, safety
-argument, termination argument, coverage claim, and resource bound
-before code begins.
+A promising method still needs five things before coding: a clear
+meaning for its saved data, a reason each step is safe, a reason it
+finishes, an explanation of why it misses no answer, and an estimate
+of its time and memory.
 
 ##### The idea in simple terms
 
-Write the proof obligations as short sentences. If one cannot be made
-precise, the method is still a guess.
+Write those five checks as short sentences. If one cannot be stated
+clearly, the method is still a guess.
 
 ##### How it works
 
 1.  **Stored meaning:** define every variable, table entry, queue
-    item, or stack item.
-2.  **Invariant:** state the fact that remains true before and after
-    each step.
-3.  **Progress:** name the bounded measure that moves toward
-    completion.
-4.  **Coverage:** explain why discarded choices cannot contain an
-    answer.
+    item, or stack item in ordinary words.
+2.  **Fact that stays true:** state what is true before and after each
+    step. This fact is often called an **invariant**.
+3.  **Progress:** name what moves closer to completion and explain why
+    it cannot move forever.
+4.  **No missed answers:** explain why discarded choices cannot
+    contain a required answer.
 5.  **Work and memory:** count processing frequency and retained
     information.
 
@@ -10533,34 +11826,44 @@ and removal of the assumption that enabled the optimization.
 
 ##### Step-by-step examples
 
-For lower-bound binary search on `[1,3,3,5]`:
+Use binary search to find the first position in `[1,3,3,5]` whose
+value is at least `3`. This is called a **lower-bound search**, and
+the expected position is `1`.
 
-1.  **Meaning.** **Before:** `left` and `right` are undefined.
-    **Decision:** let `[left,right)` contain every possible first
-    valid position. **After:** start with `[0,4)`. **Known correct:**
-    the answer has not been discarded.
-2.  **Progress and coverage.** **Before:** a middle position is
-    tested. **Decision:** keep only the half that can contain the
-    first valid position. **After:** the interval strictly shrinks.
-    **Known correct:** discarded positions were proved too early or
-    too late.
-3.  **Cost and boundaries.** **Before:** the plan handles the ordinary
-    case. **Decision:** test empty input, duplicates, and insertion at
-    `len(values)`. **After:** the half-open contract covers all three.
-    **Known correct:** the method and boundary behavior agree.
+1.  **Check: Meaning**
+    - **Before:** `left` and `right` have no stated meaning.
+    - **Decision:** The possible answer starts at `left` and stops
+      before `right`. Including the first position and excluding the
+      second is called a half-open range, written `[left,right)`.
+    - **After:** Start with `[0,4)`, which contains all four indexes.
+    - **Known correct:** Position `1` has not been discarded.
+2.  **Check: Progress and coverage**
+    - **Before:** A middle position is tested.
+    - **Decision:** Keep only the half that can contain the first
+      value at least `3`.
+    - **After:** The number of possible positions becomes smaller.
+    - **Known correct:** Every discarded value was proved either too
+      small or too late to be the first valid one.
+3.  **Check: Cost and boundaries**
+    - **Before:** The plan handles the ordinary four-value input.
+    - **Decision:** Also test empty input, repeated values, and an
+      answer just after the final value.
+    - **After:** The half-open rule represents all three cases.
+    - **Known correct:** The method and its boundary behavior agree.
 
 ##### Why it works
 
-Together, the five sentences show that the stored state is meaningful,
-every step is safe, the process finishes, all possible answers are
-covered, and the implementation fits the limits. That is exactly what
-a correctness and feasibility argument must establish.
+Together, the five sentences show that the stored information is
+meaningful, every step is safe, the process finishes, all possible
+answers are covered, and the implementation fits the limits. That is
+what a correctness and practicality argument must establish.
 
 ##### Go example
 
-Translate each sentence into a nearby name, condition, or assertion.
+Translate each sentence into a nearby name, condition, or explicit
+check.
 For the trace, [E.1 Binary search bounds](#e1-binary-search-bounds)
-uses the same `left`, `right`, and half-open range contract.
+uses the same `left`, `right`, and half-open range rule.
 
 ##### Work and memory
 
@@ -10570,14 +11873,14 @@ recursion, output, and meaningful Go allocations.
 
 ##### When to use it
 
-Use it after selecting a candidate and before implementation, and
+Use it after selecting a method and before implementation, and
 repeat it when requirements or constraints change.
 
 ##### When not to use it
 
 Do not replace an actual trace with slogans such as "it is greedy" or
 "binary search halves the work." The sentences must name this
-problem's state and rule.
+problem's stored information and rule.
 
 ##### Common mistakes and edge cases
 
@@ -10585,14 +11888,15 @@ problem's state and rule.
 > equality branch keeps the same middle position, the progress
 > argument fails and the loop may never terminate.
 
-Also verify mutation permission, integer overflow, empty output,
-duplicates, unreachable graph states, and whether an optimization
-prevents reconstructing the required path or indices.
+Also verify whether the input may change, whether arithmetic can
+overflow, what empty output means, how repeated values behave, whether
+some graph locations are unreachable, and whether skipped information
+is later needed to rebuild a path or return original positions.
 
 ##### Related material
 
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants)
-  owns the proof structure.
+  explains this proof structure in more detail.
 - [C.1.5 Let constraints eliminate bad
   choices](#c15-let-constraints-eliminate-bad-choices) supplies the
   resource screen.
@@ -10630,9 +11934,9 @@ JSON, a command line, or a test.
 #### How it works
 
 1.  Decode the outside representation into a problem-specific Go type.
-2.  Validate rules that belong to the input contract, such as required
-    fields or legal ranges. Return a useful error before calling the
-    algorithm when the request is invalid.
+2.  Validate input rules, such as required fields or legal ranges.
+    Return a useful error before calling the algorithm when the
+    request is invalid.
 3.  Pass the typed fields to an algorithm whose parameters and return
     values describe the problem itself.
 4.  Convert the algorithm's result into the outside representation.
@@ -10662,6 +11966,13 @@ is `pairInput{Values: []int{2, 7, 11, 15}, Target: 9}`.
     - **After:** The adapter returns `input` unchanged.
     - **Known correct:** A called pair-search algorithm receives a
       valid typed request and no JSON concerns.
+3.  **Step: Format a successful answer**
+    - **Before:** The pair-search algorithm returned indexes `0` and
+      `1`.
+    - **Decision:** Encode those two indexes as a JSON array.
+    - **After:** The output bytes contain `[0,1]` and no error.
+    - **Known correct:** The outside caller receives the same two
+      indexes in its required text format.
 
 For a failure case, use `raw = {"values":[2,7],"target":"nine"}`. The
 expected result is a decoding error and no usable `pairInput`.
@@ -10687,6 +11998,13 @@ remain separate from algorithm failures.
 #### Go example
 
 ```go
+package boundary
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
 type pairInput struct {
 	// JSON tags bind the external field names to strongly typed Go
 	// fields.
@@ -10728,7 +12046,7 @@ available to callers while adding boundary context.
 
 For `b` input bytes containing `n` numbers, decoding examines the
 input and builds the `Values` slice, so it takes `O(b)` work and
-`O(n)` additional memory. Validation here takes constant work.
+`O(n)` extra memory. Validation here takes constant work.
 Formatting two indices takes constant work and a small output
 allocation. These boundary costs are separate from the called
 algorithm's own work and memory.
@@ -10742,9 +12060,10 @@ clear boundary error.
 
 #### When not to use it
 
-Do not add serialization to a function whose caller already supplies
-the correct typed values. Do not put problem reasoning in a generic
-decoder; keep problem-specific validation beside the problem adapter.
+Do not add text encoding or decoding to a function whose caller
+already supplies the correct Go values. Do not put problem reasoning
+in a generic decoder; keep problem-specific validation beside the
+problem adapter.
 
 #### Common mistakes and edge cases
 
@@ -10762,7 +12081,7 @@ accidentally.
 #### Related material
 
 - [E.3 Hash-map complement lookup](#e3-hash-map-complement-lookup)
-  owns the complete pair-search implementation.
+  provides the complete pair-search implementation.
 - [D.2 Table-driven tests](#d2-table-driven-tests) keeps valid and
   invalid boundary cases under the same test logic.
 - [D.4 Map presence and sets](#d4-map-presence-and-sets) explains the
@@ -10790,7 +12109,8 @@ for one run.
 
 1.  Define a struct whose fields hold one case's name, inputs, and
     expected outputs.
-2.  Build a slice containing ordinary, boundary, and adversarial rows.
+2.  Build a slice containing ordinary, boundary, and deliberately
+    tricky rows.
 3.  Loop over the slice and call `t.Run` so each row is reported by
     name.
 4.  Inside every subtest, call the same behavior and compare every
@@ -10827,17 +12147,17 @@ expected outcome is a passing subtest because `0%2 == 0`.
     - **Decision:** `isEven(0)` returns `true`.
     - **After:** The comparison passes without special-case test
       logic.
-    - **Known correct:** The boundary value is covered by the same
-      contract as every other row.
+    - **Known correct:** The boundary value is checked by the same
+      rules as every other row.
 
 #### Why it works
 
 Every row reaches the same call and comparison, so differences in
 results come from the case data rather than from different test code.
 Naming each subtest ties a failure to its input. The loop is finite
-because the table is finite; after all rows pass, the tested contract
-holds for every listed case. This is evidence for those cases, not
-proof for every possible input.
+because the table is finite; after all rows pass, the promised
+behavior holds for every listed case. This is evidence for those
+cases, not proof for every possible input.
 
 #### Go example
 
@@ -10893,8 +12213,8 @@ although individual inputs and outputs may allocate their own memory.
 
 #### When to use it
 
-Use table-driven tests when many inputs share one contract and
-assertion shape, especially for boundary values, malformed input,
+Use table-driven tests when many inputs follow the same rules and use
+the same checks, especially for boundary values, malformed input,
 duplicates, and regression cases that should remain named.
 
 #### When not to use it
@@ -10946,8 +12266,7 @@ the copy does not reorder the caller's slice.
 
 #### How it works
 
-1.  Decide whether the function's contract allows it to reorder the
-    input.
+1.  Decide whether the function promises to preserve the input order.
 2.  If not, clone the slice before sorting. A **clone** here means a
     new slice with the same element values.
 3.  Sort the clone with `sort.Ints`, `sort.Strings`, or an explicit
@@ -10966,7 +12285,7 @@ is `sorted = [1,2,3]` while `values` remains `[3,1,2]`.
 1.  **Step: Clone the slice**
     - **Before:** `values` refers to one backing array containing
       `[3,1,2]`.
-    - **Decision:** The contract promises not to reorder `values`, so
+    - **Decision:** The function promises not to reorder `values`, so
       `slices.Clone` creates a separate backing array for `sorted`.
     - **After:** Both slices contain `[3,1,2]`, but changing one
       array's elements cannot change the other array's elements.
@@ -10980,20 +12299,23 @@ is `sorted = [1,2,3]` while `values` remains `[3,1,2]`.
     - **Known correct:** The result is ordered and the promised input
       state is preserved.
 
-For the adversarial version, assign `sorted := values` instead of
-cloning. The expected observation after `sort.Ints(sorted)` is that
-both variables show `[1,2,3]`.
+For a deliberately broken version, assign `sorted := values` instead
+of cloning. After `sort.Ints(sorted)`, both variables unexpectedly
+show `[1,2,3]`.
 
 1.  **Step: Copy only the slice descriptor**
     - **Before:** `values=[3,1,2]`.
     - **Decision:** Assignment copies the pointer, length, and
       capacity, not the backing array.
     - **After:** `sorted` and `values` view the same elements.
+    - **Known correct:** No independent element storage was created.
 2.  **Step: Sort through the alias**
     - **Before:** Both slices view `[3,1,2]`.
     - **Decision:** Sorting writes into the shared backing array.
-    - **After:** Both show `[1,2,3]`; the no-mutation contract is
-      broken.
+    - **After:** Both show `[1,2,3]`; the promise to preserve the
+      input is broken.
+    - **Known correct:** A write through either slice is visible
+      through the other because both still share one backing array.
 
 #### Why it works
 
@@ -11037,7 +12359,7 @@ input before and after the call.
 
 #### When not to use it
 
-Do not pay for a clone when the contract explicitly allows in-place
+Do not pay for a clone when the function explicitly allows in-place
 reordering and the caller no longer needs the old order. A shallow
 clone is also insufficient when sorting code mutates fields through
 pointer-like elements; copy those nested values when isolation
@@ -11051,17 +12373,17 @@ requires it.
 
 Duplicates require a tie rule only when the relative order of equal
 primary keys matters; choose a **stable sort**, which preserves the
-earlier order of equal keys, for that contract. Nil and empty slices
-are already sorted. Tests should cover both allowed in-place behavior
-and promised non-mutation explicitly.
+earlier order of equal keys, when the function promises that behavior.
+Nil and empty slices are already sorted. Tests should cover both
+allowed in-place changes and a promise to preserve the input.
 
 #### Related material
 
 - [B.1 Arrays, slices, and strings](#b1-arrays-slices-and-strings)
-  owns slice descriptors, backing arrays, capacity, and append
+  explains slice descriptors, backing arrays, capacity, and append
   behavior.
 - [C.1.3.5 Put related values together (sorting and
-  selection)](#c135-sorting-and-selection) owns the
+  selection)](#c135-sorting-and-selection) explains the
   algorithm-selection reasons for sorting.
 - [D.9 Slice storage and retained
   memory](#d9-slice-storage-and-retained-memory) explains how sharing
@@ -11132,14 +12454,18 @@ first appearances. The expected result is `["go", "rust"]`.
     - **Before:** `seen={}`, `result=[]`
     - **Decision:** `"go"` is absent; add and append it.
     - **After:** `seen={"go"}`, `result=["go"]`
+    - **Known correct:** The first distinct input appears once.
 2.  **Value: `"go"`**
     - **Before:** `seen={"go"}`, `result=["go"]`
     - **Decision:** `"go"` is present; skip the duplicate.
     - **After:** State unchanged.
+    - **Known correct:** The duplicate creates no second output.
 3.  **Value: `"rust"`**
     - **Before:** `seen={"go"}`, `result=["go"]`
     - **Decision:** `"rust"` is absent; add and append it.
     - **After:** `seen={"go","rust"}`, `result=["go","rust"]`
+    - **Known correct:** Each distinct input now appears once, in
+      first-appearance order.
 
 The result order comes from scanning `values`, not from iterating over
 `seen`.
@@ -11229,7 +12555,7 @@ Duplicate input must not be appended twice, and tests must not expect
 
 #### Related material
 
-- [C.1.3.4 Hash map or set](#c134-hash-map-or-set) owns the
+- [C.1.3.4 Hash map or set](#c134-hash-map-or-set) explains the
   algorithm-selection clues and invariants for lookup-based methods.
 - [E.3 Hash-map complement lookup](#e3-hash-map-complement-lookup)
   shows map presence in a complete reference algorithm.
@@ -11260,8 +12586,9 @@ highest-priority item available at index zero.
 
 1.  Define `Len`, `Less`, and `Swap` on a slice type. `Less(i, j)`
     must report whether item `i` should come out before item `j`.
-2.  Define pointer-receiver `Push` and `Pop` methods so the package
-    can grow and shrink the slice.
+2.  Define `Push` and `Pop` with a pointer to the slice value as their
+    receiver. This **pointer receiver** lets the methods replace the
+    slice's length after growing or shrinking it.
 3.  Call `heap.Init` when starting from existing values.
 4.  Use `heap.Push` and `heap.Pop`--not the methods directly--so the
     package repairs the parent-child ordering after each change.
@@ -11387,7 +12714,8 @@ func popAscending(values []int) []int {
 The package moves the root to the final slot before it calls the
 type's `Pop` method, so that method removes the last element. The type
 assertion `value.(int)` is safe here because this queue's callers push
-only integers.
+only integers. The fragment requires imports `"container/heap"` and
+`"slices"`.
 
 #### Work and memory
 
@@ -11426,12 +12754,13 @@ array does not retain it; see
 #### Related material
 
 - [C.1.3.27 Remove urgent
-  items](#c1327-heap-or-priority-queue) owns heap selection,
+  items](#c1327-heap-or-priority-queue) explains heap selection,
   correctness, and algorithmic variants.
 - [C.1.3.23 Dijkstra shortest paths](#c1323-dijkstra-shortest-paths)
   explains why skipping stale shortest-path entries is safe.
 - [D.9 Slice storage and retained
-  memory](#d9-slice-storage-and-retained-memory) owns clearing pointer
+  memory](#d9-slice-storage-and-retained-memory) explains clearing
+  pointer
   elements removed from long-lived heaps.
 
 <a id="e6-bytes-runes-and-visible-characters"></a>
@@ -11452,7 +12781,8 @@ called a **code point** to each textual unit, and UTF-8 is the
 encoding that maps that number to one or more bytes. Go calls one code
 point a **rune**. A user-visible symbol can contain several runes,
 such as a letter followed by a combining accent, so even a rune is not
-always a complete visible character.
+always a complete visible character. Unicode calls one user-visible
+group a **grapheme cluster**.
 
 #### How it works
 
@@ -11464,7 +12794,7 @@ always a complete visible character.
     each rune's starting byte index.
 4.  Convert with `[]rune(text)` when the algorithm needs rune
     positions or reverse indexing.
-5.  Use a Unicode text-segmentation library when the contract requires
+5.  Use a Unicode text-segmentation library when the problem counts
     user-visible symbols rather than code points.
 
 #### Step-by-step examples
@@ -11483,6 +12813,8 @@ expected rune sequence is `['A','\u00e9']`.
     - **Decision:** The first byte is the complete rune `A`.
     - **After:** The first pair is `index=0, value='A'`; decoding
       continues at byte index `1`.
+    - **Known correct:** The first byte and first rune have both been
+      processed once.
 3.  **Step: Decode the multibyte rune**
     - **Before:** Bytes `0xC3 0xA9` begin at index `1`.
     - **Decision:** UTF-8 combines them into rune `\u00e9`.
@@ -11541,7 +12873,7 @@ without allocating a slice.
 #### Work and memory
 
 `len(text)` reads the stored byte length in `O(1)` time. Ranging over
-`b` bytes takes `O(b)` time and constant auxiliary memory. Building
+`b` bytes takes `O(b)` time and constant extra memory. Building
 `[]rune(text)` also takes `O(b)` time and allocates `O(r)` rune
 storage, where `r` is the decoded rune count. Visible-symbol
 segmentation has its own library-specific state and costs.
@@ -11555,7 +12887,7 @@ movement or limits that must match what a reader sees.
 
 #### When not to use it
 
-Do not convert every string to runes when the contract guarantees a
+Do not convert every string to runes when the input uses a guaranteed
 one-byte alphabet or the algorithm only copies bytes. Do not use rune
 indexes as byte slice boundaries without converting them back to byte
 positions.
@@ -11568,18 +12900,18 @@ positions.
 
 Invalid UTF-8 causes `range` to produce `utf8.RuneError` for invalid
 encoding units. An empty string has zero bytes and zero runes.
-Normalized-looking text may have different code-point sequences, as
-`"\u00e9"` and `"e\u0301"` demonstrate, so equality rules must match
-the problem contract.
+Text that looks identical may have different code-point sequences, as
+`"\u00e9"` and `"e\u0301"` demonstrate. Equality must therefore follow
+the problem's definition.
 
 #### Related material
 
 - [B.1 Arrays, slices, and strings](#b1-arrays-slices-and-strings)
-  owns string immutability and basic sequence storage.
+  explains string immutability and basic sequence storage.
 - [C.1.3.7 Reuse a partial match](#c137-string-matching) explains how
   the chosen text unit affects string-matching positions.
 - [C.1.3.33 Share stored word beginnings](#c1333-trie) shows a
-  byte-based trie whose alphabet contract must be explicit.
+  byte-based trie that must clearly state its allowed alphabet.
 
 <a id="e7-type-parameters"></a>
 
@@ -11847,10 +13179,9 @@ results.
 
 For `n` nodes, each node is pushed, popped, and appended once, so
 traversal takes `O(n)` time. The result uses `O(n)` output memory. The
-explicit stack uses `O(h)` auxiliary memory for this binary-tree
+explicit stack uses `O(h)` extra memory for this binary-tree
 traversal, where `h` is the tree height; in the worst case `h=n`. The
-recursive form uses a call stack with the same asymptotic height
-bound.
+recursive form uses a call stack with the same `O(h)` height bound.
 
 #### When to use it
 
@@ -11860,10 +13191,10 @@ iterative interface is required.
 
 #### When not to use it
 
-Do not replace short, naturally bounded recursion when the manual
-frames make the invariant harder to see. A simple node-only stack is
-not enough when work must happen after a child returns; encode that
-return state explicitly.
+Do not replace short, safely bounded recursion when manual stack items
+make the logic harder to understand. A stack containing only nodes is
+not enough when work must happen after a child returns; each item must
+also record what should happen next.
 
 #### Common mistakes and edge cases
 
@@ -11877,9 +13208,10 @@ separately or a cycle can keep adding work forever.
 
 #### Related material
 
-- [A.3 Recursion and saved work](#a3-recursion-and-saved-work) owns
+- [A.3 Recursion and saved
+  work](#a3-recursion-and-saved-work) explains
   recursive call frames and stack-memory accounting.
-- [B.4.2 Traversal order](#b42-traversal-order) owns preorder,
+- [B.4.2 Traversal order](#b42-traversal-order) explains preorder,
   inorder, and postorder meaning.
 - [C.1.3.20 Depth-first search](#c1320-depth-first-search) explains
   the broader search method that can use either call stack.
@@ -11949,14 +13281,21 @@ should be `nil`.
     - **Decision:** Save `items[2]` so it can be returned.
     - **After:** `value=C`; the slice and backing array are otherwise
       unchanged.
-2.  **Step: Clear and shorten**
+    - **Known correct:** The value remains available to return after
+      its old array slot is cleared.
+2.  **Step: Clear the old slot**
     - **Before:** The final slot still references `C`.
-    - **Decision:** Assign `nil` to `items[2]`, then reslice to
-      `items[:2]`.
-    - **After:** Visible `items=[A,B]`; the reusable final slot is
-      nil.
-    - **Known correct:** The returned value is preserved, while the
-      backing array no longer retains `C` through the removed slot.
+    - **Decision:** Assign `nil` to `items[2]`.
+    - **After:** Visible length is still `3`, but the backing array is
+      `[A,B,nil]`; saved `value` still refers to `C`.
+    - **Known correct:** The result is preserved separately, and the
+      reusable array slot no longer retains `C`.
+3.  **Step: Shorten the visible slice**
+    - **Before:** `items` still has length `3` and final value `nil`.
+    - **Decision:** Reslice to `items[:2]`.
+    - **After:** Visible `items=[A,B]`; the hidden final slot is nil.
+    - **Known correct:** The returned slice contains exactly the
+      unremoved pointers in their original order.
 
 #### Why it works
 
@@ -12017,8 +13356,8 @@ heaps, buffers, or pools whose backing arrays remain reachable.
 
 Do not copy every short-lived subslice; the allocation can cost more
 than brief retention. Clearing scalar slots such as integers usually
-does not affect object reachability, though it may still be required
-by a data-structure invariant.
+does not affect object reachability, though the data structure's rules
+may still require it.
 
 #### Common mistakes and edge cases
 
@@ -12036,7 +13375,7 @@ instead of indexing them.
 #### Related material
 
 - [B.1 Arrays, slices, and strings](#b1-arrays-slices-and-strings)
-  owns slice length, capacity, shared arrays, and append behavior.
+  explains slice length, capacity, shared arrays, and append behavior.
 - [D.3 Sorting without unexpected
   mutation](#d3-sorting-without-unexpected-mutation) uses cloning to
   protect observable order.
@@ -12048,11 +13387,11 @@ instead of indexing them.
 ## E. Go reference implementations
 
 These snippets are complete, small implementations of ideas taught
-elsewhere in the guide. Each entry states its contract and required
-input conditions, traces the variables used by the code, and gives
-concrete cases to test. The linked owner explains how to recognize and
-choose the method; this section keeps the implementation details
-beside runnable Go code.
+elsewhere in the guide. Each entry states its promised behavior and
+required input conditions, traces the variables used by the code, and
+gives concrete cases to test. The linked teaching entry explains how
+to recognize and choose the method. This section keeps implementation
+details beside runnable Go code.
 
 Some snippets use a type parameter written as `T`. Treat `T` as a
 placeholder for the value type chosen by the caller, such as `int` or
@@ -12072,25 +13411,34 @@ exact range boundaries.
 
 #### The idea in simple terms
 
-Keep a half-open candidate range: `left` is included and `right` is
-excluded. Inspect its middle value and discard the half that cannot
-contain the first valid boundary. This is **binary search**; a **lower
-bound** is the first value greater than or equal to the target, while
-an **upper bound** is the first value strictly greater than it.
+Keep a range of positions that have not yet been classified. Its left
+edge is included and its right edge is excluded. This is called a
+**half-open range** and is written `[left,right)`: the square bracket
+includes `left`, while the parenthesis excludes `right`. Positions
+before `left` are known to fail. Position `right` is the earliest
+known success, or the position just after the slice. Testing the
+middle moves one of these two boundaries inward.
+
+This repeated halving is **binary search**. A **lower bound** is the
+first position whose value is greater than or equal to the target. An
+**upper bound** is the first position whose value is strictly greater
+than the target. Either result may equal `len(values)`, meaning the
+target would be inserted after every existing value.
 
 #### How it works
 
 The input must be sorted in ascending order.
 
-1.  Start with `[left,right) = [0,len(values))`.
+1.  Start with `left=0` and `right=len(values)`. No slice position has
+    been classified; `right` is the allowed after-the-slice answer.
 2.  For a lower bound, move `left` past `middle` when
-    `values[middle] < target`; otherwise keep `middle` by moving
-    `right` to it.
+    `values[middle] < target`; otherwise record `middle` as the
+    earliest known success by moving `right` to it.
 3.  For an upper bound, use `values[middle] <= target` as the
     condition for moving `left` past `middle`.
-4.  When `left == right`, return that insertion position. For exact
-    search, confirm that the lower-bound position exists and contains
-    the target.
+4.  When `left == right`, return that position. It is where the target
+    could be inserted without breaking the sorted order. For exact
+    search, confirm that the position exists and contains the target.
 
 #### Step-by-step examples
 
@@ -12101,21 +13449,46 @@ For `values=[1,2,2,2,5]` and `target=2`, `LowerBound` should return
     - **Before:** `left=0`, `right=5`, `middle=2`, value `2`.
     - **Decision:** `2` is not smaller than the target, so index 2
       might be the first match; set `right=2`.
-    - **After:** The candidate range is `[0,2)`.
-    - **Known correct:** No index from 2 onward can be earlier than a
-      valid boundary still in the range.
+    - **After:** Positions in `[0,2)` remain unchecked; index `2` is
+      the earliest known success.
+    - **Known correct:** No index after `2` can be the first success.
 2.  **Step: Inspect index 1**
     - **Before:** `left=0`, `right=2`, `middle=1`, value `2`.
     - **Decision:** Keep this possible first match by setting
       `right=1`.
-    - **After:** The candidate range is `[0,1)`.
-    - **Known correct:** Any lower bound must be at index 0 or 1.
+    - **After:** Position `0` remains unchecked; index `1` is the
+      earliest known success.
+    - **Known correct:** The lower bound is either unchecked index `0`
+      or known-success index `1`.
 3.  **Step: Inspect index 0**
     - **Before:** `left=0`, `right=1`, `middle=0`, value `1`.
     - **Decision:** `1 < 2`, so index 0 cannot qualify; set `left=1`.
     - **After:** `left=right=1`; return `1`.
     - **Known correct:** Index 0 is too small and index 1 is the first
       value at least 2.
+
+For the same input and target, `UpperBound` should return `4`, the
+first index whose value is greater than `2`.
+
+1.  **Step: Inspect index 2**
+    - **Before:** `left=0`, `right=5`, `middle=2`, value `2`.
+    - **Decision:** An upper bound must be strictly greater than `2`,
+      so set `left=3`.
+    - **After:** Positions in `[3,5)` remain unchecked.
+    - **Known correct:** Indexes `0` through `2` cannot be the answer;
+      index `5` remains the allowed after-the-slice boundary.
+2.  **Step: Inspect index 4**
+    - **Before:** `left=3`, `right=5`, `middle=4`, value `5`.
+    - **Decision:** Index 4 qualifies and may be first, so set
+      `right=4`.
+    - **After:** Position `3` remains unchecked; index `4` is the
+      earliest known success.
+    - **Known correct:** No index after `4` can be the first answer.
+3.  **Step: Inspect index 3**
+    - **Before:** `left=3`, `right=4`, `middle=3`, value `2`.
+    - **Decision:** Equality does not qualify, so set `left=4`.
+    - **After:** `left=right=4`; return `4`.
+    - **Known correct:** Index 4 is the first value greater than `2`.
 
 For the boundary case `values=[1,2,2,2,5]`, `target=6`, `LowerBound`
 returns `5`. Every inspected value is smaller than 6, so `left`
@@ -12125,14 +13498,16 @@ indexing and returns `-1`.
 #### Why it works
 
 For a lower bound, every index before `left` is known to contain a
-value smaller than the target, and every in-range index at or after
-`right` is known to contain a value at least as large as the target.
-Those facts remain true after either update because the values are
-sorted. Each step makes the candidate range shorter, so the loop
-finishes. At `left == right`, no earlier index qualifies; that index
-is the first qualifying position, or it equals `len(values)` when none
-exists. The upper-bound proof is identical with "smaller than or equal
-to" as the discarded-left condition.
+value smaller than the target. Index `right` and every later slice
+index are known to contain a value at least as large as the target;
+`right=len(values)` also represents no qualifying slice value. Those
+facts remain true after either update because the values are sorted.
+Each step makes the unchecked range shorter, so the loop finishes. At
+`left == right`, the known-failure and known-success boundaries meet.
+No earlier index qualifies, so that index is the first qualifying
+position, or it equals `len(values)` when none exists. The upper-bound
+proof is identical with "smaller than or equal to" as the failed-left
+condition.
 
 #### Go example
 
@@ -12154,8 +13529,8 @@ func LowerBound(values []int, target int) int {
 			// middle and everything before it are too small.
 			left = middle + 1
 		} else {
-			// middle may be the first qualifying index, so keep it in the
-			// range.
+			// middle may be the first qualifying index, so save it as the
+			// right boundary.
 			right = middle
 		}
 	}
@@ -12188,8 +13563,8 @@ func Search(values []int, target int) int {
 	// LowerBound gives the only position that could be target's first
 	// occurrence.
 	index := LowerBound(values, target)
-	// Check the len sentinel before indexing, then confirm exact
-	// equality.
+	// The lower bound may be one position past the final element. Check
+	// for that result before indexing, then confirm exact equality.
 	if index == len(values) || values[index] != target {
 		return -1
 	}
@@ -12204,11 +13579,11 @@ target producing `-1`.
 
 #### Work and memory
 
-Each update removes at least half of the remaining candidate
-positions, so a nonempty input takes `O(log n)` time and an empty
-input takes `O(1)`. `Search` adds one constant-time check after
-`LowerBound`. The functions keep only index variables and use `O(1)`
-auxiliary memory without allocations.
+Let `n` be the number of values. Each update removes at least half of
+the remaining possible positions, so nonempty input takes
+`O(log n)` time and empty input takes `O(1)`. `Search` adds one
+constant-time check after `LowerBound`. The functions keep only index
+variables and use `O(1)` extra memory without allocations.
 
 #### When to use it
 
@@ -12227,7 +13602,7 @@ unavailable or forbidden.
 
 > **Warning:** Changing the range to inclusive bounds without changing
 > the updates can skip an index or loop forever. With this half-open
-> contract, initialize `right=len(values)` and never read
+> range rule, initialize `right=len(values)` and never read
 > `values[right]`.
 
 Check `index == len(values)` before reading `values[index]`. Keep the
@@ -12239,7 +13614,7 @@ possible.
 #### Related material
 
 - [C.1.3.6 Find a changing boundary (binary search)](#binary-search)
-  owns method selection and the boundary invariant.
+  explains when binary search applies and why its boundaries are safe.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants)
   explains how the maintained facts prove the result.
 - [Find First and Last Position of Element in Sorted Array](
@@ -12256,7 +13631,7 @@ possible.
 Count ordered sequences of one-step and two-step moves that reach an
 exact nonnegative total. Recomputing every smaller total recursively
 repeats the same work, while storing every answer uses more memory
-than this recurrence needs.
+than this answer-building rule needs.
 
 #### The idea in simple terms
 
@@ -12264,7 +13639,8 @@ Every final sequence reaches `current` from either `current-1` or
 `current-2`. Add those two already known counts, then keep only the
 newest two counts for the next total. Reusing answers to smaller
 problems is **dynamic programming**; retaining only the recent states
-is a **rolling** form of it.
+is a **rolling** form of it. Here a **state** is one saved count that
+will help build a later count.
 
 #### How it works
 
@@ -12360,15 +13736,15 @@ fits in `int`.
 
 Negative, zero, and one return in `O(1)` time. For larger `steps`, the
 loop runs `steps-1` times, so time is `O(steps)`. Two counts and one
-loop index use `O(1)` auxiliary memory, and the function makes no
+loop index use `O(1)` extra memory, and the function makes no
 allocations. This removes the `O(steps)` table allocation but not the
 time needed to build each answer.
 
 #### When to use it
 
-Use rolling state when a recurrence proceeds in one direction, the
-output is only the final value, and each new answer depends on a fixed
-number of recent answers.
+Use rolling state when answers are built in one direction, only the
+final answer is needed, and each new answer depends on a fixed number
+of recent answers.
 
 #### When not to use it
 
@@ -12390,8 +13766,8 @@ intended roll.
 #### Related material
 
 - [C.1.3.10 Reuse smaller answers (dynamic
-  programming)](#dynamic-programming) owns recurrence design and state
-  selection.
+  programming)](#dynamic-programming) explains recurrence design and
+  state selection.
 - [A.3 Recursion and saved work](#a3-recursion-and-saved-work)
   compares saved answers with repeated recursive calls.
 - [Climbing
@@ -12497,10 +13873,10 @@ used.
 
 With ordinary Go map behavior, each lookup and insertion takes
 constant time on average, so the scan takes `O(n)` average time and
-can take `O(n^2)` in the map's pathological worst case. The map stores
-at most `n` entries and uses `O(n)` additional memory. A successful
-early pair can reduce actual work but does not change the worst-case
-bound.
+can take `O(n^2)` in an unusually bad case where map operations stop
+behaving like constant-time lookups. The map stores at most `n`
+entries and uses `O(n)` additional memory. A successful early pair can
+reduce actual work but does not change the worst-case bound.
 
 #### When to use it
 
@@ -12511,7 +13887,7 @@ useful, and `O(n)` extra map memory is acceptable.
 
 Use the sorted two-pointer implementation in
 [E.9](#e9-sorted-two-pointer-pair-search) when the input is already
-sorted or may be reordered and constant auxiliary memory matters. A
+sorted or may be reordered and constant extra memory matters. A
 frequency map is needed instead when the task asks for all pairs or
 counts rather than one pair.
 
@@ -12528,7 +13904,7 @@ arithmetic when `target-value` may overflow `int`.
 #### Related material
 
 - [C.1.3.4 Remember facts by key (hash map or set)](#hash-map-or-set)
-  owns the lookup method.
+  explains the lookup method.
 - [D.4 Map presence and sets](#d4-map-presence-and-sets)
   explains the two-result lookup used here.
 - [Two Sum](problems/solved_easy_leetcode_0001_two_sum.go) is the
@@ -12571,33 +13947,66 @@ before it is overwritten.
 Build and reverse `values=[10,20,30]`; the expected final slice is
 `[30,20,10]`.
 
-1.  **Step: Build the list**
+1.  **Step: Create the temporary start**
     - **Before:** `dummy.Next=nil`, `tail=dummy`.
-    - **Decision:** Append nodes 10, 20, and 30 after the current
-      `tail`, moving `tail` to each new node.
-    - **After:** `dummy -> 10 -> 20 -> 30 -> nil`; return
-      `dummy.Next`.
-    - **Known correct:** The links preserve the input slice order.
-2.  **Step: Reverse node 10**
+    - **Decision:** Use `dummy` as a construction-only node before the
+      first real value.
+    - **After:** The real list is empty; `tail` names where to append.
+    - **Known correct:** Empty and nonempty input can use the same
+      append operation.
+2.  **Step: Append value 10**
+    - **Before:** `tail=dummy`, `dummy.Next=nil`.
+    - **Decision:** Create node 10 after `tail`, then move `tail` to
+      node 10.
+    - **After:** `dummy -> 10 -> nil`; `tail=10`.
+    - **Known correct:** The list contains exactly the first input
+      value.
+3.  **Step: Append value 20**
+    - **Before:** `tail=10`.
+    - **Decision:** Create node 20 after node 10, then move `tail`.
+    - **After:** `dummy -> 10 -> 20 -> nil`; `tail=20`.
+    - **Known correct:** The first two input values remain in order.
+4.  **Step: Append value 30**
+    - **Before:** `tail=20`.
+    - **Decision:** Create node 30 after node 20, then move `tail`.
+    - **After:** `dummy -> 10 -> 20 -> 30 -> nil`; return node 10.
+    - **Known correct:** Returning `dummy.Next` excludes the temporary
+      node and preserves all input values in order.
+5.  **Step: Reverse node 10**
     - **Before:** `previous=nil`, `current=10 -> 20`, `next` not yet
       saved.
     - **Decision:** Save node 20, then set `10.Next=nil`.
     - **After:** `previous=10 -> nil`, `current=20 -> 30`.
     - **Known correct:** Node 10 forms the complete reversed prefix,
       and node 20 still reaches every unprocessed node.
-3.  **Step: Reverse node 20**
+6.  **Step: Reverse node 20**
     - **Before:** `previous=10`, `current=20`, `next=30` after saving.
     - **Decision:** Set `20.Next=10` and advance.
     - **After:** `previous=20 -> 10`, `current=30`.
     - **Known correct:** The first two original nodes are reversed
       without losing node 30.
-4.  **Step: Reverse node 30 and convert**
+7.  **Step: Reverse node 30**
     - **Before:** `previous=20 -> 10`, `current=30`.
     - **Decision:** Save `nil`, point 30 to 20, and advance to `nil`.
-    - **After:** Return `previous=30 -> 20 -> 10`; `ToSlice` returns
-      `[30,20,10]`.
+    - **After:** Return `previous=30 -> 20 -> 10` as the new head.
     - **Known correct:** Every original node appears once in reverse
       order.
+8.  **Step: Convert node 30**
+    - **Before:** Output slice is empty; current node is 30.
+    - **Decision:** Append 30 and follow `Next` to node 20.
+    - **After:** Output is `[30]`.
+    - **Known correct:** It contains the first reversed-list value.
+9.  **Step: Convert node 20**
+    - **Before:** Output is `[30]`; current node is 20.
+    - **Decision:** Append 20 and follow `Next` to node 10.
+    - **After:** Output is `[30,20]`.
+    - **Known correct:** It contains the first two list values in
+      encounter order.
+10. **Step: Convert node 10**
+    - **Before:** Output is `[30,20]`; current node is 10.
+    - **Decision:** Append 10 and follow `Next` to `nil`.
+    - **After:** Return `[30,20,10]`.
+    - **Known correct:** Every reversed-list node was visited once.
 
 For an empty `values=[]`, `FromSlice` returns `nil`, `Reverse(nil)`
 returns `nil`, and `ToSlice(nil)` returns an empty slice without
@@ -12679,13 +14088,13 @@ nodes, and all three operations on an empty list.
 For `n` values, `FromSlice` takes `O(n)` time and allocates `n` result
 nodes; the temporary dummy may remain on the stack or be optimized by
 the compiler. `ToSlice` takes `O(n)` time and `O(n)` result memory for
-the returned slice. `Reverse` takes `O(n)` time and `O(1)` auxiliary
-memory and allocates no nodes.
+the returned slice. `Reverse` takes `O(n)` time, uses `O(1)` extra
+memory, and allocates no nodes.
 
 #### When to use it
 
 Use this reference when a problem supplies singly linked nodes, needs
-constant- time link changes after a known node, or teaches pointer
+constant-time link changes after a known node, or teaches pointer
 rewiring. The slice adapters are useful at test and input boundaries.
 
 #### When not to use it
@@ -12707,7 +14116,8 @@ guaranteed acyclic.
 
 #### Related material
 
-- [B.2 Linked lists](#linked-lists) owns node operations and reversal
+- [B.2 Linked lists](#linked-lists) explains node operations and
+  reversal
   reasoning.
 - [D.7 Type parameters](#d7-type-parameters) explains `T` and `any`.
 - [D.9 Slice storage and retained
@@ -12763,10 +14173,22 @@ push `"b"`, peek, then pop. The expected peek and pop value is `"b"`.
     - **After:** Return `"b",true`; `items` remains `["a","b"]`.
     - **Known correct:** Inspection did not change stack order or
       length.
-4.  **Step: Pop**
-    - **Before:** `last=1`, `value="b"`.
-    - **Decision:** Clear slot 1, then shorten the visible slice.
-    - **After:** Return `"b",true`; `items=["a"]`.
+4.  **Step: Save the top value**
+    - **Before:** `items=["a","b"]`; last index is 1.
+    - **Decision:** Save `items[1]` in `value`.
+    - **After:** `value="b"`; the slice is unchanged.
+    - **Known correct:** The value to return is preserved before its
+      slot changes.
+5.  **Step: Clear the old slot**
+    - **Before:** Slot 1 still contains `"b"`.
+    - **Decision:** Assign the string zero value `""` to slot 1.
+    - **After:** Backing storage is `["a",""]`; visible length is 2.
+    - **Known correct:** The saved result remains `"b"`, and the old
+      slot no longer retains it.
+6.  **Step: Shorten and return**
+    - **Before:** `items=["a",""]`, `value="b"`.
+    - **Decision:** Reslice before index 1 and return the saved value.
+    - **After:** Return `"b",true`; visible `items=["a"]`.
     - **Known correct:** The newest value was removed first.
 
 For an empty stack, both `Pop` and `Peek` return `"",false` for
@@ -12852,9 +14274,10 @@ zero-value stack.
 #### Work and memory
 
 `Peek`, `Pop`, `Len`, and `IsEmpty` take `O(1)` time. `Push` takes
-`O(1)` amortized time: most appends are constant work, while an
+`O(1)` amortized time. **Amortized** means averaged across a sequence:
+most appends are constant work, while an
 occasional capacity growth copies `O(n)` items. Storing `n` values
-uses `O(n)` memory. The methods use `O(1)` auxiliary memory beyond the
+uses `O(n)` memory. The methods use `O(1)` extra memory beyond the
 slice storage.
 
 #### When to use it
@@ -12883,7 +14306,8 @@ because slice growth can copy the stored items.
 
 #### Related material
 
-- [C.1.3.13 Finish the newest open item first (stack)](#stack) owns
+- [C.1.3.13 Finish the newest open item first
+  (stack)](#stack) explains
   stack-method selection.
 - [D.7 Type parameters](#d7-type-parameters) explains the generic
   type.
@@ -13005,18 +14429,18 @@ because its reversal is one greater than `math.MaxInt64`.
 If `d` is the number of decimal digits, the loop takes `O(d)` time,
 which is `O(log value)` for positive input. Zero and rejected negative
 input take `O(1)` time. The function stores a fixed number of integers
-and uses `O(1)` auxiliary memory without allocations.
+and uses `O(1)` extra memory without allocations.
 
 #### When to use it
 
-Use this implementation when decimal digits must be processed
-numerically, negative input is outside the contract, and overflow must
+Use this implementation when decimal digits must be processed as
+numbers, negative input is not allowed, and overflow must
 be reported rather than wrapped or clamped.
 
 #### When not to use it
 
-Use text reversal or arbitrary-precision arithmetic when every input
-digit must be preserved beyond `int64`, including leading zeroes from
+Use text reversal or an integer library that grows beyond `int64` when
+every input digit must be preserved, including leading zeroes from
 textual input. Derive a separate sign rule when negative values should
 be reversed rather than rejected.
 
@@ -13035,14 +14459,13 @@ last-digit tie case.
 
 #### Related material
 
-- [A.8 Integer digit processing](#integer-digit-processing) owns digit
-  extraction and the reversal invariant.
+- [A.8 Integer digit processing](#integer-digit-processing) explains
+  digit extraction and why the partially reversed value stays correct.
 - [A.4 Integer limits and bits](#a4-integer-limits-and-bits) explains
   why range checks must precede unsafe arithmetic.
 - [Palindrome
   Number](problems/solved_easy_leetcode_0009_palindrome_number.go)
-  uses the same digit-extraction invariant under a narrower input
-  range.
+  uses the same digit-extraction rule with a narrower input range.
 
 <a id="d7-common-prefix-scan"></a>
 
@@ -13065,7 +14488,7 @@ user-visible symbols.
 #### How it works
 
 1.  Return `""` when `strs` is empty.
-2.  Use each byte position in `strs[0]` as a candidate `column`.
+2.  Use each byte position in `strs[0]` as the next `column` to check.
 3.  Compare `strs[row][column]` with the first string's `expected`
     byte, first checking that the row is long enough.
 4.  On a missing or unequal byte, return `strs[0][:column]`.
@@ -13151,12 +14574,12 @@ strings.
 If the first string has `m` bytes and there are `n` strings, the worst
 case does `O(n*m)` byte comparisons. A mismatch can return earlier,
 including in constant time at the first column. The function uses
-`O(1)` auxiliary memory. The returned substring reuses the first
+`O(1)` extra memory. The returned substring reuses the first
 string's bytes rather than allocating a copied result.
 
 #### When to use it
 
-Use this implementation when byte-prefix equality is the contract, all
+Use this implementation when the problem compares byte prefixes, all
 strings must participate, and returning a substring of the first input
 is acceptable.
 
@@ -13175,12 +14598,14 @@ useful when many changing queries share a large stored dictionary.
 Guard empty input before reading `strs[0]`. The first string may be
 the shortest without being specially selected. Byte slicing can split
 a multi-byte UTF-8 encoding if a different string disagrees inside
-that encoding, which is why the byte contract must be explicit.
+that encoding, which is why the byte-based comparison rule must be
+explicit.
 
 #### Related material
 
 - [C.1.3.1 Compare from the left (common-prefix
-  scan)](#common-prefix-scan) owns the method and its invariant.
+  scan)](#common-prefix-scan) explains the method and why the known
+  prefix stays correct.
 - [D.6 Bytes, runes, and visible
   characters](#d6-bytes-runes-and-visible-characters) explains how to
   choose the unit of comparison.
@@ -13295,14 +14720,15 @@ func SumWithSmallerLeftValuesSubtracted(values []int) int {
 ```
 
 Concrete cases to test are `[] -> 0`, `[7] -> 7`, `[5,4,3] -> 12`,
-`[3,4] -> 1`, and `[3,4,2] -> 3`, plus values near the accepted
-integer limits to enforce the no-overflow contract.
+`[3,4] -> 1`, and `[3,4,2] -> 3`. Also test values near the accepted
+integer limits while ensuring every running total still fits in
+`int`; this function does not report overflow outside that contract.
 
 #### Work and memory
 
 The function visits each of `n` values once, so it takes `O(n)` time;
 empty and single inputs are still within that bound. It stores a fixed
-number of integers, uses `O(1)` auxiliary memory, and makes no
+number of integers, uses `O(1)` extra memory, and makes no
 allocations.
 
 #### When to use it
@@ -13325,14 +14751,14 @@ unit.
 > mistake can classify index 0 against 6 rather than 4.
 
 Handle empty input before calculating `len(values)-1`. State what
-happens at the last item. Check equality explicitly through the
-contract: equal adjacent values are added because only a strictly
-smaller left value is subtracted.
+happens at the last item. Handle equality explicitly: equal adjacent
+values are added because only a strictly smaller left value is
+subtracted.
 
 #### Related material
 
 - [C.1.3.2 Process the needed neighbor first (directional
-  scan)](#directional-scan) owns method selection and direction
+  scan)](#directional-scan) explains method selection and direction
   choice.
 - [A.2 Correctness and invariants](#a2-correctness-and-invariants)
   explains the maintained `rightValue` fact.
@@ -13357,7 +14783,8 @@ once.
 Place one pointer at each end. If their sum is too small, only a
 larger left value can help; if it is too large, only a smaller right
 value can help. Moving the two boundary positions inward is the
-**two-pointer** method for this sorted pair search.
+**two-pointer** method for this sorted pair search. Here each pointer
+is an integer index, not a Go memory pointer.
 
 #### How it works
 
@@ -13380,13 +14807,13 @@ For `values=[-3,1,2,5,8]` and `target=7`, the expected result is
 1.  **Step: Check indexes 0 and 4**
     - **Before:** `left=0`, `right=4`, sum `-3+8=5`.
     - **Decision:** The sum is too small, so increment `left`.
-    - **After:** Candidate range is indexes 1 through 4.
+    - **After:** Possible positions are indexes 1 through 4.
     - **Known correct:** Index 0 cannot pair with any remaining value
       because 8 was already its largest possible partner.
 2.  **Step: Check indexes 1 and 4**
     - **Before:** Sum `1+8=9`.
     - **Decision:** The sum is too large, so decrement `right`.
-    - **After:** Candidate range is indexes 1 through 3.
+    - **After:** Possible positions are indexes 1 through 3.
     - **Known correct:** Index 4 cannot pair with any remaining value
       because 1 was already its smallest possible partner.
 3.  **Step: Check indexes 1 and 3**
@@ -13458,14 +14885,14 @@ duplicate values such as `[3,3],6`; and empty input.
 
 Each unsuccessful iteration moves one pointer inward, so there are at
 most `n-1` iterations and `O(n)` time. An early match may take `O(1)`
-actual time. The function uses `O(1)` auxiliary memory and makes no
+actual time. The function uses `O(1)` extra memory and makes no
 allocations. Sorting an unsorted input first would add the sorting
 time and any copy required to preserve caller order.
 
 #### When to use it
 
 Use this implementation when the values are already sorted, one
-matching pair is enough, and constant auxiliary memory or ordered
+matching pair is enough, and constant extra memory or ordered
 elimination is preferable to a map.
 
 #### When not to use it
@@ -13490,7 +14917,7 @@ overflow.
 #### Related material
 
 - [C.1.3.9 Move coordinated positions (two pointers)](#two-pointers)
-  owns the elimination proof and related forms.
+  explains why each pointer move is safe and shows related forms.
 - [E.3 Hash-map complement lookup](#e3-hash-map-complement-lookup) is
   the unsorted one-pass alternative.
 - [D.3 Sorting without unexpected
@@ -13501,36 +14928,39 @@ overflow.
 
 ## F. Further study
 
-The material above covers the reusable concepts emphasized by the
-repository's problem set and contemporary general
-interview-preparation lists. The topics below are later extensions,
-not prerequisites for the core methods in this guide. Study one when a
-target role, contest, or interview loop calls for it:
+The topics below are optional. The rest of this guide does not require
+them. Study one when a problem, contest, or job calls for it. Follow
+the linked starting point first if the new topic is unfamiliar.
 
-- **Strongly connected components** divide a directed graph into
-  largest groups in which every node can reach every other node. Start
-  with [depth-first search](#c1320-depth-first-search) and graph
-  direction in [graphs and grids](#b5-graphs-and-grids).
-- **All-pairs shortest paths** find the cheapest route for every
-  start-and-end pair, instead of routes from one start. Compare
-  repeated [Dijkstra searches](#c1323-dijkstra-shortest-paths) with
-  reusing smaller answers through [dynamic
-  programming](#c1310-dynamic-programming).
-- **Maximum flow** asks how much material can travel from a source to
-  a destination when every directed connection has a capacity. Its
-  starting point is the adjacency representation in [graphs and
-  grids](#b5-graphs-and-grids).
-- **Suffix arrays and suffix automata** organize all endings of a
-  string, or remembered text states, so repeated substring questions
-  can be answered quickly. Begin with [string
-  matching](#c137-string-matching) and [parsing
+- **Strongly connected components** find groups in a graph whose
+  connections have directions. Within one group, every node can reach
+  every other node by following those directions. Start with
+  [depth-first search](#c1320-depth-first-search) and graph direction
+  in [graphs and grids](#b5-graphs-and-grids).
+- **All-pairs shortest paths** find the cheapest route between every
+  pair of nodes, rather than routes from only one starting node.
+  Compare repeated [Dijkstra
+  searches](#c1323-dijkstra-shortest-paths) with reusing smaller
+  answers through [dynamic programming](#c1310-dynamic-programming).
+- **Maximum flow** asks how much material can travel from a starting
+  point to a destination. Each one-way connection has a **capacity**,
+  meaning the largest amount it can carry. Start with the way
+  [graphs and grids](#b5-graphs-and-grids) store each node's
+  neighbors.
+- **Suffix arrays** organize every suffix of a string. A suffix is a
+  piece that starts at some position and continues to the end.
+  **Suffix automata** compactly represent the string's substrings.
+  Both can speed up repeated questions about text inside one string.
+  Begin with [string matching](#c137-string-matching) and [parsing
   state](#c138-parsing-and-state-machines).
 - **Computational geometry beyond normalized slopes** uses exact
-  orientation, intersection, and boundary tests to reason about points
-  and shapes. The prerequisite is [exact slopes without
+  arithmetic instead of rounded decimal values. It can decide which
+  side of a line contains a point, whether shapes cross, and whether a
+  point lies on a boundary. Start with [exact slopes without
   rounding](#a63-exact-slopes-without-rounding).
-- **Randomized balanced search trees** keep ordered values while
-  random priorities make long one-sided shapes unlikely, giving
-  expected logarithmic search and update work. Compare
+- **Randomized balanced search trees** keep values in order. They use
+  random priorities to make a long, one-sided shape unlikely. Search
+  and update usually need only a number of steps proportional to the
+  tree's height. Compare
   [binary-search-tree ordering](#b41-terminology-and-search) with
   [heap priorities](#c1327-heap-or-priority-queue).
