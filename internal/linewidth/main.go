@@ -16,11 +16,11 @@ import (
 const maximumLineWidth = 70
 
 var exemptPaths = map[string]struct{}{
-	"AGENTS.md":             {},
-	"CODING_RULES.md":       {},
-	"CONCEPTS_LINKS.md":     {},
-	"CONCEPTS_STANDARDS.md": {},
-	"VALIDATION.md":         {},
+	"AGENTS.md":                 {},
+	"CODING_RULES.md":           {},
+	"REFERENCE_LINKS.md":        {},
+	"VALIDATION.md":             {},
+	"dsa/CONCEPTS_STANDARDS.md": {},
 }
 
 func main() {

@@ -1,0 +1,759 @@
+# Identity and API Security
+
+This chapter expands the security competency module in the [overview
+and competency map][chapter-link-1]. It treats the API as an OAuth 2.0
+resource server: an external identity provider issues access tokens,
+while this service verifies them and enforces authorization.
+
+## Learning outcomes
+
+By the end of this lesson, you should be able to:
+
+- separate authentication from authorization;
+- identify the OAuth 2.0 and OpenID Connect participants relevant to
+  an API;
+- validate an access token's signature and security claims;
+- handle caching and rotation of the identity provider's JSON Web Key
+  Set (JWKS) without disabling verification;
+- introduce a trusted principal into request context;
+- enforce role and object-level authorization;
+- explain JSON Web Token (JWT), opaque-token, cross-origin resource
+  sharing (CORS), cross-site request forgery (CSRF), and
+  browser-session tradeoffs;
+- prevent over-posting and sensitive-data leakage;
+- test missing, invalid, expired, wrong-role, and wrong-owner access;
+- write a compact threat model.
+
+### How to use this lesson
+
+Security decisions form a trust pipeline:
+
+```text
+untrusted request
+  -> cryptographically verify token and required claims
+  -> construct a small trusted principal
+  -> authorize the requested operation
+  -> scope access to the specific object
+  -> record a safe decision without leaking credentials
+```
+
+Passing one stage does not skip the next. A genuine token can belong
+to the wrong API, a genuine customer can lack an administrator role,
+and an authorized customer can still be forbidden from reading another
+customer's order. Read each section as one independent question in
+that pipeline.
+
+### Before you start: one person, three decisions
+
+Imagine customer `C-17` asks for order `O-42`. The server must answer
+three separate questions:
+
+1. **Authentication:** who is making the request?
+2. **Action authorization:** may that identity call this operation?
+3. **Object authorization:** does that identity have access to this
+   particular order?
+
+A token helps answer the first question. It does not automatically
+answer the next two.
+
+The security acronyms in this lesson name specific pieces of that
+flow:
+
+- **Term:** OAuth 2.0
+  - **Meaning in this project:** The authorization framework governing
+    access tokens
+
+- **Term:** OpenID Connect (OIDC)
+  - **Meaning in this project:** Identity conventions built on OAuth
+    2.0
+
+- **Term:** JSON Web Token (JWT)
+  - **Meaning in this project:** One signed token format the API may
+    validate locally
+
+- **Term:** JSON Web Key Set (JWKS)
+  - **Meaning in this project:** The issuer's published public
+    verification keys
+
+- **Term:** `iss`
+  - **Meaning in this project:** The token claim naming who issued it
+
+- **Term:** `aud`
+  - **Meaning in this project:** The token claim naming the intended
+    recipient API
+
+- **Term:** `sub`
+  - **Meaning in this project:** The token claim naming the
+    authenticated subject
+
+- **Term:** CORS
+  - **Meaning in this project:** A browser policy for cross-origin
+    JavaScript requests
+
+- **Term:** CSRF
+  - **Meaning in this project:** An attack that abuses credentials a
+    browser attaches automatically
+
+Do not try to memorize the acronyms first. Follow one request from
+untrusted token to verified principal to authorized operation. Return
+to the table whenever a term appears.
+
+## 1. Authentication and authorization are separate decisions
+
+**Authentication** answers: who or what is making this request, and
+how was that identity verified?
+
+**Authorization** answers: may that principal perform this action on
+this resource?
+
+A valid token does not authorize every operation. Authentication
+middleware can establish a principal; each use case or authorization
+boundary must still evaluate the required role, scope, tenant, and
+object ownership.
+
+Hiding a button in a frontend is not authorization. Attackers can call
+the API directly.
+
+For example, consider `GET /v1/orders/O-42`:
+
+```text
+No token                    -> authentication fails (401)
+Valid token for customer A  -> authentication succeeds
+Order O-42 belongs to B     -> object authorization fails (public 404)
+Order O-42 belongs to A     -> request proceeds (200)
+```
+
+The same principal may be authorized for one object and denied for
+another. That is why "the middleware checked the token" is never a
+complete authorization design.
+
+## 2. Participants and token purpose
+
+For this service:
+
+- the **resource owner** is normally the user;
+- the **client** is the frontend or other caller;
+- the **authorization server / OpenID Provider** authenticates the
+  user and issues tokens;
+- the **resource server** is this Order API;
+- an **access token** authorizes API access;
+- an **ID token** tells the client about the authenticated session and
+  should not be accepted by the API merely because it is a JWT.
+
+OAuth 2.0 defines delegated authorization. OpenID Connect adds
+identity semantics and discovery around OAuth 2.0. This project
+consumes identity; it does not implement password storage, login UI,
+token issuance, recovery, or multifactor authentication.
+
+A simplified interaction is:
+
+```text
+user -> client -> authorization server
+                  returns tokens to the client
+
+client -- access token --> Order API (resource server)
+Order API -- verifies issuer, key, audience, and claims --> accept or
+reject
+```
+
+The ID token's audience is normally the client because it describes
+the user's authentication to that client. The access token is meant
+for a resource server. Their formats may look similar, but purpose and
+audience, not the number of dots in the string, determine where a
+token may be accepted.
+
+## 3. What access-token validation must prove
+
+For a signed JWT access token, validation is a conjunction of checks:
+
+1. Parse the compact token with strict size and syntax limits.
+2. Accept only explicitly configured signing algorithms.
+3. Select a trusted key from the issuer's JWKS.
+4. Verify the cryptographic signature.
+5. Require the exact configured issuer (`iss`).
+6. Require this API in the audience (`aud`).
+7. Require expiration (`exp`) and reject expired tokens.
+8. Honor `nbf` when present and apply only small configured clock
+   skew.
+9. Require a stable subject (`sub`).
+10. Validate any application-required scope, role, tenant, or
+    token-type claims.
+
+Every check is necessary. Signature verification alone proves only
+that a holder of the selected key signed the bytes. Without issuer and
+audience validation, a token created for another system may be
+accepted here.
+
+Group the checks by the question they answer:
+
+- **Check:** Algorithm, key, signature
+  - **Security question:** Were these exact bytes signed by an allowed
+    trusted key?
+
+- **Check:** `iss`
+  - **Security question:** Is this the authority configured to issue
+    identities we trust?
+
+- **Check:** `aud`
+  - **Security question:** Was this token issued for this API?
+
+- **Check:** `exp` and `nbf`
+  - **Security question:** Is the token valid at the current time?
+
+- **Check:** `sub`
+  - **Security question:** Which stable principal does it identify?
+
+- **Check:** Scope, role, tenant, token type
+  - **Security question:** Is it suitable for the requested
+    application boundary?
+
+These checks must operate on verified claims. A verifier may inspect
+the unverified protected header to select a candidate key by a bounded
+`kid`, but it must treat the header as attacker-controlled until
+signature verification succeeds. Unverified payload claims must never
+establish identity or permission.
+
+Never choose the validation algorithm from the token header without an
+allowlist. Never skip signature validation because a token's payload
+looks plausible.
+
+Use a maintained OIDC/JWT library rather than implementing
+cryptography or token parsing manually. Pin and review the dependency
+when implementation begins.
+
+## 4. Discovery and JWKS rotation
+
+OIDC discovery publishes issuer metadata, including the JWKS URI. JWKS
+is a set of public signing keys, commonly identified by `kid`.
+
+A safe verifier:
+
+- loads discovery only from the configured trusted issuer;
+- requires the discovered issuer to match exactly;
+- fetches JWKS over TLS;
+- caches keys for a bounded period;
+- refreshes on normal expiry;
+- may trigger one rate-limited refresh when an unknown `kid` appears;
+- keeps still-valid cached keys during a brief refresh failure;
+- never accepts an unverifiable token merely because the issuer is
+  unavailable;
+- bounds response size, network time, cache size, and refresh
+  concurrency.
+
+During key rotation, the issuer should publish old and new public keys
+for an overlap period. The service must accept tokens signed by either
+currently trusted key. A test issuer can demonstrate rotation:
+
+1. Publish key A and validate a token signed by A.
+2. Publish keys A and B.
+3. Validate a new token signed by B without restarting the service.
+4. Remove A only after tokens signed by A have expired.
+5. Confirm old A tokens then fail according to the expected lifecycle.
+
+Do not fetch keys separately for every request; that turns
+authentication into an unbounded network dependency and creates an
+easy denial-of-service path.
+
+An unknown `kid` is ambiguous: it may be a legitimate rotation or
+attacker-chosen input. A bounded refresh resolves that ambiguity
+safely:
+
+```text
+known kid    -> use cached key -> verify token
+unknown kid -> one rate-limited refresh -> key now trusted? verify :
+reject
+issuer down -> cached known key may still verify; unknown key remains
+rejected
+```
+
+Failing closed means lack of fresh key data never turns into skipped
+verification. It does not require discarding a still-valid cache on
+every temporary network failure.
+
+## 5. Build a trusted principal
+
+After complete token validation, map only required claims into an
+application type:
+
+```go
+type Principal struct {
+    Subject string
+    Roles   map[string]struct{}
+}
+
+func (p Principal) HasRole(role string) bool {
+    _, ok := p.Roles[role]
+    return ok
+}
+```
+
+Store the principal in request context with an unexported typed key.
+Expose helper functions rather than allowing packages to depend on raw
+claim maps.
+
+```go
+type principalContextKey struct{}
+
+func WithPrincipal(
+    ctx context.Context,
+    principal Principal,
+) context.Context {
+    return context.WithValue(ctx, principalContextKey{}, principal)
+}
+
+func PrincipalFromContext(ctx context.Context) (Principal, bool) {
+    principal, ok := ctx.Value(principalContextKey{}).(Principal)
+    return principal, ok
+}
+```
+
+Context carries the request-scoped verified identity, not an arbitrary
+bag of optional parameters.
+
+Authentication middleware behavior:
+
+- missing bearer token: return 401 with a stable problem;
+- malformed scheme or token: return 401;
+- invalid signature or claims: return 401;
+- valid token: attach the principal and continue;
+- verifier infrastructure failure that prevents verification: fail
+  closed with a generic 503 and log the internal reason. Do not
+  misreport it as bad credentials.
+
+Do not log the Authorization header or the token.
+
+The principal is a deliberate reduction of authority-bearing input. A
+raw token may contain dozens of provider-specific claims; most
+application code needs only a stable subject and a few normalized
+permissions. Mapping once after validation prevents downstream
+packages from interpreting raw claim shapes inconsistently.
+
+Keep two error categories distinct for operations and clients:
+
+- **Situation:** Token absent, malformed, expired, or invalid
+  - **Public result:** 401
+  - **Internal meaning:** Caller did not present acceptable
+    authentication
+
+- **Situation:** Verifier cannot obtain any information required to
+  decide safely
+  - **Public result:** 503
+  - **Internal meaning:** Authentication dependency is unavailable; no
+    token was accepted
+
+Both outcomes deny access, but the second is an availability failure
+worth alerting on rather than evidence that the caller supplied bad
+credentials.
+
+## 6. Role authorization belongs near the action
+
+Product creation requires an administrator. The handler can require an
+authenticated principal, but the application operation should enforce
+the role so another adapter cannot bypass it accidentally.
+
+```go
+var ErrForbidden = errors.New("forbidden")
+
+func (s *Service) CreateProduct(
+    ctx context.Context,
+    actor Principal,
+    input NewProduct,
+) (Product, error) {
+    if !actor.HasRole("admin") {
+        return Product{}, ErrForbidden
+    }
+    // Validate and create.
+}
+```
+
+Return 401 when authentication is absent or invalid. Return 403 when
+authentication succeeded but the known principal lacks permission. In
+cases where revealing a resource's existence would leak information,
+return the same 404 for wrong owner and nonexistent object.
+
+Roles should be narrowly defined. Avoid a universal `admin` bypass
+scattered across handlers; centralize which operation requires which
+capability.
+
+## 7. Object-level authorization belongs in data access
+
+The customer order query must include ownership:
+
+```sql
+SELECT id, customer_id, status, total_cents, created_at
+FROM orders
+WHERE id = $1
+  AND customer_id = $2;
+```
+
+The service passes `principal.Subject` as the trusted customer
+identity. It never accepts `customer_id` from the request body or
+query string for a customer endpoint.
+
+For list access:
+
+```sql
+SELECT id, customer_id, status, total_cents, created_at
+FROM orders
+WHERE customer_id = $1
+  AND (created_at, id) < ($2, $3)
+ORDER BY created_at DESC, id DESC
+LIMIT $4;
+```
+
+This prevents insecure direct object references even if an attacker
+guesses an order ID. Test the SQL-backed behavior, not only a handler
+check.
+
+Loading by ID and checking afterward creates a dangerous intermediate
+state:
+
+```go
+// Risky shape: another customer's data has already been loaded.
+order, err := repository.GetByID(ctx, orderID)
+if order.CustomerID != principal.Subject {
+    return ErrNotFound
+}
+```
+
+A future log, metric label, cache, trace attribute, or early return
+can expose the object before the check. `GetByIDAndCustomer` makes
+ownership part of what it means to retrieve the row at all.
+
+## 8. JWTs and opaque tokens have different tradeoffs
+
+A signed JWT can be validated locally, reducing per-request issuer
+calls. Its claims remain valid until expiration unless the system adds
+a revocation mechanism. Keep access-token lifetimes bounded and avoid
+sensitive data in the payload: JWT payloads are encoded, not encrypted
+by default.
+
+An opaque token carries no locally readable claims. The resource
+server may call an introspection endpoint or use a gateway-provided
+verified identity. This can support centralized revocation but adds
+latency, availability, caching, and credential requirements.
+
+Choose based on the identity provider and threat model. Do not infer
+token type by whether a string happens to contain dots.
+
+Compare one request under each model:
+
+```text
+JWT:
+  API reads the token -> verifies cached public key and claims locally
+  -> decides
+
+Opaque token:
+  API reads the token -> calls or consults cached introspection ->
+  receives active,
+  subject, audience, and scopes -> decides
+```
+
+If the issuer is temporarily unavailable, a JWT already covered by a
+valid cached key may still verify. An uncached opaque token may not be
+decidable and must fail closed. Conversely, an introspection response
+can report a token inactive before its original expiry, while a
+locally validated JWT needs an additional revocation design to learn
+that fact.
+
+## 9. Browser sessions, CORS, and CSRF
+
+CORS is a browser rule controlling whether frontend JavaScript may
+read or send certain cross-origin requests. It is not authentication
+and does not stop curl, server-to-server callers, or same-origin
+attackers.
+
+Configure exact allowed origins, methods, and headers. Do not combine
+wildcard origins with credentials. Keep preflight behavior tested.
+
+CSRF matters when a browser automatically attaches credentials,
+especially cookies. Mitigations include appropriate `SameSite`
+cookies, CSRF tokens, origin checking, and avoiding unsafe state
+changes through safe methods. A bearer token explicitly attached by
+JavaScript is not automatically sent like a cookie, but XSS and token
+storage risks remain.
+
+Cookies carrying sessions should be `Secure`, `HttpOnly` when
+JavaScript access is unnecessary, have an appropriate `SameSite`
+policy, narrow path/domain scope, and a bounded lifetime. Logout must
+define whether it clears only the browser session or also revokes
+server-side state.
+
+Keep the browser concerns separate:
+
+- **Concern:** CORS
+  - **Primary question:** May JavaScript from this origin make/read
+    this cross-origin request?
+
+- **Concern:** CSRF
+  - **Primary question:** Can another site cause the browser to send
+    ambient credentials for an unwanted action?
+
+- **Concern:** XSS
+  - **Primary question:** Can injected script execute as this
+    application and read or perform what the user can?
+
+CORS configuration does not replace authentication, CSRF defenses do
+not repair XSS, and `HttpOnly` cookies prevent JavaScript reads but do
+not by themselves stop the browser from sending a cookie on a forged
+request. The credential model and threat determine which controls are
+required.
+
+## 10. Prevent common API data exposures
+
+### Over-posting and mass assignment
+
+Decode into a request DTO containing only client-writable fields.
+Never decode directly into a persistence or domain type with fields
+such as role, owner, price, status, or audit timestamps.
+
+For example, an attacker may send more fields than the UI exposes:
+
+```json
+{
+  "sku": "TEA-001",
+  "name": "Green tea",
+  "price_cents": 1,
+  "created_by": "admin-user",
+  "is_featured": true
+}
+```
+
+If the request DTO contains only `sku` and `name` and unknown fields
+are rejected, the caller cannot bind privileged persistence fields
+accidentally. The application obtains price, ownership, and audit
+identity from their authoritative sources.
+
+### Injection
+
+Continue using parameterized SQL. Token claims and authenticated IDs
+are still data, not trusted SQL syntax.
+
+### Logging and telemetry
+
+Do not record:
+
+- bearer tokens or cookies;
+- passwords, authorization codes, or refresh tokens;
+- raw request/response bodies by default;
+- full personal data;
+- private signing material;
+- database URLs containing credentials.
+
+Log bounded identifiers needed for diagnosis: request ID, route
+template, public error code, subject only when policy permits, and
+authorization decision category.
+
+### Secrets and least privilege
+
+Load secrets from the deployment environment or secret manager, not
+source control. The API database role should have only the required
+schema and statement privileges. Migration credentials can be separate
+because schema modification is more powerful.
+
+A concrete separation is:
+
+```text
+api_runtime role: SELECT, INSERT, UPDATE on application tables
+migrator role: CREATE, ALTER, DROP during the controlled migration
+step
+```
+
+If the running API is compromised, its database identity still cannot
+drop a table or grant itself privileges. Keeping migrator credentials
+out of the application runtime narrows the damage available through
+that process.
+
+### Abuse controls
+
+Set body, header, timeout, page-size, and concurrency limits. Rate
+limits should be bounded by a meaningful key such as trusted client or
+principal, consider proxy address trust, and return a clear 429
+response. A rate limiter complements rather than replaces
+authorization.
+
+For example, limit product search separately from order placement. A
+burst of 100 cheap cached reads may be acceptable while 100 concurrent
+order transactions could exhaust the database pool. A customer who
+remains under the rate limit still cannot place an order for another
+customer; capacity policy and authorization answer different
+questions.
+
+## 11. Security test matrix
+
+Add deterministic tests for:
+
+- **Case:** Missing token
+  - **Expected result:** 401
+
+- **Case:** Malformed bearer scheme
+  - **Expected result:** 401
+
+- **Case:** Invalid signature
+  - **Expected result:** 401
+
+- **Case:** Disallowed algorithm
+  - **Expected result:** 401
+
+- **Case:** Wrong issuer
+  - **Expected result:** 401
+
+- **Case:** Wrong audience
+  - **Expected result:** 401
+
+- **Case:** Expired token
+  - **Expected result:** 401
+
+- **Case:** Token not yet valid beyond allowed skew
+  - **Expected result:** 401
+
+- **Case:** Valid customer token
+  - **Expected result:** Customer endpoint proceeds
+
+- **Case:** Customer calls admin product creation
+  - **Expected result:** 403
+
+- **Case:** Admin creates product
+  - **Expected result:** Operation proceeds
+
+- **Case:** Customer reads own order
+  - **Expected result:** 200
+
+- **Case:** Customer reads another customer's order
+  - **Expected result:** Same 404 as nonexistent order
+
+- **Case:** Signing key rotates
+  - **Expected result:** Old and new valid during overlap
+
+- **Case:** JWKS refresh temporarily fails
+  - **Expected result:** Cached valid keys continue; unknown key fails
+    closed
+
+Capture logs in tests and assert that token text and authorization
+headers do not appear. Generate test keys locally; never use
+production keys in fixtures.
+
+## 12. Compact threat model
+
+Record at least this table and adapt it to the implementation:
+
+- **Asset:** Customer orders
+  - **Threat:** ID guessing reads another user's order
+  - **Boundary:** Client to API
+  - **Mitigation:** Owner-scoped query
+  - **Evidence:** Wrong-owner integration test
+
+- **Asset:** Admin operations
+  - **Threat:** Customer forges or reuses privilege
+  - **Boundary:** Token to use case
+  - **Mitigation:** Signature, claims, and role checks
+  - **Evidence:** Wrong-role tests
+
+- **Asset:** Access tokens
+  - **Threat:** Token leaks through logs
+  - **Boundary:** API to telemetry
+  - **Mitigation:** Redaction and field allowlist
+  - **Evidence:** Captured-log test
+
+- **Asset:** Inventory
+  - **Threat:** Concurrent order oversells
+  - **Boundary:** API to PostgreSQL
+  - **Mitigation:** Atomic conditional update
+  - **Evidence:** Last-unit test
+
+- **Asset:** Signing trust
+  - **Threat:** Unknown key accepted during outage
+  - **Boundary:** API to issuer
+  - **Mitigation:** Bounded cache, refresh, fail closed
+  - **Evidence:** Rotation/outage tests
+
+- **Asset:** Database
+  - **Threat:** Compromised app modifies schema
+  - **Boundary:** API to database
+  - **Mitigation:** Least-privilege runtime role
+  - **Evidence:** Privilege verification
+
+For each threat, name the attacker capability, entry point, impact,
+prevention, detection, and recovery. A threat model is useful only
+when it changes design or produces verifiable controls.
+
+## 13. Guided build
+
+Complete the work in this order:
+
+1. Add an `auth` platform package containing principal and verifier
+   boundaries.
+2. Configure one trusted issuer and audience through validated startup
+   config.
+3. Use a maintained library to validate signed access tokens and
+   claims.
+4. Add bounded discovery/JWKS caching and a local rotating test
+   issuer.
+5. Attach a verified principal in authentication middleware.
+6. Enforce admin authorization inside product creation.
+7. Pass the principal subject into place/list/get order use cases.
+8. Scope order SQL by customer ID.
+9. Add the complete negative test matrix and log-redaction checks.
+10. Write the compact threat model.
+
+Do not add password login or token issuance. Those are separate
+security products and distract from learning resource-server
+responsibilities.
+
+## 14. Knowledge check
+
+1. What is the difference between authentication and authorization?
+2. Why must an API validate audience after verifying a JWT signature?
+3. Why is an ID token not automatically an API access token?
+4. What must happen when an unknown signing key appears?
+5. Why should role authorization also exist in the application
+   operation?
+6. Why scope the order query instead of loading then checking
+   ownership?
+7. Why does CORS not protect an API from non-browser callers?
+8. When is CSRF relevant?
+9. Why is decoding JSON into a database model dangerous?
+
+### Expected answers
+
+1. Authentication establishes identity; authorization decides whether
+   that identity may perform a particular action on a resource.
+2. A correctly signed token may have been issued for a different
+   resource server.
+3. It communicates authentication to a client and can have a different
+   audience and purpose.
+4. Perform at most a bounded, rate-limited JWKS refresh; accept only
+   if verification succeeds with a trusted key, otherwise fail closed.
+5. It protects the behavior when called by a non-HTTP adapter or a
+   future refactor.
+6. Unauthorized data never enters application memory and the check
+   cannot be accidentally omitted later.
+7. CORS is enforced by browsers, not by curl or arbitrary servers.
+8. When a browser automatically attaches ambient credentials to a
+   state-changing request.
+9. It may allow clients to set ownership, role, status, price, or
+   audit fields they must not control.
+
+## 15. Completion evidence
+
+This chapter is complete when:
+
+- token validation requires trusted algorithm, signature, issuer,
+  audience, time, and subject claims;
+- JWKS rotation succeeds without accepting unverifiable tokens;
+- product administration is enforced in the use case;
+- all order reads and lists are scoped by the authenticated subject;
+- wrong-owner and nonexistent order responses are indistinguishable
+  externally;
+- the complete negative-token and wrong-role test matrix passes;
+- captured telemetry contains no tokens, credentials, or raw personal
+  payloads;
+- the threat model maps every listed threat to implementation
+  evidence;
+- formatting, tests, race checks, vet, and vulnerability checks pass.
+
+Then continue to [Testing, observability, and
+operations][chapter-link-2].
+
+[chapter-link-1]: 00-overview-and-competency-map.md
+[chapter-link-2]: 07-testing-observability-and-operations.md

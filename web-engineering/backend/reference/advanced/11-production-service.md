@@ -1,0 +1,534 @@
+# Production Service
+
+These lessons take the correct order workflow and make it safe to
+retry, observable, deployable, measurable, and recoverable.
+
+## Idempotency and Failure Semantics
+
+### Goal and mental model
+
+A client timeout does not reveal whether a write committed.
+Idempotency lets the client repeat one logical request without
+creating another effect.
+
+The idempotency key identifies an attempt within a documented scope,
+normally authenticated customer plus operation. A request fingerprint
+binds the key to one canonical payload. Same key and same fingerprint
+reuses the outcome; same key and a different fingerprint is a
+conflict.
+
+Canonicalization must be deterministic. Parse and validate JSON,
+normalize the application command, serialize a defined field order,
+and hash those bytes. Do not hash raw JSON because whitespace and
+object-key order can differ without changing meaning. Exclude
+transport fields that do not affect the operation.
+
+Model record states explicitly:
+
+```text
+in_progress -> completed
+in_progress -> failed_retryable or removed according to policy
+completed   -> replay stored response
+```
+
+Create the idempotency record, order, items, inventory changes, and
+completed outcome inside one correctness boundary whenever possible.
+Concurrent duplicates must serialize on the scoped key. One performs
+work; others wait briefly, observe the committed outcome, or return a
+stable in-progress response according to the contract.
+
+Store enough response data to reproduce the public status and body.
+Avoid storing secrets or unstable transport headers. Define retention
+from the maximum client retry window plus operational margin; cleanup
+must be bounded and observable.
+
+### Start with a concrete situation
+
+A client sends `POST /v1/orders` and waits. The server commits order
+`O-42`, but the network connection breaks before the response reaches
+the client. From the client's view, success and failure look
+identical: it received no answer.
+
+If the client repeats an ordinary `POST`, the service may create a
+second order. An idempotency key lets the client say, "this is another
+attempt at the same logical operation":
+
+```text
+customer: C-17
+key:      checkout-8f31
+request:  2 x TEA-001
+```
+
+The first request stores the key, a fingerprint of the normalized
+request, and the completed outcome in the same transaction as the
+order. A retry with the same key and fingerprint receives that stored
+outcome. The same key with `3 x TEA-001` is not a retry; it is
+conflicting input and must be rejected.
+
+Before implementing the table, write the three observable cases on
+paper: first attempt, identical retry, and conflicting reuse. Then add
+the concurrent case where two identical attempts arrive before either
+completes.
+
+### Guided work
+
+1. Require one bounded `Idempotency-Key` on order creation.
+2. Define key syntax, scope, retention, and response-replay contract
+   in OpenAPI.
+3. Convert the validated order command to one standard byte
+   representation (canonicalize it), then hash it.
+4. Add a table keyed by customer and key with fingerprint, state,
+   outcome, and expiry.
+5. Acquire or inspect the record inside the placement transaction.
+6. Reject mismatched fingerprints with a stable conflict.
+7. Serialize concurrent matches and return one compatible stored
+   outcome.
+8. Persist completion atomically with the order transaction.
+9. Add a bounded cleanup job and metrics for records, age, conflicts,
+   and replays.
+10. Document which client failures may be retried and for how long.
+
+### Failure checks
+
+- Send identical requests concurrently and prove one order exists.
+- Reuse a key with reordered but semantically equal JSON and verify
+  canonical match.
+- Reuse it with one changed quantity and verify explicit conflict.
+- Disconnect after commit but before reading the response, then retry.
+- Crash at each state transition and verify no second effect or
+  permanently hidden committed result.
+- Expire a record and prove the documented old-retry behavior.
+
+### Knowledge check and expected answers
+
+1. **Why not hash raw JSON?** Equivalent requests may differ in
+   whitespace and key order, producing false conflicts.
+2. **Why scope a key by customer?** Different principals may
+   legitimately choose the same opaque value and must not observe one
+   another's outcome.
+3. **Why store the response?** The caller needs a compatible answer
+   when retrying an operation whose first response was lost.
+
+### Completion evidence
+
+Concurrent duplicates create one order; mismatched payloads conflict;
+disconnect retry returns the stored outcome; crash tests cover each
+transition; record growth has a measured retention/cleanup policy; and
+the client retry contract is explicit.
+
+## Observability and Operational Controls
+
+### Goal and mental model
+
+Observability lets an operator answer why user-visible behavior
+occurred without adding debug code during the incident. Logs describe
+events, metrics show aggregate trends, traces connect a request path,
+and audit events record privileged actions.
+
+Use structured logs with bounded fields: timestamp, level, message,
+request ID, trace ID, route template, status, duration, and stable
+error code. Log an unexpected error once at the boundary with context.
+Never record tokens, cookies, bodies, credentials, or unrestricted
+personal data.
+
+When an audit record is required evidence for a financial or
+security-sensitive state change, commit it atomically with that change
+or record its publication through an outbox. A best-effort log written
+afterward can disappear during a crash.
+
+Metrics should cover traffic, errors, latency distributions, and
+saturation. Database pool acquisition wait often reveals pressure
+before requests fail. Labels must be bounded; IDs, raw paths, SKUs,
+user values, and error text belong elsewhere.
+
+Traces connect HTTP, use case, and PostgreSQL operations. Name spans
+by stable operation, propagate context, record result category, and
+omit parameters or sensitive payload. Sampling must retain enough
+errors and slow traces for diagnosis.
+
+Dashboards follow user symptoms toward resources: the measured
+reliability signal (service-level indicator, or SLI), endpoint
+breakdown, dependency latency/errors, pool saturation, process
+resources, and deployments. Alerts page only on actionable sustained
+impact or imminent exhaustion.
+
+### Start with a concrete situation
+
+At 14:05, order latency rises from 80 ms to 900 ms. A useful
+observability system should let an operator move from symptom to
+cause:
+
+```text
+metric: order latency rose across many requests
+  -> trace: slow requests spent time waiting for a DB connection
+      -> pool metric: all connections were in use
+          -> log/deployment marker: a new query shipped at 14:03
+```
+
+A log alone cannot establish how widespread the problem is. A metric
+alone cannot show the path of one request. A trace alone may not show
+whether the example is typical. Teach and implement the signals
+together around one diagnostic question.
+
+Begin with one request ID and one route. Produce a successful request
+and a failed request, then prove you can find their public result,
+log, trace, and relevant metric without adding temporary debug output.
+
+### Guided work
+
+1. Add build revision/version metadata to startup logs and telemetry
+   resources.
+2. Emit JSON access logs with request and trace correlation.
+3. Add request count, latency histogram, in-flight requests, and error
+   metrics.
+4. Export PostgreSQL pool size, use, wait, and named-operation
+   duration.
+5. Trace handler and database boundaries with redacted attributes.
+6. Add audit events for admin product changes and sensitive operator
+   actions.
+7. Build a user-first dashboard for order placement and retrieval.
+8. Define a service-level indicator (SLI) to measure and a
+   service-level objective (SLO) as its target, then add error-rate,
+   latency, and saturation alerts.
+9. Write a runbook from symptom to queries, mitigation, rollback, and
+   escalation.
+10. Capture one successful and one failed request across all telemetry
+    types.
+
+### Failure checks
+
+Trigger invalid input, an unexpected application error, pool
+exhaustion, a slow query, and database unavailability. Verify each
+produces distinguishable signals. Search exported telemetry for
+authorization headers, token fragments, database URLs, order payloads,
+and unbounded IDs. Force alert conditions and follow the runbook.
+
+### Knowledge check and expected answers
+
+1. **Why are raw paths dangerous metric labels?** Embedded IDs create
+   unbounded time series and may expose user data.
+2. **Why are audit events separate?** Security actions need explicit
+   actor/outcome, stricter access, and different retention from
+   ordinary diagnostics.
+3. **What makes an alert actionable?** It maps meaningful user impact
+   to tested diagnosis, mitigation, escalation, and recovery
+   verification.
+
+### Completion evidence
+
+One request is reconstructable through logs and traces; dashboards
+expose SLIs and resource pressure; labels are bounded; sensitive-data
+review passes; alerts cover sustained errors, latency, and saturation;
+and the runbook successfully guides a failure drill.
+
+## Deployment Hardening
+
+### Goal and mental model
+
+Promote one immutable artifact and supply environment-specific
+configuration at runtime. Deployment correctness includes process
+identity, filesystem, resources, health, termination, secrets, schema
+compatibility, recovery, and provenance.
+
+Use a multi-stage container whose final image contains only required
+runtime files. Run as a non-root user, support a read-only root
+filesystem, and write only to explicit ephemeral locations. Pin base
+images and dependencies; scan both source dependencies and the built
+image.
+
+Inject secrets through the platform or secret manager, never image
+layers, Git, or startup logs. Separate runtime database privileges
+from migration privileges.
+
+Set CPU/memory requests and limits from measurements. Ensure HTTP
+concurrency, database pool size, telemetry queues, and shutdown
+deadline fit platform behavior. Readiness gates traffic; liveness does
+not restart a process for dependency failure.
+
+Schema and app versions overlap during rollout. Use
+expand-and-contract: add compatible structure, deploy mixed-version
+code, backfill, switch usage, stop old writes, then remove old
+structure in a later release.
+
+Backups are unproven until an isolated restore verifies application
+invariants and measures recovery time and recoverable point.
+
+### Start with a concrete situation
+
+Release B adds a nullable `description` column and starts writing it.
+During the rollout, some instances still run Release A. Ask four
+questions before deploying:
+
+1. Can A run against the expanded schema?
+2. Can B read rows created before `description` existed?
+3. Can traffic move back to A after B has written data?
+4. What exact signal stops the rollout?
+
+This is why application and schema deployment cannot be treated as one
+instant. Expand first, run compatible versions, migrate data, switch
+usage, and contract only after old versions no longer need the old
+representation.
+
+Perform the exercise with built artifacts, not just source. Start the
+old binary against the new schema, start the new binary against old
+rows, and rehearse the selected recovery direction. The deployment is
+understood only when those mixed states have observed outcomes.
+
+### Guided work
+
+1. Add a pinned multi-stage container and strict `.dockerignore`.
+2. Run the final binary as non-root with read-only-root compatibility.
+3. Validate runtime configuration and secret references before
+   listening.
+4. Add resource requests/limits and align pool/concurrency budgets.
+5. Configure readiness, liveness, startup, and termination timings.
+6. Define a controlled migration step with separate credentials.
+7. Rehearse one expand-and-contract schema change with old/new
+   binaries.
+8. Configure backup and perform an isolated restore with data checks.
+9. Add dependency, image, and secret scanning to CI/release.
+10. Record artifact digest, source revision, schema version, and
+    deployment result.
+
+### Failure checks
+
+Run with missing secret, read-only filesystem, denied database
+privilege, and memory or CPU pressure. Terminate during an active
+request. Deploy new schema with old app, then old schema expectations
+with new app. Restore into isolation and verify counts, constraints,
+order totals, and owner access.
+
+### Knowledge check and expected answers
+
+1. **Why use the same artifact in every environment?** Tested bytes
+   and provenance stay constant while runtime configuration varies.
+2. **Why separate migration credentials?** Schema modification has
+   greater power than ordinary runtime queries and should have a
+   smaller exposure window.
+3. **Why is a backup status insufficient?** Only restoration proves
+   bytes are usable and meet measured recovery objectives.
+
+### Completion evidence
+
+The container runs non-root/read-only; runtime secrets never enter the
+image or logs; resource and shutdown limits align; old/new versions
+coexist through a schema change; scanners run on source and artifact;
+and a restore drill verifies data and records measured recovery.
+
+## Performance and Resilience Based on Evidence
+
+### Goal and mental model
+
+Optimize the limiting user workload, not a guessed hot function.
+Performance claims must state data size, traffic mix, concurrency,
+environment, warmup, duration, and target latency/throughput.
+
+Latency is a distribution. Report percentiles and errors alongside
+throughput. Utilization shows resource use; saturation shows queued
+demand. Near a resource's capacity, queueing can increase latency
+sharply before throughput improves.
+
+A load generator must maintain the intended arrival pattern.
+Closed-loop tools that wait for each slow response can hide delay,
+called coordinated omission. Use an appropriate constant-arrival or
+corrected measurement for service objectives.
+
+Profile the measured workload. CPU, heap, allocations, goroutines,
+mutex, blocking, GC, database plan, connection wait, and downstream
+time answer different questions. Do not interpret a CPU profile as
+evidence about database lock wait.
+
+Overload controls include bounded concurrency, queues, rate limits,
+deadlines, and load shedding. Recovery after pressure is as important
+as peak throughput.
+
+Caching is justified only when repeated reads create measured
+latency/load and the team can define the source of truth, cache key,
+lifetime (time to live, or TTL), and rule for removing stale entries.
+It must also prevent a cache stampede, where many requests miss at
+once and overload the database, and define failure and monitoring
+behavior.
+
+### Start with a concrete situation
+
+Under a controlled load test, request latency climbs while CPU remains
+moderate. Database-pool wait consumes most of each trace. That
+evidence suggests connection or query pressure; it does not yet prove
+the pool should be enlarged.
+
+Use one hypothesis at a time:
+
+```text
+Observation: pool wait is high and one product-list query scans many
+rows.
+Hypothesis: the query lacks an index matching its filter and order.
+Change: add or correct that one index.
+Verification: repeat the identical workload and compare plans, pool
+wait,
+              latency distribution, throughput, and errors.
+```
+
+If you change the pool, query, cache, and concurrency limit together,
+an improved result teaches nothing about which change mattered.
+Performance work is an experiment: control the workload, change one
+cause, and preserve correctness tests while measuring again.
+
+### Guided work
+
+1. Define order/list workloads and measurable latency, throughput, and
+   error targets.
+2. Generate representative products, customers, orders, and pagination
+   shapes.
+3. Establish a reproducible environment and healthy baseline.
+4. Run a load test that avoids coordinated omission.
+5. Capture CPU, heap, allocation, goroutine, mutex, block, pool, and
+   query-plan data.
+6. Identify one limiting resource and state a hypothesis.
+7. Make the smallest targeted change: query/index, pool, allocation,
+   or limit.
+8. Repeat the identical workload and compare confidence intervals or
+   stable runs.
+9. Add overload, dependency slowdown, and recovery experiments.
+10. Add cache only if measurement and consistency design justify it.
+
+### Failure checks
+
+Drive beyond capacity and verify bounded rejection rather than memory
+growth. Slow PostgreSQL and observe whether concurrency limits prevent
+pool collapse. Stop load and measure recovery. Repeat
+correctness/concurrency tests during load. Invalidate or remove any
+cache and ensure authoritative behavior remains correct.
+
+### Knowledge check and expected answers
+
+1. **Why are averages insufficient?** They can hide the slow tail
+   experienced by a meaningful fraction of requests.
+2. **What is coordinated omission?** A generator slows its issuance
+   when the system slows, omitting waits that real arrivals would
+   experience.
+3. **When is caching justified?** After measurement identifies
+   repeated-read cost and a safe freshness/invalidation/failure policy
+   is defined.
+
+### Completion evidence
+
+Targets and workload assumptions are written; profiles identify the
+bottleneck; before/after evidence supports each optimization; overload
+is bounded and recovery measured; query and pool tuning preserve
+correctness; and any cache has explicit consistency and removal
+behavior.
+
+## Advanced PostgreSQL Operations and Recovery
+
+### Goal and mental model
+
+Understand PostgreSQL as a concurrent, maintained, recoverable system
+rather than a query endpoint. PostgreSQL keeps multiple row versions
+so transactions can read a consistent snapshot while writes occur.
+This behavior is called multi-version concurrency control (MVCC).
+Isolation rules control which changes a transaction may observe, but
+stronger rules can add waiting or aborted work. Locks, maintenance,
+the write-ahead log (WAL), backups, and replicas all affect service
+behavior.
+
+At `READ COMMITTED`, separate statements may observe different
+committed data. `REPEATABLE READ` preserves a snapshot but can still
+reject conflicting writes. `SERIALIZABLE` aims to reproduce serial
+outcomes by aborting some transactions; callers must retry the entire
+safe operation, never only the last statement.
+
+Deadlocks are cycles of lock waiting. PostgreSQL aborts one
+participant. Consistent lock order reduces risk, while short
+transactions and bounded statement/lock timeouts limit impact.
+Diagnose with lock and activity views rather than guessing.
+
+Vacuum reclaims dead tuples for reuse and protects transaction ID
+safety. Statistics guide plans. Bloat, checkpoints, WAL volume, long
+transactions, and replication lag are operational signals, not
+one-time tuning values.
+
+Online backfills must be restartable: select a bounded key range,
+update idempotently, record progress, commit, throttle, observe
+locks/lag, and verify. Schema constraints can be added in validation
+stages when supported to limit blocking.
+
+A base backup plus continuous WAL archiving enables point-in-time
+recovery (PITR): restoring the database close to a chosen time.
+Streaming replication keeps a standby copy available but does not
+replace backups because deletion or corruption can also be copied.
+Measure maximum acceptable data loss (recovery point objective, or
+RPO) and maximum acceptable restoration time (recovery time objective,
+or RTO) with restore and promotion drills.
+
+### Start with a concrete situation
+
+Open two database sessions against the same product row. Session A
+updates it but does not commit. Session B tries a conflicting update
+and waits. You can now observe the concepts instead of memorizing
+them:
+
+```text
+Session A: BEGIN -> UPDATE product -> holds row lock
+Session B: BEGIN -> UPDATE same product -> waits
+Session A: COMMIT
+Session B: continues using the now-current row
+```
+
+Change the experiment so A and B lock two products in opposite orders.
+The wait can become a cycle, and PostgreSQL aborts one transaction as
+a deadlock victim. Repeat with the same sorted lock order and observe
+why the cycle no longer forms for that path.
+
+The WAL records changes needed for crash recovery and replication.
+PITR combines a base backup with later WAL records. These terms become
+useful only after you connect them to an observable transaction or
+recovery experiment.
+
+### Guided work
+
+1. Build deterministic two-session tests for non-repeatable read,
+   blocking, serialization failure, and deadlock.
+2. Document the anomaly allowed by each isolation level used by the
+   service.
+3. Add bounded whole-operation retry only for safe
+   serialization/deadlock failures.
+4. Inspect activity, lock waits, query statistics, maintenance state,
+   and plans.
+5. Create representative data and a restartable, throttled backfill
+   with progress.
+6. Interrupt it repeatedly and prove resume plus verification.
+7. Configure base backups and continuous WAL archive in a disposable
+   environment.
+8. Record a target timestamp, mutate data, and restore to that point.
+9. Promote a standby, measure lag and failover, and reconnect the
+   application.
+10. Write the operator runbook with prerequisites, abort conditions,
+    and validation.
+
+### Failure checks
+
+Hold a lock and verify statement/lock timeouts. Create a deadlock
+using deliberate opposite lock order and inspect the chosen victim.
+Run the backfill during traffic and observe locks, latency, WAL, and
+replica lag. Corrupt or remove a backup segment in a disposable drill
+and confirm verification fails loudly. After restore, test order
+totals, nonnegative inventory, ownership, and schema version.
+
+### Knowledge check and expected answers
+
+1. **Why retry the entire serializable transaction?** Its prior reads
+   and decisions were based on a snapshot that can no longer be
+   treated as valid.
+2. **Why are replicas not backups?** Destructive or corrupt writes may
+   replicate, while backups preserve historical recovery points.
+3. **What makes a backfill restartable?** Bounded idempotent batches,
+   durable progress, repeat-safe selection, verification, and
+   controlled throttling.
+
+### Completion evidence
+
+Tests reproduce and explain anomalies without timing sleeps; retry is
+limited to whole safe operations; database diagnostic evidence is
+captured; interrupted backfills resume without gaps or duplicates;
+PITR reaches a chosen timestamp; standby promotion is rehearsed; and
+measured RPO, RTO, lag, and failover match the documented objectives.

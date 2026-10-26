@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <easy|medium|hard> <problem-id> "\
+"<descriptive-slug> [source]" >&2
+}
+
+fail() {
+  echo "error: $1" >&2
+  exit 1
+}
+
+if [[ $# -lt 3 || $# -gt 4 ]]; then
+  usage
+  exit 2
+fi
+
+difficulty=$1
+problem_id=$2
+slug=$3
+source_name=${4:-leetcode}
+
+case $difficulty in
+  easy) difficulty_label=Easy ;;
+  medium) difficulty_label=Medium ;;
+  hard) difficulty_label=Hard ;;
+  *) fail "difficulty must be easy, medium, or hard" ;;
+esac
+
+[[ $source_name =~ ^[a-z0-9]+$ ]] ||
+  fail "source must contain lowercase letters and digits"
+[[ $problem_id =~ ^[a-z0-9]+$ ]] ||
+  fail "problem ID must contain lowercase letters and digits"
+[[ $slug =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] ||
+  fail "slug must contain lowercase letters, digits, and "\
+"single hyphen separators"
+
+filename_problem_id=$problem_id
+if [[ $problem_id =~ ^[0-9]+$ ]]; then
+  problem_id_number=$((10#$problem_id))
+  printf -v filename_problem_id '%04d' "$problem_id_number"
+fi
+
+script_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+default_root=$(cd "$script_directory/../.." && pwd)
+repository_root=${ALGOS_REPO_ROOT:-$default_root}
+dsa_root="$repository_root/dsa"
+source_file="$dsa_root/workbench/main.go"
+problem_root="$dsa_root/problems"
+link_targets="$repository_root/REFERENCE_LINKS.md"
+filename="solved_${difficulty}_${source_name}_"\
+"${filename_problem_id}_${slug//-/_}.go"
+destination="$problem_root/$filename"
+link_anchor=""
+if (( ${#filename} > 70 )); then
+  link_anchor="problem-file-${source_name}-${filename_problem_id}"
+fi
+
+[[ -f $source_file ]] || fail "$source_file was not found"
+[[ -f "$problem_root/README.md" ]] ||
+  fail "$problem_root/README.md was not found"
+[[ -f $link_targets ]] || fail "$link_targets was not found"
+[[ ! -e $destination ]] || fail "$destination already exists"
+if [[ -n $link_anchor ]] &&
+  rg -Fq "id=\"$link_anchor\"" "$link_targets"; then
+  fail "link anchor $link_anchor already exists"
+fi
+rg -q '^const archiveReady = true$' "$source_file" ||
+  fail "workbench is not marked ready to archive"
+
+(cd "$repository_root" && go test ./dsa/workbench)
+
+temporary_directory=$(mktemp -d \
+  "$dsa_root/.archive-workbench.XXXXXX")
+temporary_file="$temporary_directory/$filename"
+cleanup() {
+  rm -f "$temporary_file"
+  rmdir "$temporary_directory" 2>/dev/null || true
+}
+trap cleanup EXIT
+
+{
+  printf '%s\n\n' '//go:build ignore'
+  printf '// Difficulty: %s\n' "$difficulty_label"
+  printf '// Source: %s\n' "$source_name"
+  printf '// Problem ID: %s\n\n' "$problem_id"
+  sed -n '1,$p' "$source_file"
+} > "$temporary_file"
+
+gofmt -w "$temporary_file"
+(cd "$repository_root" && go run "$temporary_file")
+
+mv "$temporary_file" "$destination"
+if (( ${#filename} <= 70 )); then
+  printf -- '- [\n%s\n](\n%s\n)\n' \
+    "$filename" "$filename" >> "$problem_root/README.md"
+else
+  printf '\n<a id="%s"></a>\n\n- [%s](dsa/problems/%s)\n' \
+    "$link_anchor" "$filename" "$filename" >> "$link_targets"
+  printf -- '- [%s %s archive](\n../../REFERENCE_LINKS.md#%s\n)\n' \
+    "$source_name" "$problem_id" "$link_anchor" \
+    >> "$problem_root/README.md"
+fi
+rmdir "$temporary_directory"
+trap - EXIT
+
+echo "archived $destination"
+echo "after verification, reset with "\
+"./dsa/internal/reset-workbench.sh"

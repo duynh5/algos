@@ -8,8 +8,8 @@ prefix_rule(
         "repository."
     ),
     match = [
-        "git mv problems/easy_leetcode_0070_climbing_stairs.go " +
-        "problems/solved_easy_leetcode_0070_climbing_stairs.go",
+        "git mv dsa/problems/easy_leetcode_0070_climbing_stairs.go " +
+        "dsa/problems/solved_easy_leetcode_0070_climbing_stairs.go",
         "git mv old_name.go new_name.go",
     ],
     not_match = [
@@ -28,9 +28,9 @@ prefix_rule(
     ),
     match = [
         "go test ./...",
-        "go test ./internal/testrunner",
+        "go test ./dsa/internal/testrunner",
         "go test -run TestConfiguredSamplesAgainstEverySolution " +
-        "./workbench",
+        "./dsa/workbench",
     ],
     not_match = [
         "go vet ./...",
