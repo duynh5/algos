@@ -1,7 +1,8 @@
 //go:build ignore
 
 // Command check-concepts-doc validates the structure and local links
-// of the concepts guide. Run it from the repository root with:
+// of every active concept study guide. Run it from the repository
+// root with:
 //
 // go run dsa/internal/check-concepts-doc.go
 package main
@@ -21,7 +22,6 @@ import (
 )
 
 const (
-	guidePath       = "dsa/CONCEPTS.md"
 	linkTargetsPath = "REFERENCE_LINKS.md"
 )
 
@@ -47,18 +47,25 @@ var (
 	)
 )
 
-var requiredFields = []string{
-	"The problem it solves",
-	"The idea in simple terms",
-	"How it works",
-	"Step-by-step examples",
-	"Why it works",
-	"Go example",
-	"Work and memory",
-	"When to use it",
-	"When not to use it",
-	"Common mistakes and edge cases",
-	"Related material",
+var conceptGuideSpecs = []conceptGuideSpec{
+	{
+		path:              "dsa/CONCEPTS.md",
+		requiredFields:    teachingFields("Go example"),
+		expectedEntries:   93,
+		ownsBaselineLinks: true,
+	},
+	{
+		path: "web-engineering/frontend/CONCEPTS.md",
+		requiredFields: teachingFields(
+			"TypeScript example",
+		),
+		expectedEntries: 8,
+	},
+	{
+		path:            "web-engineering/backend/CONCEPTS.md",
+		requiredFields:  teachingFields("Go example"),
+		expectedEntries: 32,
+	},
 }
 
 var baselineExternalLinks = []string{
@@ -94,6 +101,19 @@ type document struct {
 	explicitAnchors int
 }
 
+type conceptGuideSpec struct {
+	path              string
+	requiredFields    []string
+	expectedEntries   int
+	ownsBaselineLinks bool
+}
+
+type conceptGuideReport struct {
+	spec       conceptGuideSpec
+	document   *document
+	entryCount int
+}
+
 type linkCounts struct {
 	internal int
 	local    int
@@ -107,38 +127,50 @@ func main() {
 		fatal(err)
 	}
 
-	guide, issues := readDocument(
-		filepath.Join(repositoryRoot, guidePath),
-	)
+	issues := make([]string, 0)
+	counts := linkCounts{}
+	externalLinks := make(map[string]struct{})
+	reports := make([]conceptGuideReport, 0, len(conceptGuideSpecs))
+	for _, spec := range conceptGuideSpecs {
+		guide, guideIssues := readDocument(
+			filepath.Join(repositoryRoot, spec.path),
+		)
+		issues = append(issues, guideIssues...)
+		if guide == nil {
+			continue
+		}
+
+		entryIssues, entryCount := validateTeachingEntries(
+			spec,
+			guide.prose,
+		)
+		issues = append(issues, entryIssues...)
+		issues = append(
+			issues,
+			validateNoTables(spec.path, guide.prose)...,
+		)
+		linkIssues, linkTotals, guideExternalLinks :=
+			validateDocumentLinks(guide)
+		issues = append(issues, linkIssues...)
+		counts.internal += linkTotals.internal
+		counts.local += linkTotals.local
+		counts.external += linkTotals.external
+		if spec.ownsBaselineLinks {
+			for destination := range guideExternalLinks {
+				externalLinks[destination] = struct{}{}
+			}
+		}
+		reports = append(reports, conceptGuideReport{
+			spec:       spec,
+			document:   guide,
+			entryCount: entryCount,
+		})
+	}
+
 	linkTargets, linkTargetIssues := readDocument(
 		filepath.Join(repositoryRoot, linkTargetsPath),
 	)
 	issues = append(issues, linkTargetIssues...)
-	if guide != nil {
-		issues = append(
-			issues,
-			validateTeachingEntries(guide.prose)...)
-		issues = append(issues, validateNoTables(guide.prose)...)
-	}
-
-	counts := linkCounts{}
-	externalLinks := make(map[string]struct{})
-	if guide != nil {
-		linkIssues, linkTotals, guideExternalLinks := validateDocumentLinks(
-			guide,
-		)
-		issues = append(issues, linkIssues...)
-		counts = linkTotals
-		for destination := range guideExternalLinks {
-			externalLinks[destination] = struct{}{}
-		}
-
-		inboundIssues, inboundCount := validateInboundLinks(
-			repositoryRoot,
-		)
-		issues = append(issues, inboundIssues...)
-		counts.inbound = inboundCount
-	}
 	if linkTargets != nil {
 		linkIssues, linkTotals, targetExternalLinks :=
 			validateDocumentLinks(linkTargets)
@@ -150,6 +182,9 @@ func main() {
 			externalLinks[destination] = struct{}{}
 		}
 	}
+	inboundIssues, inboundCount := validateInboundLinks(repositoryRoot)
+	issues = append(issues, inboundIssues...)
+	counts.inbound = inboundCount
 	for _, baselineLink := range baselineExternalLinks {
 		if _, exists := externalLinks[baselineLink]; !exists {
 			issues = append(
@@ -170,14 +205,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("headings: %d\n", guide.headingCount)
-	fmt.Printf("explicit anchors: %d\n", guide.explicitAnchors)
-	fmt.Printf(
-		"fenced blocks: %d (%d go, %d text)\n",
-		guide.fenceCount,
-		guide.goBlockCount,
-		guide.textBlockCount,
-	)
+	for _, report := range reports {
+		fmt.Printf(
+			"%s: %d headings, %d anchors, %d fenced blocks, "+
+				"%d teaching entries\n",
+			report.spec.path,
+			report.document.headingCount,
+			report.document.explicitAnchors,
+			report.document.fenceCount,
+			report.entryCount,
+		)
+	}
 	fmt.Printf(
 		"links: %d internal, %d local files, %d "+
 			"external, %d repository inbound\n",
@@ -186,7 +224,22 @@ func main() {
 		counts.external,
 		counts.inbound,
 	)
-	fmt.Println("teaching entries: 93 with 11 ordered fields each")
+}
+
+func teachingFields(exampleHeading string) []string {
+	return []string{
+		"The problem it solves",
+		"The idea in simple terms",
+		"How it works",
+		"Step-by-step examples",
+		"Why it works",
+		exampleHeading,
+		"Work and memory",
+		"When to use it",
+		"When not to use it",
+		"Common mistakes and edge cases",
+		"Related material",
+	}
 }
 
 func readDocument(path string) (*document, []string) {
@@ -390,9 +443,12 @@ func githubSlug(heading string) string {
 	return strings.Trim(slug.String(), "-")
 }
 
-func validateTeachingEntries(prose []byte) []string {
-	fieldIndex := make(map[string]int, len(requiredFields))
-	for index, field := range requiredFields {
+func validateTeachingEntries(
+	spec conceptGuideSpec,
+	prose []byte,
+) ([]string, int) {
+	fieldIndex := make(map[string]int, len(spec.requiredFields))
+	for index, field := range spec.requiredFields {
 		fieldIndex[field] = index
 	}
 
@@ -418,13 +474,13 @@ func validateTeachingEntries(prose []byte) []string {
 				fmt.Sprintf(
 					"%s:%d: teaching field %q appears where %q is "+
 						"required",
-					guidePath,
+					spec.path,
 					lineNumber,
 					match[2],
-					requiredFields[expected],
+					spec.requiredFields[expected],
 				),
 			)
-			expected = (index + 1) % len(requiredFields)
+			expected = (index + 1) % len(spec.requiredFields)
 			continue
 		}
 		level := len(match[1])
@@ -436,7 +492,7 @@ func validateTeachingEntries(prose []byte) []string {
 				fmt.Sprintf(
 					"%s:%d: teaching field %q uses level %d; "+
 						"entry started at level %d",
-					guidePath,
+					spec.path,
 					lineNumber,
 					match[2],
 					level,
@@ -445,7 +501,7 @@ func validateTeachingEntries(prose []byte) []string {
 			)
 		}
 		expected++
-		if expected == len(requiredFields) {
+		if expected == len(spec.requiredFields) {
 			entryCount++
 			expected = 0
 		}
@@ -455,25 +511,26 @@ func validateTeachingEntries(prose []byte) []string {
 			issues,
 			fmt.Sprintf(
 				"%s: final teaching entry stops before %q",
-				guidePath,
-				requiredFields[expected],
+				spec.path,
+				spec.requiredFields[expected],
 			),
 		)
 	}
-	if entryCount != 93 {
+	if entryCount != spec.expectedEntries {
 		issues = append(
 			issues,
 			fmt.Sprintf(
-				"%s: teaching entries: got %d, want 93",
-				guidePath,
+				"%s: teaching entries: got %d, want %d",
+				spec.path,
 				entryCount,
+				spec.expectedEntries,
 			),
 		)
 	}
-	return issues
+	return issues, entryCount
 }
 
-func validateNoTables(prose []byte) []string {
+func validateNoTables(path string, prose []byte) []string {
 	lines := strings.Split(string(prose), "\n")
 	for index := 1; index < len(lines); index++ {
 		if tablePattern.MatchString(lines[index-1]) &&
@@ -482,7 +539,7 @@ func validateNoTables(prose []byte) []string {
 				fmt.Sprintf(
 					"%s:%d: Markdown tables are not allowed in "+
 						"teaching entries",
-					guidePath,
+					path,
 					index,
 				),
 			}
@@ -644,7 +701,7 @@ func validateInboundLinks(
 				}
 				return nil
 			}
-			if path == filepath.Join(repositoryRoot, guidePath) {
+			if isActiveConceptGuide(repositoryRoot, path) {
 				return nil
 			}
 			contents, err := os.ReadFile(path)
@@ -711,6 +768,15 @@ func validateInboundLinks(
 		)
 	}
 	return issues, count
+}
+
+func isActiveConceptGuide(repositoryRoot string, path string) bool {
+	for _, spec := range conceptGuideSpecs {
+		if path == filepath.Join(repositoryRoot, spec.path) {
+			return true
+		}
+	}
+	return false
 }
 
 func fatal(err error) {

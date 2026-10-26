@@ -15,9 +15,12 @@ tracked content consisted of:
 - A standalone module declaration named `be-standard` using Go
   `1.26.3`.
 
-The numbered chapters are preserved under `reference/foundations/` and
-`reference/advanced/`. The Go exercise is preserved under
-`labs/order-api/`. The README was adapted into the backend index.
+The numbered chapters were inventoried and incorporated into
+[`CONCEPTS.md`](CONCEPTS.md). Their original file, section, and line
+provenance remains in
+[`CONCEPTS_SOURCE_INVENTORY.md`](CONCEPTS_SOURCE_INVENTORY.md). The Go
+exercise is preserved under `labs/order-api/`, and the source README
+was adapted into the backend index.
 
 The standalone `go.mod` was not copied because this repository already
 has a module owner. Its module name and Go version are recorded above,
@@ -31,8 +34,14 @@ link relocation, and code-line wrapping required by this repository's
 70-character physical line limit. These changes do not intentionally
 alter the curriculum's technical meaning.
 
-The imported chapters are source reference material. The active
-backend lessons are grouped in
+The imported chapter files were removed after all 237 inventory
+records acquired terminal destinations and repository-owned examples.
+The 32 active backend entries are grouped in
 [`CONCEPTS.md`](CONCEPTS.md) and follow the
-[DSA teaching standards](../../dsa/CONCEPTS_STANDARDS.md) through the
-shared web lesson profile.
+[shared concept study standards](../../CONCEPTS_STANDARDS.md) through
+the web lesson profile.
+
+Repository-authored inventory, ownership, specification, design, and
+traceability documents record how source ideas were reconciled into
+the active guide. They preserve provenance and review evidence; they
+are not additional source chapters or active teaching owners.

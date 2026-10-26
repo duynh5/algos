@@ -17,7 +17,8 @@ and algorithms (DSA).
 ## Directory map
 
 - `CONCEPTS.md` owns reusable DSA teaching material.
-- `CONCEPTS_STANDARDS.md` defines the teaching-entry contract.
+- The root [concept study standards](../CONCEPTS_STANDARDS.md) define
+  the shared DSA, frontend, and backend teaching-entry contract.
 - `workbench/` owns the active exercise.
 - `problems/` owns unsolved practice and completed solutions.
 - `internal/` owns DSA-specific runners and validation tools.

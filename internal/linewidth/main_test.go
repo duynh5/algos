@@ -1,9 +1,37 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
+
+func TestExistingRepositoryPathsSkipsDeletedFiles(t *testing.T) {
+	repositoryRoot := t.TempDir()
+	existingPath := "existing.md"
+	if err := os.WriteFile(
+		filepath.Join(repositoryRoot, existingPath),
+		[]byte("content"),
+		0o600,
+	); err != nil {
+		t.Fatalf("write existing file: %v", err)
+	}
+
+	paths, err := existingRepositoryPaths(
+		repositoryRoot,
+		[][]byte{
+			[]byte(existingPath),
+			[]byte("deleted.md"),
+		},
+	)
+	if err != nil {
+		t.Fatalf("existingRepositoryPaths() error = %v", err)
+	}
+	if len(paths) != 1 || paths[0] != existingPath {
+		t.Fatalf("existing paths = %v; want [%s]", paths, existingPath)
+	}
+}
 
 func TestValidateContents(t *testing.T) {
 	testCases := []struct {
@@ -74,6 +102,12 @@ func TestIsExemptPath(t *testing.T) {
 		if !isExemptPath(path) {
 			t.Errorf("isExemptPath(%q) = false; want true", path)
 		}
+	}
+	if !isExemptPath("CONCEPTS_STANDARDS.md") {
+		t.Error("root concept standards must be exempt")
+	}
+	if isExemptPath("dsa/CONCEPTS_STANDARDS.md") {
+		t.Error("old DSA concept standards path must not be exempt")
 	}
 	if isExemptPath("docs/AGENTS.md") {
 		t.Error("nested AGENTS.md must not be exempt")

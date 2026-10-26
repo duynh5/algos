@@ -15,41 +15,24 @@ failure testing, explanation, and production evidence.
 ## Active concept guide
 
 The single [backend concept guide](CONCEPTS.md) owns all active
-lessons, matching the DSA curriculum's grouped teaching structure.
+lessons. Its 32 entries form four dependency-ordered stages:
 
-1. [HTTP API contracts][http-lesson]
-2. [Data, transactions, and architecture][data-lesson]
-3. [Production and distributed systems][production-lesson]
+1. [Go language and execution foundations][go-stage], entries 1-3.
+2. [Service and data foundations][service-stage], entries 4-12.
+3. [Production and distributed systems][production-stage],
+   entries 13-23.
+4. [Scale, operations, and leadership][leadership-stage],
+   entries 24-32.
 
-## Source reference
+The [source inventory](CONCEPTS_SOURCE_INVENTORY.md),
+[ownership map](CONCEPTS_OWNERSHIP_MAP.md), and
+[traceability matrix](CONCEPTS_TRACEABILITY_MATRIX.md) show how every
+imported idea reaches one active or supporting destination. They are
+audit artifacts rather than competing lessons.
 
-The complete substantive study material from `be-standard` is
-preserved as reference material. It retains the source's sequence and
-detail without being presented as a standards-compliant lesson set.
-
-### Foundations
-
-1. [Overview and competency map][overview]
-2. [Go language refresher][go-refresher]
-3. [Go backend foundations][go-backend]
-4. [HTTP contracts and service lifecycle][http]
-5. [PostgreSQL and relational data][postgresql]
-6. [Business logic and architecture][architecture]
-7. [Identity and API security][security]
-8. [Testing, observability, and operations][operations]
-9. [Delivery and production readiness][delivery]
-
-### Advanced systems
-
-10. [Domain discovery and modeling][domain]
-11. [Build the service core][service-core]
-12. [Make the service production-ready][production]
-13. [Durable work and distributed foundations][distributed]
-14. [Service extraction and distributed delivery][extraction]
-15. [Scale, security, cloud, and operations][scale]
-16. [Integrations, maintenance, and leadership][leadership]
-17. [Key-concept review][review]
-18. [Language portability][portability]
+Complete examples for entries 9 through 32 live under
+[`examples/`](examples/). Each package has focused ordinary and
+failure-path tests and is linked from its owning guide entry.
 
 ## Lab
 
@@ -60,31 +43,9 @@ repository's Go module owns compilation and testing.
 See [migration provenance](SOURCE.md) for the precise source mapping
 and excluded repository metadata.
 
-[overview]: reference/foundations/00-overview-and-competency-map.md
-[go-refresher]: reference/foundations/01-go-language-refresher.md
-[go-backend]: reference/foundations/02-go-backend-foundations.md
-[http]:
-  reference/foundations/03-http-contracts-and-service-lifecycle.md
-[postgresql]:
-  reference/foundations/04-postgresql-and-relational-data.md
-[architecture]:
-  reference/foundations/05-business-logic-and-architecture.md
-[security]: reference/foundations/06-identity-and-api-security.md
-[operations]:
-  reference/foundations/07-testing-observability-and-operations.md
-[delivery]:
-  reference/foundations/08-delivery-and-production-readiness.md
-[domain]: reference/advanced/09-domain-discovery.md
-[service-core]: reference/advanced/10-service-core.md
-[production]: reference/advanced/11-production-service.md
-[distributed]: reference/advanced/12-distributed-foundations.md
-[extraction]: reference/advanced/13-service-extraction.md
-[scale]: reference/advanced/14-scale-security-cloud-operations.md
-[leadership]:
-  reference/advanced/15-integrations-maintenance-leadership.md
-[review]: reference/advanced/16-key-concepts-review.md
-[portability]: reference/advanced/17-language-portability.md
-[http-lesson]: CONCEPTS.md#1-http-api-contracts
-[data-lesson]: CONCEPTS.md#2-data-transactions-and-architecture
-[production-lesson]:
-  CONCEPTS.md#3-production-and-distributed-systems
+[go-stage]: CONCEPTS.md#1-go-values-program-structure-and-ownership
+[service-stage]: CONCEPTS.md#4-domain-discovery-and-modeling
+[production-stage]:
+  CONCEPTS.md#13-idempotency-and-ambiguous-write-outcomes
+[leadership-stage]:
+  CONCEPTS.md#24-data-scaling-caching-and-tenant-isolation

@@ -4,6 +4,8 @@
 
 The `dsa/` domain teaches algorithms and data structures in Go. Keep the educational guide in `dsa/CONCEPTS.md`, the active exercise under `dsa/workbench/`, and standalone practice and completed judge-ready solutions under `dsa/problems/`.
 
+The shared teaching contract in `CONCEPTS_STANDARDS.md` applies to every active concept study guide: `dsa/CONCEPTS.md`, `web-engineering/frontend/CONCEPTS.md`, and `web-engineering/backend/CONCEPTS.md`. Use `web-engineering/LESSON_STANDARDS.md` only for web-specific adaptations.
+
 ## Code Generation Standard
 
 Before creating or modifying code, read and follow [`CODING_RULES.md`](CODING_RULES.md). It applies to all agent-generated source code, tests, scripts, scaffolding, and code examples in documentation. The workflows below add task-specific rules.
@@ -12,7 +14,7 @@ Before creating or modifying code, read and follow [`CODING_RULES.md`](CODING_RU
 
 - Keep every physical line in repository text files at no more than 70 Unicode characters.
 - Apply the limit to source, tests, scripts, templates, configuration, Markdown, comments, embedded documentation, and generated scaffolding.
-- The only exempt files are `AGENTS.md`, `CODING_RULES.md`, `REFERENCE_LINKS.md`, `dsa/CONCEPTS_STANDARDS.md`, and `VALIDATION.md`.
+- The only exempt files are `AGENTS.md`, `CODING_RULES.md`, `CONCEPTS_STANDARDS.md`, `REFERENCE_LINKS.md`, and `VALIDATION.md`.
 - There are no content-specific exceptions in other files. Long URLs, paths, identifiers, and serialized values must be represented without creating a physical line over 70 characters.
 - Run `go run ./internal/linewidth` after modifying repository text files.
 
@@ -140,7 +142,8 @@ When the completed problem is in the workbench:
 ## Documentation Map
 
 - [`dsa/CONCEPTS.md`](dsa/CONCEPTS.md) is the learning guide for reusable algorithms, data structures, Go techniques, and problem-solving methods.
-- [`dsa/CONCEPTS_STANDARDS.md`](dsa/CONCEPTS_STANDARDS.md) defines how to maintain that guide.
+- [`CONCEPTS_STANDARDS.md`](CONCEPTS_STANDARDS.md) defines how to maintain every active DSA, frontend, and backend concept study guide.
+- [`web-engineering/LESSON_STANDARDS.md`](web-engineering/LESSON_STANDARDS.md) defines the web-specific profile without replacing the shared standard.
 - [`dsa/workbench/README.md`](dsa/workbench/README.md) explains how to prepare and run the active problem.
 - [`dsa/problems/README.md`](dsa/problems/README.md) documents standalone problem files and provides their index.
 - [`VALIDATION.md`](VALIDATION.md) owns repository prerequisites and validation commands.

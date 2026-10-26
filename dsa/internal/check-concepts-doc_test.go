@@ -9,6 +9,113 @@ import (
 	"testing"
 )
 
+func TestConceptGuideSpecsCoverEveryActiveGuide(t *testing.T) {
+	wantedPaths := []string{
+		"dsa/CONCEPTS.md",
+		"web-engineering/frontend/CONCEPTS.md",
+		"web-engineering/backend/CONCEPTS.md",
+	}
+	wantedEntries := []int{93, 8, 32}
+	if len(conceptGuideSpecs) != len(wantedPaths) {
+		t.Fatalf(
+			"concept guide count = %d; want %d",
+			len(conceptGuideSpecs),
+			len(wantedPaths),
+		)
+	}
+	for index, wantedPath := range wantedPaths {
+		if conceptGuideSpecs[index].path != wantedPath {
+			t.Fatalf(
+				"concept guide %d = %q; want %q",
+				index,
+				conceptGuideSpecs[index].path,
+				wantedPath,
+			)
+		}
+		if conceptGuideSpecs[index].expectedEntries !=
+			wantedEntries[index] {
+			t.Fatalf(
+				"concept guide %d entries = %d; want %d",
+				index,
+				conceptGuideSpecs[index].expectedEntries,
+				wantedEntries[index],
+			)
+		}
+	}
+}
+
+func TestValidateTeachingEntriesUsesGuideExampleHeading(
+	t *testing.T,
+) {
+	spec := conceptGuideSpec{
+		path: "web-engineering/frontend/CONCEPTS.md",
+		requiredFields: teachingFields(
+			"TypeScript example",
+		),
+		expectedEntries: 1,
+	}
+	prose := []byte(strings.Join([]string{
+		"## Frontend lesson",
+		"### The problem it solves",
+		"### The idea in simple terms",
+		"### How it works",
+		"### Step-by-step examples",
+		"### Why it works",
+		"### TypeScript example",
+		"### Work and memory",
+		"### When to use it",
+		"### When not to use it",
+		"### Common mistakes and edge cases",
+		"### Related material",
+	}, "\n"))
+
+	issues, entryCount := validateTeachingEntries(spec, prose)
+	if len(issues) != 0 {
+		t.Fatalf("validateTeachingEntries() issues = %v", issues)
+	}
+	if entryCount != 1 {
+		t.Fatalf("teaching entry count = %d; want 1", entryCount)
+	}
+}
+
+func TestValidateTeachingEntriesRejectsWrongExampleHeading(
+	t *testing.T,
+) {
+	spec := conceptGuideSpec{
+		path: "web-engineering/frontend/CONCEPTS.md",
+		requiredFields: teachingFields(
+			"TypeScript example",
+		),
+		expectedEntries: 1,
+	}
+	prose := []byte(strings.Join([]string{
+		"## Frontend lesson",
+		"### The problem it solves",
+		"### The idea in simple terms",
+		"### How it works",
+		"### Step-by-step examples",
+		"### Why it works",
+		"### Go example",
+		"### Work and memory",
+		"### When to use it",
+		"### When not to use it",
+		"### Common mistakes and edge cases",
+		"### Related material",
+	}, "\n"))
+
+	issues, _ := validateTeachingEntries(spec, prose)
+	if len(issues) == 0 {
+		t.Fatal("wrong example heading returned no issue")
+	}
+	if !strings.Contains(issues[0], spec.path) ||
+		!strings.Contains(issues[0], "TypeScript example") {
+		t.Fatalf(
+			"wrong example heading issue = %q; want path and field",
+			issues[0],
+		)
+	}
+}
+
 func TestCollectTargetsRecognizesMultilineAnchor(t *testing.T) {
 	const legacyAnchor = "e4-distinguish-missing-keys-from-stored-" +
 		"values-" +

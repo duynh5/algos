@@ -1,11 +1,12 @@
 # Web Engineering Lesson Standards
 
-All active frontend and backend lessons follow
-[`CONCEPTS_STANDARDS.md`](../dsa/CONCEPTS_STANDARDS.md). That document
+All active frontend and backend concept-study lessons follow
+[`CONCEPTS_STANDARDS.md`](../CONCEPTS_STANDARDS.md). That document
 owns the teaching method, example quality, correctness, cost analysis,
 content ownership, navigation, and maintenance rules.
 
-This profile defines only the web-curriculum adaptations.
+This profile defines only the web-curriculum adaptations. The shared
+concepts-document checker enforces both frontend and backend guides.
 
 ## Required lesson contract
 
@@ -30,7 +31,7 @@ The literal sixth heading is:
   browser or framework is relevant.
 - `Go example` for backend lessons.
 
-All other headings use the exact labels from the DSA teaching
+All other headings use the exact labels from the shared teaching
 standards.
 
 ## Examples and evidence

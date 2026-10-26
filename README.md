@@ -23,6 +23,7 @@ roles or systems that require it.
 - `web-engineering/frontend/CONCEPTS.md` owns active frontend lessons.
 - `web-engineering/backend/` owns backend lessons, labs, and imported
   reference material.
+- `CONCEPTS_STANDARDS.md` owns the shared concept-study contract.
 - `web-engineering/LESSON_STANDARDS.md` adapts the repository teaching
   standard for frontend and backend lessons.
 - `REFERENCE_LINKS.md` holds long shared source and file targets.

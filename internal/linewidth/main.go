@@ -4,6 +4,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -16,11 +17,11 @@ import (
 const maximumLineWidth = 70
 
 var exemptPaths = map[string]struct{}{
-	"AGENTS.md":                 {},
-	"CODING_RULES.md":           {},
-	"REFERENCE_LINKS.md":        {},
-	"VALIDATION.md":             {},
-	"dsa/CONCEPTS_STANDARDS.md": {},
+	"AGENTS.md":             {},
+	"CODING_RULES.md":       {},
+	"CONCEPTS_STANDARDS.md": {},
+	"REFERENCE_LINKS.md":    {},
+	"VALIDATION.md":         {},
 }
 
 func main() {
@@ -93,9 +94,24 @@ func repositoryPaths(repositoryRoot string) ([]string, error) {
 	}
 
 	encodedPaths := bytes.Split(trimmedOutput, []byte{0})
+	return existingRepositoryPaths(repositoryRoot, encodedPaths)
+}
+
+func existingRepositoryPaths(
+	repositoryRoot string,
+	encodedPaths [][]byte,
+) ([]string, error) {
 	paths := make([]string, 0, len(encodedPaths))
 	for _, encodedPath := range encodedPaths {
-		paths = append(paths, string(encodedPath))
+		path := string(encodedPath)
+		_, err := os.Stat(filepath.Join(repositoryRoot, path))
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		if err != nil {
+			return nil, fmt.Errorf("inspect repository path %s: %w", path, err)
+		}
+		paths = append(paths, path)
 	}
 	return paths, nil
 }

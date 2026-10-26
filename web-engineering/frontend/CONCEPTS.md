@@ -446,7 +446,7 @@ contract.
 
 [data]: #b2-server-data-routing-rendering-and-forms
 [backend-security]:
-  ../backend/reference/foundations/06-identity-and-api-security.md
+  ../backend/CONCEPTS.md#9-identity-authorization-and-api-security
 
 ## B. Product Application Engineering
 
