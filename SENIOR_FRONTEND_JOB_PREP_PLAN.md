@@ -15,7 +15,7 @@ application package, system-design practice, and mock interviews.
 
 - Use the [frontend curriculum][frontend] as the owner of technical
   lessons referenced by this schedule.
-- Use the [web competency map][web] to assess implementation,
+- Use the [frontend capstone][capstone] to assess implementation,
   operations, and leadership evidence.
 - Use the [algorithm guide][algorithms] for coding-interview methods.
 - Use the [backend extension][backend] when targeting full-stack roles
@@ -535,6 +535,6 @@ topics before dropping a complete mock or the application package.
 [number-of-islands]:
   dsa/problems/medium_leetcode_0200_number_of_islands.go
 [frontend]: web-engineering/frontend/README.md
-[web]: web-engineering/README.md
+[capstone]: web-engineering/frontend/CAPSTONE.md
 [algorithms]: dsa/CONCEPTS.md
 [backend]: web-engineering/backend/README.md

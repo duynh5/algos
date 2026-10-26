@@ -7,7 +7,7 @@ architecture, and production operations.
 ## Contents
 
 - [Backend competency map](#backend-competency-map)
-- [Provenance and further study](#provenance-and-further-study)
+- [Further study](#further-study)
 - [Go values and
   ownership](#1-go-values-program-structure-and-ownership)
 - [Errors and cancellation](#2-go-errors-resources-and-cancellation)
@@ -58,9 +58,9 @@ contents when using the guide as a reference.
 
 The competency map is a supporting roadmap for the active entries.
 The 32 entries that follow own the teaching contract and progress from
-Go mechanics through production leadership. The inventory and
-traceability matrix preserve source provenance without requiring a
-second set of lesson owners.
+Go mechanics through production leadership. Repository-owned examples
+and tests provide executable evidence without a second set of lesson
+owners.
 
 ## Backend competency map
 
@@ -668,12 +668,7 @@ Before treating a capability as complete, answer all of these:
 - **Simplicity:** Which complexity is necessary now, and what can be
   deferred or removed?
 
-## Provenance and further study
-
-The [source inventory](CONCEPTS_SOURCE_INVENTORY.md) preserves each
-imported idea's historical chapter and section. The
-[traceability matrix](CONCEPTS_TRACEABILITY_MATRIX.md) connects those
-records to their active or supporting owners in this guide.
+## Further study
 
 Optional specialization is role-driven. Streaming, machine learning,
 ledger, real-time media, and other specialist systems belong here only

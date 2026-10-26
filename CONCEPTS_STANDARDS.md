@@ -10,9 +10,7 @@ changed:
 The current working-tree version of each guide is the source of truth.
 Preserve its useful teaching material, examples, code, sources, links,
 and compatibility anchors unless a verified correction requires a
-change. `web-engineering/LESSON_STANDARDS.md` defines only the web
-curriculum's domain-specific adaptations; it does not replace or
-weaken this shared contract.
+change.
 
 ## 1. Purpose and audience
 
@@ -41,8 +39,8 @@ weaken this shared contract.
   helps readers choose among.
 - Keep DSA Go techniques before the reference-implementation section
   so language behavior is available before implementations rely on it.
-- Preserve the frontend and backend progression defined by
-  `web-engineering/LESSON_STANDARDS.md` and their curriculum indexes.
+- Preserve the frontend and backend progression defined by their
+  curriculum indexes.
 - Treat evidence sections, competency maps, navigational groups,
   source references, and further-study lists as supporting material.
   They do not need the teaching-entry contract unless promoted into
@@ -178,6 +176,9 @@ Use each required label as a Markdown heading exactly one level below the entry 
 - Let a language-technique entry own language, runtime, browser, or
   standard-library behavior. Other entries should link to it when
   that behavior matters.
+- Let the DSA guide own reusable algorithms and DSA-specific Go
+  techniques. Web entries should link to those owners instead of
+  copying their explanations.
 - Let a reference implementation own its full code, contract, required input conditions, variable-level trace, implementation costs, and concrete test cases.
 - Summarize cross-entry relationships in one or two sentences and link to the owner instead of copying its explanation.
 - When moving ownership, confirm the new owner is complete before removing material from the old location.
@@ -211,7 +212,7 @@ Use each required label as a Markdown heading exactly one level below the entry 
 
 Before editing:
 
-1. Read this standards file, the applicable domain profile, the
+1. Read this standards file, the relevant curriculum index, the
    complete entry being changed, its linked owners, and
    `CODING_RULES.md` when code or code examples are involved.
 2. Inspect `git status` and the relevant diff. Preserve unrelated and user-authored changes; never restore the guide from `HEAD` over working-tree work.

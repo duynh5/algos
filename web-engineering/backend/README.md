@@ -2,12 +2,12 @@
 
 This extension teaches backend engineering with Go through one
 evolving Order API. Active lessons follow the shared
-[lesson standards](../LESSON_STANDARDS.md).
+[concept study standards](../../CONCEPTS_STANDARDS.md).
 
-Frontend candidates should first follow the frontend path from the
-[web engineering guide](../README.md). Use this extension to develop
-full-stack range, understand the systems behind browser applications,
-or prepare for backend-heavy roles.
+Frontend candidates should first follow the
+[frontend curriculum](../frontend/README.md). Use this extension to
+develop full-stack range, understand the systems behind browser
+applications, or prepare for backend-heavy roles.
 
 Reading alone is not completion. Each chapter asks for implementation,
 failure testing, explanation, and production evidence.
@@ -24,12 +24,6 @@ lessons. Its 32 entries form four dependency-ordered stages:
 4. [Scale, operations, and leadership][leadership-stage],
    entries 24-32.
 
-The [source inventory](CONCEPTS_SOURCE_INVENTORY.md),
-[ownership map](CONCEPTS_OWNERSHIP_MAP.md), and
-[traceability matrix](CONCEPTS_TRACEABILITY_MATRIX.md) show how every
-imported idea reaches one active or supporting destination. They are
-audit artifacts rather than competing lessons.
-
 Complete examples for entries 9 through 32 live under
 [`examples/`](examples/). Each package has focused ordinary and
 failure-path tests and is linked from its owning guide entry.
@@ -40,8 +34,14 @@ The imported [Order API exercise](labs/order-api/) is intentionally
 incomplete. Building it is part of the curriculum. The destination
 repository's Go module owns compilation and testing.
 
-See [migration provenance](SOURCE.md) for the precise source mapping
-and excluded repository metadata.
+## Provenance
+
+This curriculum was adapted from the clean source repository at
+`/Users/nolan/Development/be-standard`. Its numbered chapters were
+incorporated into the active guide, and its incomplete product-store
+exercise remains in the lab. The source repository retains the
+original chapters and history. Its standalone module and Git metadata
+were not copied because this repository owns those concerns.
 
 [go-stage]: CONCEPTS.md#1-go-values-program-structure-and-ownership
 [service-stage]: CONCEPTS.md#4-domain-discovery-and-modeling

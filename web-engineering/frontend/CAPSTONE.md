@@ -52,6 +52,6 @@ every major tradeoff without relying on framework slogans.
 
 Related material:
 
-- [Frontend curriculum](../README.md)
-- [Web competency map](../../README.md)
-- [Backend extension](../../backend/README.md)
+- [Frontend curriculum](README.md)
+- [Software engineering guide](../../README.md)
+- [Backend extension](../backend/README.md)

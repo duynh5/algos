@@ -5,7 +5,7 @@ roles first and preserves a direct route into full-stack work.
 
 Every numbered lesson is grouped in the single
 [frontend concept guide](CONCEPTS.md) and follows the shared
-[lesson standards](../LESSON_STANDARDS.md).
+[concept study standards](../../CONCEPTS_STANDARDS.md).
 
 ## Foundations
 
@@ -51,6 +51,6 @@ explain its tradeoffs aloud.
 [leadership]:
   CONCEPTS.md#c2-delivery-migrations-and-technical-leadership
 [job-plan]: ../../SENIOR_FRONTEND_JOB_PREP_PLAN.md
-[capstone]: projects/CAPSTONE.md
+[capstone]: CAPSTONE.md
 [algorithms]: ../../dsa/CONCEPTS.md
 [backend]: ../backend/README.md
