@@ -42,9 +42,10 @@ func DecodeJSONArgs(input string, destinations ...any) error {
 }
 
 // FormatJSONOutput serializes a typed algorithm result into the JSON
-// text used by sample cases. Nil slices are emitted as [] to match
-// judge collection output. Problem-specific formatters should wrap
-// this helper when the judge uses ordinary JSON output.
+// text used by sample cases. A nil slice passed directly or nested in
+// another slice or array is emitted as [] to match judge collection
+// output. Problem-specific formatters should wrap this helper when
+// the judge uses ordinary JSON output.
 func FormatJSONOutput(value any) string {
 	output, err := json.Marshal(
 		normalizeJSONOutputValue(reflect.ValueOf(value)),

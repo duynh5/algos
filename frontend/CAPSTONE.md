@@ -53,5 +53,5 @@ every major tradeoff without relying on framework slogans.
 Related material:
 
 - [Frontend curriculum](README.md)
-- [Software engineering guide](../../README.md)
+- [Software engineering guide](../README.md)
 - [Backend extension](../backend/README.md)

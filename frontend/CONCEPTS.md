@@ -104,6 +104,8 @@ receive the same state transitions.
 This example runs in a page containing `#subscription` and `#status`.
 
 ```typescript
+// Resolve the semantic controls once and fail before registering a
+// partially functional interaction.
 const form = document.querySelector<HTMLFormElement>("#subscription");
 const statusElement = document.querySelector<HTMLElement>("#status");
 
@@ -111,13 +113,18 @@ if (!form || !statusElement) {
   throw new Error("subscription form is incomplete");
 }
 
+type SubmitButton = HTMLButtonElement;
+
+// One submit handler owns validation, visible status, and the
+// disabled state for the lifetime of each request.
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const submit = form.querySelector<HTMLButtonElement>(
-    'button[type="submit"]',
-  );
+  const submitSelector = 'button[type="submit"]';
+  const submit = form.querySelector<SubmitButton>(submitSelector);
   if (!submit || submit.disabled) return;
 
+  // Disable repeated intent before starting asynchronous work, then
+  // restore the control on every completion path.
   submit.disabled = true;
   statusElement.textContent = "Saving";
   try {
@@ -241,15 +248,20 @@ type SearchState =
 let activeController: AbortController | undefined;
 
 async function search(query: string): Promise<SearchState> {
+  // Revoke the preceding request before a newer query takes
+  // ownership.
   activeController?.abort();
   const controller = new AbortController();
   activeController = controller;
 
+  // Treat transport status and decoded JSON as untrusted boundary
+  // data before constructing the ready state.
   try {
-    const response = await fetch(
-      `/search?q=${encodeURIComponent(query)}`,
-      { signal: controller.signal },
-    );
+    const encodedQuery = encodeURIComponent(query);
+    const searchURL = `/search?q=${encodedQuery}`;
+    const response = await fetch(searchURL, {
+      signal: controller.signal,
+    });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const value: unknown = await response.json();
     if (!Array.isArray(value)) throw new Error("invalid result");
@@ -258,8 +270,11 @@ async function search(query: string): Promise<SearchState> {
     );
     return { kind: "ready", query, items };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "unknown";
+    // Convert every failure shape into the explicit failed state.
+    let message = "unknown";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return { kind: "failed", query, message };
   }
 }
@@ -302,7 +317,7 @@ processing it.
 
 - [Network, storage, and browser security][network]
 - [React components, state, and effects][react]
-- [Algorithm and Go concept guide](../../dsa/CONCEPTS.md)
+- [Algorithm and Go concept guide](../dsa/CONCEPTS.md)
 
 [react]: #b1-react-components-state-and-effects
 [network]: #a3-networking-storage-and-browser-security
@@ -373,8 +388,10 @@ server result.
 
 ```typescript
 type Order = { id: string; status: "placed" | "rejected" };
+type OrderPromise = Promise<Order>;
 
 function isOrder(value: unknown): value is Order {
+  // Validate the complete wire shape before application code uses it.
   if (typeof value !== "object" || value === null) return false;
   const record = value as Record<string, unknown>;
   return (
@@ -383,10 +400,9 @@ function isOrder(value: unknown): value is Order {
   );
 }
 
-async function placeOrder(
-  body: unknown,
-  key: string,
-): Promise<Order> {
+async function placeOrder(body: unknown, key: string): OrderPromise {
+  // Send credentials and replay identity explicitly at the HTTP
+  // boundary.
   const response = await fetch("/v1/orders", {
     method: "POST",
     credentials: "same-origin",
@@ -396,6 +412,8 @@ async function placeOrder(
     },
     body: JSON.stringify(body),
   });
+  // Accept the response only when transport and runtime contracts
+  // both succeed.
   const value: unknown = await response.json();
   if (!response.ok || !isOrder(value)) {
     throw new Error("order request failed");
@@ -519,24 +537,30 @@ function ProductDetails({ id }: { id: string }) {
   const [product, setProduct] = React.useState<Product | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
+  // Each committed product identity owns one abortable request.
   React.useEffect(() => {
     const controller = new AbortController();
     setProduct(null);
     setError(null);
 
+    // Ignore rejection from work that cleanup has already revoked.
     loadProduct(id, controller.signal)
       .then(setProduct)
       .catch((reason: unknown) => {
         if (!controller.signal.aborted) {
-          setError(
-            reason instanceof Error ? reason.message : "failed",
-          );
+          let message = "failed";
+          if (reason instanceof Error) {
+            message = reason.message;
+          }
+          setError(message);
         }
       });
 
+    // Cleanup prevents an obsolete request from publishing afterward.
     return () => controller.abort();
   }, [id]);
 
+  // Render every observable request state from the current snapshot.
   if (error) return <p role="alert">{error}</p>;
   if (!product) return <p>Loading</p>;
   return <h2>{product.name}</h2>;
@@ -650,6 +674,7 @@ separate from confirmed data until mutation policy reconciles them.
 type ProductQuery = { category: string; page: number };
 
 function parseProductQuery(url: URL): ProductQuery {
+  // Parse and validate URL-owned state before building a cache key.
   const category = url.searchParams.get("category")?.trim();
   const rawPage = Number(url.searchParams.get("page") ?? "1");
   if (!category) throw new Error("category is required");
@@ -660,9 +685,11 @@ function parseProductQuery(url: URL): ProductQuery {
 }
 
 function productKey(query: ProductQuery): readonly unknown[] {
+  // Include every input that can change the server result.
   return ["products", query.category, query.page] as const;
 }
 
+// Exercise the ordinary URL-to-key path with a concrete assertion.
 const query = parseProductQuery(
   new URL("https://example.test/products?category=books&page=2"),
 );
@@ -777,17 +804,18 @@ function nextRetryState(
   state: RetryState,
   event: "submit" | "reject" | "resolve",
 ): RetryState {
-  if (
-    (state === "ready" || state === "failed") &&
-    event === "submit"
-  ) {
+  // Only idle terminal states may begin a new request.
+  const canSubmit = state === "ready" || state === "failed";
+  if (canSubmit && event === "submit") {
     return "pending";
   }
+  // A pending request owns the only valid completion transitions.
   if (state === "pending" && event === "reject") return "failed";
   if (state === "pending" && event === "resolve") return "complete";
   throw new Error(`invalid transition: ${state} -> ${event}`);
 }
 
+// Exercise both the start and failure transitions.
 console.assert(nextRetryState("ready", "submit") === "pending");
 console.assert(nextRetryState("pending", "reject") === "failed");
 ```
@@ -910,11 +938,14 @@ type CheckoutConfirmation = {
 };
 
 function confirmationTitle(value: CheckoutConfirmation): string {
+  // Domain data determines presentation without entering the dialog
+  // interaction contract.
   const amount = (value.totalCents / 100).toFixed(2);
   return `Order ${value.orderId}: ${amount}`;
 }
 
 function closeDialog(request: DialogRequest): void {
+  // The shared interaction closes through its narrow callback.
   request.close();
 }
 ```
@@ -1036,12 +1067,16 @@ type ReleaseSignals = {
 };
 
 function decideRollout(signals: ReleaseSignals): RolloutDecision {
-  const unsafe =
-    signals.errorRate > 0.01 || signals.duplicateOrderRate > 0;
+  // Continue only while every user-impact signal stays within policy.
+  const errorRateUnsafe = signals.errorRate > 0.01;
+  const duplicateUnsafe = signals.duplicateOrderRate > 0;
+  const unsafe = errorRateUnsafe || duplicateUnsafe;
   if (!unsafe) return "continue";
+  // Prefer reversal when supported; otherwise halt further exposure.
   return signals.canRollback ? "rollback" : "stop";
 }
 
+// Exercise the rollback branch with a breached error-rate threshold.
 console.assert(
   decideRollout({
     errorRate: 0.02,
@@ -1091,4 +1126,4 @@ Do not use consensus as a substitute for a named accountable decision.
 - [Senior frontend job preparation][job-plan]
 
 [backend-delivery]: ../backend/README.md
-[job-plan]: ../../SENIOR_FRONTEND_JOB_PREP_PLAN.md
+[job-plan]: ../SENIOR_FRONTEND_JOB_PREP_PLAN.md

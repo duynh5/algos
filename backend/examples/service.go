@@ -1,6 +1,5 @@
-// Package service contains the executable examples for backend
-// concept entries 9 through 12.
-package service
+// Service examples cover backend concept entries 9 through 12.
+package examples
 
 import (
 	"context"

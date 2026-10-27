@@ -1,6 +1,12 @@
 # AI Code Generation Rules
 
-These rules are mandatory whenever an AI agent creates or modifies code in this repository. They apply to Go source, tests, scripts, generated scaffolding, and code examples embedded in documentation. Workflow-specific instructions in `AGENTS.md` add to these rules and take precedence when they are more specific.
+These rules are mandatory whenever an AI agent creates or modifies
+content expressed as code syntax in this repository. This includes
+source code, tests, scripts, configuration, queries, command examples,
+generated scaffolding, and code examples embedded in documentation. It
+does not include ordinary prose, raw data, lockfiles, or verbatim
+third-party content. Workflow-specific instructions in `AGENTS.md` add
+to these rules and take precedence when they are more specific.
 
 ## Preserve Intent and Existing Behavior
 

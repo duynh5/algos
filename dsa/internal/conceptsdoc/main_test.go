@@ -1,5 +1,3 @@
-//go:build ignore
-
 package main
 
 import (
@@ -12,8 +10,8 @@ import (
 func TestConceptGuideSpecsCoverEveryActiveGuide(t *testing.T) {
 	wantedPaths := []string{
 		"dsa/CONCEPTS.md",
-		"web-engineering/frontend/CONCEPTS.md",
-		"web-engineering/backend/CONCEPTS.md",
+		"frontend/CONCEPTS.md",
+		"backend/CONCEPTS.md",
 	}
 	wantedEntries := []int{93, 8, 32}
 	if len(conceptGuideSpecs) != len(wantedPaths) {
@@ -48,7 +46,7 @@ func TestValidateTeachingEntriesUsesGuideExampleHeading(
 	t *testing.T,
 ) {
 	spec := conceptGuideSpec{
-		path: "web-engineering/frontend/CONCEPTS.md",
+		path: "frontend/CONCEPTS.md",
 		requiredFields: teachingFields(
 			"TypeScript example",
 		),
@@ -82,7 +80,7 @@ func TestValidateTeachingEntriesRejectsWrongExampleHeading(
 	t *testing.T,
 ) {
 	spec := conceptGuideSpec{
-		path: "web-engineering/frontend/CONCEPTS.md",
+		path: "frontend/CONCEPTS.md",
 		requiredFields: teachingFields(
 			"TypeScript example",
 		),
@@ -164,7 +162,6 @@ func TestValidateInboundLinksUsesDestinationGuideTargets(
 	repositoryRoot := t.TempDir()
 	frontendDirectory := filepath.Join(
 		repositoryRoot,
-		"web-engineering",
 		"frontend",
 	)
 	if err := os.MkdirAll(frontendDirectory, 0o755); err != nil {
@@ -191,7 +188,7 @@ func TestValidateInboundLinksUsesDestinationGuideTargets(
 	// The inbound link must resolve against the file named in the
 	// destination rather than against a single global target set.
 	readme := []byte(
-		"[Entry](web-engineering/frontend/" +
+		"[Entry](frontend/" +
 			"CONCEPTS.md" + "#frontend-entry)\n",
 	)
 	if err := os.WriteFile(
@@ -212,7 +209,7 @@ func TestValidateInboundLinksUsesDestinationGuideTargets(
 
 	// A fragment absent from the destination guide must still fail.
 	invalidReadme := []byte(
-		"[Entry](web-engineering/frontend/" +
+		"[Entry](frontend/" +
 			"CONCEPTS.md" + "#missing-entry)\n",
 	)
 	if err := os.WriteFile(

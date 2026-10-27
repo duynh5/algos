@@ -1,6 +1,5 @@
-// Package distributed contains executable examples for backend
-// concept entries 19 through 23.
-package distributed
+// Distributed examples cover backend concept entries 19 through 23.
+package examples
 
 import (
 	"context"

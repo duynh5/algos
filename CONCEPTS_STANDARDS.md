@@ -4,8 +4,8 @@ These standards apply whenever any active concept study guide is
 changed:
 
 - `dsa/CONCEPTS.md`;
-- `web-engineering/frontend/CONCEPTS.md`; and
-- `web-engineering/backend/CONCEPTS.md`.
+- `frontend/CONCEPTS.md`; and
+- `backend/CONCEPTS.md`.
 
 The current working-tree version of each guide is the source of truth.
 Preserve its useful teaching material, examples, code, sources, links,
@@ -205,7 +205,8 @@ Use each required label as a Markdown heading exactly one level below the entry 
 - Do not turn company tags or remembered question lists into claims about what is currently asked.
 - When intentionally replacing or removing a DSA baseline external
   source,
-  update `dsa/internal/check-concepts-doc.go` in the same change and
+  update the checker under `dsa/internal/conceptsdoc/` in the same
+  change and
   explain why the new source supports the claim.
 
 ## 12. Update workflow
@@ -224,9 +225,9 @@ While editing:
 2. Finish all eleven required sections of an added or materially reorganized entry. Do not leave a partially converted entry.
 3. Keep cross-section changes limited to corrections required for consistency, ownership, or navigation.
 4. Preserve an old fragment with an explicit anchor as soon as its heading is renamed.
-5. Update `dsa/internal/check-concepts-doc.go` when an intentional
-   structural change alters the number of teaching entries or the
-   maintained source contract.
+5. Update `dsa/internal/conceptsdoc/` when an intentional structural
+   change alters the number of teaching entries or the maintained
+   source contract.
 
 After editing:
 
@@ -246,17 +247,18 @@ active concept study guide:
 ~/.codex/scripts/check-non-ascii.py \
   CONCEPTS_STANDARDS.md \
   dsa/CONCEPTS.md \
-  web-engineering/frontend/CONCEPTS.md \
-  web-engineering/backend/CONCEPTS.md
+  frontend/CONCEPTS.md \
+  backend/CONCEPTS.md
 git diff --check HEAD -- \
   CONCEPTS_STANDARDS.md \
   dsa/CONCEPTS.md \
-  web-engineering/frontend/CONCEPTS.md \
-  web-engineering/backend/CONCEPTS.md
-go run dsa/internal/check-concepts-doc.go
+  frontend/CONCEPTS.md \
+  backend/CONCEPTS.md
+go run ./dsa/internal/conceptsdoc
+go run ./internal/codeexamples
 go run ./internal/linewidth
-go vet dsa/internal/check-concepts-doc.go
-go test dsa/internal/check-concepts-doc.go
+go vet ./dsa/internal/conceptsdoc
+go test ./dsa/internal/conceptsdoc
 go test ./...
 ```
 

@@ -41,7 +41,7 @@ output string. For a site such as LeetCode, where the submitted
 function receives several arguments, write those arguments in call
 order as a JSON array--the bracketed text format shown below:
 
-```go
+```text
 Input: `[[2,7,11,15],9]`,
 Want:  `[0,1]`,
 ```

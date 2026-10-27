@@ -1,4 +1,4 @@
-package production
+package examples
 
 import (
 	"errors"
@@ -63,6 +63,24 @@ func TestRetryPolicy(t *testing.T) {
 	if !allowed || delay != time.Second {
 		t.Fatalf("overflow-safe delay = %v, %v; want 1s, true",
 			delay, allowed)
+	}
+
+	// Adding a maximum call budget to any positive delay overflows a
+	// duration. The policy must reject the work before doing that sum.
+	maximumDuration := time.Duration(1<<63 - 1)
+	overflowPolicy = RetryPolicy{
+		MaximumAttempts: 2,
+		MaximumDelay:    time.Nanosecond,
+		CallBudget:      maximumDuration,
+	}
+	_, allowed = overflowPolicy.NextDelay(
+		1,
+		time.Nanosecond,
+		0,
+		maximumDuration,
+	)
+	if allowed {
+		t.Fatal("NextDelay() allowed an overflowing total budget")
 	}
 }
 

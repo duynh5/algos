@@ -1,6 +1,5 @@
-// Package production contains executable examples for backend concept
-// entries 13 through 18.
-package production
+// Production examples cover backend concept entries 13 through 18.
+package examples
 
 import (
 	"crypto/sha256"
@@ -79,7 +78,14 @@ func (policy RetryPolicy) NextDelay(
 		delay = policy.MaximumDelay
 	}
 	delay += jitter
-	if delay < 0 || delay+policy.CallBudget > remaining {
+	if delay < 0 || delay > remaining {
+		return 0, false
+	}
+
+	// Subtract only after proving delay fits. Comparing the remaining
+	// capacity avoids overflowing delay plus the reserved call budget.
+	remainingAfterDelay := remaining - delay
+	if policy.CallBudget > remainingAfterDelay {
 		return 0, false
 	}
 	return delay, true

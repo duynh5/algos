@@ -2,7 +2,7 @@
 
 This extension teaches backend engineering with Go through one
 evolving Order API. Active lessons follow the shared
-[concept study standards](../../CONCEPTS_STANDARDS.md).
+[concept study standards](../CONCEPTS_STANDARDS.md).
 
 Frontend candidates should first follow the
 [frontend curriculum](../frontend/README.md). Use this extension to
@@ -24,13 +24,13 @@ lessons. Its 32 entries form four dependency-ordered stages:
 4. [Scale, operations, and leadership][leadership-stage],
    entries 24-32.
 
-Complete examples for entries 9 through 32 live under
-[`examples/`](examples/). Each package has focused ordinary and
-failure-path tests and is linked from its owning guide entry.
+Complete examples for entries 9 through 32 live as topic-named files
+under [`examples/`](examples/). The shared package has focused
+ordinary and failure-path tests linked from each owning guide entry.
 
 ## Lab
 
-The imported [Order API exercise](labs/order-api/) is intentionally
+The imported [Order API exercise](orderapi/) is intentionally
 incomplete. Building it is part of the curriculum. The destination
 repository's Go module owns compilation and testing.
 

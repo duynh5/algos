@@ -1,7 +1,8 @@
-package platform
+package examples
 
 import (
 	"errors"
+	"math"
 	"testing"
 )
 
@@ -20,6 +21,23 @@ func TestNewTenantCacheKey(t *testing.T) {
 	_, err = NewTenantCacheKey("", "product-1", 2)
 	if !errors.Is(err, ErrMissingTenant) {
 		t.Fatalf("NewTenantCacheKey() error = %v; want missing tenant", err)
+	}
+
+	// Delimiters inside an identity component must not let different
+	// tenants and items produce the same cache key.
+	firstAmbiguousKey, err := NewTenantCacheKey("a:v1", "b", 2)
+	if err != nil {
+		t.Fatalf("first ambiguous key error = %v; want nil", err)
+	}
+	secondAmbiguousKey, err := NewTenantCacheKey("a", "v2:b", 1)
+	if err != nil {
+		t.Fatalf("second ambiguous key error = %v; want nil", err)
+	}
+	if firstAmbiguousKey == secondAmbiguousKey {
+		t.Fatalf(
+			"distinct identities produced cache key %q",
+			firstAmbiguousKey,
+		)
 	}
 }
 
@@ -98,5 +116,9 @@ func TestCalculateErrorBudget(t *testing.T) {
 	_, err = CalculateErrorBudget(0, 0, 0.999)
 	if !errors.Is(err, ErrNoEligibleEvents) {
 		t.Fatalf("CalculateErrorBudget() error = %v; want no events", err)
+	}
+	_, err = CalculateErrorBudget(1, 1, math.NaN())
+	if err == nil {
+		t.Fatal("CalculateErrorBudget() accepted a NaN target")
 	}
 }

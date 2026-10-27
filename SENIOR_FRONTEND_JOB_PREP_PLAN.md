@@ -534,7 +534,7 @@ topics before dropping a complete mock or the application package.
   dsa/problems/medium_leetcode_0056_merge_intervals.go
 [number-of-islands]:
   dsa/problems/medium_leetcode_0200_number_of_islands.go
-[frontend]: web-engineering/frontend/README.md
-[capstone]: web-engineering/frontend/CAPSTONE.md
+[frontend]: frontend/README.md
+[capstone]: frontend/CAPSTONE.md
 [algorithms]: dsa/CONCEPTS.md
-[backend]: web-engineering/backend/README.md
+[backend]: backend/README.md

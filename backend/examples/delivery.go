@@ -1,6 +1,5 @@
-// Package delivery contains executable examples for backend concept
-// entries 29 through 32.
-package delivery
+// Delivery examples cover backend concept entries 29 through 32.
+package examples
 
 import (
 	"context"

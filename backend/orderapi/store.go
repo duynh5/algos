@@ -1,4 +1,4 @@
-package product
+package orderapi
 
 // Product represents the small catalog entity used by the first lab.
 type Product struct {

@@ -3075,15 +3075,17 @@ logs.
 The invariant is that every derived location retains the authoritative
 tenant
 and object identity. Compound keys and storage policy preserve
-isolation;
-bounded coalescing allows one refill while waiters share its result.
+isolation. Length-prefixed components keep delimiters inside tenant or
+object
+identities from creating the same serialized key. Storage policy and
+bounded coalescing allow one refill while waiters share its result.
 
 ### Go example
 
 See the typed tenant cache key in
 [the platform examples][platform-examples]. Its
-[tests][platform-tests] prove distinct tenant keys and reject an empty
-trusted tenant identity.
+[tests][platform-tests] reject empty tenant identity and prove that
+delimiter-containing identities cannot alias.
 
 
 ### Work and memory
@@ -3926,15 +3928,15 @@ See [language portability][portability-reference],
 [scale-reference]: #24-data-scaling-caching-and-tenant-isolation
 [integration-reference]: #29-production-integration-boundaries
 [portability-reference]: #32-language-portability
-[service-examples]: examples/service/examples.go
-[service-tests]: examples/service/examples_test.go
-[production-examples]: examples/production/examples.go
-[production-tests]: examples/production/examples_test.go
-[distributed-examples]: examples/distributed/examples.go
-[distributed-tests]: examples/distributed/examples_test.go
-[platform-examples]: examples/platform/examples.go
-[platform-tests]: examples/platform/examples_test.go
-[delivery-examples]: examples/delivery/examples.go
-[delivery-tests]: examples/delivery/examples_test.go
+[service-examples]: examples/service.go
+[service-tests]: examples/service_test.go
+[production-examples]: examples/production.go
+[production-tests]: examples/production_test.go
+[distributed-examples]: examples/distributed.go
+[distributed-tests]: examples/distributed_test.go
+[platform-examples]: examples/platform.go
+[platform-tests]: examples/platform_test.go
+[delivery-examples]: examples/delivery.go
+[delivery-tests]: examples/delivery_test.go
 [resilience-experiments]:
   #23-distributed-observability-and-resilience-experiments

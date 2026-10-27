@@ -1,6 +1,5 @@
-// Package platform contains executable examples for backend concept
-// entries 24 through 28.
-package platform
+// Platform examples cover backend concept entries 24 through 28.
+package examples
 
 import (
 	"errors"
@@ -21,9 +20,16 @@ func NewTenantCacheKey(
 	if itemID == "" || version < 1 {
 		return "", errors.New("item and positive version are required")
 	}
-	// Tenant and version are part of identity, so two authorities or
-	// representations cannot alias one cached value.
-	return fmt.Sprintf("%s:v%d:%s", tenantID, version, itemID), nil
+	// Length prefixes keep delimiters inside either identity component
+	// from making two different authorities share one cache entry.
+	return fmt.Sprintf(
+		"%d:%s:v%d:%d:%s",
+		len(tenantID),
+		tenantID,
+		version,
+		len(itemID),
+		itemID,
+	), nil
 }
 
 type Permission struct {
@@ -161,7 +167,7 @@ func CalculateErrorBudget(
 	if goodEvents < 0 || goodEvents > eligibleEvents {
 		return ErrorBudget{}, errors.New("good events are out of range")
 	}
-	if target <= 0 || target > 1 {
+	if math.IsNaN(target) || target <= 0 || target > 1 {
 		return ErrorBudget{}, errors.New("target must be in (0, 1]")
 	}
 

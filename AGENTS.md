@@ -4,7 +4,7 @@
 
 The `dsa/` domain teaches algorithms and data structures in Go. Keep the educational guide in `dsa/CONCEPTS.md`, the active exercise under `dsa/workbench/`, and standalone practice and completed judge-ready solutions under `dsa/problems/`.
 
-The shared teaching contract in `CONCEPTS_STANDARDS.md` applies to every active concept study guide: `dsa/CONCEPTS.md`, `web-engineering/frontend/CONCEPTS.md`, and `web-engineering/backend/CONCEPTS.md`.
+The shared teaching contract in `CONCEPTS_STANDARDS.md` applies to every active concept study guide: `dsa/CONCEPTS.md`, `frontend/CONCEPTS.md`, and `backend/CONCEPTS.md`.
 
 ## Code Generation Standard
 

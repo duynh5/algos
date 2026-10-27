@@ -2032,10 +2032,10 @@ func primesThrough(limit int) []int {
 		}
 		// Smaller multiples were marked by smaller primes, so begin at
 		// prime^2.
-		for multiple := prime * prime;
-			multiple <= limit;
-			multiple += prime {
+		multiple := prime * prime
+		for multiple <= limit {
 			composite[multiple] = true
+			multiple += prime
 		}
 	}
 	// Every unmarked value at least two is prime.
@@ -2499,9 +2499,8 @@ func combinationCount(numItems, numChosen int64) (*big.Int, bool) {
 	result := big.NewInt(1)
 	factor := new(big.Int)
 	divisor := new(big.Int)
-	for numChosenSoFar := int64(1);
-		numChosenSoFar <= numChosen;
-		numChosenSoFar++ {
+	numChosenSoFar := int64(1)
+	for numChosenSoFar <= numChosen {
 		// Extend the count by one chosen item. This recurrence's division
 		// is exact at every step, including the final requested count.
 		result.Mul(
@@ -2509,6 +2508,7 @@ func combinationCount(numItems, numChosen int64) (*big.Int, bool) {
 			factor.SetInt64(numItems-numChosen+numChosenSoFar),
 		)
 		result.Quo(result, divisor.SetInt64(numChosenSoFar))
+		numChosenSoFar++
 	}
 	return result, true
 }
@@ -2658,13 +2658,13 @@ func uniqueCombinations(values []int, combinationLength int) [][]int {
 			result = append(result, append([]int{}, currentCombination...))
 			return
 		}
-		for candidateIndex := startIndex;
-			candidateIndex < len(sorted);
-			candidateIndex++ {
+		candidateIndex := startIndex
+		for candidateIndex < len(sorted) {
 			if candidateIndex > startIndex &&
 				sorted[candidateIndex] == sorted[candidateIndex-1] {
 				// This call already tried the same value for this output
 				// position, so trying it again would repeat answers.
+				candidateIndex++
 				continue
 			}
 			// Choose this value, fill later positions, then remove it so
@@ -2675,6 +2675,7 @@ func uniqueCombinations(values []int, combinationLength int) [][]int {
 			)
 			build(candidateIndex + 1)
 			currentCombination = currentCombination[:len(currentCombination)-1]
+			candidateIndex++
 		}
 	}
 	build(0)
@@ -3466,9 +3467,8 @@ func breadthFirstOrder(start int, neighbors [][]int) []int {
 	// nextQueueIndex advances without shifting queued values. Appends
 	// add newly discovered vertices at the back in first-in, first-out
 	// order.
-	for nextQueueIndex := 0;
-		nextQueueIndex < len(queue);
-		nextQueueIndex++ {
+	nextQueueIndex := 0
+	for nextQueueIndex < len(queue) {
 		currentVertex := queue[nextQueueIndex]
 		order = append(order, currentVertex)
 		for _, neighboringVertex := range neighbors[currentVertex] {
@@ -3479,6 +3479,7 @@ func breadthFirstOrder(start int, neighbors [][]int) []int {
 				queue = append(queue, neighboringVertex)
 			}
 		}
+		nextQueueIndex++
 	}
 	return order
 }
@@ -4974,11 +4975,13 @@ func rotateSquare(matrix [][]int) {
 	// Mirroring every transposed row completes the clockwise coordinate
 	// mapping (row,column) -> (column,n-1-row).
 	for row := range matrix {
-		for left, right := 0, len(matrix[row])-1;
-			left < right;
-			left, right = left+1, right-1 {
+		left := 0
+		right := len(matrix[row]) - 1
+		for left < right {
 			matrix[row][left], matrix[row][right] =
 				matrix[row][right], matrix[row][left]
+			left++
+			right--
 		}
 	}
 }
@@ -8859,10 +8862,10 @@ func (tree *fenwick) add(index, delta int) {
 	// Start at the public index's one-based position. Adding the lowest
 	// set bit moves to the next larger stored range that also contains
 	// the updated value.
-	for oneBasedIndex := index + 1;
-		oneBasedIndex < len(tree.sums);
-		oneBasedIndex += oneBasedIndex & -oneBasedIndex {
+	oneBasedIndex := index + 1
+	for oneBasedIndex < len(tree.sums) {
 		tree.sums[oneBasedIndex] += delta
+		oneBasedIndex += oneBasedIndex & -oneBasedIndex
 	}
 }
 func (tree *fenwick) prefix(end int) int {
@@ -8870,10 +8873,10 @@ func (tree *fenwick) prefix(end int) int {
 	// Subtracting the lowest set bit removes the range just counted. The
 	// visited disjoint ranges exactly cover the public half-open prefix
 	// [0,end).
-	for oneBasedIndex := end;
-		oneBasedIndex > 0;
-		oneBasedIndex -= oneBasedIndex & -oneBasedIndex {
+	oneBasedIndex := end
+	for oneBasedIndex > 0 {
 		total += tree.sums[oneBasedIndex]
+		oneBasedIndex -= oneBasedIndex & -oneBasedIndex
 	}
 	return total
 }
@@ -9533,9 +9536,8 @@ func breadthFirstDistances(graph [][]int, start int) []int {
 	distanceByVertex[start] = 0
 	// FIFO processing visits all distance-d vertices before distance
 	// d+1.
-	for nextQueueIndex := 0;
-		nextQueueIndex < len(queue);
-		nextQueueIndex++ {
+	nextQueueIndex := 0
+	for nextQueueIndex < len(queue) {
 		vertex := queue[nextQueueIndex]
 		for _, neighboringVertex := range graph[vertex] {
 			if distanceByVertex[neighboringVertex] == -1 {
@@ -9545,6 +9547,7 @@ func breadthFirstDistances(graph [][]int, start int) []int {
 				queue = append(queue, neighboringVertex)
 			}
 		}
+		nextQueueIndex++
 	}
 	return distanceByVertex
 }
@@ -9679,9 +9682,8 @@ func topologicalOrder(graph [][]int) ([]int, bool) {
 	}
 	// Vertices with no prerequisites can appear first.
 	queue := make([]int, 0, len(graph))
-	for vertex, numUnmetPrerequisites :=
-		range numUnmetPrerequisitesByVertex {
-		if numUnmetPrerequisites == 0 {
+	for vertex := range numUnmetPrerequisitesByVertex {
+		if numUnmetPrerequisitesByVertex[vertex] == 0 {
 			// This vertex is ready immediately because it has no incoming
 			// edge.
 			queue = append(queue, vertex)
@@ -9690,9 +9692,8 @@ func topologicalOrder(graph [][]int) ([]int, bool) {
 	// Removing a vertex satisfies each outgoing prerequisite. A neighbor
 	// becomes ready exactly when its count reaches zero.
 	order := make([]int, 0, len(graph))
-	for nextQueueIndex := 0;
-		nextQueueIndex < len(queue);
-		nextQueueIndex++ {
+	nextQueueIndex := 0
+	for nextQueueIndex < len(queue) {
 		// Emit the oldest ready vertex without shifting the queue slice.
 		vertex := queue[nextQueueIndex]
 		order = append(order, vertex)
@@ -9705,6 +9706,7 @@ func topologicalOrder(graph [][]int) ([]int, bool) {
 				queue = append(queue, destinationVertex)
 			}
 		}
+		nextQueueIndex++
 	}
 	// A cycle leaves a positive unfinished-prerequisite count, so not
 	// every vertex is emitted.
