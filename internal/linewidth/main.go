@@ -1,4 +1,4 @@
-// Command linewidth checks line widths in repository text files.
+// Command linewidth checks code and concept-guide line widths.
 package main
 
 import (
@@ -16,12 +16,58 @@ import (
 
 const maximumLineWidth = 70
 
-var exemptPaths = map[string]struct{}{
-	"AGENTS.md":             {},
-	"CODING_RULES.md":       {},
-	"CONCEPTS_STANDARDS.md": {},
-	"REFERENCE_LINKS.md":    {},
-	"VALIDATION.md":         {},
+type validationScope int
+
+const (
+	skipFile validationScope = iota
+	validateWholeFile
+	validateCodeBlocks
+)
+
+var conceptGuidePaths = map[string]struct{}{
+	"backend/CONCEPTS.md":  {},
+	"dsa/CONCEPTS.md":      {},
+	"frontend/CONCEPTS.md": {},
+}
+
+var codeExtensions = map[string]struct{}{
+	".bash":  {},
+	".c":     {},
+	".cc":    {},
+	".conf":  {},
+	".cpp":   {},
+	".cs":    {},
+	".css":   {},
+	".go":    {},
+	".h":     {},
+	".html":  {},
+	".java":  {},
+	".js":    {},
+	".jsx":   {},
+	".kt":    {},
+	".kts":   {},
+	".mod":   {},
+	".php":   {},
+	".proto": {},
+	".py":    {},
+	".rb":    {},
+	".rs":    {},
+	".scss":  {},
+	".sh":    {},
+	".sql":   {},
+	".swift": {},
+	".toml":  {},
+	".ts":    {},
+	".tsx":   {},
+	".vue":   {},
+	".xml":   {},
+	".yaml":  {},
+	".yml":   {},
+}
+
+var extensionlessCodeFiles = map[string]struct{}{
+	"Dockerfile": {},
+	"Makefile":   {},
 }
 
 func main() {
@@ -36,9 +82,15 @@ func main() {
 	}
 
 	issues := make([]string, 0)
-	textFileCount := 0
-	exemptFileCount := 0
+	wholeFileCount := 0
+	codeBlockFileCount := 0
+	skippedFileCount := 0
 	for _, path := range paths {
+		scope := scopeForPath(path)
+		if scope == skipFile {
+			skippedFileCount++
+			continue
+		}
 		contents, readErr := os.ReadFile(
 			filepath.Join(repositoryRoot, path),
 		)
@@ -49,12 +101,19 @@ func main() {
 		if bytes.IndexByte(contents, 0) >= 0 {
 			continue
 		}
-		if isExemptPath(path) {
-			exemptFileCount++
-			continue
+		if scope == validateWholeFile {
+			wholeFileCount++
+			issues = append(
+				issues,
+				validateContents(path, contents)...,
+			)
+		} else {
+			codeBlockFileCount++
+			issues = append(
+				issues,
+				validateCodeBlockContents(path, contents)...,
+			)
 		}
-		textFileCount++
-		issues = append(issues, validateContents(path, contents)...)
 	}
 
 	sort.Strings(issues)
@@ -66,11 +125,15 @@ func main() {
 	}
 
 	fmt.Printf(
-		"line width: %d repository text files checked; maximum %d\n",
-		textFileCount,
+		"line width: %d code or concept files checked; maximum %d\n",
+		wholeFileCount,
 		maximumLineWidth,
 	)
-	fmt.Printf("line width exemptions: %d files\n", exemptFileCount)
+	fmt.Printf(
+		"line width: %d documentation files checked for code blocks\n",
+		codeBlockFileCount,
+	)
+	fmt.Printf("line width: %d files outside scope\n", skippedFileCount)
 }
 
 func repositoryPaths(repositoryRoot string) ([]string, error) {
@@ -117,6 +180,42 @@ func existingRepositoryPaths(
 }
 
 func validateContents(path string, contents []byte) []string {
+	return validateSelectedLines(path, contents, func(string) bool {
+		return true
+	})
+}
+
+func validateCodeBlockContents(
+	path string,
+	contents []byte,
+) []string {
+	inCodeBlock := false
+	fenceMarker := ""
+	return validateSelectedLines(
+		path,
+		contents,
+		func(line string) bool {
+			trimmedLine := strings.TrimSpace(line)
+			if !inCodeBlock {
+				fenceMarker = openingFenceMarker(trimmedLine)
+				inCodeBlock = fenceMarker != ""
+				return false
+			}
+			if strings.HasPrefix(trimmedLine, fenceMarker) {
+				inCodeBlock = false
+				fenceMarker = ""
+				return false
+			}
+			return true
+		},
+	)
+}
+
+func validateSelectedLines(
+	path string,
+	contents []byte,
+	shouldValidate func(string) bool,
+) []string {
 	issues := make([]string, 0)
 	scanner := bufio.NewScanner(bytes.NewReader(contents))
 	scanner.Buffer(make([]byte, 64*1024), 1024*1024)
@@ -125,6 +224,9 @@ func validateContents(path string, contents []byte) []string {
 	for scanner.Scan() {
 		lineNumber++
 		line := scanner.Text()
+		if !shouldValidate(line) {
+			continue
+		}
 		width := utf8.RuneCountInString(line)
 		if width <= maximumLineWidth {
 			continue
@@ -149,9 +251,43 @@ func validateContents(path string, contents []byte) []string {
 	return issues
 }
 
-func isExemptPath(path string) bool {
-	_, exempt := exemptPaths[filepath.ToSlash(path)]
-	return exempt
+func openingFenceMarker(line string) string {
+	if strings.HasPrefix(line, "```") {
+		return "```"
+	}
+	if strings.HasPrefix(line, "~~~") {
+		return "~~~"
+	}
+	return ""
+}
+
+func scopeForPath(path string) validationScope {
+	normalizedPath := filepath.ToSlash(path)
+	_, isConceptGuide := conceptGuidePaths[normalizedPath]
+	if isConceptGuide {
+		return validateWholeFile
+	}
+	if filepath.Ext(normalizedPath) == ".md" {
+		return validateCodeBlocks
+	}
+	if isCodePath(normalizedPath) {
+		return validateWholeFile
+	}
+	return skipFile
+}
+
+func isCodePath(path string) bool {
+	base := filepath.Base(path)
+	_, isExtensionlessCode := extensionlessCodeFiles[base]
+	if isExtensionlessCode {
+		return true
+	}
+	pathWithoutTemplate := strings.TrimSuffix(path, ".template")
+	codeExtension := strings.ToLower(
+		filepath.Ext(pathWithoutTemplate),
+	)
+	_, isCodeExtension := codeExtensions[codeExtension]
+	return isCodeExtension
 }
 
 func fatal(err error) {

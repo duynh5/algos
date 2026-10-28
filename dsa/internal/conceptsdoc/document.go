@@ -314,3 +314,81 @@ func validateNoTables(path string, prose []byte) []string {
 	}
 	return nil
 }
+
+func validateTraceItems(path string, prose []byte) []string {
+	requiredLabels := []string{
+		"Before",
+		"Decision",
+		"After",
+		"Known correct",
+	}
+	issues := make([]string, 0)
+	inExamples := false
+	itemLine := 0
+	var item strings.Builder
+
+	flushItem := func() {
+		if itemLine == 0 {
+			return
+		}
+		itemText := item.String()
+		foundLabels := 0
+		missingLabels := make([]string, 0, len(requiredLabels))
+		for _, label := range requiredLabels {
+			marker := "**" + label + ":**"
+			if strings.Contains(itemText, marker) {
+				foundLabels++
+				continue
+			}
+			missingLabels = append(missingLabels, label)
+		}
+		// A numbered explanation without state labels may accompany a
+		// concrete diagram. Once an item adopts the trace vocabulary,
+		// require the complete transition in that same item.
+		if foundLabels > 0 && len(missingLabels) > 0 {
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s:%d: trace item is missing %s",
+					path,
+					itemLine,
+					strings.Join(missingLabels, ", "),
+				),
+			)
+		}
+		item.Reset()
+		itemLine = 0
+	}
+
+	scanner := bufio.NewScanner(bytes.NewReader(prose))
+	lineNumber := 0
+	for scanner.Scan() {
+		lineNumber++
+		line := scanner.Text()
+		if match := headingPattern.FindStringSubmatch(line); match != nil {
+			switch match[2] {
+			case "Step-by-step examples":
+				inExamples = true
+			case "Why it works":
+				if inExamples {
+					flushItem()
+					inExamples = false
+				}
+			}
+			continue
+		}
+		if !inExamples {
+			continue
+		}
+		if traceItemPattern.MatchString(line) {
+			flushItem()
+			itemLine = lineNumber
+		}
+		if itemLine > 0 {
+			item.WriteString(line)
+			item.WriteByte('\n')
+		}
+	}
+	flushItem()
+	return issues
+}

@@ -219,8 +219,8 @@ first. Expected output: only results for `cat` appear.
    view unless canceled. **Known correct:** The current query is `ca`.
 2. **Before:** Request 1 is pending and the user enters `cat`.
    **Decision:** Abort request 1 before starting request 2. **After:**
-   Only request 2 owns permission to publish results. **Known
-   correct:** Any result for `ca` is obsolete.
+   Only request 2 owns permission to publish results.
+   **Known correct:** Any result for `ca` is obsolete.
 3. **Before:** Request 2 returns valid data. **Decision:** Validate
    its shape and publish it. **After:** The view shows results for
    `cat`. **Known correct:** Visible data matches the latest accepted
@@ -646,8 +646,8 @@ Input: route `/products?category=books&page=2`. Expected output: page
 
 1. **Before:** The URL contains untrusted strings. **Decision:**
    Validate category and parse a positive page number. **After:**
-   Application input is `{ category: "books", page: 2 }`. **Known
-   correct:** Invalid page values cannot enter the cache key.
+   Application input is `{ category: "books", page: 2 }`.
+   **Known correct:** Invalid page values cannot enter the cache key.
 2. **Before:** No matching cache entry is fresh. **Decision:** Fetch
    with key `["products", "books", 2]`. **After:** The route renders
    its pending state. **Known correct:** Other categories and pages
@@ -910,8 +910,9 @@ workflows.
    dependency.
 3. **Before:** The primitive changes its close behavior. **Decision:**
    Test consumers, document compatibility, and provide a migration
-   path. **After:** Teams can adopt the release deliberately. **Known
-   correct:** Shared change does not require hidden coordination.
+   path. **After:** Teams can adopt the release deliberately.
+   **Known correct:** Shared change does not require hidden
+   coordination.
 
 Adversarial example: extracting every repeated class name creates a
 shared package whose API changes for unrelated feature requests.

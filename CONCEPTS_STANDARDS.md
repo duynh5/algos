@@ -12,6 +12,16 @@ Preserve its useful teaching material, examples, code, sources, links,
 and compatibility anchors unless a verified correction requires a
 change.
 
+## Physical line width
+
+- Keep every physical line in each active concept guide at no more
+  than 70 Unicode characters.
+- Apply the limit to all guide content, including prose, headings,
+  lists, links, comments, diagrams, and embedded code examples.
+- Represent long URLs, paths, identifiers, and serialized values
+  without creating a physical guide line over 70 characters.
+- Run `go run ./internal/linewidth` after modifying a concept guide.
+
 ## 1. Purpose and audience
 
 - Keep each guide a consistent learning resource for its stated
@@ -52,6 +62,35 @@ change.
 - Define every necessary technical term in the paragraph where it first appears. Do not define one unfamiliar term using several other undefined terms.
 - Prefer concrete verbs such as "visit," "remember," "compare," and "move" over phrases such as "perform traversal" or "leverage state."
 - Explain notation in words before relying on it repeatedly.
+- Explain what one representative state value, table entry, lookup,
+  pointer, or boundary means before explaining how the algorithm
+  constructs or changes it.
+- Before teaching updates to indexed or mapped state, state its data
+  contract as `lookup input -> stored fact`. Name what selects an
+  entry, what unit the stored value measures, and how to read one
+  concrete entry as a sentence.
+- Keep logical quantities, storage locations, and stored values
+  distinct. When code converts between a count, key, index, offset,
+  or boundary, show the conversion with exact values before using its
+  general expression.
+- If the implementation's representation hides the natural mental
+  model, show the conceptual representation first, then map it to the
+  actual storage representation. The implementation detail must
+  refine the mental model rather than create it.
+- When equal data appears in multiple roles or locations, label each
+  occurrence by both role and location. Do not let terms such as
+  "current," "copy," "position," or "value" silently refer to
+  different things.
+- Give state a plain-language mental model when that model reduces the
+  amount of machinery a learner must remember. Follow it with the
+  precise term and rule so the analogy does not replace correctness.
+- Choose one primary mental model for an entry and carry it through
+  the introduction, procedure, traces, correctness argument, and
+  code. Do not switch explanatory models without explicitly mapping
+  between them.
+- Show before telling. Demonstrate a non-obvious rule with exact
+  values, positions, or state changes before summarizing it in
+  abstract language.
 - Keep standard names such as *binary search*, *dynamic programming*, and *Big-O* visible because readers need to recognize them in problems, documentation, and interviews.
 - Pair a precise technical term with a plain-English restatement when removing the term would make the explanation less accurate.
 - Expand abbreviations on first use within the relevant learning context.
@@ -104,6 +143,13 @@ it must not omit a required heading.
 
 Use each required label as a Markdown heading exactly one level below the entry heading. For example, an `###` entry uses `#### The problem it solves`; a `#####` pattern card uses `###### The problem it solves`.
 
+Treat the required headings as distinct teaching responsibilities,
+not prompts to repeat the same explanation. Let the simple-terms
+section establish the mental model, the procedure state the rules,
+the trace show the rules operating, and the correctness section
+justify them. Refer back to the owning explanation instead of
+rephrasing it in every section.
+
 ## 5. Example and trace standards
 
 - Identify the exact input and expected output for every worked example.
@@ -113,6 +159,61 @@ Use each required label as a Markdown heading exactly one level below the entry 
   - **After:** the resulting state; and
   - **Known correct:** the portion of the result already established.
 - Use numbered lists for state-changing traces and concise bullets for static comparisons or mappings.
+- Use one small ordinary example to teach the main path. Put unusual
+  branches, boundaries, failures, and adversarial behavior in focused
+  follow-up examples when combining them would obscure the main idea.
+  Coverage may span several examples; one input need not exercise
+  every branch.
+- For a table or other derived state, show how to read one completed
+  representative value before tracing its construction.
+- In a state trace, use the real state and collection names rather
+  than generic labels such as "value" or "table." Show every item
+  needed to replay the transition, including the complete relevant
+  collection after the step, the lookup key or index, the returned
+  value, unchanged retry state, and whether displayed defaults are
+  initialized or confirmed.
+- Separate a multi-phase method into named phases. Give state distinct
+  role-based names when its meaning changes between phases, and keep
+  those phase and state names consistent in prose, traces, and code.
+- Use a compact aligned text diagram when position, nesting, overlap,
+  ownership, or another spatial relationship is materially clearer
+  visually than in prose.
+- For a stateful process, prefer a sequence of aligned snapshots that
+  keeps the input, current positions, derived state, and output in
+  stable locations. Change only the values or markers that actually
+  change, and keep an important unchanged value visible when that is
+  the point of the step.
+- Place a derived table, index, pointer, or status beside the data it
+  describes. Place the active rule beside the state transition it
+  controls so the learner does not have to join separated diagrams
+  mentally.
+- Show one active rule or branch at a time. Introduce another branch
+  when the example reaches it instead of displaying the entire control
+  flow before the learner has a concrete state for it.
+- When an optimized method exists to avoid visible wasted work, first
+  show the baseline method performing that waste once. Let the
+  optimization answer a problem the learner has already seen.
+- Let the concrete example or diagram carry the explanation. Use
+  prose to label what the learner should notice instead of restating
+  the same relationship abstractly.
+- Do not narrate every movement already visible in a snapshot. Prose
+  should add the reason for the transition, the rule being applied, or
+  a distinction the visual cannot express by itself.
+- A visualization must encode real input values and the state or
+  transition being taught. Decorative diagrams and outcome-only
+  pictures do not count as evidence that the rule was demonstrated.
+- Use labels, position, brackets, or symbols in addition to color so
+  every state distinction remains understandable without color.
+- If a fallback, retry, propagation, or other branch can repeat, add a
+  focused trace in which it repeats. Do not stop the demonstration
+  after its first iteration.
+- Design focused examples around the misconception they must resolve,
+  not only around branch coverage. State the distinction the example
+  demonstrates, such as count versus position, key versus value, or
+  initialized versus confirmed state.
+- Keep each numbered step focused on one meaningful state transition.
+  Compress repeated identical transitions only after showing the rule
+  they repeat.
 - Do not call an outcome-only paragraph a worked example.
 - Do not use Markdown tables in teaching entries; narrow screens and long state descriptions make them harder to follow.
 - Use `> **Warning:**` for a warning, followed by the concrete failure and its correction.
@@ -142,6 +243,22 @@ Use each required label as a Markdown heading exactly one level below the entry 
   blocks for frontend code.
 - Follow `CODING_RULES.md`, including its learner-focused comment
   standard.
+- Make every example locally understandable. A learner must be able to
+  follow its non-obvious state changes from the names, control flow,
+  and nearby comments without searching earlier prose for missing
+  steps.
+- Do not compress several reasoning steps into one unexplained
+  expression. Explain index offsets, sentinel values, fallback
+  lookups, bit operations, boundary updates, mutations, and compound
+  conditions with named intermediate steps or an immediate
+  invariant-based comment. Keep self-evident language idioms concise.
+- When code converts a logical quantity into an index, key, offset, or
+  boundary, use role-based intermediate names when they clarify the
+  conversion. Make the prose and trace show the same input,
+  conversion, lookup, and returned value.
+- Make the code's phase boundaries and role-based state names match
+  the explanation. Do not reuse one vague state name for different
+  roles merely because the underlying type or update rule is similar.
 - Keep examples complete enough to understand and compile in their stated context.
 - State required input conditions immediately before the code.
 - Explain non-obvious language and runtime behavior at the point where
@@ -222,21 +339,41 @@ Before editing:
 While editing:
 
 1. Make the smallest complete change that keeps the entry accurate.
-2. Finish all eleven required sections of an added or materially reorganized entry. Do not leave a partially converted entry.
-3. Keep cross-section changes limited to corrections required for consistency, ownership, or navigation.
-4. Preserve an old fragment with an explicit anchor as soon as its heading is renamed.
-5. Update `dsa/internal/conceptsdoc/` when an intentional structural
+2. When learner feedback exposes a failed explanation, find the
+   earliest misunderstood prerequisite and rebuild from there. Replace
+   the failed model and remove superseded prose instead of layering on
+   more terminology, exceptions, and supplemental examples.
+3. Finish all eleven required sections of an added or materially reorganized entry. Do not leave a partially converted entry.
+4. Keep cross-section changes limited to corrections required for consistency, ownership, or navigation.
+5. Preserve an old fragment with an explicit anchor as soon as its heading is renamed.
+6. Update `dsa/internal/conceptsdoc/` when an intentional structural
    change alters the number of teaching entries or the maintained
    source contract.
 
 After editing:
 
 1. Re-read each changed entry from a beginner's perspective for undefined terms, vague pronouns, unexplained notation, and circular explanations.
-2. Perform a separate technical pass: replay each trace, compare it
+   Confirm that the reader can explain one representative state value
+   before following how it is constructed.
+2. Test the entry with a short learner-paraphrase prompt for each
+   non-obvious representation, such as identifying the lookup input
+   and stored fact in one concrete expression. If the expected answer
+   requires terminology not established by the example, revise it.
+3. Perform a separate technical pass: replay each trace, compare it
    with the code, verify the correctness or lifecycle argument, and
    recalculate the applicable costs.
-3. Review the complete diff for lost prose, examples, links, code, sources, and accidental changes outside the requested scope.
-4. Run the validation commands below and resolve every failure before treating the update as complete.
+4. Review the complete diff for lost prose, examples, links, code, sources, and accidental changes outside the requested scope.
+5. Inspect every fenced code example in each changed guide for local
+   clarity. Formatting, compilation, and tests do not replace this
+   review.
+6. Check that the ordinary example teaches the main path without
+   depending on an edge-case trace, and that added coverage uses
+   focused examples instead of one branch-heavy input.
+7. Perform a compression pass. Remove prose that merely narrates an
+   adjacent visual or repeats another required section. Preserve
+   information only when it adds a rule, reason, distinction,
+   boundary, or verification the reader does not already have.
+8. Run the validation commands below and resolve every failure before treating the update as complete.
 
 ## 13. Validation
 
@@ -266,15 +403,25 @@ Also format, compile or type-check, and exercise each changed complete
 code example in its stated environment or a temporary package. Remove
 temporary validation artifacts after the checks.
 
-The concepts-document checker is the executable structural contract for guide-specific rules. The repository line-width checker owns the physical line limit and the root-file exemptions defined in `AGENTS.md`. The concepts checker must continue to verify:
+The concepts-document checker is the executable structural contract
+for guide-specific rules. The repository line-width checker enforces
+the physical line limits defined here and in `CODING_RULES.md`. The
+concepts checker must continue to verify:
 
 - a valid heading hierarchy with no duplicate targets;
 - balanced fenced blocks;
 - all teaching entries and their eleven ordered fields;
 - the no-Markdown-table rule for teaching content;
+- complete before, decision, after, and known-correct state in every
+  numbered item that uses the trace vocabulary;
 - local paths and fragments;
 - repository links into the guide; and
 - the maintained external-source set.
+
+These automated checks establish structure, links, formatting, and
+executable consistency. They do not establish that a learner can form
+the intended mental model. The beginner and technical reading passes
+remain required.
 
 ## 14. Definition of done
 
@@ -283,7 +430,32 @@ An update to an active concept study guide is complete only when:
 - every line in the changed guide is at most 70 characters;
 - every changed teaching entry follows the eleven-part contract;
 - new terminology is explained in plain language before it is relied on;
-- ordinary and relevant boundary behavior are demonstrated with replayable traces;
+- representative state values are given concrete meaning before their
+  construction mechanics are traced;
+- indexed and mapped state declares its lookup input, stored fact, and
+  any conversion between the learner's logical quantity and the
+  implementation's storage location;
+- non-obvious rules are demonstrated on concrete state before they
+  are summarized, with actual-value diagrams for relationships that
+  are materially easier to see than describe;
+- traces use real identifiers, show complete relevant state, and
+  distinguish default or unconfirmed values from confirmed results;
+- stateful explanations use stable, aligned snapshots, keep related
+  state together, and present the active rule at the step where it
+  executes;
+- every code example exposes its non-obvious state transitions locally
+  through explicit names, control flow, or invariant-based comments;
+- ordinary and relevant boundary behavior are demonstrated with
+  replayable traces, using focused examples when one combined trace
+  would hide the main idea;
+- prose, traces, and code use matching phase boundaries and role-based
+  state names;
+- one primary mental model remains consistent across the entry, with
+  explicit mappings wherever the implementation requires a different
+  representation;
+- each required section contributes a distinct teaching function, and
+  prose does not duplicate information already clear from an adjacent
+  visual or owning section;
 - the correctness or lifecycle explanation, code, and cost analysis
   agree;
 - content ownership is clear and duplicated teaching prose has been replaced with links;

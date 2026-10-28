@@ -97,19 +97,55 @@ func TestValidateContents(t *testing.T) {
 	}
 }
 
-func TestIsExemptPath(t *testing.T) {
-	for path := range exemptPaths {
-		if !isExemptPath(path) {
-			t.Errorf("isExemptPath(%q) = false; want true", path)
-		}
+func TestValidateCodeBlockContents(t *testing.T) {
+	longLine := strings.Repeat("a", maximumLineWidth+1)
+	contents := strings.Join(
+		[]string{
+			longLine,
+			"```go",
+			longLine,
+			"```",
+		},
+		"\n",
+	)
+
+	issues := validateCodeBlockContents(
+		"README.md",
+		[]byte(contents),
+	)
+	if len(issues) != 1 {
+		t.Fatalf(
+			"validateCodeBlockContents() returned %d issues; want 1: %v",
+			len(issues),
+			issues,
+		)
 	}
-	if !isExemptPath("CONCEPTS_STANDARDS.md") {
-		t.Error("root concept standards must be exempt")
+}
+
+func TestScopeForPath(t *testing.T) {
+	testCases := []struct {
+		path      string
+		wantScope validationScope
+	}{
+		{path: "dsa/CONCEPTS.md", wantScope: validateWholeFile},
+		{path: "main.go", wantScope: validateWholeFile},
+		{path: "main.go.template", wantScope: validateWholeFile},
+		{path: "script.sh", wantScope: validateWholeFile},
+		{path: "README.md", wantScope: validateCodeBlocks},
+		{path: "data.csv", wantScope: skipFile},
 	}
-	if isExemptPath("dsa/CONCEPTS_STANDARDS.md") {
-		t.Error("old DSA concept standards path must not be exempt")
-	}
-	if isExemptPath("docs/AGENTS.md") {
-		t.Error("nested AGENTS.md must not be exempt")
+
+	for _, testCase := range testCases {
+		t.Run(testCase.path, func(t *testing.T) {
+			gotScope := scopeForPath(testCase.path)
+			if gotScope != testCase.wantScope {
+				t.Errorf(
+					"scopeForPath(%q) = %d; want %d",
+					testCase.path,
+					gotScope,
+					testCase.wantScope,
+				)
+			}
+		})
 	}
 }

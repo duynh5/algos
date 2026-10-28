@@ -261,49 +261,31 @@ Search for `9` in the sorted values `[1,3,5,7,9,11,13,15]`.
 The indexes run from `0` through `7`. Both methods should return
 `true`, but we will count how many values each method checks.
 
-1.  **Method and step: Linear check `0`**
+1.  **Method: Scan through the failed values**
     - **Before:** Eight positions could contain the target.
-    - **Decision:** `1 != 9`; advance one position.
-    - **After:** Seven unchecked positions remain.
-    - **Known correct:** Index `0` is not the answer; this method has
-      made 1 comparison.
-2.  **Method and step: Linear check `1`**
-    - **Before:** Seven unchecked positions remain.
-    - **Decision:** `3 != 9`; advance one position.
-    - **After:** Six unchecked positions remain.
-    - **Known correct:** Indexes `0` and `1` are not the answer; this
-      method has made 2 comparisons.
-3.  **Method and step: Linear check `2`**
-    - **Before:** The current value is `5`.
-    - **Decision:** `5 != 9`; advance one position.
-    - **After:** Five unchecked positions remain.
-    - **Known correct:** Indexes `0` through `2` are not the answer;
-      this method has made 3 comparisons.
-4.  **Method and step: Linear check `3`**
-    - **Before:** The current value is `7`.
-    - **Decision:** `7 != 9`; advance one position.
-    - **After:** Four unchecked positions remain.
-    - **Known correct:** Indexes `0` through `3` are not the answer;
-      this method has made 4 comparisons.
-5.  **Method and step: Linear check `4`**
-    - **Before:** The current value is `9`.
+    - **Decision:** Compare `1`, `3`, `5`, and `7` with `9` in that
+      order. Each differs, so advance after each comparison.
+    - **After:** The scan reaches index `4` after 4 comparisons.
+    - **Known correct:** Indexes `0` through `3` are not the answer.
+2.  **Method: Finish the scan**
+    - **Before:** The current value is `9` at index `4`.
     - **Decision:** Match and stop.
     - **After:** Return `true`.
     - **Known correct:** Index `4` contains the target; this method
       made 5 comparisons. A miss could require all 8.
-6.  **Method and step: Halving check `3`**
+3.  **Method: Halving check `3`**
     - **Before:** Indexes `0` through `7` are possible.
     - **Decision:** `7 < 9`; indexes `0` through `3` are too small.
     - **After:** Indexes `4` through `7` remain possible.
     - **Known correct:** No discarded index can contain `9`; this
       method has made 1 comparison.
-7.  **Method and step: Halving check `5`**
+4.  **Method: Halving check `5`**
     - **Before:** Indexes `4` through `7` remain possible.
     - **Decision:** `11 > 9`; indexes `5` through `7` are too large.
     - **After:** Only index `4` remains possible.
     - **Known correct:** No discarded index can contain `9`; this
       method has made 2 comparisons.
-8.  **Method and step: Halving check `4`**
+5.  **Method: Halving check `4`**
     - **Before:** The only possible value is at index `4`.
     - **Decision:** `9 == 9`; stop.
     - **After:** Return `true`.
@@ -1926,32 +1908,15 @@ For all primes through `limit`:
 For trial division with `value=91`, the expected smallest factor is
 `7`.
 
-1.  **Step: Try divisor `2`**
+1.  **Step: Try the divisors that fail**
     - **Before:** No divisor has been found.
-    - **Decision:** `91%2=1`, so `2` does not divide `91`.
-    - **After:** Advance to divisor `3`.
-    - **Known correct:** No divisor from `2` through `2` works.
-2.  **Step: Try divisor `3`**
-    - **Before:** Divisors below `3` have failed.
-    - **Decision:** `91%3=1`.
-    - **After:** Advance to divisor `4`.
-    - **Known correct:** No divisor from `2` through `3` works.
-3.  **Step: Try divisor `4`**
-    - **Before:** Divisors below `4` have failed.
-    - **Decision:** `91%4=3`.
-    - **After:** Advance to divisor `5`.
-    - **Known correct:** No divisor from `2` through `4` works.
-4.  **Step: Try divisor `5`**
-    - **Before:** Divisors below `5` have failed.
-    - **Decision:** `91%5=1`.
-    - **After:** Advance to divisor `6`.
-    - **Known correct:** No divisor from `2` through `5` works.
-5.  **Step: Try divisor `6`**
-    - **Before:** Divisors below `6` have failed.
-    - **Decision:** `91%6=1`.
-    - **After:** Advance to divisor `7`.
-    - **Known correct:** No divisor from `2` through `6` works.
-6.  **Step: Try divisor `7`**
+    - **Decision:** Test `2`, `3`, `4`, `5`, and `6` in order. Their
+      remainders are `1`, `1`, `3`, `1`, and `1`, so advance after
+      each test.
+    - **After:** The next candidate divisor is `7`.
+    - **Known correct:** No integer from `2` through `6` divides
+      `91`.
+2.  **Step: Try divisor `7`**
     - **Before:** Divisors below `7` have failed.
     - **Decision:** `91%7=0`, so `7` divides `91`.
     - **After:** Return `7`; its paired factor is `91/7=13`.
@@ -6292,39 +6257,24 @@ a different representation before this procedure is used.
 For `strs = ["flower", "flow", "flight"]`, the expected output is
 `"fl"`.
 
-1.  **Check: Start**
-    - **Before:** `column=0`, proven prefix `""`
-    - **Decision:** No columns have been checked.
-    - **After:** `expected='f'` from row `0`
-    - **Known correct:** Every string shares the empty prefix.
-2.  **Check: Row `1`, column `0`**
-    - **Before:** `expected='f'`
-    - **Decision:** `"flow"[0]` is `'f'`, so continue.
-    - **After:** Row advances to `2`.
-    - **Known correct:** Rows `0` and `1` match at column `0`.
-3.  **Check: Row `2`, column `0`**
-    - **Before:** `expected='f'`
-    - **Decision:** `"flight"[0]` is `'f'`; the whole column matches.
-    - **After:** `column=1`
-    - **Known correct:** Every string shares `"f"`.
-4.  **Check: Row `1`, column `1`**
-    - **Before:** `expected='l'`
-    - **Decision:** `"flow"[1]` is `'l'`, so continue.
-    - **After:** Row advances to `2`.
-    - **Known correct:** Rows `0` and `1` match at column `1`.
-5.  **Check: Row `2`, column `1`**
-    - **Before:** `expected='l'`
-    - **Decision:** `"flight"[1]` is `'l'`; the whole column matches.
-    - **After:** `column=2`
-    - **Known correct:** Every string shares `"fl"`.
-6.  **Check: Row `1`, column `2`**
-    - **Before:** `expected='o'`
-    - **Decision:** `"flow"[2]` is `'o'`, so continue.
-    - **After:** Row advances to `2`.
-    - **Known correct:** Rows `0` and `1` match at column `2`.
-7.  **Check: Row `2`, column `2`**
-    - **Before:** `expected='o'`
-    - **Decision:** `"flight"[2]` is `'i'`, a mismatch.
+1.  **Check column `0`**
+    - **Before:** `column=0`; the proven prefix is `""`; and the
+      reference byte is `'f'`.
+    - **Decision:** Compare row `1` and row `2` with `'f'`. Both
+      contain `'f'` at column `0`.
+    - **After:** Advance to `column=1`.
+    - **Known correct:** Every string shares prefix `"f"`.
+2.  **Check column `1`**
+    - **Before:** The proven prefix is `"f"`; the reference byte is
+      `'l'`.
+    - **Decision:** Both later rows contain `'l'` at column `1`.
+    - **After:** Advance to `column=2`.
+    - **Known correct:** Every string shares prefix `"fl"`.
+3.  **Find the first mismatching column**
+    - **Before:** The reference byte is `'o'`; row `1` also has
+      `'o'`, but row `2` has `'i'`.
+    - **Decision:** The mismatch prevents any shared prefix from
+      including column `2`.
     - **After:** Return `strs[0][:2]`
     - **Known correct:** No shared prefix can include column `2`;
       `"fl"` is longest.
@@ -6989,133 +6939,366 @@ comparing text already understood.
 
 ###### The idea in simple terms
 
-Search a text for an exact pattern while remembering how much of the
-pattern is still useful after a mismatch. The
-**Knuth-Morris-Pratt algorithm (KMP)** prepares that reuse information
-from the pattern before scanning the text.
+This method prepares backup answers before searching. Each answer
+says:
+
+> If this many pattern bytes matched and the next byte fails, how many
+> of those matched bytes can still be kept?
+
+For pattern `"ababac"`, imagine the answers indexed by matched count:
+
+```text
+matched count:    1   2    3     4      5       6
+matched piece:    a   ab   aba   abab   ababa   ababac
+keep on failure:  0   0    1     2      3       0
+```
+
+For example, after five bytes match, the matched piece is `"ababa"`.
+If the next byte fails, its final `"aba"` is still equal to the first
+three pattern bytes:
+
+```text
+matched piece:       a b a b a
+pattern beginning:   a b a
+useful ending:           a b a
+```
+
+So the backup answer for a matched count of `5` is `3`. The method
+keeps those three bytes instead of restarting from zero.
+
+This reuse-before-restart method is the
+**Knuth-Morris-Pratt algorithm (KMP)**.
 
 ###### How it works
 
-First decide that positions mean bytes, Unicode code points, or
-visible symbols; the example uses bytes. For a direct search, try
-every possible start and compare left to right until the pattern
-matches or one byte differs.
+This implementation compares bytes. It stores the conceptual backup
+answers in a slice named `prefixLengths`. The slice is indexed by the
+final position of the matched piece:
 
-A **prefix** begins at the pattern's first byte. A **suffix** ends at
-its last byte. A **proper prefix** is shorter than the whole piece.
-KMP first builds a table for the pattern. For each ending position,
-the table records the length of the longest proper prefix that is also
-a suffix there. During the text scan, `matched` is the number of
-starting pattern bytes that currently equal the ending bytes of the
-processed text. On a mismatch, the table shortens `matched` to the
-next possible reusable beginning without moving backward in the text.
-Decide what an empty pattern means before scanning.
+```text
+matched count:   1  2  3  4  5  6
+end position:    0  1  2  3  4  5
+prefixLengths:   0  0  1  2  3  0
+```
 
-For a rolling hash, maintain a numeric fingerprint for each
-pattern-sized text window. Equal fingerprints select candidates, but
-compare the actual bytes before returning because different windows
-can collide.
+The index is not stored inside the slice. It selects an entry. The
+selected entry contains a backup length:
+
+```text
+prefixLengths[2] = 1
+              ^    ^
+              |    backup length stored there
+              position used to select the entry
+```
+
+Read that entry as:
+
+> After the three-byte piece `"aba"` matched, keep one byte if the
+> next comparison fails.
+
+The code must convert a matched count into a zero-based end position:
+
+```text
+three matched bytes:  a  b  a
+positions:            0  1  2
+end position:         3 - 1 = 2
+```
+
+That is the only reason for subtracting one:
+
+```go
+lastMatchedIndex := matchedLength - 1
+matchedLength = prefixLengths[lastMatchedIndex]
+```
+
+Conceptually, KMP wants this answer:
+
+```text
+backupForMatchedCount[3] = 1
+```
+
+The actual slice stores the same answer by end position:
+
+```text
+prefixLengths[3 - 1] = prefixLengths[2] = 1
+```
+
+The stored number is the length of the longest ending of the matched
+piece that is also the beginning of the pattern. The formal name is a
+**proper prefix-suffix**. This entry calls it an **overlap**. The
+whole matched piece cannot count as its own backup.
+
+**Phase 1: build the backup list.**
+
+The builder fills one backup answer for every pattern position. It
+keeps two numbers:
+
+- `patternIndex` is the position whose answer is being found.
+- `overlapLength` is the backup length currently being tested.
+
+To see whether that backup grows, compare:
+
+```go
+pattern[patternIndex] == pattern[overlapLength]
+```
+
+If `overlapLength` bytes can be kept, the next byte after them is at
+position `overlapLength`. The comparison asks whether the current byte
+can extend the backup by one.
+
+- If the bytes match, grow the backup, store its length, and move
+  `patternIndex` forward.
+- If they differ and `overlapLength` is zero, leave the stored answer
+  as zero and move `patternIndex` forward.
+- If they differ and `overlapLength` is positive, use the backup
+  answer for that matched count. Retry the same `patternIndex`.
+
+For example, a backup length of `3` describes the three-byte piece
+`"aba"`. Its answer is stored at end position `3-1=2`:
+
+```go
+backupPieceEndIndex := overlapLength - 1
+overlapLength = prefixLengths[backupPieceEndIndex]
+```
+
+With `prefixLengths[2]=1`, the failed backup length changes from `3`
+to `1`. The builder then retries the same current byte.
+
+**Phase 2: search the text.**
+
+The search keeps two numbers:
+
+- `textIndex` is the next text position to inspect.
+- `matchedLength` is the number of pattern bytes currently matched.
+
+There are only three cases:
+
+- Equal bytes: advance both numbers.
+- Different bytes with nothing matched: advance `textIndex`.
+- Different bytes after a partial match: use the backup answer for
+  `matchedLength`, then retry the same text byte.
+
+A full match occurs when `matchedLength == len(pattern)`. An empty
+pattern is defined here as matching at text position `0`.
 
 ###### Step-by-step examples
 
-Search for pattern `"ababac"` in text `"abababac"`. The expected
-starting index is `2`.
+The table-building example and the searching example are separate.
+Each one has only one job.
 
-1.  **Step: Prepare the pattern table**
-    - **Before:** Pattern is `"ababac"`.
-    - **Decision:** For every ending position, record the longest
-      shorter beginning that also appears at that ending.
-    - **After:** Table is `[0,0,1,2,3,0]`.
-    - **Known correct:** After matching `"ababa"`, a mismatch can
-      retain its ending `"aba"`, whose length is `3`.
-2.  **Step: Match the first five text bytes**
-    - **Before:** `textIndex=0`, `matched=0`.
-    - **Decision:** Text `"ababa"` equals the first five pattern
-      bytes.
-    - **After:** `textIndex=5`, `matched=5`.
-    - **Known correct:** The processed text ends with the matched
-      pattern prefix `"ababa"`.
-3.  **Step: Reuse after the mismatch**
-    - **Before:** Text byte `text[5]='b'` differs from
-      `pattern[5]='c'`.
-    - **Decision:** Use table entry `3`; keep the matching ending
-      `"aba"` and do not advance `textIndex`.
-    - **After:** `textIndex=5`, `matched=3`.
-    - **Known correct:** The kept three text bytes still equal the
-      first three pattern bytes.
-4.  **Step: Finish the reused match**
-    - **Before:** Remaining text is `"bac"`; unmatched pattern part
-      is also `"bac"`.
-    - **Decision:** Match all three bytes.
-    - **After:** `textIndex=8`, `matched=6`; return `8-6=2`.
-    - **Known correct:** Six consecutive text bytes starting at index
-      `2` equal the complete pattern.
+**Example 1: build every backup answer.** Use pattern `"ababac"`.
+Its completed `prefixLengths` should be `[0,0,1,2,3,0]`.
 
-An empty pattern returns index `0`. A pattern longer than the text
-returns `-1` after the text ends.
+Here is every state while building `prefixLengths`. `i` means
+`patternIndex`, and `L` means `overlapLength`. The test column shows
+the current byte followed by the pattern byte it is compared with.
+The final column is the complete slice after that action.
 
-A hash is a compact numeric fingerprint. Maintain the fingerprint for
-the current length-`m` text window by removing the outgoing
-character's contribution and adding the incoming character's
-contribution. A decimal toy version moves from window `123` to `234`
-with `(123 - 1*100)*10 + 4 = 234`; a real string hash applies the same
-remove, shift, and add steps under its chosen base and modulus. Two
-different windows can occasionally have the same fingerprint; this is
-a **collision**. Equal hashes therefore identify candidates, not
-proof. Compare the actual bytes before reporting a match unless the
-problem explicitly accepts a collision risk.
+Go fills the slice with zeros when it is created. A zero to the right
+of `i` is still only the initial value; it has not been confirmed yet.
+
+```text
+step  i  old L  test  action                   new L  prefixLengths
+----  -  -----  ----  -----------------------  -----  -------------
+init  1  0      -     allocate zeros           0      [0,0,0,0,0,0]
+0     1  0      b/a   store 0; i++             0      [0,0,0,0,0,0]
+1     2  0      a/a   grow; store 1            1      [0,0,1,0,0,0]
+2     3  1      b/b   grow; store 2            2      [0,0,1,2,0,0]
+3     4  2      a/a   grow; store 3            3      [0,0,1,2,3,0]
+4     5  3      c/b   prefixLengths[2] -> 1    1      [0,0,1,2,3,0]
+5     5  1      c/b   prefixLengths[0] -> 0    0      [0,0,1,2,3,0]
+6     5  0      c/a   store 0; i++             0      [0,0,1,2,3,0]
+```
+
+The fallback rows use the same count-to-position conversion introduced
+above:
+
+```text
+current backup count:       3
+end position for count 3:   3 - 1 = 2
+backup answer:              prefixLengths[2] = 1
+next backup count:          1
+```
+
+1. At step `4`, `overlapLength=3`. The builder tests whether the
+   three-byte backup `"aba"` can grow through the current `'c'`:
+
+   ```text
+   current ending plus byte:  a b a | c
+   pattern start plus byte:   a b a | b
+   ```
+
+   It cannot. The backup answer for a matched count of `3` is stored
+   at position `3-1=2`. Read `prefixLengths[2]=1`, set
+   `overlapLength=1`, and keep `patternIndex=5`.
+
+2. At step `5`, retry the same `'c'` with the new backup count `1`:
+
+   ```text
+   current ending plus byte:  a | c
+   pattern start plus byte:   a | b
+   ```
+
+   That also fails. Convert matched count `1` to end position
+   `1-1=0`. Read `prefixLengths[0]=0`, set `overlapLength=0`, and
+   keep `patternIndex=5` again.
+
+3. At step `6`, no backup remains. Compare the same `'c'` with the
+   first pattern byte, `'a'`. They differ, so confirm the answer `0`
+   at position `5` and finally move forward.
+
+The slice does not change during steps `4` and `5`; only
+`overlapLength` changes. The same current byte is retried until a
+backup grows or the backup count reaches zero.
+
+**Example 2: a smaller backup succeeds.** For pattern `"aabaaab"`,
+consider position `5` with `overlapLength=2`:
+
+```text
+current byte:                  pattern[5] = 'a'
+next byte after backup 2:      pattern[2] = 'b'
+first test:                    'a' != 'b'
+backup for matched count 2:    prefixLengths[2-1] = 1
+retry against:                 pattern[1] = 'a'
+second test:                   'a' == 'a'
+stored answer at position 5:   2
+```
+
+The first backup count fails, but its backup count succeeds. The
+builder stores `2` and advances.
+
+**Example 3: use the table while searching.** Search for pattern
+`"ababac"` in text `"abababac"`. The answer should be position `2`.
+
+The pattern's table is `[0,0,1,2,3,0]`.
+
+1. The first five text bytes match `"ababa"`. The next state is
+   `textIndex=5` and `matchedLength=5`.
+
+2. At text position `5`, the text has `'b'`, but pattern position `5`
+   has `'c'`. The bytes differ:
+
+   ```text
+   text:    a b a b a | b a c
+   pattern: a b a b a | c
+   ```
+
+3. The matched count is `5`. Convert it to end position `5-1=4`,
+   then read the backup answer `prefixLengths[4]=3`. Set
+   `matchedLength=3`. This keeps the final `"aba"`:
+
+   ```text
+   text:    a b a b a | b a c
+   pattern:     a b a | b a c
+   ```
+
+   `textIndex` stays at `5`. The `'b'` has not matched yet.
+
+4. Retry that same `'b'` against pattern position `3`. The remaining
+   bytes `"bac"` now match. The scan ends with `textIndex=8` and
+   `matchedLength=6`, so the start is `8-6=2`.
+
+**Small boundary cases.** Searching text `"x"` for pattern `"a"`
+returns `-1`: no bytes matched, so the search simply advances through
+the text. An empty pattern returns `0`. A pattern longer than the text
+cannot complete and returns `-1`.
+
+A direct search is usually easier to write, but it may compare the
+same text bytes many times. A rolling hash compares fingerprints of
+pattern-sized windows; equal fingerprints still require a byte check
+because different windows can share a fingerprint.
 
 ###### Why it works
 
-A direct search checks every legal start, so it cannot miss an
-occurrence. For KMP, the first `matched` pattern bytes always equal
-the suffix of the text processed so far. Its fallback table keeps the
-longest shorter suffix that could still be a prefix, so it discards
-only alignments already disproved by the mismatch. Each step either
-advances the text position or shortens `matched`; total shortening is
-linear because `matched` can grow only when the text advances. The
-scan therefore finishes in linear time. Reaching the full pattern
-length proves an occurrence. A rolling hash remains correct only when
-an equal fingerprint is followed by the byte comparison that rules out
-a collision.
+Every backup answer is proved before it is stored. For example,
+storing `3` for the matched piece `"ababa"` means the builder directly
+confirmed this relationship:
+
+```text
+pattern beginning:  a b a
+matched ending:         a b a
+```
+
+Therefore, if the next comparison fails, keeping those three bytes is
+safe. They already equal the first three pattern bytes.
+
+When a backup count such as `3` also fails, the builder needs the
+backup answer for a three-byte matched piece. The count-to-position
+conversion selects that previously proved answer:
+
+```text
+matched count:     3
+end position:      3 - 1 = 2
+backup answer:     prefixLengths[2] = 1
+```
+
+The builder tries these proved backup counts from largest to smallest.
+It therefore discards only choices that have failed and does not skip
+a smaller choice that could work.
+
+The search uses the same answers. It returns only after every pattern
+byte has matched. Each loop pass either moves to a new byte or changes
+a positive backup count to a smaller one, so both phases finish.
 
 ###### Go example
 
 ```go
+func buildPrefixLengths(pattern string) []int {
+	prefixLengths := make([]int, len(pattern))
+	patternIndex := 1
+	overlapLength := 0
+
+	// overlapLength is the backup count being tested for the piece
+	// immediately before patternIndex.
+	for patternIndex < len(pattern) {
+		if pattern[patternIndex] == pattern[overlapLength] {
+			overlapLength++
+			prefixLengths[patternIndex] = overlapLength
+			patternIndex++
+			continue
+		}
+		if overlapLength == 0 {
+			patternIndex++
+			continue
+		}
+
+		// Convert the failed backup count to its end position. That
+		// entry contains the next backup count to try.
+		backupPieceEndIndex := overlapLength - 1
+		overlapLength = prefixLengths[backupPieceEndIndex]
+	}
+	return prefixLengths
+}
+
 func firstMatchKMP(text, pattern string) int {
 	if len(pattern) == 0 {
 		return 0
 	}
 
-	// prefixLengths[i] is the longest proper prefix of pattern that
-	// also ends at i.
-	prefixLengths := make([]int, len(pattern))
-	for current, matched := 1, 0; current < len(pattern); {
-		if pattern[current] == pattern[matched] {
-			matched++
-			prefixLengths[current] = matched
-			current++
-		} else if matched > 0 {
-			matched = prefixLengths[matched-1]
-		} else {
-			current++
-		}
-	}
+	prefixLengths := buildPrefixLengths(pattern)
+	textIndex := 0
+	matchedLength := 0
 
-	for textIndex, matched := 0, 0; textIndex < len(text); {
-		if text[textIndex] == pattern[matched] {
+	// The processed text ends with the first matchedLength bytes of
+	// the pattern. Compare the next text and pattern bytes.
+	for textIndex < len(text) {
+		if text[textIndex] == pattern[matchedLength] {
 			textIndex++
-			matched++
-			if matched == len(pattern) {
-				return textIndex - matched
+			matchedLength++
+			if matchedLength == len(pattern) {
+				return textIndex - matchedLength
 			}
-		} else if matched > 0 {
-			// Reuse the longest possible matching ending without moving
-			// backward in the text.
-			matched = prefixLengths[matched-1]
-		} else {
-			textIndex++
+			continue
 		}
+		if matchedLength == 0 {
+			textIndex++
+			continue
+		}
+
+		// Convert the matched count to its end position, read its
+		// backup count, and retry the same text byte.
+		matchedPieceEndIndex := matchedLength - 1
+		matchedLength = prefixLengths[matchedPieceEndIndex]
 	}
 	return -1
 }
@@ -7125,33 +7308,53 @@ The code compares bytes. It needs no imports.
 
 ###### Work and memory
 
-The direct method can take `O(nm)` time and `O(1)` extra memory, such
-as when many repeated characters match before the final character
-fails. KMP takes `O(n + m)` time and `O(m)` memory. A rolling hash can
-scan in `O(n)` expected time after `O(m)` setup, but correctness still
-requires the collision check described above.
+Let `n` be the number of text bytes and `m` the number of pattern
+bytes. A direct search may compare as many as `m` bytes at each text
+start, taking `O(nm)` time and `O(1)` extra memory.
+
+KMP builds the table in `O(m)` time and scans the text in `O(n)`
+time. It therefore takes `O(n + m)` total time and stores `m` table
+entries, using `O(m)` auxiliary memory.
+
+A rolling hash takes `O(m)` setup and `O(n)` hash updates. Candidate
+byte comparisons can make its worst case `O(nm)`, although expected
+time is `O(n + m)` when collisions and repeated candidates are rare.
 
 ###### When to use it
 
-The same pattern is searched inside a larger string, and a
-straightforward restart would compare the same text characters many
-times. For a short pattern or one search, that straightforward method
-may still be best.
+Use KMP when the task requires an exact substring, inputs can be
+large, and a worst-case linear guarantee matters. It is especially
+useful when repeated pattern pieces would make a direct search compare
+the same text bytes again.
 
 ###### When not to use it
 
-One short or one-off search is clearer with a direct scan or a
-standard library operation, or when the match permits edits, reordered
-characters, or another relationship that exact string matching does
-not model.
+A short or one-off search is often clearer with a direct scan or a
+standard library operation. KMP also does not model approximate
+matches, reordered characters, or other non-exact relationships.
 
 ###### Common mistakes and edge cases
 
-Define the empty-pattern result. Byte-based matching is correct for
-inputs defined as bytes or a one-byte alphabet, but it can split a
-Unicode character encoded with several bytes. KMP is valuable when its
-worst-case guarantee matters; it is not a requirement to replace a
-clear linear-library search in every interview.
+The slice stores backup lengths. Its indexes are end positions. Keep
+those two roles separate:
+
+```text
+matched count:        5
+lookup position:      5 - 1 = 4
+stored backup length: prefixLengths[4] = 3
+```
+
+Do not move past the current pattern or text byte during a fallback.
+That byte failed against one pattern position, but it may match the
+next position after the pattern is shortened.
+
+Define the empty-pattern result before scanning. This implementation
+returns position `0`.
+
+Byte-based matching is correct for byte-defined input or a one-byte
+alphabet. It can report a position inside the multi-byte encoding of
+a Unicode character when the task instead defines character or
+visible-symbol positions.
 
 ###### Related material
 
@@ -7842,29 +8045,13 @@ Sort `[4,1,3,2]`; expect `[1,2,3,4]`.
     - **Known correct:** The result is sorted and contains every input
       value exactly once.
 
-An empty or one-value input is already solved and prevents endless
-splitting.
+**Focused second example.** Calculate `2^10`; expect `1024`.
+Exponentiation by squaring reuses the same smaller power:
 
-For merge sort, each call sorts two halves, then merges them by
-repeatedly taking the smaller unread value. During the merge, the
-output built so far is sorted and contains exactly the smallest values
-already read from both halves. The running-time rule
-`T(n) = 2T(n/2) + O(n)` gives `O(n log n)` time. The reason is
-concrete: repeatedly halving `n` creates about `log n` levels, and all
-merges on one level process `n` values in total. Multiplying the
-levels by the work per level gives `O(n log n)`. Ordinary slice-based
-merging needs `O(n)` extra storage in addition to `O(log n)` recursive
-stack depth for balanced splits.
-
-Exponentiation by squaring uses the same idea without two recursive
-calls. If `n` is even, `x^n = (x^(n/2))^2`; if odd, multiply by one
-extra `x`. Repeatedly halving the exponent takes `O(log |n|)`
-multiplications. For example, `x^10 = (x^5)^2`, and
-`x^5 = x * (x^2)^2`, so the calculation reuses squared results instead
-of multiplying `x` ten times. For negative exponents, use
-`x^(-n) = 1/x^n`. Take care when converting `-n` to a positive
-magnitude: negating the most negative signed integer exceeds that
-type's positive limit.
+```text
+split:    2^10 -> (2^5)^2 -> (2 * (2^2)^2)^2
+combine:  2^1=2 -> 2^2=4 -> 2^5=32 -> 2^10=1024
+```
 
 ###### Why it works
 
@@ -7949,6 +8136,10 @@ An empty or one-value input is the base case. During merge, copy the
 remainder of either half after the other empties. When equal values
 must remain in their original relative order, called stable order,
 declare and preserve a tie rule.
+
+For a negative exponent, compute the positive magnitude and take its
+reciprocal. Negating the most negative signed integer in the same type
+overflows, so obtain its magnitude without evaluating that negation.
 
 ###### Related material
 
@@ -8272,76 +8463,43 @@ range is the longest valid one ending at the right position.
 Find the shortest positive-value range totaling at least `7` in
 `[2,3,1,2,4,3]`; expect length `2`.
 
-1.  **Add index `0`, value `2`**
-    - **Before:** Window is empty; `left=0`, `sum=0`.
-    - **Decision:** Move the right edge through index `0`.
-    - **After:** Window is `[2]`; `sum=2`.
-    - **Known correct:** The sum is below `7`, so no valid window ends
-      here.
-2.  **Add index `1`, value `3`**
-    - **Before:** Window is `[2]`; `sum=2`.
-    - **Decision:** Move the right edge through index `1`.
-    - **After:** Window is `[2,3]`; `sum=5`.
-    - **Known correct:** No valid window ends at index `1`.
-3.  **Add index `2`, value `1`**
-    - **Before:** Window is `[2,3]`; `sum=5`.
-    - **Decision:** Move the right edge through index `2`.
-    - **After:** Window is `[2,3,1]`; `sum=6`.
-    - **Known correct:** No valid window ends at index `2`.
-4.  **Add index `3`, value `2`**
-    - **Before:** `left=0`, `sum=6`.
-    - **Decision:** Add `2`. The sum becomes `8`, so record length
-      `4`.
-    - **After:** Window is `[2,3,1,2]`; `sum=8`, `best=4`.
-    - **Known correct:** This is the first valid window ending at
-      index `3`.
-5.  **Shrink once at right index `3`**
-    - **Before:** Window is valid with `left=0`, `sum=8`.
-    - **Decision:** Remove the leftmost `2` and increment `left`.
-    - **After:** Window is `[3,1,2]`; `left=1`, `sum=6`.
-    - **Known correct:** Removing another positive value cannot raise
-      the sum back to `7`.
-6.  **Add index `4`, value `4`**
-    - **Before:** Window is `[3,1,2]`; `sum=6`, `best=4`.
-    - **Decision:** Add `4`; sum `10` is valid, so compare length `4`
-      with the best length.
-    - **After:** Window is `[3,1,2,4]`; `sum=10`, `best=4`.
-    - **Known correct:** The best is the shortest valid length seen so
-      far.
-7.  **Shrink past value `3`**
-    - **Before:** `left=1`, `sum=10`.
-    - **Decision:** Remove `3` and increment `left`; sum stays valid
-      at `7`, so record the shorter length `3`.
-    - **After:** Window is `[1,2,4]`; `left=2`, `sum=7`, `best=3`.
-    - **Known correct:** Both starts `1` and `2` for this right edge
-      have now been tested.
-8.  **Shrink past value `1`**
-    - **Before:** `left=2`, `sum=7`.
-    - **Decision:** Remove `1` and increment `left`.
-    - **After:** Window is `[2,4]`; `left=3`, `sum=6`, `best=3`.
-    - **Known correct:** Further removal cannot restore validity.
-9.  **Add index `5`, value `3`**
-    - **Before:** Window is `[2,4]`; `sum=6`.
-    - **Decision:** Add `3`; sum `9` is valid, so compare length `3`
-      with the best.
-    - **After:** Window is `[2,4,3]`; `sum=9`, `best=3`.
-    - **Known correct:** Length `3` is the first valid length ending
-      at index `5`.
-10. **Shrink past value `2`**
-    - **Before:** `left=3`, `sum=9`.
-    - **Decision:** Remove `2`; sum stays valid at `7`, so record
-      length `2`.
-    - **After:** Window is `[4,3]`; `left=4`, `best=2`.
-    - **Known correct:** `[4,3]` is the shortest valid window tested
-      so far.
-11. **Shrink past value `4`**
-    - **Before:** `left=4`, `sum=7`.
-    - **Decision:** Remove `4` and increment `left`.
-    - **After:** Window is `[3]`; `sum=3`, `best=2`.
-    - **Known correct:** The scan is finished, so return `2`.
+1.  **Grow until the first valid window**
+    - **Before:** The window is empty; `left=0`, `sum=0`.
+    - **Decision:** Add values `2`, `3`, and `1`; their running sums
+      are `2`, `5`, and `6`. Add the next value `2`; sum `8` reaches
+      the target, so record length `4`.
+    - **After:** The window is `[2,3,1,2]`; `sum=8`, `best=4`.
+    - **Known correct:** No window ending before index `3` reaches
+      `7`, and a valid window ending at index `3` has been found.
+2.  **Shrink the window ending at index `3`**
+    - **Before:** `left=0`, `sum=8`, and `best=4`.
+    - **Decision:** Remove the leftmost `2`. The sum becomes `6`, so
+      stop shrinking.
+    - **After:** The window is `[3,1,2]`; `left=1`, `sum=6`.
+    - **Known correct:** Every valid start for right index `3` was
+      tested; removing another positive value cannot restore `7`.
+3.  **Add index `4` and test its possible starts**
+    - **Before:** The window is `[3,1,2]`; `sum=6`, `best=4`.
+    - **Decision:** Add `4`, giving sum `10`. Record length `4`,
+      remove `3`, record the shorter length `3` at sum `7`, then
+      remove `1`. Sum `6` is invalid, so stop shrinking.
+    - **After:** The window is `[2,4]`; `left=3`, `sum=6`, `best=3`.
+    - **Known correct:** Every valid start for right index `4` was
+      tested, and length `3` is the shortest seen so far.
+4.  **Add index `5` and finish**
+    - **Before:** The window is `[2,4]`; `sum=6`, `best=3`.
+    - **Decision:** Add `3`, giving sum `9`. Record length `3`, remove
+      `2`, and record length `2` at sum `7`. Remove `4`; sum `3` is
+      invalid, so stop.
+    - **After:** The window is `[3]`; `left=5`, `sum=3`, `best=2`.
+    - **Known correct:** Every ending position has been handled, so
+      return `2` for window `[4,3]`.
 
-Mixed negative values break this shrinking rule because removing a
-negative value can increase the sum.
+**Focused failure case.** For values `[1,-1,5]` and target `5`, the
+expected shortest length is `1`, but this positive-value method would
+record length `3`, remove `1`, see sum `4`, and stop. It would never
+remove `-1`, even though doing so raises the sum to `5`. Negative
+values therefore require another method.
 
 ###### Why it works
 
@@ -8599,6 +8757,8 @@ left to right while keeping a running total of the changes.
 Start with four zeroes and add `3` to every index from `1` through
 `3`, including both endpoints. Expect `[0,3,3,3]`.
 
+**Phase 1: record where the update starts and stops.**
+
 1.  **Create the markers**
     - **Before:** The result length is `4`.
     - **Decision:** Create five zero markers so index `4` can mark a
@@ -8606,37 +8766,29 @@ Start with four zeroes and add `3` to every index from `1` through
     - **After:** `difference=[0,0,0,0,0]`.
     - **Known correct:** Every possible start and stop position has a
       marker slot.
-2.  **Mark where `+3` starts**
-    - **Before:** The update begins at index `1`.
-    - **Decision:** Add `3` to `difference[1]`.
-    - **After:** `difference=[0,3,0,0,0]`.
-    - **Known correct:** A left-to-right running total becomes `3` at
-      index `1`.
-3.  **Mark where `+3` stops**
-    - **Before:** The update includes index `3` and stops before index
-      `4`.
-    - **Decision:** Subtract `3` at `difference[4]`.
+2.  **Record both boundaries**
+    - **Before:** The update adds `3` from index `1` through index
+      `3`.
+    - **Decision:** Add `3` at its start, `difference[1]`, and
+      subtract `3` immediately after its end, `difference[4]`.
     - **After:** `difference=[0,3,0,0,-3]`.
-    - **Known correct:** The running total remains `3` through index
-      `3` and returns to zero afterward.
-4.  **Rebuild index `0`**
-    - **Before:** `runningTotal=0`.
-    - **Decision:** Add marker `difference[0]=0`.
-    - **After:** `result[0]=0`.
-    - **Known correct:** The update has not started.
-5.  **Rebuild index `1`**
-    - **Before:** `runningTotal=0`.
-    - **Decision:** Add marker `difference[1]=3`.
-    - **After:** `runningTotal=3`, `result[1]=3`.
-    - **Known correct:** The update is active at index `1`.
-6.  **Rebuild index `2`**
-    - **Before:** `runningTotal=3`, `difference[2]=0`.
-    - **Decision:** Add the zero marker and store `3`.
-    - **After:** `result=[0,3,3]` so far.
-    - **Known correct:** The update remains active at index `2`.
-7.  **Rebuild index `3`**
-    - **Before:** `runningTotal=3`, `difference[3]=0`.
-    - **Decision:** Add the zero marker and store `3`.
+    - **Known correct:** A running total becomes `3` at index `1`,
+      stays `3` through index `3`, and returns to zero afterward.
+
+**Phase 2: rebuild the result from left to right.**
+
+3.  **Reach the update's start**
+    - **Before:** `runningTotal=0`; the result is empty.
+    - **Decision:** At index `0`, add marker `0` and store `0`. At
+      index `1`, add marker `3` and store the new total `3`.
+    - **After:** `result=[0,3]`; `runningTotal=3`.
+    - **Known correct:** The result is unchanged before index `1` and
+      includes the update at its start.
+4.  **Finish the included positions**
+    - **Before:** Markers at indexes `2` and `3` are both zero;
+      `runningTotal=3`.
+    - **Decision:** Add each zero marker and store the unchanged total
+      at each position.
     - **After:** `result=[0,3,3,3]`.
     - **Known correct:** Every included position receives `3` once.
 
@@ -8996,32 +9148,20 @@ start exactly when the previous meeting ends.
     - **Known correct:** The new meeting starts after the previous one
       ends.
 
-To prove the rule for every input, let `E` be the compatible meeting
-with the earliest end and let `F` be
-the first meeting in any optimal remaining schedule. Because
-`E.end <= F.end`, every meeting that can follow `F` can also follow
-`E`. Replacing `F` with `E` preserves both validity and the number of
-meetings. After choosing `E`, the remaining meetings form the same
-kind of scheduling problem, so the argument repeats.
-
-For a counterexample, coin values `[1, 3, 4]` and target `6` do not
-support "take the largest coin." Choosing `4` requires two more coins,
-while choosing `3` requires only one. The local choice worsens the
-future, so it cannot be made permanent.
-
-Boyer-Moore majority vote keeps a candidate and a balance. Equal
-values add to the balance; different values cancel. A value occupying
-more than half the input cannot be completely canceled and must be the
-final candidate. Without a guaranteed majority, make a second pass to
-verify it; the first pass produces only a candidate.
+**Focused failure case.** For coin values `[1,3,4]` and target `6`,
+"take the largest coin" chooses `4+1+1`, using three coins. The
+expected best result is `3+3`, using two. The apparently largest
+choice blocks the better combination, so that rule is unsafe.
 
 ###### Why it works
 
-After every choice, some optimal complete answer is still reachable,
-and the remaining work obeys the same rule. A successful trace on one
-input is not enough; the exchange, stays-ahead, or cut argument must
-justify every permanent discard. The scan then examines one meeting
-per iteration, so it finishes after the finite sorted list ends.
+Let `E` be the compatible meeting with the earliest end and `F` be
+the first meeting in any optimal remaining schedule. Because
+`E.end <= F.end`, every meeting that can follow `F` can also follow
+`E`. Replacing `F` with `E` preserves validity and the number of
+meetings. The remaining meetings form the same smaller problem, so
+the replacement argument repeats. The scan examines one finite input
+meeting per iteration and therefore finishes.
 
 ###### Go example
 
@@ -9065,6 +9205,10 @@ choices, and one available choice appears to leave every useful future
 option intact. Scheduling, selecting items, and connecting components
 often have this form. The optimization goal alone is not evidence that
 greedy works.
+
+Boyer-Moore majority vote is another permanent-choice scan. When the
+input does not promise a majority, verify its candidate in a second
+pass before returning it.
 
 ###### When not to use it
 
@@ -9846,28 +9990,44 @@ func dijkstraDense(graph [][]weightedEdge, start int) []int {
 	for range graph {
 		// Among unfinished vertices, choose the smallest tentative
 		// distance.
-		vertex := -1
+		selectedVertex := -1
 		for candidateVertex := range graph {
-			if !finalized[candidateVertex] &&
-				(vertex < 0 ||
-					distanceByVertex[candidateVertex] <
-						distanceByVertex[vertex]) {
-				vertex = candidateVertex
+			if finalized[candidateVertex] {
+				continue
+			}
+			// The -1 sentinel means no unfinished candidate has been
+			// selected. Store the first one before comparing distances.
+			if selectedVertex < 0 {
+				selectedVertex = candidateVertex
+				continue
+			}
+			candidateDistance :=
+				distanceByVertex[candidateVertex]
+			selectedDistance :=
+				distanceByVertex[selectedVertex]
+			if candidateDistance < selectedDistance {
+				selectedVertex = candidateVertex
 			}
 		}
-		if vertex < 0 || distanceByVertex[vertex] == infinity {
-			// Every reachable vertex is done; the rest cannot be reached from
-			// start.
+		if selectedVertex < 0 {
+			// Every vertex has already been finalized.
 			break
 		}
-		finalized[vertex] = true
-		for _, edge := range graph[vertex] {
-			// Relax the edge only when addition is safe and the path improves
-			// the destination. Correctness requires every edge cost to be
-			// nonnegative.
-			if distanceByVertex[vertex] <= infinity-edge.cost &&
-				distanceByVertex[vertex]+edge.cost < distanceByVertex[edge.to] {
-				distanceByVertex[edge.to] = distanceByVertex[vertex] + edge.cost
+		if distanceByVertex[selectedVertex] == infinity {
+			// Unfinished vertices remain, but none is reachable.
+			break
+		}
+		finalized[selectedVertex] = true
+		for _, edge := range graph[selectedVertex] {
+			// Prove the route addition is safe before evaluating it.
+			if distanceByVertex[selectedVertex] > infinity-edge.cost {
+				continue
+			}
+			candidateDistance :=
+				distanceByVertex[selectedVertex] + edge.cost
+			if candidateDistance < distanceByVertex[edge.to] {
+				// Keep the cheaper complete route to this destination.
+				distanceByVertex[edge.to] = candidateDistance
 			}
 		}
 	}
@@ -9876,9 +10036,9 @@ func dijkstraDense(graph [][]weightedEdge, start int) []int {
 ```
 
 This complete fragment requires `import "math"`, a valid start and
-endpoints, non-negative costs, and route sums that fit in `int`. Its
-dense scan is `O(V^2+E)`. A heap changes selection to the
-`O((V+E) log V)` form analyzed below.
+endpoints, non-negative costs, and every reachable route cost to be
+less than `math.MaxInt`. Its dense scan is `O(V^2+E)`. A heap changes
+selection to the `O((V+E) log V)` form analyzed below.
 
 ###### Work and memory
 
@@ -10372,35 +10532,22 @@ For `A-B=1`, `B-C=2`, and `A-C=5`, expect total cost `3`.
     - **Known correct:** Any additional edge would create a loop and
       cannot be part of a tree on these vertices.
 
-If fewer than `V-1` edges can be accepted, the graph is disconnected
-and has only a minimum spanning forest.
-
-Why is the next accepted edge safe? Consider one group containing an
-endpoint of that edge and all vertices outside the group. Any final
-connected tree must use some edge across that split. Every cheaper
-edge was already examined; if one could cross the split, it would
-already have joined the groups. The current edge is therefore a
-cheapest available crossing edge. Replacing another answer's crossing
-edge with this one cannot raise total cost. This reasoning is the
-**cut property**.
-
-Prim begins from any vertex and keeps the cheapest connections leaving
-the connected part in a min-heap. It repeatedly takes the cheapest
-connection that reaches a new vertex. In the same office example,
-starting at `A` adds
-`A-B = 1` and `A-C = 5` to the heap. Taking `A-B` adds `B-C = 2`;
-taking `B-C` next connects `C` for the same total cost `3`, so the
-unused `A-C` entry is skipped. With adjacency lists and a binary heap,
-this takes `O(E log V)` time. Ignore stale heap entries whose
-destination has already been added.
+**Focused failure case.** With only `A-B=1` and isolated vertex `C`,
+the scan accepts one edge, fewer than `V-1=2`. The expected result is
+failure plus the forest edge `A-B`, not a spanning tree.
 
 ###### Why it works
 
 Kruskal never creates a loop because it rejects a connection whose
-ends are already in the same group. The cut-property argument above
-shows that each accepted connection can belong to a minimum-cost tree.
-Each acceptance also joins two groups, so `V - 1` accepted edges leave
-one connected tree. If the scan cannot reach that count, some vertices
+ends are already in the same group. For an accepted edge, separate
+one endpoint's current group from every vertex outside it. Any final
+tree needs an edge across that split. Every cheaper edge was examined
+already; a usable one would have joined the groups. The accepted edge
+is therefore a cheapest crossing edge and can replace another tree's
+crossing edge without raising cost. This is the **cut property**.
+
+Each acceptance joins two groups, so `V - 1` accepted edges leave one
+connected tree. If the scan cannot reach that count, some vertices
 cannot be connected to the others.
 
 ###### Go example
@@ -11413,64 +11560,38 @@ the end marker after the last character.
 Insert `car` and `cat`; expect prefix `ca` to exist but full word `ca`
 not to exist.
 
-1.  **Insert byte `c` from `car`**
-    - **Before:** Root has no children.
-    - **Decision:** Create a `c` child and move to it.
-    - **After:** Path from root spells `c`.
-    - **Known correct:** The stored path equals the processed byte.
-2.  **Insert byte `a` from `car`**
-    - **Before:** Current path spells `c`.
-    - **Decision:** Create an `a` child and move to it.
-    - **After:** Path from root spells `ca`.
-    - **Known correct:** The path equals the first two input bytes.
-3.  **Insert byte `r` from `car`**
-    - **Before:** Current path spells `ca`.
-    - **Decision:** Create and follow child `r`, then mark its node as
-      a word end because the input word is finished.
-    - **After:** Path spells `car` and its last node is marked.
+1.  **Insert `car`**
+    - **Before:** The root has no children.
+    - **Decision:** Create and follow children `c`, `a`, and `r` in
+      order, then mark the `r` node as a word end.
+    - **After:** The path from the root spells `car`.
     - **Known correct:** Exact lookup for `car` can follow every byte
-      and find the end marker.
-4.  **Reuse `c` while inserting `cat`**
-    - **Before:** Root already has a `c` child.
-    - **Decision:** Follow that existing child instead of creating
-      one.
-    - **After:** Current path spells `c`; no node was added.
-    - **Known correct:** Both words share the same stored beginning.
-5.  **Reuse `a` while inserting `cat`**
-    - **Before:** The `c` node already has an `a` child.
-    - **Decision:** Follow that existing child.
-    - **After:** Current path spells `ca`; no node was added.
-    - **Known correct:** The complete shared beginning was reused.
-6.  **Add `t` to finish `cat`**
-    - **Before:** Current path spells `ca`, with existing child `r`.
-    - **Decision:** Create child `t` and mark its node as a word end.
-    - **After:** Complete paths for `car` and `cat` exist.
-    - **Known correct:** Their shared `ca` nodes were reused, while
-      their final bytes have separate children.
-7.  **Query prefix `ca`**
+      and find its end marker.
+2.  **Insert `cat` by reusing its beginning**
+    - **Before:** The path `root -> c -> a` already exists.
+    - **Decision:** Follow the existing `c` and `a` children. Create
+      child `t` beside `r`, then mark `t` as a word end.
+    - **After:** The stored shape is:
+
+      ```text
+      root -> c -> a -> r (word)
+                    `-> t (word)
+      ```
+
+    - **Known correct:** Both words share `ca`; their final bytes use
+      separate marked nodes.
+3.  **Query prefix `ca`**
     - **Before:** Start at the root.
     - **Decision:** Follow child `c`, then child `a`; do not require a
       word-end marker for a prefix query.
     - **After:** Prefix lookup returns `true`.
     - **Known correct:** At least one stored word begins with `ca`.
-8.  **Query whole word `ca`**
+4.  **Query whole word `ca`**
     - **Before:** The same path reaches the `a` node.
     - **Decision:** Require that node's word-end marker.
     - **After:** Whole-word lookup returns `false`.
     - **Known correct:** `ca` is only a beginning, not an inserted
       complete word.
-
-Empty-string insertion is represented by the root end marker if empty
-strings are allowed. A wildcard may branch to many children and lose
-linear lookup time.
-
-Use a fixed child array for a small fixed alphabet and a map for a
-sparse or large alphabet. A wildcard search branches over every
-existing child at that position, so its worst case can be exponential
-in the number of wildcards even though ordinary exact lookup is
-`O(word length)`. During a board search, carry the trie node reached
-by the current path so a prefix missing from the trie can stop that
-branch immediately.
 
 ###### Why it works
 
@@ -13949,6 +14070,8 @@ before it is overwritten.
 Build and reverse `values=[10,20,30]`; the expected final slice is
 `[30,20,10]`.
 
+**Phase 1: build the list.**
+
 1.  **Step: Create the temporary start**
     - **Before:** `dummy.Next=nil`, `tail=dummy`.
     - **Decision:** Use `dummy` as a construction-only node before the
@@ -13956,59 +14079,45 @@ Build and reverse `values=[10,20,30]`; the expected final slice is
     - **After:** The real list is empty; `tail` names where to append.
     - **Known correct:** Empty and nonempty input can use the same
       append operation.
-2.  **Step: Append value 10**
+2.  **Step: Append all three values**
     - **Before:** `tail=dummy`, `dummy.Next=nil`.
-    - **Decision:** Create node 10 after `tail`, then move `tail` to
-      node 10.
-    - **After:** `dummy -> 10 -> nil`; `tail=10`.
-    - **Known correct:** The list contains exactly the first input
-      value.
-3.  **Step: Append value 20**
-    - **Before:** `tail=10`.
-    - **Decision:** Create node 20 after node 10, then move `tail`.
-    - **After:** `dummy -> 10 -> 20 -> nil`; `tail=20`.
-    - **Known correct:** The first two input values remain in order.
-4.  **Step: Append value 30**
-    - **Before:** `tail=20`.
-    - **Decision:** Create node 30 after node 20, then move `tail`.
+    - **Decision:** Create node `10` after `tail` and move `tail` to
+      it. Repeat the same append operation for `20`, then `30`.
     - **After:** `dummy -> 10 -> 20 -> 30 -> nil`; return node 10.
     - **Known correct:** Returning `dummy.Next` excludes the temporary
       node and preserves all input values in order.
-5.  **Step: Reverse node 10**
+
+**Phase 2: reverse the links.**
+
+3.  **Step: Reverse node 10**
     - **Before:** `previous=nil`, `current=10 -> 20`, `next` not yet
       saved.
     - **Decision:** Save node 20, then set `10.Next=nil`.
     - **After:** `previous=10 -> nil`, `current=20 -> 30`.
     - **Known correct:** Node 10 forms the complete reversed prefix,
       and node 20 still reaches every unprocessed node.
-6.  **Step: Reverse node 20**
+4.  **Step: Reverse node 20**
     - **Before:** `previous=10`, `current=20`, `next=30` after saving.
     - **Decision:** Set `20.Next=10` and advance.
     - **After:** `previous=20 -> 10`, `current=30`.
     - **Known correct:** The first two original nodes are reversed
       without losing node 30.
-7.  **Step: Reverse node 30**
+5.  **Step: Reverse node 30**
     - **Before:** `previous=20 -> 10`, `current=30`.
     - **Decision:** Save `nil`, point 30 to 20, and advance to `nil`.
     - **After:** Return `previous=30 -> 20 -> 10` as the new head.
     - **Known correct:** Every original node appears once in reverse
       order.
-8.  **Step: Convert node 30**
-    - **Before:** Output slice is empty; current node is 30.
-    - **Decision:** Append 30 and follow `Next` to node 20.
-    - **After:** Output is `[30]`.
-    - **Known correct:** It contains the first reversed-list value.
-9.  **Step: Convert node 20**
-    - **Before:** Output is `[30]`; current node is 20.
-    - **Decision:** Append 20 and follow `Next` to node 10.
-    - **After:** Output is `[30,20]`.
-    - **Known correct:** It contains the first two list values in
-      encounter order.
-10. **Step: Convert node 10**
-    - **Before:** Output is `[30,20]`; current node is 10.
-    - **Decision:** Append 10 and follow `Next` to `nil`.
+
+**Phase 3: convert the result for inspection.**
+
+6.  **Step: Follow the reversed links**
+    - **Before:** Output is empty; the current node is 30.
+    - **Decision:** Append `30`, `20`, and `10` while following each
+      `Next` link. Stop when the next node is `nil`.
     - **After:** Return `[30,20,10]`.
-    - **Known correct:** Every reversed-list node was visited once.
+    - **Known correct:** Every reversed-list node was visited once and
+      appears in encounter order.
 
 For an empty `values=[]`, `FromSlice` returns `nil`, `Reverse(nil)`
 returns `nil`, and `ToSlice(nil)` returns an empty slice without

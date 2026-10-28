@@ -114,6 +114,46 @@ func TestValidateTeachingEntriesRejectsWrongExampleHeading(
 	}
 }
 
+func TestValidateTraceItemsRequiresCompleteState(t *testing.T) {
+	prose := []byte(strings.Join([]string{
+		"### Step-by-step examples",
+		"",
+		"1. **Before:** state is empty.",
+		"2. **Decision:** insert one item.",
+		"3. **After:** state has one item.",
+		"4. **Known correct:** one item exists.",
+		"",
+		"### Why it works",
+	}, "\n"))
+
+	issues := validateTraceItems("guide.md", prose)
+	if len(issues) != 4 {
+		t.Fatalf("trace issues = %v; want four incomplete items", issues)
+	}
+	if !strings.Contains(issues[0], "Decision") ||
+		!strings.Contains(issues[0], "After") ||
+		!strings.Contains(issues[0], "Known correct") {
+		t.Fatalf("first trace issue = %q; want missing labels", issues[0])
+	}
+}
+
+func TestValidateTraceItemsAcceptsReplayableStep(t *testing.T) {
+	prose := []byte(strings.Join([]string{
+		"### Step-by-step examples",
+		"",
+		"1. **Before:** state is empty. **Decision:** insert one item.",
+		"   **After:** state has one item.",
+		"   **Known correct:** one item exists.",
+		"",
+		"### Why it works",
+	}, "\n"))
+
+	issues := validateTraceItems("guide.md", prose)
+	if len(issues) != 0 {
+		t.Fatalf("validateTraceItems() issues = %v", issues)
+	}
+}
+
 func TestCollectTargetsRecognizesMultilineAnchor(t *testing.T) {
 	const legacyAnchor = "e4-distinguish-missing-keys-from-stored-" +
 		"values-" +

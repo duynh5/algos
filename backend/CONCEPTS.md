@@ -709,12 +709,27 @@ immutable values and pointer receivers for mutation or costly copies.
 
 ### Step-by-step examples
 
-1. **Before:** `Product{Tags: ["tea", "sale"]}` owns one slice array.
-2.  **Decision:** `Clone` allocates a new array before copying the
-   tags.
-3. **After:** a caller tag change does not alter the clone.
-4. **Known correct:** both products retain the intended two-tag shape,
-  and their first elements can differ without a hidden write.
+Input: clone `Product{Tags: ["tea", "sale"]}`, then change the
+source's first tag to `"coffee"`. Expected output: the source tags
+become `["coffee", "sale"]`, while the clone stays
+`["tea", "sale"]`.
+
+```text
+before Clone:  product.Tags -> array A [tea, sale]
+after Clone:   product.Tags -> array A [tea, sale]
+               clone.Tags   -> array B [tea, sale]
+after change:  product.Tags -> array A [coffee, sale]
+               clone.Tags   -> array B [tea, sale]
+```
+
+1. **Before:** Only `product.Tags` points to array A. **Decision:**
+   `Clone` allocates array B and copies both strings. **After:** The
+   two slices contain equal values but point to different arrays.
+   **Known correct:** No mutable array crosses the ownership boundary.
+2. **Before:** The source and clone own arrays A and B. **Decision:**
+   Change `product.Tags[0]` in array A. **After:** Only the source
+   reads `"coffee"`. **Known correct:** The clone cannot observe the
+   source's later mutation.
 
 ### Why it works
 
@@ -735,6 +750,8 @@ type Product struct {
 
 func Clone(product Product) Product {
 	clone := product
+	// Starting from nil copies the tags into storage independent of
+	// product.Tags, so later mutations cannot cross the boundary.
 	clone.Tags = append([]string(nil), product.Tags...)
 	return clone
 }
@@ -810,11 +827,22 @@ small stable condition set; typed errors suit structured details.
 
 ### Step-by-step examples
 
-1. **Before:** neither a product result nor cancellation is ready.
-2. **Decision:** the request context becomes ready first in `select`.
-3. **After:** it returns `context.Canceled` and stops waiting.
-4. **Known correct:** no result was consumed, no child timer remains,
-  and the caller can still identify cancellation with `errors.Is`.
+Input: `Await` receives a blocked result channel and a context that is
+then canceled. Expected output: an error that
+`errors.Is(err, context.Canceled)` recognizes.
+
+1. **Before:** Neither `results` nor `ctx.Done()` is ready.
+   **Decision:** `Await` remains inside `select`. **After:** No branch
+   runs and no value is consumed. **Known correct:** Waiting has not
+   invented a result or lost cancellation.
+2. **Before:** `results` is still blocked. **Decision:** Cancel the
+   context, making `ctx.Done()` ready. **After:** The cancellation
+   branch wraps `ctx.Err()` and returns. **Known correct:** The result
+   channel was not read and the caller can classify the cause.
+3. **Before:** The caller owns the wrapped error. **Decision:** Check
+   it with `errors.Is`. **After:** The check reports
+   `context.Canceled`. **Known correct:** Added operation context did
+   not erase the original error identity.
 
 ### Why it works
 
@@ -919,12 +947,22 @@ targeted fuzzing cover different defect classes.
 
 ### Step-by-step examples
 
-1. **Before:** `TEA-001` is absent; goroutines A and B are ready.
-2. **Decision:** A locks, checks, inserts, and unlocks while B waits.
-3. **After:** B locks, observes the stored SKU, and returns duplicate.
-4.  **Known correct:** one call succeeds, one fails, and the map has
-   one
-  product regardless of which goroutine acquired the lock first.
+Input: goroutines A and B call `Create("TEA-001")` at the same time.
+Expected output: one call succeeds, one returns `ErrDuplicate`, and
+the map contains one product.
+
+1. **Before:** `products={}` and the mutex is free. **Decision:** A
+   acquires the mutex; B waits. **After:** A alone may perform the
+   check and insert. **Known correct:** B cannot observe the empty map
+   and write concurrently.
+2. **Before:** A owns the mutex and `products={}`. **Decision:** A
+   finds no SKU, stores `TEA-001`, and unlocks. **After:**
+   `products={TEA-001}` and A returns success. **Known correct:** One
+   successful creation now owns the only map entry.
+3. **Before:** B acquires the mutex with the stored SKU visible.
+   **Decision:** B reports `ErrDuplicate` without writing. **After:**
+   The map still has one product. **Known correct:** Reversing which
+   goroutine acquires the mutex changes the winner, not the outcome.
 
 ### Why it works
 
@@ -1033,12 +1071,22 @@ reading HTTP, SQL, or framework code.
 
 ### Step-by-step examples
 
-1. **Before:** order `O-42` is placed for customer `C-17`.
-2. **Decision:** a cancel command checks ownership and current state.
-3. **After:** the order becomes canceled and emits `OrderCanceled`.
-4.  **Known correct:** another customer is rejected, and a shipped
-   order
-  cannot move backward to canceled.
+Input: order `O-42` is `placed` and owned by `C-17`. First `C-99`,
+then `C-17`, asks to cancel it. Expected output: `C-99` is rejected
+without a state change; `C-17` changes the order to `canceled`.
+
+1. **Before:** `status=placed`, `owner=C-17`, and actor `C-99` sends
+   `Cancel`. **Decision:** Compare actor and owner before changing
+   state. **After:** Return `ErrCannotCancel`; status stays `placed`.
+   **Known correct:** Knowing an order ID did not grant authority.
+2. **Before:** The same order is still `placed`; actor is now `C-17`.
+   **Decision:** Ownership and the allowed source state both match.
+   **After:** Set status to `canceled` and record `OrderCanceled`.
+   **Known correct:** One legal command produced one legal transition.
+3. **Before:** The order is `canceled`. **Decision:** Reject another
+   cancel because `placed` is required. **After:** State remains
+   `canceled`. **Known correct:** A terminal state cannot move
+   backward or emit the event twice.
 
 ### Why it works
 
@@ -1152,12 +1200,25 @@ cost.
 
 ### Step-by-step examples
 
-1. **Before:** an HTTP body requests placement of order `O-42`.
-2. **Decision:** the handler validates shape and calls `PlaceOrder`.
-3. **After:** the use case applies policy and asks storage to persist.
-4. **Known correct:** invalid input never calls storage, and the same
-  use
-  case can be invoked by a job without importing HTTP types.
+Input: one HTTP request contains order `O-42` with quantity `0`; a
+second contains quantity `2`. Expected output: the invalid request
+returns `ErrInvalidQuantity` without storage; the valid request calls
+`Save` once with a domain `Order`.
+
+1. **Before:** The handler has untrusted JSON for quantity `0`.
+   **Decision:** Decode it into a command and call `Place`. **After:**
+   The use case rejects the command before `Save`. **Known correct:**
+   Transport parsing did not bypass business policy.
+2. **Before:** The next command has `ID=O-42` and `Quantity=2`.
+   **Decision:** The use case validates the quantity and calls its
+   `Store` interface. **After:** The concrete store receives one
+   domain value. **Known correct:** HTTP and persistence details do
+   not enter the policy.
+3. **Before:** A scheduled job owns the same typed command.
+   **Decision:** Call the same use case without an HTTP handler.
+   **After:** Validation and storage behavior are unchanged.
+   **Known correct:** The business operation keeps one owner across
+   adapters.
 
 ### Why it works
 
@@ -1295,12 +1356,19 @@ Expected output: one order response or one stable documented error.
 Failure example: a second JSON value after the first is rejected
 rather than silently ignored.
 
-Process trace: before a termination signal, readiness is true and
-requests may enter. The signal makes readiness false and begins a
-bounded server shutdown. After handlers drain or the deadline expires,
-owned dependencies close. The process is known correct when no new
-request was admitted during the drain and listener failure reached the
-supervising goroutine.
+Focused shutdown example: input is a termination signal while request
+`R1` is running. Expected output: no new request is admitted, `R1`
+drains within the deadline, and owned dependencies close.
+
+1. **Before:** Readiness is true and `R1` is active. **Decision:** On
+   the signal, set readiness false before shutdown starts.
+   **After:** Load balancers stop sending new requests.
+   **Known correct:** The
+   draining set cannot grow through normal admission.
+2. **Before:** `R1` is still active and the shutdown deadline remains.
+   **Decision:** Wait for `R1` rather than closing its dependencies.
+   **After:** `R1` finishes and the server closes owned resources.
+   **Known correct:** Accepted work finished within bounded shutdown.
 
 ### Why it works
 
@@ -1323,17 +1391,23 @@ import (
 	"net/http"
 )
 
+// Bound decoder input before it can allocate from the request body.
+// The limit is one mebibyte.
+const maximumBodyBytes int64 = 1_048_576
+
 func Decode(
 	w http.ResponseWriter,
 	r *http.Request,
 	destination any,
 ) error {
-	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+	r.Body = http.MaxBytesReader(w, r.Body, maximumBodyBytes)
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(destination); err != nil {
 		return err
 	}
+	// A second decode must reach EOF. Any value means the body contains
+	// trailing JSON that the first decode would otherwise ignore.
 	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
 		return errors.New("body must contain one JSON value")
 	}
@@ -1415,14 +1489,21 @@ for the old and new application during rollout.
 
 ### Step-by-step examples
 
-1. **Before:** SKU `TEA-001` is absent and an insert is parameterized.
-2. **Decision:** PostgreSQL checks `NOT NULL` and unique SKU
-  constraints.
-3. **After:** one row exists, or the duplicate maps to a stable
-  conflict.
-4.  **Known correct:** malformed data cannot bypass the same
-   constraints
-  through another process, and values never become SQL syntax.
+Input: processes A and B concurrently insert
+`(sku="TEA-001", name="Tea")`. Expected output: one insert commits,
+one returns the stable duplicate conflict, and one row exists.
+
+1. **Before:** No `TEA-001` row exists; both statements bind the SKU
+   as data. **Decision:** PostgreSQL evaluates both inserts against
+   the same unique constraint. **After:** One statement claims the
+   unique value while the other waits or conflicts. **Known correct:**
+   Application timing cannot create two committed copies.
+2. **Before:** A row with `TEA-001` is committed. **Decision:** Map
+   the losing constraint error to the documented conflict.
+   **After:** The table contains one valid row and the caller gets a
+   stable outcome.
+   **Known correct:** The SKU never became SQL syntax and every writer
+   faced the same integrity rule.
 
 ### Why it works
 
@@ -1534,18 +1615,18 @@ resource.
 
 ### Step-by-step examples
 
-Input: inventory `1`; requests A and B each reserve `1`. Expected
-output: one success, one insufficient-inventory result, final stock
-`0`.
+Input: inventory `1`; requests A and B each reserve `1`.
+Expected output: one success, one insufficient result, and final
+stock `0`.
 
 1. **Before:** Stock is `1` and neither request owns it. **Decision:**
    A performs an atomic decrement conditioned on stock at least `1`.
-   **After:** A changes stock to `0` and owns the reservation. **Known
-   correct:** Stock has never been negative.
+   **After:** A changes stock to `0` and owns the reservation.
+   **Known correct:** Stock has never been negative.
 2. **Before:** B evaluates the same condition against current stock
    `0`. **Decision:** Its conditional update affects no row.
-   **After:** B returns the expected business conflict. **Known
-   correct:** No second reservation exists.
+   **After:** B returns the expected business conflict.
+   **Known correct:** No second reservation exists.
 3. **Before:** A writes its order and commits. **Decision:** Publish
    success only after commit. **After:** Order and inventory become
    visible together. **Known correct:** The database contains no
@@ -1667,12 +1748,19 @@ protection where browser ambient authority applies.
 
 ### Step-by-step examples
 
-1. **Before:** user `U-7` requests order `O-42`, owned by `U-9`.
-2. **Decision:** the use case compares the principal with resource
-  owner.
-3. **After:** it returns a stable forbidden result without mutation.
-4. **Known correct:** changing the URL identifier never grants access,
-  and logs contain identifiers rather than credentials or raw tokens.
+Input: authenticated user `U-7` requests `DELETE /orders/O-42`; the
+order is owned by `U-9`. Expected output: a stable forbidden result,
+no order mutation, and no token value in logs.
+
+1. **Before:** The route contains `O-42` and the verified principal is
+   `U-7`. **Decision:** Load the order and compare its owner with the
+   principal inside the use case. **After:** The comparison is
+   `U-9 != U-7`. **Known correct:** An order ID is not permission.
+2. **Before:** Authorization has failed and the order is unchanged.
+   **Decision:** Return the stable forbidden outcome and log only the
+   request, actor, and order identifiers. **After:** No delete reaches
+   storage and no credential is recorded. **Known correct:** The
+   response and telemetry preserve both access control and secrecy.
 
 ### Why it works
 
@@ -1757,15 +1845,25 @@ assertions.
 
 ### Step-by-step examples
 
-1.  **Before:** two reservation workers are blocked on one start
-   signal.
-2. **Decision:** the test releases both, waits for both, and sorts
-  results.
-3. **After:** exactly one succeeds and final inventory is zero.
-4. **Known correct:** no sleep or scheduler guess affects the
-  assertion;
-  a deliberately injected storage error also leaves inventory
-  unchanged.
+Input: inventory is `1`; two workers each call `Reserve(1)` after one
+start signal. Expected output: one success, one insufficient result,
+and final inventory `0`, independent of scheduling.
+
+1. **Before:** Both workers are blocked on `start`; inventory is `1`.
+   **Decision:** Close `start` once so both calls become eligible.
+   **After:** The workers contend through production synchronization.
+   **Known correct:** No sleep guesses when either worker begins.
+2. **Before:** One worker owns the reservation transition and the
+   other waits. **Decision:** Join both workers and collect both
+   outcomes. **After:** No assertion runs while work is unfinished.
+   **Known correct:** The test observes the complete result.
+3. **Before:** Outcomes may arrive in either order. **Decision:** Sort
+   them before comparison. **After:** Assert one success, one
+   insufficient result, and inventory `0`. **Known correct:** The
+   assertion depends on behavior, not scheduler order.
+
+Failure example: inject storage failure before commit. The expected
+output is two failure outcomes and unchanged inventory `1`.
 
 ### Why it works
 
@@ -1856,14 +1954,22 @@ profiles only on authenticated, restricted interfaces.
 
 ### Step-by-step examples
 
-1. **Before:** request `R-8` enters while database latency rises.
-2.  **Decision:** the handler span records the query child and
-   deadline.
-3. **After:** the request returns unavailable and increments one
-  counter.
-4. **Known correct:** logs, metric, and trace share `R-8`; no body,
-  token,
-  or unbounded customer value became a metric label.
+Input: request `R-8` reaches a database call whose 100 ms deadline
+expires. Expected output: an unavailable response, one bounded outcome
+metric, and correlated log and trace records without private data.
+
+1. **Before:** `R-8` has a request span and the database attempt has
+   not started. **Decision:** Create a child span with dependency name
+   and deadline. **After:** The trace shows which wait belongs to the
+   request. **Known correct:** Causal context crosses the boundary.
+2. **Before:** The database exceeds 100 ms. **Decision:** Classify the
+   deadline as dependency unavailability. **After:** Return the stable
+   unavailable response and increment one low-cardinality counter.
+   **Known correct:** Error text did not become a metric label.
+3. **Before:** The request has finished. **Decision:** Emit one event
+   with `R-8`, outcome, and duration. **After:** Log, metric, and
+   trace agree on the failure. **Known correct:** No private value
+   entered telemetry.
 
 ### Why it works
 
@@ -1950,13 +2056,22 @@ objectives, then prove them with restore exercises.
 
 ### Step-by-step examples
 
-1.  **Before:** version B serves 5% of traffic beside healthy version
-   A.
-2. **Decision:** B exceeds the error threshold during the observation
-  window.
-3. **After:** admission to B stops and traffic returns to A.
-4. **Known correct:** the schema remains backward compatible, the same
-  artifact was tested, and the rollback condition is recorded.
+Input: immutable version B receives 5% of traffic with a 1% error-rate
+stop threshold; B reaches 3%. Expected output: rollout stops and all
+traffic returns to healthy version A.
+
+1. **Before:** A serves 95%, B serves 5%, and both read the expanded
+   schema. **Decision:** Observe B for the defined window. **After:**
+   B's measured error rate is 3%. **Known correct:** The comparison
+   uses the stated canary cohort and threshold.
+2. **Before:** B exceeds the 1% stop threshold. **Decision:** Stop new
+   admission to B and route traffic to A. **After:** A serves 100%.
+   **Known correct:** The rollback did not require a rebuild or an
+   incompatible schema reversal.
+3. **Before:** User success has recovered. **Decision:** Record the
+   threshold breach and preserve B's evidence. **After:** The rollout
+   remains stopped for diagnosis. **Known correct:** Recovery was
+   verified rather than inferred from ending the deployment.
 
 ### Why it works
 
@@ -2039,14 +2154,22 @@ conflict. Retention must exceed the documented retry window.
 
 ### Step-by-step examples
 
-1. **Before:** key `K1` has no record and create-order begins.
-2. **Decision:** the transaction claims `K1`, creates `O-42`, and
-  commits.
-3.  **After:** the response is lost; a retry finds the completed
-   record.
-4. **Known correct:** the retry returns `O-42`, while changed input
-  with
-  `K1` is rejected and no second order exists.
+Input: create-order command `{item: "tea", quantity: 1}` uses key
+`K1`; its first response is lost and the client retries.
+Expected output: both attempts return `O-42`; one order exists.
+
+1. **Before:** `K1` is absent. **Decision:** In one transaction, bind
+   `K1` to the command hash, create `O-42`, store its response, and
+   commit. **After:** The order and completed key record are durable.
+   **Known correct:** The semantic effect and replay information
+   cannot commit separately.
+2. **Before:** The client saw a timeout, but the completed record
+   exists. **Decision:** Retry with `K1` and the same command.
+   **After:** Return stored order `O-42` without creating an order.
+   **Known correct:** Ambiguous delivery did not duplicate the effect.
+3. **Before:** `K1` is bound to the original hash. **Decision:** Try
+   `{item: "tea", quantity: 2}` with `K1`. **After:** Return a key
+   conflict. **Known correct:** One key cannot name two writes.
 
 ### Why it works
 
@@ -2132,14 +2255,22 @@ scope.
 
 ### Step-by-step examples
 
-1. **Before:** ten worker slots are full and the bounded queue holds
-  twenty.
-2. **Decision:** a new request is rejected with a retryable overload
-  result.
-3. **After:** no extra goroutine or queue node is created.
-4. **Known correct:** admitted work keeps its latency budget and
-  retries cannot
-  create more offered load than the configured retry budget.
+Input: all 10 worker slots and all 20 queue positions are occupied
+when request `R31` arrives. Expected output: `R31` receives the
+documented retryable overload result without allocating queued work.
+
+1. **Before:** `workers=10/10`, `queue=20/20`, and `R31` is not
+   admitted. **Decision:** Check capacity before creating a goroutine
+   or queue node. **After:** The admission check reports full.
+   **Known correct:** The configured bounds still hold.
+2. **Before:** Capacity is still full. **Decision:** Return the
+   overload result with the bounded retry policy. **After:**
+   `workers=10/10` and `queue=20/20`; `R31` owns no server work.
+   **Known correct:** Rejection preserved headroom for admitted work.
+
+Failure example: if every rejected client retries immediately, offered
+load grows. The retry response therefore includes delay and attempt
+bounds rather than inviting an immediate loop.
 
 ### Why it works
 
@@ -2225,14 +2356,22 @@ time recovery to a stated objective.
 
 ### Step-by-step examples
 
-1. **Before:** transaction A locks account 1; B locks account 2.
-2. **Decision:** both operations instead sort identifiers before
-  locking.
-3.  **After:** one waits for account 1 rather than forming a lock
-   cycle.
-4. **Known correct:** balances remain atomic; an injected deadlock
-  retries the
-  complete idempotent transaction within a bounded attempt count.
+Input: transaction A transfers from account 1 to 2 while B transfers
+from 2 to 1. Expected output: both lock accounts in order `1,2`, so
+one waits instead of forming a deadlock cycle.
+
+1. **Before:** Neither transaction owns a lock. **Decision:** Each
+   sorts its account IDs as `[1,2]`. **After:** Both first request the
+   lock for account 1. **Known correct:** Opposite transfer direction
+   no longer creates opposite lock order.
+2. **Before:** A owns account 1; B waits for account 1.
+   **Decision:** A locks account 2, applies both changes, and commits.
+   **After:** A releases both locks. **Known correct:** No transaction
+   held account 2 while waiting for account 1.
+3. **Before:** B can now lock accounts 1 and 2. **Decision:** Re-read
+   the current balances and run its whole transaction. **After:** B
+   commits or returns a business conflict. **Known correct:** Waiting
+   did not permit a stale partial retry.
 
 ### Why it works
 
@@ -2320,12 +2459,23 @@ semantic run.
 
 ### Step-by-step examples
 
-1. **Before:** job `J7` is ready with no valid lease.
-2. **Decision:** worker A atomically leases it until time `T`.
-3. **After:** A crashes; after `T`, worker B claims and completes it.
-4.  **Known correct:** the effect key prevents duplication, attempts
-   are
-  bounded, and a permanent failure reaches the dead-letter state.
+Input: job `J7` has effect key `E7`, lease duration 30 seconds, and a
+three-attempt limit. Worker A crashes after producing the effect but
+before completion. Expected output: worker B completes `J7` after
+lease expiry without producing `E7` twice.
+
+1. **Before:** `J7` is ready with no lease. **Decision:** A atomically
+   claims attempt 1 until `T+30s`. **After:** Only A may complete.
+   **Known correct:** One current owner is recorded.
+2. **Before:** A has stored effect `E7` but has not marked the job
+   complete. **Decision:** A crashes; no worker may claim before
+   `T+30s`. **After:** The expired lease makes `J7` ready again.
+   **Known correct:** A crash delayed progress but did not lose work.
+3. **Before:** B owns attempt 2 and finds `E7` already stored.
+   **Decision:** Treat the effect as complete and finalize `J7` under
+   B's lease. **After:** The job is complete with one effect.
+   **Known correct:** Lease recovery and effect idempotency cover
+   separate failure risks.
 
 ### Why it works
 
@@ -2411,13 +2561,22 @@ when per-aggregate order matters, and evolve payloads additively.
 
 ### Step-by-step examples
 
-1. **Before:** order `O-42` and outbox event `E9` are uncommitted.
-2. **Decision:** one transaction commits both; the relay publishes
-  `E9` twice.
-3. **After:** the consumer's unique inbox key applies the effect once.
-4. **Known correct:** no committed order lacks an event, rollback
-  publishes
-  nothing, and duplicate delivery cannot duplicate consumer state.
+Input: placing order `O-42` creates outbox event `E9`; the relay
+delivers `E9` twice. Expected output: the order commits with its event
+and the consumer applies one semantic effect.
+
+1. **Before:** Neither `O-42` nor `E9` is committed. **Decision:**
+   Insert both in one database transaction. **After:** Both become
+   visible together. **Known correct:** A committed order has a
+   durable event.
+2. **Before:** `E9` is unpublished. **Decision:** The relay publishes
+   it, then crashes before recording progress. **After:** The broker
+   may deliver `E9` again. **Known correct:** The system exposes the
+   duplicate instead of pretending the first delivery was certain.
+3. **Before:** The consumer has already stored inbox key `E9` and its
+   effect. **Decision:** A second delivery attempts the same unique
+   key. **After:** The transaction performs no second effect.
+   **Known correct:** At-least-once delivery produced one result.
 
 ### Why it works
 
@@ -2505,13 +2664,21 @@ rule, version check, or explicit conflict workflow.
 
 ### Step-by-step examples
 
-1. **Before:** worker A holds fencing token 7 and pauses past lease
-  expiry.
-2. **Decision:** worker B obtains token 8 and writes; A later resumes.
-3. **After:** storage rejects A's stale token 7 write.
-4. **Known correct:** the newest lease owns the resource even if old
-  work is
-  still running, and a timeout never proves that A stopped.
+Input: worker A holds lease token `7`, pauses past expiry, and resumes
+after worker B obtains token `8`. Expected output: storage accepts B's
+write and rejects A's later write.
+
+1. **Before:** Storage's latest accepted token is `7`; A is paused.
+   **Decision:** Expire A's lease and issue the next monotonic token
+   `8` to B. **After:** B is the current owner. **Known correct:**
+   Reassignment did not assume A had stopped running.
+2. **Before:** B writes with token `8`. **Decision:** Storage compares
+   `8 >= 7` and accepts the mutation. **After:** Its latest token is
+   `8`. **Known correct:** The current owner advanced the state.
+3. **Before:** A resumes with token `7`. **Decision:** Storage sees
+   `7 < 8` and rejects the mutation. **After:** B's value remains.
+   **Known correct:** A stale process cannot regain authority merely
+   by continuing to run.
 
 ### Why it works
 
@@ -2596,15 +2763,25 @@ the old path only after rollback and reconciliation are proved.
 
 ### Step-by-step examples
 
-1. **Before:** billing code owns invoice writes behind an internal
-  interface.
-2. **Decision:** a facade records old and candidate results during
-  shadowing.
-3. **After:** verified traffic moves to the billing service by
-  percentage.
-4. **Known correct:** one writer owns each invoice, mismatches are
-  measured,
-  and the route can return to the monolith without losing writes.
+Input: the monolith owns invoice `I-42`; a candidate billing service
+must reproduce its read result before receiving writes.
+Expected output: mismatches block cutover; verified traffic moves in
+stages while exactly one system owns each write.
+
+1. **Before:** The monolith owns all invoice writes. **Decision:**
+   Send shadow reads through a facade to both paths, but return only
+   the monolith result. **After:** Differences are
+   recorded without creating two writers. **Known correct:** Shadowing
+   cannot mutate production ownership.
+2. **Before:** A mismatch for `I-42` is visible. **Decision:** Keep
+   routing at zero percent and correct the candidate. **After:** The
+   same request produces matching results.
+   **Known correct:** Evidence controls cutover.
+3. **Before:** Verification passes and the facade owns routing.
+   **Decision:** Move a bounded cohort to the service with one writer
+   selected per invoice. **After:** Traffic can expand or return to
+   the monolith. **Known correct:** Every stage retains single-write
+   ownership and a tested reversal.
 
 ### Why it works
 
@@ -2685,14 +2862,30 @@ propagate identity plus trace context through a trusted boundary.
 
 ### Step-by-step examples
 
-1. **Before:** the caller has 800 ms; local work reserves 200 ms.
-2. **Decision:** the dependency receives a 500 ms deadline and one
-  safe retry.
-3. **After:** the first transient failure backs off; the second call
-  succeeds.
-4. **Known correct:** total work remains within 800 ms, and a
-  permanent error
-  or exhausted budget is returned without another attempt.
+Input: the caller has 800 ms remaining. Local response work reserves
+200 ms; dependency calls and backoff may use at most 500 ms.
+Expected output: one safe retry succeeds within the caller deadline.
+
+```text
+caller budget:       800 ms
+local reserve:      -200 ms
+dependency budget:  -500 ms
+safety margin:       100 ms
+```
+
+1. **Before:** The dependency budget is 500 ms. **Decision:** Attempt
+   1 fails after 150 ms, then back off for 50 ms. **After:**
+   300 ms remains for dependency work. **Known correct:** The retry
+   has not borrowed the local reserve.
+2. **Before:** 300 ms remains and the operation is idempotent.
+   **Decision:** Start the one allowed retry with that smaller
+   deadline. **After:** Attempt 2 succeeds in 180 ms.
+   **Known correct:**
+   Dependency work used 380 ms, within its 500 ms budget.
+3. **Before:** 420 ms remains on the caller deadline. **Decision:**
+   Finish local response work. **After:** The call completes within
+   800 ms. **Known correct:** A third attempt cannot consume the
+   reserved completion time.
 
 ### Why it works
 
@@ -2774,15 +2967,27 @@ duplicate messages.
 
 ### Step-by-step examples
 
-1. **Before:** order `O-42` is pending payment and workflow state is
-  `pay`.
-2. **Decision:** payment succeeds, but inventory reservation is
-  rejected.
-3. **After:** the workflow requests a refund and ends `canceled` after
-  reply.
-4. **Known correct:** each step effect is deduplicated, pending is
-  observable,
-  and an exhausted compensation becomes an operator-owned repair item.
+Input: workflow `W42` starts in `pay`; payment succeeds, inventory
+reservation fails, and refund succeeds. Expected output: durable state
+moves through compensation to `canceled`, with one charge and refund.
+
+```text
+state:  pay -> reserve -> refund -> canceled
+effect:       charge     refund
+```
+
+1. **Before:** `W42.state=pay` and no charge exists. **Decision:**
+   Commit the payment effect key and next state `reserve`. **After:**
+   One charge exists and inventory work is durable. **Known correct:**
+   A crash can replay without charging twice.
+2. **Before:** `W42.state=reserve` and inventory is unavailable.
+   **Decision:** Record rejection and commit next state `refund`.
+   **After:** The order remains visibly pending compensation.
+   **Known correct:** Partial success was not shown as complete.
+3. **Before:** `W42.state=refund` and the charge exists. **Decision:**
+   Apply the idempotent refund and store `canceled`. **After:** One
+   refund exists and the workflow is terminal. **Known correct:** Each
+   external effect has matching durable workflow state.
 
 ### Why it works
 
@@ -2866,14 +3071,23 @@ rollback.
 
 ### Step-by-step examples
 
-1. **Before:** consumers read event v1 without `currency`.
-2. **Decision:** the producer adds optional `currency` and still emits
-  v1 data.
-3. **After:** old consumers ignore it; new consumers default missing
-  values.
-4. **Known correct:** both version combinations pass contracts, and
-  removal is
-  blocked until telemetry shows no old consumer traffic.
+Input: old producer P1 emits `{amount: 500}`; new producer P2 may emit
+`{amount: 500, currency: "USD"}`. Old consumer C1 ignores unknown
+fields; new consumer C2 defaults missing currency to `"USD"`.
+Expected output: all four producer-consumer pairs remain valid.
+
+1. **Before:** P1 and C1 use only `amount`. **Decision:** Add optional
+   `currency` to P2 without changing `amount`. **After:** C1 reads P2
+   by ignoring the new field. **Known correct:** The old consumer's
+   interpretation is unchanged.
+2. **Before:** C2 receives P1 data with no currency. **Decision:** Use
+   the documented `"USD"` default. **After:** C2 produces the same
+   value as it would for P2's explicit field. **Known correct:** The
+   new consumer remains compatible with the old producer.
+3. **Before:** All four contract cases pass, but C1 still has traffic.
+   **Decision:** Keep the optional field and default. **After:** No
+   removal occurs until usage reaches zero. **Known correct:** Safe
+   deletion depends on observed consumers, not release age.
 
 ### Why it works
 
@@ -2961,14 +3175,22 @@ guardrail breach, restore, and record evidence plus follow-up work.
 
 ### Step-by-step examples
 
-1. **Before:** checkout success is 99.95% and one canary worker is
-  selected.
-2. **Decision:** add 200 ms payment latency with a 99.5% abort
-  guardrail.
-3. **After:** deadlines shed work; success stays above the guardrail.
-4. **Known correct:** linked traces show the delayed attempt, rollback
-  removes
-  injection, and the service returns to the measured steady state.
+Input: checkout baseline success is 99.95%. Add 200 ms payment latency
+to one canary worker with a 99.5% abort guardrail. Expected output:
+the experiment either stays above 99.5% or restores baseline.
+
+1. **Before:** Baseline is measured and only the named canary is in
+   scope. **Decision:** Enable the 200 ms delay. **After:** Linked
+   traces identify delayed payment attempts. **Known correct:** The
+   blast radius matches the approved target.
+2. **Before:** Success falls to 99.4%. **Decision:** The automated
+   guardrail disables injection. **After:** No new attempt receives
+   added latency. **Known correct:** The experiment stopped on the
+   stated user-visible threshold.
+3. **Before:** Injection is off. **Decision:** Observe checkout until
+   success returns to its baseline range. **After:** Recovery evidence
+   and traces are stored. **Known correct:** Ending the fault was not
+   mistaken for proving restoration.
 
 ### Why it works
 
@@ -3061,14 +3283,21 @@ logs.
 
 ### Step-by-step examples
 
-1. **Before:** tenant A and B both request product key `P1`.
-2. **Decision:** cache lookup uses `(tenant, product)` and misses only
-  for A.
-3. **After:** A loads and caches its row; B cannot observe A's value.
-4. **Known correct:** database policy repeats the tenant predicate,
-  invalidation
-  names the same compound key, and a hot key cannot create unbounded
-  fills.
+Input: tenants A and B both request product `P1`; only A's value is
+cached. Expected output: A receives A's product, B misses and loads
+B's product, and neither tenant can observe the other's value.
+
+1. **Before:** Cache contains `(A,P1) -> "A tea"`. **Decision:** A
+   looks up the full compound key. **After:** A receives `"A tea"`.
+   **Known correct:** The cached tenant matches the principal.
+2. **Before:** B requests `P1`; `(B,P1)` is absent. **Decision:** Do
+   not fall back to a product-only key; query storage with tenant B.
+   **After:** B loads `"B tea"` and caches it under `(B,P1)`.
+   **Known correct:** A's cache entry was never eligible for B.
+3. **Before:** Both compound entries exist. **Decision:** Invalidate
+   only `(A,P1)` after A changes its product. **After:** B's entry
+   remains valid. **Known correct:** Lookup, storage, and invalidation
+   use the same ownership dimension.
 
 ### Why it works
 
@@ -3159,14 +3388,23 @@ privileged data or secret action.
 
 ### Step-by-step examples
 
-1. **Before:** signing key version 3 serves traffic and version 4 is
-  published.
-2. **Decision:** new artifacts use v4 while verification accepts v3
-  and v4.
-3. **After:** old artifacts age out; v3 is revoked and removed.
-4. **Known correct:** no unsigned gap occurred, access was audited,
-  and a
-  rollback window existed before destructive retirement.
+Input: key v3 signs existing artifacts; key v4 is ready for rotation.
+Artifacts remain valid for 24 hours. Expected output: new artifacts
+use v4, old v3 artifacts verify during overlap, then v3 is retired.
+
+1. **Before:** Signing and verification both use v3. **Decision:**
+   Publish v4 to verifiers without changing the signing key.
+   **After:** Verifiers accept v3 and v4. **Known correct:** Adding
+   trust did not
+   invalidate existing artifacts.
+2. **Before:** Both keys verify. **Decision:** Switch new signatures
+   to v4 while retaining v3 verification for 24 hours. **After:** New
+   artifacts use v4; old artifacts still work. **Known correct:** The
+   rotation has a usable rollback window.
+3. **Before:** No valid v3 artifact remains. **Decision:** Revoke v3
+   and verify that v3 signatures fail. **After:** Only v4 is trusted.
+   **Known correct:** Retirement happened after measured expiry, not
+   immediately after publishing the new key.
 
 ### Why it works
 
@@ -3258,15 +3496,22 @@ data.
 
 ### Step-by-step examples
 
-1.  **Before:** order worker identity may read queue Q but not bucket
-   B.
-2. **Decision:** it requests one message from Q with a short-lived
-  credential.
-3. **After:** queue access succeeds; an attempted bucket read is
-  denied.
-4. **Known correct:** policy names the workload, action, and resource;
-  no static
-  secret exists in the image, environment file, or repository.
+Input: workload identity `order-worker` requests `Receive` on queue Q
+and `Read` on bucket B using a short-lived credential.
+Expected output: queue access succeeds and bucket access is denied.
+
+1. **Before:** The workload has no embedded cloud key. **Decision:**
+   Exchange its deployment identity for a short-lived credential.
+   **After:** The credential names `order-worker` and its expiry.
+   **Known correct:** No static secret is stored.
+2. **Before:** Policy allows `Receive` on Q. **Decision:** Authorize
+   the queue request against workload, action, and resource.
+   **After:** One message is returned. **Known correct:** The action
+   matches the declared need.
+3. **Before:** The same identity requests `Read` on B. **Decision:**
+   No policy statement matches that action and resource. **After:**
+   Access is denied and audited. **Known correct:** Successful queue
+   access did not imply broad cloud permission.
 
 ### Why it works
 
@@ -3355,15 +3600,26 @@ length alone.
 
 ### Step-by-step examples
 
-1. **Before:** a worker pod holds job `J7` and receives termination.
-2. **Decision:** readiness fails, no new lease is claimed, and `J7` is
-  finished
-  or released before grace expiry.
-3. **After:** the scheduler replaces the pod and the job remains
-  recoverable.
-4. **Known correct:** no acknowledgement precedes durable completion,
-  and the
-  rollout maintains the minimum available capacity.
+Input: worker pod P1 holds job `J7` when it receives termination with
+a 30-second grace period. Expected output: P1 admits no new work and
+either completes or releases `J7` before exit.
+
+1. **Before:** P1 is ready, owns `J7`, and has 30 seconds remaining.
+   **Decision:** Mark readiness false before beginning drain.
+   **After:** The scheduler stops routing new work to P1.
+   **Known correct:** The
+   draining workload cannot grow through normal admission.
+2. **Before:** P1 is unready and still owns `J7`. **Decision:** Finish
+   its durable effect and acknowledge it before the grace deadline.
+   **After:** `J7` is complete and P1 may exit. **Known correct:** The
+   acknowledgement follows durable completion.
+3. **Before:** Replacement pod P2 becomes ready. **Decision:** Count
+   it toward rollout capacity only after its startup checks pass.
+   **After:** The scheduler restores the desired replica count.
+   **Known correct:** Replacement and drain preserve minimum capacity.
+
+Failure example: if `J7` cannot finish in time, P1 releases or lets
+its lease expire; it does not acknowledge unfinished work.
 
 ### Why it works
 
@@ -3453,15 +3709,22 @@ egress, telemetry, and idle headroom.
 
 ### Step-by-step examples
 
-1. **Before:** checkout has consumed 40% of its monthly error budget
-  in one hour.
-2. **Decision:** the fast burn alert pages; rollout stops and traffic
-  reverts.
-3. **After:** success recovers, stakeholders receive status, and
-  evidence is kept.
-4. **Known correct:** the alert maps to the SLO, mitigation has an
-  owner, and
-  follow-up tests the condition rather than assigning personal blame.
+Input: checkout consumes 40% of its monthly error budget in one hour
+during a rollout. Expected output: the fast-burn alert pages, rollout
+stops, traffic reverts, and recovery is verified against the SLO.
+
+1. **Before:** The release is active and the one-hour burn reaches
+   40%. **Decision:** Page the on-call owner using the fast-burn rule.
+   **After:** One incident and commander own mitigation.
+   **Known correct:** The page represents user-visible budget use.
+2. **Before:** The release is the leading correlated change.
+   **Decision:** Stop rollout and route traffic to the last healthy
+   version. **After:** New exposure ends. **Known correct:** The
+   rollback follows a documented mitigation.
+3. **Before:** Traffic has reverted. **Decision:** Observe success and
+   latency until they return to the SLO range. **After:** Recovery,
+   timeline, and evidence are recorded. **Known correct:** Follow-up
+   starts from measured conditions rather than personal blame.
 
 ### Why it works
 
@@ -3553,15 +3816,25 @@ deadlines, rate limits, contract tests, and explicit outage behavior.
 
 ### Step-by-step examples
 
-1. **Before:** signed webhook `E9` is unseen and its timestamp is
-  current.
-2. **Decision:** verify raw bytes, claim `E9`, and enqueue durable
-  processing.
-3. **After:** return success; a repeated `E9` returns the same
-  acceptance.
-4. **Known correct:** altered bytes or stale timestamps are rejected,
-  duplicate
-  delivery has one effect, and reconciliation can find a missed event.
+Input: a current, correctly signed webhook `E9` arrives twice with the
+same raw bytes. Expected output: both deliveries receive the same
+acceptance and one durable processing job exists.
+
+1. **Before:** `E9` is unseen and only raw request bytes are trusted
+   for signature input. **Decision:** Check timestamp and signature
+   before parsing. **After:** The authentic payload may be decoded.
+   **Known correct:** Parsing did not change the bytes being verified.
+2. **Before:** No durable record exists for `E9`. **Decision:** Claim
+   its unique ID and enqueue work in one durable transaction.
+   **After:** Return the documented acceptance.
+   **Known correct:** Acknowledgement follows durable ownership.
+3. **Before:** The second delivery has the same valid ID and payload.
+   **Decision:** Read the existing claim instead of enqueueing again.
+   **After:** Return the same acceptance with one job still present.
+   **Known correct:** Repeated transport produced one semantic effect.
+
+Failure example: altered bytes or a stale timestamp are rejected
+before any event identity is claimed.
 
 ### Why it works
 
@@ -3651,15 +3924,22 @@ separate compatibility changes from behavior changes.
 
 ### Step-by-step examples
 
-1. **Before:** legacy pricing returns result `P`; no reliable unit
-  tests exist.
-2. **Decision:** record boundary cases, place a facade, and shadow new
-  pricing.
-3. **After:** mismatches are classified; matching traffic shifts
-  gradually.
-4. **Known correct:** the old path remains available, data checks
-  agree, and
-  removal waits through the defined rollback window.
+Input: legacy pricing returns `$12` for product `P1`; the first
+candidate returns `$13`. Expected output: comparison blocks cutover
+until both return `$12`, then a bounded cohort moves behind a facade.
+
+1. **Before:** Only legacy pricing serves users. **Decision:** Record
+   `$12` and other boundary outcomes as characterization cases.
+   **After:** The current observable contract is executable.
+   **Known correct:** Replacement starts from observed behavior.
+2. **Before:** The facade returns legacy `$12` and shadows candidate
+   `$13`. **Decision:** Record and classify the mismatch without
+   routing users to the candidate. **After:** Cutover remains at zero.
+   **Known correct:** Comparison cannot silently change production.
+3. **Before:** The corrected candidate returns `$12` across the cases.
+   **Decision:** Route a small cohort through the facade. **After:**
+   Matching traffic can expand or revert. **Known correct:** The old
+   path remains until the defined operational window passes.
 
 ### Why it works
 
@@ -3680,11 +3960,10 @@ tenant.
 
 ### Work and memory
 
-Shadowing duplicates selected work. Backfill and comparison are `O(n)`
-in
-records and require rate limits. Temporary adapters and dual paths
-increase
-code and operational load, so each needs an owner and removal
+Shadowing duplicates selected work. Backfill and comparison visit all
+`n` records and require rate limits, so they take `O(n)` work.
+Temporary adapters and dual paths increase code and operational load,
+so each needs an owner and removal
 condition.
 
 ### When to use it
@@ -3750,16 +4029,26 @@ and remaining work.
 
 ### Step-by-step examples
 
-1. **Before:** checkout timeout rate is 2%; cause and ownership are
-  uncertain.
-2. **Decision:** the proposal chooses one bounded queue after
-  comparing query
-  optimization and capacity, with latency and cost guardrails.
-3. **After:** a canary meets the guardrails and expands by staged
-  milestones.
-4. **Known correct:** the decision log captures rejected options, each
-  risk has
-  an owner, and rollback triggers before a user-visible budget breach.
+Input: checkout timeout rate is 2%. Candidates are query
+optimization, more capacity, or one bounded queue. Expected output:
+a reviewed choice with guardrails, stages, and rollback ownership.
+
+1. **Before:** The symptom is measured but its cause is unconfirmed.
+   **Decision:** Profile queries, saturation, and queue wait before
+   selecting an option. **After:** Evidence shows burst admission is
+   the limiting condition. **Known correct:** The proposal separates
+   evidence from assumptions.
+2. **Before:** Three options and their costs are visible.
+   **Decision:** Choose the bounded queue with latency, capacity, and
+   cost limits;
+   record why the other options do not fit. **After:** Each risk and
+   rollback trigger has an owner. **Known correct:** Reviewers can
+   challenge a real tradeoff rather than a predetermined answer.
+3. **Before:** A canary receives the first bounded cohort.
+   **Decision:** Expand only while timeout and queue-wait guardrails
+   hold. **After:** The rollout reaches its next milestone or reverts.
+   **Known correct:**
+   Delivery state follows evidence defined before launch.
 
 ### Why it works
 
@@ -3850,16 +4139,24 @@ against both implementations.
 
 ### Step-by-step examples
 
-1. **Before:** Go cancellation ends a database call through request
-  context.
-2. **Decision:** the target uses an owned cancellation token
-  propagated to its
-  database driver, not an unobserved task timeout.
-3. **After:** both versions return the same canceled contract and
-  release work.
-4. **Known correct:** conformance tests match outcomes, resource
-  lifetime, and
-  deadline behavior despite different language syntax.
+Input: a database call would take 2 seconds, but its request is
+canceled after 100 ms.
+Expected output: in both languages, the call stops, returns the same
+canceled outcome, and releases work.
+
+1. **Before:** Go passes request context into the database driver.
+   **Decision:** Cancel at 100 ms. **After:** The driver stops and the
+   operation returns its stable canceled result. **Known correct:**
+   The conformance case records outcome and resource lifetime.
+2. **Before:** The target implementation has an owned cancellation
+   token. **Decision:** Pass it into the target driver and cancel at
+   100 ms. **After:** The driver returns the mapped canceled result.
+   **Known correct:** A timer did not merely stop the caller from
+   observing still-running work.
+3. **Before:** Both executions have ended. **Decision:** Compare
+   result, deadline behavior, and released resources. **After:** The
+   conformance test passes. **Known correct:** Equivalent semantics,
+   not similar syntax, define the successful port.
 
 ### Why it works
 

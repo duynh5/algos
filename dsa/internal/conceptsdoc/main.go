@@ -41,6 +41,9 @@ var (
 		`^[ \t]*\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-` +
 			`{3,}:?[ \t]*)+\|?[ \t]*$`,
 	)
+	traceItemPattern = regexp.MustCompile(
+		`^[ \t]*[0-9]+\.[ \t]+`,
+	)
 )
 
 var conceptGuideSpecs = []conceptGuideSpec{
@@ -144,6 +147,10 @@ func main() {
 		issues = append(
 			issues,
 			validateNoTables(spec.path, guide.prose)...,
+		)
+		issues = append(
+			issues,
+			validateTraceItems(spec.path, guide.prose)...,
 		)
 		linkIssues, linkTotals, guideExternalLinks :=
 			validateDocumentLinks(guide)

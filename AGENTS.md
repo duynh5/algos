@@ -10,14 +10,6 @@ The shared teaching contract in `CONCEPTS_STANDARDS.md` applies to every active 
 
 Before creating or modifying code, read and follow [`CODING_RULES.md`](CODING_RULES.md). It applies to all agent-generated source code, tests, scripts, scaffolding, and code examples in documentation. The workflows below add task-specific rules.
 
-## Physical Line Width
-
-- Keep every physical line in repository text files at no more than 70 Unicode characters.
-- Apply the limit to source, tests, scripts, templates, configuration, Markdown, comments, embedded documentation, and generated scaffolding.
-- The only exempt files are `AGENTS.md`, `CODING_RULES.md`, `CONCEPTS_STANDARDS.md`, `REFERENCE_LINKS.md`, and `VALIDATION.md`.
-- There are no content-specific exceptions in other files. Long URLs, paths, identifiers, and serialized values must be represented without creating a physical line over 70 characters.
-- Run `go run ./internal/linewidth` after modifying repository text files.
-
 ## Non-Negotiable Safety Rules
 
 - Preserve user work. Do not replace a non-template workbench problem until it has been archived or the user explicitly says to discard it.

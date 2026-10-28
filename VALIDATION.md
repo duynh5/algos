@@ -15,7 +15,10 @@ The validation commands have separate responsibilities:
 - `go run ./internal/codeexamples` checks every embedded Go block with
   `gofmt`, checks TypeScript and TSX formatting with Prettier, and
   type-checks each TypeScript example in isolation.
-- `go run ./internal/linewidth` validates the project-wide 70-character physical line limit. Only the five files named in `AGENTS.md` are exempt.
+- `go run ./internal/linewidth` validates the 70-character physical
+  line limit for code, embedded documentation code, and the three
+  active concept guides. Ordinary repository prose is outside its
+  scope.
 - `./dsa/internal/test-problem-workflow.sh` tests archiving, resetting, filename checks, focused problem runs, and bulk completed-problem runs in a temporary repository copy. It does not modify the active workbench.
 
 The usual full validation sequence is:
