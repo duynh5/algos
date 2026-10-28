@@ -13,7 +13,7 @@ func TestConceptGuideSpecsCoverEveryActiveGuide(t *testing.T) {
 		"frontend/CONCEPTS.md",
 		"backend/CONCEPTS.md",
 	}
-	wantedEntries := []int{93, 8, 32}
+	wantedEntries := []int{93, 13, 32}
 	if len(conceptGuideSpecs) != len(wantedPaths) {
 		t.Fatalf(
 			"concept guide count = %d; want %d",

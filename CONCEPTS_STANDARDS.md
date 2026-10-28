@@ -123,6 +123,8 @@ it must not omit a required heading.
      understood first.
 3. **Step-by-step examples**
    - Give at least one small, ordinary example of the complete method.
+   - Make the condition that justifies choosing the concept visible in
+     the example workload, not only in the surrounding explanation.
    - Add a boundary, duplicate, failure, or adversarial example whenever it changes behavior or exposes a common mistake.
 4. **Why it works**
    - Use simple language and as much space as the reasoning needs.
@@ -212,6 +214,17 @@ instead of rephrasing it in every section.
 - When an optimized method exists to avoid visible wasted work, first
   show the baseline method performing that waste once. Let the
   optimization answer a problem the learner has already seen.
+- Match the example workload to the selection claim. If an entry is
+  useful because operations are many, repeated, overlapping,
+  interleaved, concurrent, or failure-prone, its examples must contain
+  enough of that condition to make the distinction observable. One
+  operation that a simpler method handles just as directly demonstrates
+  mechanics, not why the concept should be selected.
+- After the examples, a learner must be able to explain why the simpler
+  alternative repeats work, loses required state, violates a contract,
+  or fails on the exact demonstrated input. If the ordinary trace does
+  not establish that distinction, add a focused comparison or a second
+  example rather than relying on an abstract complexity claim.
 - Let the concrete example or diagram carry the explanation. Use
   prose to label what the learner should notice instead of restating
   the same relationship abstractly.
@@ -392,6 +405,9 @@ After editing:
 6. Check that the ordinary example teaches the main path without
    depending on an edge-case trace, and that added coverage uses
    focused examples instead of one branch-heavy input.
+   Compare the example workload with `The problem it solves` and
+   `When to use it`; verify that the input actually exhibits the
+   condition used to justify selecting the concept.
 7. Perform a density pass. Remove filler and prose that merely narrates
    an adjacent visual or repeats another required section. Preserve
    every rule, reason, distinction, boundary, and verification the
@@ -471,6 +487,9 @@ An update to an active concept study guide is complete only when:
 - ordinary and relevant boundary behavior are demonstrated with
   replayable traces, using focused examples when one combined trace
   would hide the main idea;
+- each example workload exhibits the repeated work, overlap,
+  interleaving, failure, state requirement, or other condition that
+  justifies selecting the concept over its simpler alternative;
 - prose, traces, and code use matching phase boundaries and role-based
   state names;
 - one primary mental model remains consistent across the entry, with

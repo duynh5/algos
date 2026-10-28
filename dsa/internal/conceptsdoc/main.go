@@ -58,7 +58,7 @@ var conceptGuideSpecs = []conceptGuideSpec{
 		requiredFields: teachingFields(
 			"TypeScript example",
 		),
-		expectedEntries: 8,
+		expectedEntries: 13,
 	},
 	{
 		path:            "backend/CONCEPTS.md",

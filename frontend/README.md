@@ -10,19 +10,24 @@ Every numbered lesson is grouped in the single
 ## Foundations
 
 1. [Semantic interfaces and accessibility][interfaces]
-2. [JavaScript, TypeScript, and the browser runtime][runtime]
-3. [Networking, storage, and browser security][network]
+2. [JavaScript language and the browser runtime][runtime]
+3. [TypeScript type modeling and runtime boundaries][typescript]
+4. [HTTP, caching, and network delivery][network]
+5. [Browser storage, origins, and security][security]
+6. [CSS, layout, responsive design, and rendering][css]
+7. [Modules, toolchains, and production builds][toolchain]
 
 ## Product application engineering
 
-4. [React components, state, and effects][react]
-5. [Server data, routing, rendering, and forms][data]
-6. [Testing, performance, and frontend observability][quality]
+8. [React components, state, and effects][react]
+9. [Server data, routing, caching, and forms][data]
+10. [Testing, performance, and frontend observability][quality]
+11. [Rendering architectures, hydration, and Server Components][rendering]
 
 ## Senior engineering
 
-7. [Frontend architecture and design systems][architecture]
-8. [Delivery, migrations, and technical leadership][leadership]
+12. [Frontend architecture and design systems][architecture]
+13. [Delivery, migrations, and technical leadership][leadership]
 
 ## Application preparation
 
@@ -40,12 +45,19 @@ explain its tradeoffs aloud.
 
 [interfaces]: CONCEPTS.md#a1-semantic-interfaces-and-accessibility
 [runtime]:
-  CONCEPTS.md#a2-javascript-typescript-and-the-browser-runtime
-[network]: CONCEPTS.md#a3-networking-storage-and-browser-security
+  CONCEPTS.md#a2-javascript-language-and-browser-runtime
+[typescript]:
+  CONCEPTS.md#a3-typescript-type-modeling-and-runtime-boundaries
+[network]: CONCEPTS.md#a4-http-caching-and-network-delivery
+[security]: CONCEPTS.md#a5-browser-storage-origins-and-security
+[css]: CONCEPTS.md#a6-css-layout-responsive-design-and-rendering
+[toolchain]: CONCEPTS.md#a7-modules-toolchains-and-production-builds
 [react]: CONCEPTS.md#b1-react-components-state-and-effects
-[data]: CONCEPTS.md#b2-server-data-routing-rendering-and-forms
+[data]: CONCEPTS.md#b2-server-data-routing-caching-and-forms
 [quality]:
   CONCEPTS.md#b3-testing-performance-and-frontend-observability
+[rendering]:
+  CONCEPTS.md#b4-rendering-architectures-hydration-and-server-components
 [architecture]:
   CONCEPTS.md#c1-frontend-architecture-and-design-systems
 [leadership]:
