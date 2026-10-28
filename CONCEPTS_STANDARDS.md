@@ -105,50 +105,69 @@ it must not omit a required heading.
 1. **The problem it solves**
    - State the reader's problem, the input shape, and the desired result.
    - Do not use the technique's name as its own explanation.
-2. **The idea in simple terms**
-   - Give a short mental picture or concrete analogy.
-   - Introduce and define the formal name only after the idea is clear.
-3. **How it works**
-   - Describe the procedure as explicit actions.
-   - Name the state the method keeps and what each part means.
-   - State required input conditions before the procedure relies on them.
-4. **Step-by-step examples**
+2. **How it works**
+   - Use simple language and as much space as the concept needs.
+   - Do not omit a required rule, condition, state meaning, or
+     distinction merely to make the section shorter.
+   - Split a longer explanation into focused paragraphs when that
+     makes its ideas easier to follow.
+   - Start with a familiar action or practical situation when it makes
+     the idea easier to picture.
+   - Name the formal idea only after the reader can picture the action.
+   - Prefer the real workflow when an analogy would add more machinery
+     than it removes.
+   - Remove filler, throat-clearing, and restatements. Every sentence
+     must add a rule, reason, condition, distinction, or useful mental
+     model.
+   - Leave the full procedure to the worked trace unless a rule must be
+     understood first.
+3. **Step-by-step examples**
    - Give at least one small, ordinary example of the complete method.
    - Add a boundary, duplicate, failure, or adversarial example whenever it changes behavior or exposes a common mistake.
-5. **Why it works**
-   - Explain why each step is safe, why the process finishes, and why the final state answers the question.
-6. **Language-specific example**
+4. **Why it works**
+   - Use simple language and as much space as the reasoning needs.
+   - Start with the concrete fact that remains true; introduce
+     *invariant* only after that fact is understandable.
+   - For an algorithm, explain why the fact starts true, survives one
+     step, the process finishes, and the final state answers the
+     question.
+   - For language, browser, data, or systems behavior, explain the
+     relevant contract or lifecycle instead of forcing a loop proof.
+   - State every assumption the reasoning needs.
+   - Remove filler and avoid replaying transitions already clear in
+     the trace. Every sentence must add a reason, condition, or link
+     from state to result.
+5. **Language-specific example**
    - Use the literal `Go example` heading in the DSA and backend
      guides.
    - Use the literal `TypeScript example` heading in the frontend
      guide, including TSX when browser or framework behavior matters.
    - Provide the smallest complete fragment that matches the trace,
      or link to the one owning reference implementation.
-7. **Work and memory**
+6. **Work and memory**
    - Explain costs in words before conventional notation.
    - Include preprocessing, recursion, output construction, runtime
      allocations, rendering, network, storage, and server costs when
      they materially apply.
-8. **When to use it**
+7. **When to use it**
    - List observable clues in the problem statement, input, or required output.
-9. **When not to use it**
+8. **When not to use it**
    - State which assumption fails or which cost becomes unacceptable.
    - Point to the closest alternative when that helps the reader choose.
-10. **Common mistakes and edge cases**
+9. **Common mistakes and edge cases**
     - Connect each warning to a concrete failing input, invalid state
       change, or relevant language, browser, network, or runtime
       behavior.
-11. **Related material**
+10. **Related material**
     - Link to prerequisites, contrasting methods, the owning implementation, and representative repository problems without repeating their content.
 
 Use each required label as a Markdown heading exactly one level below the entry heading. For example, an `###` entry uses `#### The problem it solves`; a `#####` pattern card uses `###### The problem it solves`.
 
 Treat the required headings as distinct teaching responsibilities,
-not prompts to repeat the same explanation. Let the simple-terms
-section establish the mental model, the procedure state the rules,
-the trace show the rules operating, and the correctness section
-justify them. Refer back to the owning explanation instead of
-rephrasing it in every section.
+not prompts to repeat the same explanation. Let `How it works` build
+the complete mental model, the trace teach the procedure, and the
+correctness section justify it. Refer back to the owning explanation
+instead of rephrasing it in every section.
 
 ## 5. Example and trace standards
 
@@ -196,6 +215,9 @@ rephrasing it in every section.
 - Let the concrete example or diagram carry the explanation. Use
   prose to label what the learner should notice instead of restating
   the same relationship abstractly.
+- Treat the worked trace as the main demonstration. Keep prose before
+  it focused, but do not remove a fact the learner needs to understand
+  the trace merely to reach the example sooner.
 - Do not narrate every movement already visible in a snapshot. Prose
   should add the reason for the transition, the rule being applied, or
   a distinction the visual cannot express by itself.
@@ -343,7 +365,8 @@ While editing:
    earliest misunderstood prerequisite and rebuild from there. Replace
    the failed model and remove superseded prose instead of layering on
    more terminology, exceptions, and supplemental examples.
-3. Finish all eleven required sections of an added or materially reorganized entry. Do not leave a partially converted entry.
+3. Finish all ten required sections of an added or materially
+   reorganized entry. Do not leave a partially converted entry.
 4. Keep cross-section changes limited to corrections required for consistency, ownership, or navigation.
 5. Preserve an old fragment with an explicit anchor as soon as its heading is renamed.
 6. Update `dsa/internal/conceptsdoc/` when an intentional structural
@@ -369,10 +392,10 @@ After editing:
 6. Check that the ordinary example teaches the main path without
    depending on an edge-case trace, and that added coverage uses
    focused examples instead of one branch-heavy input.
-7. Perform a compression pass. Remove prose that merely narrates an
-   adjacent visual or repeats another required section. Preserve
-   information only when it adds a rule, reason, distinction,
-   boundary, or verification the reader does not already have.
+7. Perform a density pass. Remove filler and prose that merely narrates
+   an adjacent visual or repeats another required section. Preserve
+   every rule, reason, distinction, boundary, and verification the
+   reader needs, even when doing so requires a longer explanation.
 8. Run the validation commands below and resolve every failure before treating the update as complete.
 
 ## 13. Validation
@@ -410,7 +433,7 @@ concepts checker must continue to verify:
 
 - a valid heading hierarchy with no duplicate targets;
 - balanced fenced blocks;
-- all teaching entries and their eleven ordered fields;
+- all teaching entries and their ten ordered fields;
 - the no-Markdown-table rule for teaching content;
 - complete before, decision, after, and known-correct state in every
   numbered item that uses the trace vocabulary;
@@ -428,7 +451,7 @@ remain required.
 An update to an active concept study guide is complete only when:
 
 - every line in the changed guide is at most 70 characters;
-- every changed teaching entry follows the eleven-part contract;
+- every changed teaching entry follows the ten-part contract;
 - new terminology is explained in plain language before it is relied on;
 - representative state values are given concrete meaning before their
   construction mechanics are traced;

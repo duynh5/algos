@@ -685,27 +685,14 @@ owns mutable data. A copied slice can still share an array, a map is
 always a reference to shared state, and an interface can hold a typed
 nil while the interface itself is not nil.
 
-### The idea in simple terms
-
-A Go value has a representation and an owner. Copying an array copies
-its elements. A slice copy duplicates only its small descriptor. A map
-or pointer copy preserves access to the same storage. Make ownership
-visible at package boundaries and clone mutable data when ownership
-must change.
-
 ### How it works
 
-Modules group versioned packages; packages define the visibility
-boundary. Capitalized names are exported. Structs group fields,
-methods attach behavior, and interfaces describe required methods.
-Zero values should be useful when practical. Use `make` for slices,
-maps, and channels; use `new` only when a pointer to a zero value is
-actually useful.
-
-Strings contain bytes, so range over runes when the rule is about
-Unicode code points. Use the comma-ok map form when stored zero and
-missing have different meanings. Prefer value receivers for small
-immutable values and pointer receivers for mutation or costly copies.
+Copying a paper folder makes a new folder; copying a shortcut still
+points to the same cabinet. Go values work the same way: arrays copy
+their contents, while slices, maps, and pointers may still reach
+shared storage. **Ownership** says who may change that storage. An
+interface stores both a dynamic type and a value, so an interface
+holding a typed nil pointer is itself non-nil.
 
 ### Step-by-step examples
 
@@ -807,23 +794,12 @@ A request can fail after acquiring rows, files, timers, or remote
 work. Cleanup must still happen, and callers need both useful context
 and the original error identity to choose a response.
 
-### The idea in simple terms
-
-The layer that acquires a resource owns its release. Pass one context
-down the call tree, let errors travel upward, and wrap errors without
-erasing the cause that a boundary must classify.
-
 ### How it works
 
-Check acquisition before deferring cleanup. Put `defer` immediately
-after a successful acquire so later returns cannot bypass it. Accept a
-`context.Context` as the first parameter of blocking work. A layer may
-shorten a deadline it owns, but it must call the returned cancel
-function to release timer resources.
-
-Wrap with `%w`, add operation context, and classify with `errors.Is`,
-`errors.As`, or `errors.AsType` at a policy boundary. Sentinels suit a
-small stable condition set; typed errors suit structured details.
+If you borrow a key, you return it; if a job is cancelled, everyone
+working on it should stop. In Go, the code that acquires a resource
+releases it, one context carries cancellation downward, and errors
+travel upward with their cause intact.
 
 ### Step-by-step examples
 
@@ -925,25 +901,12 @@ Code can be free of data races and still violate a business rule.
 Separately locked reads and writes let two goroutines observe absence
 and then create the same SKU.
 
-### The idea in simple terms
-
-Protect the whole decision, not individual memory accesses. Give every
-goroutine an owner and a bounded ending, then verify both the memory
-safety and the business outcome.
-
 ### How it works
 
-Write the invariant before choosing a primitive. Use a mutex when
-several fields form one state transition. Use channels when ownership
-transfer or stream coordination is the clearer model. Keep the
-check-and-change inside one critical section, bound worker counts, and
-join all started work.
-
-Functional tests prove outcomes. Contention tests arrange overlap.
-`go test -race` detects unsynchronized memory access. It does not
-prove
-uniqueness, ordering, or exactly-once business behavior. `go vet` and
-targeted fuzzing cover different defect classes.
+Imagine two clerks trying to sell the last ticket. Locking only the
+cash drawer is not enough; the check and sale must be protected as one
+decision. Each goroutine also needs an owner, a stopping rule, and a
+test that proves the business result.
 
 ### Step-by-step examples
 
@@ -1048,26 +1011,14 @@ produce incompatible behavior. Words such as placed, paid, canceled,
 and refunded need agreed meaning before routes or tables freeze an
 accidental interpretation.
 
-### The idea in simple terms
-
-Use concrete stories to discover business language, commands, events,
-entities, value objects, aggregates, policies, and external systems.
-Model only distinctions that change behavior, and make every allowed
-state transition explicit.
-
 ### How it works
 
-Start with a successful story and then add rejection, concurrency, and
-external-failure stories. Name commands as requested actions and
-events
-as facts that already happened. Put identity and lifecycle on
-entities;
-make descriptive values immutable. An aggregate is the smallest unit
-that must change atomically to preserve one invariant.
-
-Record assumptions and unresolved terms. A model is useful when a
-product reviewer can decide whether each transition is legal without
-reading HTTP, SQL, or framework code.
+Start with a real story such as a customer placing and cancelling an
+order. Its nouns, actions, rules, and outcomes reveal the domain
+model. An **entity** keeps identity, a **value object** is compared by
+value, an **aggregate** protects one consistency boundary, and
+commands, events, and policies describe allowed change. Keep only
+distinctions that affect behavior.
 
 ### Step-by-step examples
 
@@ -1177,26 +1128,13 @@ Transport, business policy, and storage change for different reasons.
 When they are mixed in handlers or repository-shaped services, tests
 require infrastructure and a small contract change spreads everywhere.
 
-### The idea in simple terms
-
-Dependencies point inward toward stable policy. Handlers adapt HTTP to
-commands, use cases own business orchestration, repositories adapt
-persistence, and the composition root constructs concrete
-dependencies.
-
 ### How it works
 
-Define a narrow use-case input around business intent. Keep domain
-types unaware of JSON and SQL. Declare an interface only at the caller
-that needs substitution. Make each transaction boundary match one use
-case, and wire concrete implementations in `main` or another explicit
-composition root.
-
-A modular monolith is the default: one deployment, clear internal
-packages, and database-enforced invariants. Extract a service only
-when
-an independently owned boundary has evidence that repays distributed
-cost.
+Treat a service like a shop with a front counter and a stockroom. The
+handler receives the request, the use case decides the business
+action, and a repository talks to storage. Dependencies point inward
+toward those stable business rules. The **composition root** connects
+concrete parts when the service starts.
 
 ### Step-by-step examples
 
@@ -1314,26 +1252,13 @@ A browser and server need one observable agreement about requests,
 responses, validation, identity, caching, cancellation, and failure.
 Without it, clients guess and servers expose accidental behavior.
 
-### The idea in simple terms
-
-Treat an API as a public promise, not a route that happens to decode
-JSON. HTTP supplies method, target, headers, representation, status,
-and caching semantics. The application contract narrows those choices
-for one operation.
-
 ### How it works
 
-1. Define the operation's intent and whether it is safe or idempotent.
-2. Bound the request body and processing time.
-3. Verify media type, identity, authorization, and syntax.
-4. Translate transport data into an application command.
-5. Let the use case decide business outcomes.
-6. Map known outcomes to stable status and problem codes.
-7. Return one documented representation and correlation identity.
-8. Propagate cancellation and release every owned resource.
-9. Start dependencies before advertising readiness.
-10.  On shutdown, stop admission, drain bounded work, then close
-    owners.
+An API is like a posted service menu: callers rely on its request,
+response, and failure rules. HTTP provides methods, headers, status
+codes, and caching; the application contract chooses the exact rules
+for one operation. At shutdown, stop accepting new work, let bounded
+in-flight work finish or cancel it, then close owned resources.
 
 ### Step-by-step examples
 
@@ -1376,6 +1301,13 @@ Each boundary narrows possible state before handing data inward.
 Stable error identity lets one boundary translate an outcome without
 parsing text. Bounded input, time, and resources guarantee that one
 request cannot consume unlimited process capacity.
+
+During shutdown, stopping admission makes the in-flight set only
+shrink. Waiting until it is empty or the deadline passes gives
+accepted work a bounded chance to finish. Assuming each worker
+observes cancellation and reports completion, remaining work then
+stops before owned resources close. No accepted request can start
+after draining or keep using a resource after shutdown completes.
 
 ### Go example
 
@@ -1467,25 +1399,12 @@ Application values must survive restarts, concurrent readers, schema
 change, and operational recovery. A convenient object shape is not
 automatically a relational model with enforceable meaning.
 
-### The idea in simple terms
-
-Model durable facts with tables, keys, constraints, and indexes. Keep
-queries explicit, bind values as parameters, propagate context, and
-own every row iterator and transaction resource you acquire.
-
 ### How it works
 
-Choose primary keys for stable identity and foreign keys for valid
-relationships. Use `NOT NULL`, checks, and unique constraints for
-facts
-the database can enforce. Normalize update-sensitive facts, then
-denormalize only with measured read evidence and a repair strategy.
-
-Select only required columns and scan them in one reviewed order. Use
-`QueryRowContext` for one row and `QueryContext` for many. Close rows,
-check iteration errors, distinguish no row from failure, and design
-indexes from actual predicates and ordering. Migrations must be safe
-for the old and new application during rollout.
+Use a database like a labeled filing system. Tables hold kinds of
+facts, keys identify records, constraints reject impossible records,
+and indexes help find them. Queries bind outside values safely and
+close every row, transaction, and connection they open.
 
 ### Step-by-step examples
 
@@ -1595,23 +1514,12 @@ Business actions often change several records under concurrent access.
 The system must preserve rules such as non-negative inventory even
 when requests overlap or one step fails.
 
-### The idea in simple terms
-
-Put one business action behind one use-case boundary. A transaction
-makes its required data changes succeed or fail together. Locking or
-an atomic condition prevents concurrent actions from spending the same
-resource.
-
 ### How it works
 
-1. Write the business rule independently of transport and storage.
-2. Validate values that do not require database state.
-3. Begin a transaction at the use-case boundary.
-4. Read or update contested records through one consistent strategy.
-5. Check affected rows and translate expected conflicts.
-6. Write every dependent record in the same transaction.
-7. Commit once the invariant holds or roll back every partial change.
-8. Keep HTTP and database representations outside the domain rule.
+A bank transfer must not remove money without adding it at the other
+end. A **transaction** makes the whole business action succeed or fail
+together. Locks or atomic conditions stop two callers from spending
+the same balance, seat, or inventory item.
 
 ### Step-by-step examples
 
@@ -1727,24 +1635,14 @@ An API must know who is acting, whether that actor may perform this
 operation on this object, and whether untrusted input can escape its
 intended data boundary.
 
-### The idea in simple terms
-
-Authentication establishes an identity. Authorization evaluates that
-identity, action, resource, and context for every protected operation.
-Validation, output encoding, secret handling, and browser policy form
-additional independent controls.
-
 ### How it works
 
-Verify credentials with an established library, normalize one
-principal,
-and place only that identity in request context. Enforce object-level
-authorization in the use case, close to the loaded resource. Prefer
-short-lived credentials, explicit revocation strategy, least
-privilege,
-parameterized SQL, bounded input, and redacted logs. Cookies carrying
-authority need `Secure`, `HttpOnly`, suitable `SameSite`, and CSRF
-protection where browser ambient authority applies.
+Showing an ID proves who you are; a locked door still decides whether
+you may enter. **Authentication** establishes identity, while
+**authorization** checks the person, action, resource, and situation.
+Input validation, output encoding, secret handling, and browser policy
+remain separate controls, so one failure does not remove every
+defense.
 
 ### Step-by-step examples
 
@@ -1823,25 +1721,12 @@ state,
 and goroutine ordering are uncontrolled. Passing examples then provide
 little evidence about failures or concurrent invariants.
 
-### The idea in simple terms
-
-Test through the smallest public boundary that proves the behavior.
-Inject nondeterministic inputs, arrange concurrency with signals, and
-separate fast policy tests from realistic integration and contract
-tests.
-
 ### How it works
 
-Use table-driven tests for input classes and explicit expected
-outcomes.
-Replace wall-clock reads, random identifiers, and remote calls through
-narrow caller-owned seams. Use `httptest` for HTTP, real PostgreSQL
-for
-query and transaction semantics, and fakes only when their behavior is
-smaller than the real dependency. Gate concurrent work with channels
-or
-barriers, join it, and run the race detector separately from
-assertions.
+A useful test controls the clock, random choices, and outside systems
+so the same setup gives the same result every time. Test the smallest
+public boundary that proves the rule, then use integration tests only
+where real storage or protocols matter.
 
 ### Step-by-step examples
 
@@ -1931,26 +1816,12 @@ Operators need to distinguish invalid requests, application defects,
 dependency failure, saturation, and slow work without reading private
 payloads or reproducing production locally.
 
-### The idea in simple terms
-
-Logs describe events, metrics summarize behavior, and traces connect
-one
-request across boundaries. Health endpoints, timeouts, rate limits,
-and
-profiles turn that evidence into safe operating controls.
-
 ### How it works
 
-Define user-visible service indicators first. Emit structured logs
-with
-stable event names and correlation fields. Use bounded-cardinality
-metric
-labels, propagate trace context, and record spans around meaningful
-remote
-or queued work. Liveness answers whether the process should restart;
-readiness answers whether it should receive new traffic. Expose
-diagnostic
-profiles only on authenticated, restricted interfaces.
+Think of tracking a package. Logs record events, metrics show the
+system-wide pattern, and traces follow one request through each stop.
+Health checks, timeouts, rate limits, and profiles turn that evidence
+into safe operating controls.
 
 ### Step-by-step examples
 
@@ -2035,24 +1906,13 @@ unrepeatable,
 configuration is unsafe, a migration is incompatible, rollout lacks a
 stop signal, or backups cannot actually restore service.
 
-### The idea in simple terms
-
-Build once, promote the same immutable artifact, keep secrets outside
-it,
-deploy through compatibility stages, observe explicit health criteria,
-and rehearse rollback and data recovery before an incident.
-
 ### How it works
 
-Use reproducible builds, pinned dependencies, least-privilege runtime
-images, and generated provenance. Validate configuration at startup
-and
-redact secrets. Apply expand-migrate-contract schema changes. Roll out
-to
-a small population, compare service indicators, pause on threshold
-breach,
-and keep rollback compatible. Define recovery point and recovery time
-objectives, then prove them with restore exercises.
+Seal one package, then move that same package through inspection and
+into production. The package is an immutable build artifact; secrets
+stay outside it. Deploy through compatible stages, watch explicit
+health criteria, and practise rollback and data restore before an
+emergency.
 
 ### Step-by-step examples
 
@@ -2134,23 +1994,13 @@ See [delivery readiness][delivery-reference],
 A client can time out after a server commits. Retrying may duplicate a
 charge or order, while refusing to retry may hide a successful result.
 
-### The idea in simple terms
-
-Give one logical write a stable key. Atomically bind that key to the
-request fingerprint and durable outcome, then replay the same outcome
-or
-reject conflicting reuse.
-
 ### How it works
 
-Scope keys by tenant and operation. Canonicalize and hash the relevant
-request. In one transaction, claim a unique key, store processing
-state,
-perform the write, and persist the terminal response reference. A
-duplicate
-with the same hash reads or waits for that record; a different hash is
-a
-conflict. Retention must exceed the documented retry window.
+A payment retry should behave like showing the same receipt number,
+not buying twice. An **idempotency key** identifies one logical write.
+Atomically store it with a fingerprint of the request and the durable
+result, so an identical retry replays the result while conflicting
+reuse is rejected.
 
 ### Step-by-step examples
 
@@ -2232,26 +2082,13 @@ A service that is fast at average load can collapse when queues grow,
 dependencies slow, retries multiply, or one request consumes unbounded
 work.
 
-### The idea in simple terms
-
-Measure before optimizing, budget end-to-end latency, bound every
-resource,
-and reject excess work early enough that admitted work can still
-finish.
-
 ### How it works
 
-Profile CPU, allocation, blocking, queries, and network calls with
-realistic
-traffic. Derive capacity from arrival rate, service time, concurrency,
-and
-tail latency. Give downstream calls shorter deadlines than the caller,
-retry only transient idempotent operations with exponential backoff
-and
-jitter, cap attempts, and share a retry budget. Use semaphores, queue
-bounds,
-rate limits, and circuit breakers as admission controls with explicit
-scope.
+A restaurant cannot seat unlimited guests without ruining service for
+everyone. Measure the real bottleneck, give each step a share of the
+end-to-end time budget, bound queues and workers, retry only safe
+operations, and reject excess work early enough that accepted work can
+finish.
 
 ### Step-by-step examples
 
@@ -2334,25 +2171,12 @@ Correct queries still fail operationally through pool exhaustion,
 deadlocks,
 table bloat, replication lag, unsafe migrations, or untested recovery.
 
-### The idea in simple terms
-
-Treat connections, locks, row versions, replicas, migrations, backups,
-and
-restore time as finite operational resources with measured owners.
-
 ### How it works
 
-Size the pool against database capacity across all instances. Observe
-wait
-time separately from query time. Keep transactions short, lock
-resources in
-one order, retry whole deadlocked transactions only when safe, and
-monitor
-vacuum and long snapshots. Route replica reads only when stale data is
-valid.
-Use expand-migrate-contract changes, checksum backups, and rehearse
-point-in-
-time recovery to a stated objective.
+A database is a busy records room with limited desks, locked folders,
+old copies, and a backup vault. Connections, locks, row versions,
+replicas, migrations, and restore time are all limited resources that
+need owners and measurements.
 
 ### Step-by-step examples
 
@@ -2435,27 +2259,12 @@ coordinate work
 across replicas. Jobs may be leased twice, abandoned, or retried
 forever.
 
-### The idea in simple terms
-
-Persist work before acknowledging it. Workers lease bounded batches,
-renew
-ownership, make effects idempotent, record attempts, and move poison
-work to
-a reviewed terminal state.
-
 ### How it works
 
-Define job identity, payload version, availability time, attempt
-limit, and
-lease expiry. Claim with an atomic conditional update or skip-locked
-query.
-Heartbeat long work, complete only while holding the lease, and use
-backoff
-with jitter for transient failure. Schedulers create durable jobs from
-a
-stored schedule and stable occurrence key so failover does not
-duplicate the
-semantic run.
+Write a job on a durable ticket before promising it will be done. A
+worker leases a small batch, renews the lease while working, records
+attempts, and makes repeated effects safe. Jobs that always fail move
+to a reviewed holding area.
 
 ### Step-by-step examples
 
@@ -2539,25 +2348,12 @@ lose the event or publish an event for a transaction that later rolls
 back.
 Consumers also receive duplicates and out-of-order messages.
 
-### The idea in simple terms
-
-Write the business change and an outbox record in one local
-transaction.
-Publish the outbox asynchronously, and make consumers deduplicate
-effects by
-stable event identity while tolerating reordering.
-
 ### How it works
 
-Store event ID, aggregate ID, sequence, type, version, payload, and
-creation
-time with the business write. A relay claims unpublished rows,
-publishes, and
-marks progress; a crash may publish twice. Consumers insert an inbox
-or effect
-key in the same transaction as their state change. Partition by
-aggregate
-when per-aggregate order matters, and evolve payloads additively.
+When an order is saved, place its dispatch slip in the same locked
+transaction. An **outbox** publishes that slip later. Consumers use
+the event ID to avoid repeating effects and must tolerate late or
+reordered delivery.
 
 ### Step-by-step examples
 
@@ -2640,27 +2436,13 @@ messages repeat, and replicas observe different histories. Local
 reasoning no
 longer proves a global outcome.
 
-### The idea in simple terms
-
-State the consistency and availability requirement per operation. Use
-stable
-identity, monotonic versions, quorum or leader rules, and
-reconciliation
-instead of relying on timing or a mythical exactly-once network.
-
 ### How it works
 
-Model failure domains and the result of lost requests, replies, and
-leader
-changes. A leader can serialize one log but needs fencing after lease
-loss.
-Quorums intersect only under their stated replica assumptions. Logical
-or
-hybrid clocks express causal order better than wall time.
-At-least-once
-delivery needs idempotent effects; eventually consistent state needs a
-merge
-rule, version check, or explicit conflict workflow.
+Coordinating offices by mail is different from sharing one desk:
+messages can be late, repeated, or lost. State the consistency and
+availability needed for each operation, then use stable IDs,
+increasing versions, leader or quorum rules, and reconciliation.
+Timing alone cannot create exactly-once delivery.
 
 ### Step-by-step examples
 
@@ -2741,25 +2523,12 @@ Splitting code along technical layers creates chatty services and
 distributed
 transactions without establishing independent business ownership.
 
-### The idea in simple terms
-
-Discover boundaries from business capabilities, invariants, data
-ownership,
-team ownership, and change patterns. Prove them inside a modular
-monolith,
-then extract one measured seam at a time.
-
 ### How it works
 
-Map commands, events, consistency needs, and coupled changes. Give
-each
-candidate one owner for writes and a published contract for access.
-Measure
-latency, deployment coupling, and team contention. Extract with a
-facade,
-shadow reads, backfill and verify data, switch traffic gradually, then
-remove
-the old path only after rollback and reconciliation are proved.
+A growing company does not create a department for every desk. Group
+work by business capability, rules, data, team ownership, and change
+patterns. Prove the boundary inside one modular application before
+turning it into a separate service.
 
 ### Step-by-step examples
 
@@ -2841,24 +2610,12 @@ A remote call consumes connection, goroutine, deadline, and downstream
 capacity while adding partial failure that an ordinary function call
 lacks.
 
-### The idea in simple terms
-
-Make every call explicit about contract, time budget, retry safety,
-admission,
-error classification, and observability. Treat fallback as product
-behavior.
-
 ### How it works
 
-Derive the child timeout from the remaining caller budget. Reuse
-bounded
-clients and connections. Validate protocol and schema at both ends.
-Retry
-only classified transient failures for idempotent operations, with
-jitter and
-an attempt cap. Scope bulkheads and breakers to the failing
-dependency, and
-propagate identity plus trace context through a trusted boundary.
+Calling another service is like phoning another office while a
+customer waits. Set a time limit, know whether retrying is safe, limit
+how many calls may wait, classify failures, and record what happened.
+A fallback changes product behavior and must be designed as such.
 
 ### Step-by-step examples
 
@@ -2944,26 +2701,12 @@ One business action may span services that cannot share a database
 transaction. Partial success must be visible, retryable, and
 repairable.
 
-### The idea in simple terms
-
-Represent the workflow as durable states and messages. Advance each
-local
-step atomically, compensate only effects that are semantically
-reversible,
-and expose pending or failed states as honest product behavior.
-
 ### How it works
 
-Choose orchestration when one owner must observe and direct the
-sequence;
-choose choreography only when event relationships remain
-understandable.
-Persist workflow ID, version, state, deadlines, attempts, and step
-results.
-Use outbox and inbox guarantees for transitions. Define compensation,
-manual repair, and reconciliation before release, including late
-replies and
-duplicate messages.
+Booking a trip may reserve a flight now and a hotel later. Store each
+step durably, advance one local action at a time, and undo only
+actions with a real business reversal. Show users when the workflow is
+still pending or has failed.
 
 ### Step-by-step examples
 
@@ -3051,23 +2794,12 @@ Services deployed at different times must communicate while producers
 and
 consumers temporarily run different contract versions.
 
-### The idea in simple terms
-
-Make changes additive first, measure old usage, test consumer
-expectations,
-and remove behavior only after every known consumer has migrated.
-
 ### How it works
 
-Specify syntax and semantics, not just field types. Add optional
-fields with
-safe defaults, keep old producers readable, and tolerate unknown
-fields where
-the protocol permits. Use consumer-driven or provider contract tests
-for
-important interactions, schema compatibility checks for events, and a
-deprecation inventory with owner, deadline, traffic evidence, and
-rollback.
+Change a doorway while the shop stays open: add the wider path first,
+let old and new customers pass, and test the expectations of each
+consumer. Measure use of the old path and remove it only after every
+known consumer has moved. This is additive contract evolution.
 
 ### Step-by-step examples
 
@@ -3152,26 +2884,12 @@ retries.
 Healthy local dashboards do not reveal the causal chain or prove
 recovery.
 
-### The idea in simple terms
-
-Propagate correlation and trace context across every boundary, measure
-each
-service against user-visible objectives, and test one bounded failure
-hypothesis with an abort condition and recovery proof.
-
 ### How it works
 
-Create spans around remote attempts and message processing, linking
-rather
-than pretending asynchronous work is one call stack. Record stable
-outcome,
-dependency, attempt, and queue-delay fields. Build service-level
-objectives
-from end-user success and latency. For resilience experiments, name
-the
-steady state, inject one approved failure in a limited blast radius,
-stop on
-guardrail breach, restore, and record evidence plus follow-up work.
+Follow one delivery with the same tracking number across every depot.
+Correlation and trace context provide that number. Measure the
+user-visible promise, then run small failure drills with a stop rule
+and proof that the system recovered.
 
 ### Step-by-step examples
 
@@ -3258,28 +2976,12 @@ shared tenancy can introduce stale reads, hot keys, leakage, and
 migrations
 that are harder than the original bottleneck.
 
-### The idea in simple terms
-
-Scale from measured access patterns. Preserve one source of truth,
-define
-freshness and invalidation, choose a partition key that matches
-ownership, and
-enforce tenant identity in every storage and cache key.
-
 ### How it works
 
-Optimize queries and indexes before adding replicas or shards. Cache
-only
-when hit rate and tolerated staleness justify invalidation complexity;
-use
-bounded TTL, size, request coalescing, and negative-cache policy.
-Partition by
-a stable high-cardinality key, route through one owner, detect hot
-partitions,
-and design resharding before launch. Carry tenant ID from
-authenticated
-principal through authorization, rows, indexes, cache keys, jobs, and
-logs.
+A cache is a convenient copy of the store's real price list, not a new
+source of truth. Say how fresh it must be and how it is replaced.
+Split data by an ownership key, and include the tenant identity in
+every storage and cache lookup.
 
 ### Step-by-step examples
 
@@ -3365,26 +3067,13 @@ privilege, retained personal data, unsafe logs, and secrets that
 outlive their
 intended scope.
 
-### The idea in simple terms
-
-Threat-model assets and trust boundaries, minimize collected data and
-privilege, secure the build inputs and artifact, and make deletion,
-rotation,
-and incident response executable rather than aspirational.
-
 ### How it works
 
-List assets, actors, boundaries, abuse cases, and mitigations.
-Classify data,
-collect only required fields, define purpose and retention, encrypt in
-transit
-and at rest, and keep searchable secrets out of logs. Pin and scan
-dependencies,
-generate an SBOM and provenance, sign artifacts, protect CI
-credentials, and
-patch by severity plus exploitability. Rotate keys with overlap and
-audit every
-privileged data or secret action.
+Protect a system like a building: a **threat model** lists valuables,
+entrances, and likely misuse. Collect only needed data, give each
+actor the smallest useful privilege, and verify build inputs and
+signed artifacts through the **software supply chain**. Make deletion,
+key rotation, and incident response actions that can actually be run.
 
 ### Step-by-step examples
 
@@ -3471,28 +3160,12 @@ drift,
 overprivilege, expose publicly, or recreate differently during
 recovery.
 
-### The idea in simple terms
-
-Describe infrastructure as reviewed state, separate environments and
-failure
-domains deliberately, and grant each workload only short-lived
-permissions to
-the exact resources and actions it needs.
-
 ### How it works
 
-Use versioned infrastructure definitions, remote locked state, plan
-review,
-policy checks, and drift detection. Build private network paths by
-default,
-restrict ingress and egress, and expose only intended load balancers.
-Bind
-workload identity to deployment identity, avoid static cloud keys,
-constrain
-resource and action scope, and audit assumptions behind cross-account
-access.
-Test replacement and regional recovery from definitions plus durable
-data.
+Keep infrastructure as reviewed blueprints instead of hand-built
+rooms. Separate environments and failure areas deliberately. Give each
+workload a short-lived keycard that opens only the resources and
+actions required for its job.
 
 ### Step-by-step examples
 
@@ -3575,28 +3248,12 @@ Schedulers can restart and scale processes, but poor requests, probes,
 shutdown, disruption policy, or queue signals turn automation into
 churn.
 
-### The idea in simple terms
-
-Declare resource needs and lifecycle truth, keep stateless compute
-replaceable,
-and let autoscaling and disruption act only on signals the workload
-can honor.
-
 ### How it works
 
-Package one immutable process, run as a non-root identity, and declare
-CPU and
-memory requests plus limits from measurement. Separate startup,
-readiness, and
-liveness probes. On termination, fail readiness, stop admission, drain
-within
-the grace period, and persist or return leased work. Use disruption
-budgets,
-topology spread, and rollouts that preserve capacity. Scale request
-services
-from demand and workers from queue age plus dependency capacity, not
-queue
-length alone.
+Run compute like a delivery fleet. Each unit declares the fuel and
+time it needs, reports when it is ready, and can be replaced without
+losing cargo. Scaling and maintenance act only on signals the workload
+can really honor.
 
 ### Step-by-step examples
 
@@ -3682,30 +3339,13 @@ repeat incidents, and spend unpredictably without knowing which cost
 buys a
 user-visible reliability improvement.
 
-### The idea in simple terms
-
-Define service indicators and objectives, spend an error budget
-consciously,
-design on-call and runbooks around actionable symptoms, learn through
-blameless
-incident analysis, and attribute cost to the same demand and
-reliability model.
-
 ### How it works
 
-Choose availability and latency indicators at the user boundary. Set
-targets
-from product impact and dependency limits, then alert on multi-window
-burn
-rather than isolated spikes. Run incidents with one commander,
-communication
-cadence, timestamped decisions, and explicit mitigation. Follow with
-factual
-timeline, contributing conditions, systemic actions, owners, and
-verification.
-Track unit cost per request, tenant, job, or stored byte and include
-redundancy,
-egress, telemetry, and idle headroom.
+Run a service like a train line. A **service-level indicator**
+measures what riders experience; a **service-level objective** sets
+the target; and the allowed shortfall is an **error budget**. Alerts,
+runbooks, incident reviews, and cost should all connect to that same
+demand and service promise.
 
 ### Step-by-step examples
 
@@ -3790,29 +3430,12 @@ different
 trust, delivery, size, privacy, and failure semantics from internal
 calls.
 
-### The idea in simple terms
-
-Give each integration a narrow adapter, verify its authenticity and
-schema,
-persist important work, make effects idempotent, quarantine poison
-input, and
-reconcile against an authoritative source.
-
 ### How it works
 
-For webhooks, verify the signature over raw bytes, enforce timestamp
-and replay
-bounds, store event identity, and acknowledge only after durable
-acceptance.
-For files, stream with byte and record limits, validate headers and
-rows, stage
-results, and publish only after atomic validation. For email, search,
-and
-analytics, separate delivery from source-of-truth state, redact
-personal data,
-and provide replay, correction, and deletion paths. Partner clients
-need
-deadlines, rate limits, contract tests, and explicit outage behavior.
+Treat each outside system like a delivery company with its own forms
+and failures. A narrow adapter checks the sender and package, saves
+important work, prevents repeated effects, isolates bad input, and
+later compares results with the authoritative source.
 
 ### Step-by-step examples
 
@@ -3900,27 +3523,12 @@ dependencies, or a
 safe migration path, yet it continues to carry valuable behavior and
 data.
 
-### The idea in simple terms
-
-Observe before changing, pin behavior at the boundary, add a seam,
-migrate in
-small reversible slices, compare results, and delete the old path only
-after
-evidence and an operational window.
-
 ### How it works
 
-Inventory entry points, data owners, jobs, dependencies, and incident
-history.
-Add characterization tests around current observable behavior,
-including known
-quirks. Introduce a facade or adapter without changing outcomes. Route
-a small
-slice to the replacement, shadow and compare when safe, reconcile
-data, expand
-traffic, and keep one rollback switch. Upgrade dependencies in small
-groups and
-separate compatibility changes from behavior changes.
+Renovate an occupied house one room at a time. Observe current
+behavior, write tests that pin it down, create a safe seam, move one
+small path, compare results, and remove the old path only after a
+stable period.
 
 ### Step-by-step examples
 
@@ -4003,29 +3611,12 @@ reviewable plan, delivered system, measurable launch, and maintained
 learning
 rather than only produce locally correct code.
 
-### The idea in simple terms
-
-Frame the decision, name constraints and invariants, compare real
-alternatives,
-slice delivery into reversible milestones, assign owners, and close
-the loop
-with launch evidence and durable documentation.
-
 ### How it works
 
-Write a short proposal with problem, non-goals, users, current
-evidence,
-options, decision, risks, data and security impact, rollout, rollback,
-and
-success measures. Use a walking skeleton before scale features. Review
-API,
-schema, failure modes, operations, and cost with the owning
-specialists. Track
-milestones by observable capability. During launch, use explicit go or
-no-go
-criteria; afterward, compare results with assumptions and record the
-decision
-and remaining work.
+Lead a large change like a construction project. State the goal,
+constraints, and rules that cannot break; compare real options; divide
+work into reversible milestones; name owners; and close with launch
+evidence and lasting documentation.
 
 ### Step-by-step examples
 
@@ -4116,26 +3707,13 @@ errors, concurrency, runtime scheduling, and tooling appear through
 different
 syntax and defaults.
 
-### The idea in simple terms
-
-Port the invariant and boundary first. Then map Go's value model,
-interfaces,
-context, goroutines, errors, and tooling to the target language's real
-runtime
-semantics instead of transliterating syntax.
-
 ### How it works
 
-For each concept, write the behavior to preserve, Go mechanism, target
-mechanism, and semantic gap. Check memory and aliasing, nullability,
-exception
-or result propagation, cancellation ownership, async scheduling,
-thread safety,
-serialization defaults, package visibility, build reproducibility,
-testing,
-profiling, and deployment. Re-run the same ordinary and failure
-contract tests
-against both implementations.
+Moving code to another language is like moving a recipe to a different
+kitchen. Keep the promised result and safety rules, but use the new
+kitchen's real tools. Map Go's values, errors, contexts, and
+goroutines to the target runtime instead of translating syntax word
+for word.
 
 ### Step-by-step examples
 

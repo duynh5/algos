@@ -232,7 +232,6 @@ func main() {
 func teachingFields(exampleHeading string) []string {
 	return []string{
 		"The problem it solves",
-		"The idea in simple terms",
 		"How it works",
 		"Step-by-step examples",
 		"Why it works",

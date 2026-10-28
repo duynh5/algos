@@ -231,6 +231,20 @@ func validateTeachingEntries(
 		if match == nil {
 			continue
 		}
+		if match[2] == "The idea in simple terms" {
+			issues = append(
+				issues,
+				fmt.Sprintf(
+					"%s:%d: deprecated teaching field %q; merge it "+
+						"into %q",
+					spec.path,
+					lineNumber,
+					match[2],
+					"How it works",
+				),
+			)
+			continue
+		}
 		index, isField := fieldIndex[match[2]]
 		if !isField {
 			continue

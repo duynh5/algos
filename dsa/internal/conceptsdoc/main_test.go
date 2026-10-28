@@ -55,7 +55,6 @@ func TestValidateTeachingEntriesUsesGuideExampleHeading(
 	prose := []byte(strings.Join([]string{
 		"## Frontend lesson",
 		"### The problem it solves",
-		"### The idea in simple terms",
 		"### How it works",
 		"### Step-by-step examples",
 		"### Why it works",
@@ -89,7 +88,6 @@ func TestValidateTeachingEntriesRejectsWrongExampleHeading(
 	prose := []byte(strings.Join([]string{
 		"## Frontend lesson",
 		"### The problem it solves",
-		"### The idea in simple terms",
 		"### How it works",
 		"### Step-by-step examples",
 		"### Why it works",
@@ -111,6 +109,39 @@ func TestValidateTeachingEntriesRejectsWrongExampleHeading(
 			"wrong example heading issue = %q; want path and field",
 			issues[0],
 		)
+	}
+}
+
+func TestValidateTeachingEntriesRejectsDeprecatedIdeaHeading(
+	t *testing.T,
+) {
+	spec := conceptGuideSpec{
+		path:            "backend/CONCEPTS.md",
+		requiredFields:  teachingFields("Go example"),
+		expectedEntries: 1,
+	}
+	prose := []byte(strings.Join([]string{
+		"## Backend lesson",
+		"### The problem it solves",
+		"### The idea in simple terms",
+		"### How it works",
+		"### Step-by-step examples",
+		"### Why it works",
+		"### Go example",
+		"### Work and memory",
+		"### When to use it",
+		"### When not to use it",
+		"### Common mistakes and edge cases",
+		"### Related material",
+	}, "\n"))
+
+	issues, entryCount := validateTeachingEntries(spec, prose)
+	if len(issues) != 1 ||
+		!strings.Contains(issues[0], "deprecated teaching field") {
+		t.Fatalf("deprecated heading issues = %v; want one issue", issues)
+	}
+	if entryCount != 1 {
+		t.Fatalf("teaching entry count = %d; want 1", entryCount)
 	}
 }
 

@@ -45,27 +45,13 @@ A web interface must communicate structure, accept input, adapt to
 different screens, and remain usable with a keyboard, screen reader,
 zoom, slow device, or missing enhancement code.
 
-#### The idea in simple terms
-
-Start with the browser's built-in vocabulary. Semantic HTML names what
-an element does. CSS controls presentation without erasing that
-meaning. Accessibility means users can perceive, operate, understand,
-and trust the same workflow through different input and output modes.
-
 #### How it works
 
-1. Model the document with headings, landmarks, lists, links, buttons,
-   forms, and status regions that match their real purpose.
-2. Preserve the browser's keyboard and form behavior.
-3. Give every control a programmatic name and every input an explicit
-   label.
-4. Build layouts from normal flow, flexbox, and grid before adding
-   position-based exceptions.
-5. Let content and available space choose breakpoints.
-6. Expose validation and asynchronous results in text, not color
-   alone.
-7. Test keyboard order, focus visibility, zoom, reflow, and screen
-   reader announcements.
+Think of signs and doors in a public building. A sign says what a room
+is for, and a door works without special instructions. **Semantic
+HTML** gives a page that same clear structure, including built-in
+keyboard and form behavior. CSS changes its look, while accessibility
+keeps the workflow usable in different ways.
 
 #### Step-by-step examples
 
@@ -189,25 +175,12 @@ Frontend code coordinates user events, asynchronous work, shared data,
 and rendering on a mostly single main thread. Type errors, stale work,
 and long tasks can make an interface incorrect or unresponsive.
 
-#### The idea in simple terms
-
-JavaScript executes one current stack of work. Queues hold later work.
-The event loop chooses when queued work can run. TypeScript checks a
-model before execution, but runtime data still needs runtime checks.
-
 #### How it works
 
-1. Synchronous calls enter and leave the call stack.
-2. Browser APIs perform timers, networking, and events outside that
-   stack.
-3. Promise reactions enter the microtask queue.
-4. Events and timers enter task queues.
-5. After the stack empties, microtasks run before the browser may
-   paint and before the next task begins.
-6. TypeScript narrows unions from evidence such as a discriminant,
-   property check, or validating function.
-7. `AbortController` gives obsolete asynchronous work a cancellation
-   signal.
+Picture one cashier serving a customer while other work waits in
+lines. JavaScript runs one current job; the **event loop** chooses the
+next queued job. TypeScript checks the plan before the program runs,
+but data arriving at the counter still needs a real check.
 
 #### Step-by-step examples
 
@@ -330,28 +303,13 @@ A browser application exchanges untrusted data across network and
 origin boundaries. Incorrect caching, credential handling, or output
 encoding can expose private data or make state inconsistent.
 
-#### The idea in simple terms
-
-Treat the browser, network, API, storage, and third-party content as
-separate trust zones. Each boundary needs an explicit contract for
-identity, validation, caching, failure, and data lifetime.
-
 #### How it works
 
-1. A URL identifies a scheme, host, port, path, query, and fragment.
-2. DNS resolves the host; transport and TLS establish a protected
-   connection; HTTP exchanges request and response messages.
-3. The same-origin policy limits one origin's access to another.
-4. Cross-Origin Resource Sharing (CORS) lets a server declare allowed
-   browser origins; it is not authentication.
-5. Cookies may be attached automatically and therefore require
-   Cross-Site Request Forgery (CSRF) defenses for changing requests.
-6. Content must be encoded for its output context to prevent
-   Cross-Site Scripting (XSS).
-7. Cache directives define reuse. Application caches still need keys,
-   freshness, invalidation, and ownership rules.
-8. Storage choice follows sensitivity, size, lifetime, and access
-   requirements.
+Sending data from a page to an API is like passing a package through
+several hands. At each handoff, say who may send it, what a valid
+package looks like, whether an old copy may be reused, how long it may
+be kept, and what happens if it is late, changed, or lost. Each
+handoff is a **trust boundary**.
 
 #### Step-by-step examples
 
@@ -476,26 +434,13 @@ Interactive screens must turn changing data into predictable UI while
 keeping reusable parts understandable. Poor state ownership and
 effects create stale values, duplicate requests, and render loops.
 
-#### The idea in simple terms
-
-A React component describes what the interface should look like for
-its current inputs and state. Rendering calculates that description.
-Effects synchronize the committed result with systems outside React;
-they are not a general place for derived values or event logic.
-
 #### How it works
 
-1. Props provide values owned by a parent.
-2. State stores values that must survive renders and are owned
-   locally.
-3. A render reads one state snapshot and returns elements.
-4. React reconciles the previous and next element trees.
-5. The commit phase updates the host environment.
-6. Effects run after commit to synchronize subscriptions, timers,
-   network ownership, or imperative browser APIs.
-7. Before a changed effect runs, its previous cleanup releases the old
-   synchronization.
-8. Stable keys preserve item identity across list changes.
+Think of a component as a display board built from today's inputs and
+settings. **Rendering** redraws the board when those facts change.
+Values derived from them stay in rendering, and user actions stay in
+event handlers. An **effect** synchronizes the committed result with a
+system outside React, such as a browser API.
 
 #### Step-by-step examples
 
@@ -617,27 +562,13 @@ A product interface must coordinate URLs, server data, user edits,
 caching, navigation, and several failure states without presenting old
 or contradictory information.
 
-#### The idea in simple terms
-
-Give each kind of state one owner. The URL owns shareable navigation.
-The server owns remote records. A server-data cache owns synchronized
-copies. A form owns an uncommitted draft. Components own temporary
-interaction that has no meaning outside their subtree.
-
 #### How it works
 
-1. Translate route parameters and search parameters into validated
-   application inputs.
-2. Build cache keys from every value that changes the server result.
-3. Render explicit pending, empty, ready, partial, and failed states.
-4. Cancel or disregard work invalidated by navigation.
-5. Keep form drafts separate from confirmed server records.
-6. Submit mutations with stable operation identity when retries can be
-   uncertain.
-7. Update, invalidate, or reconcile affected cached records only after
-   a defined mutation outcome.
-8. Choose server rendering, static generation, or client rendering
-   from user needs, freshness, personalization, and operational cost.
+Keep each fact in the place responsible for it, like keeping an
+address on an envelope and an unfinished note on its own notepad. The
+URL owns shareable location, the server owns saved records, a
+server-data cache owns synchronized copies, a form owns its draft, and
+a component owns only temporary local interaction.
 
 #### Step-by-step examples
 
@@ -746,26 +677,12 @@ accessibility, browser differences, slow networks, or production-only
 data. Teams need evidence that behavior works and signals that explain
 failure after release.
 
-#### The idea in simple terms
-
-Test at the boundary that owns the risk. Measure what users
-experience, not only isolated function speed. Connect errors,
-performance, and releases so an engineer can move from a symptom to a
-cause.
-
 #### How it works
 
-1. Unit tests prove deterministic functions and state transitions.
-2. Component tests prove rendered behavior through user-observable
-   roles, names, input, and output.
-3. Integration tests prove boundaries such as routing and data
-   clients.
-4. End-to-end tests prove a few critical workflows in a real browser.
-5. Static checks prevent type, lint, and dependency defects early.
-6. Lab measurements diagnose controlled builds and devices.
-7. Real-user monitoring measures actual users, networks, and releases.
-8. Errors carry release, route, user-safe context, and correlation
-   IDs.
+Test the part a user actually depends on. A fast button is not useful
+if the page freezes after it is pressed. Check behavior at the
+boundary that can fail, measure the user's wait, and connect errors to
+the release that introduced them.
 
 #### Step-by-step examples
 
@@ -873,24 +790,12 @@ As products and teams grow, unclear boundaries make changes risky.
 Components duplicate behavior, state leaks across features, visual
 rules drift, and every release requires coordination.
 
-#### The idea in simple terms
-
-Architecture assigns ownership and controls change. Organize code by
-stable product capabilities, keep dependency direction visible, and
-give shared UI one governed source. A design system is a product with
-users, compatibility promises, and release responsibilities.
-
 #### How it works
 
-1. Identify product capabilities and the changes they own.
-2. Keep feature code close to its routes, data, state, tests, and UI.
-3. Put cross-feature policy behind small, explicit public interfaces.
-4. Separate reusable visual primitives from domain-specific workflows.
-5. Define tokens for named design decisions, not arbitrary values.
-6. Version behavior, accessibility, and migration expectations.
-7. Record consequential decisions and rejected alternatives.
-8. Introduce larger boundaries, including micro-frontends, only when
-   independent ownership and delivery justify their runtime cost.
+Organize a frontend like a well-run workshop: each area owns a clear
+job, shared tools have one maintained home, and dependencies point in
+an obvious direction. A **design system** is that shared tool cabinet,
+with users, compatibility promises, and releases of its own.
 
 #### Step-by-step examples
 
@@ -1006,25 +911,13 @@ delivery, losing user trust, or making success depend on one person's
 memory. Technical correctness alone does not coordinate teams or
 control release risk.
 
-#### The idea in simple terms
-
-Make change observable, reversible, and small enough to review. Lead
-by turning ambiguity into decisions, evidence, owners, and follow-up.
-A migration succeeds when old and new behavior coexist safely until
-the old path can be removed.
-
 #### How it works
 
-1. Define the user outcome, constraints, risks, and success measures.
-2. Compare options and record why one was chosen.
-3. Split the change into compatible increments.
-4. Add measurement before changing behavior.
-5. Release behind a bounded rollout or feature control when risk is
-   material.
-6. Observe technical and user outcomes by release cohort.
-7. Stop, roll back, or roll forward using predefined thresholds.
-8. Remove compatibility code only after evidence shows it is unused.
-9. Review incidents and migrations for system improvements, not blame.
+Replace a busy bridge one lane at a time. Keep traffic visible, make
+each change small enough to reverse, and let old and new routes
+coexist safely. A **migration** ends only when evidence shows the old
+route can be removed. Technical leadership turns remaining uncertainty
+into a decision, evidence, an owner, and follow-up.
 
 #### Step-by-step examples
 
