@@ -2,10 +2,56 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
+	"sort"
 	"strings"
 	"testing"
 )
+
+func TestExemptMarkdownKeepsProseUnwrapped(t *testing.T) {
+	_, testFilePath, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("locate line-width test file")
+	}
+	repositoryRoot := filepath.Join(
+		filepath.Dir(testFilePath),
+		"..",
+		"..",
+	)
+
+	paths := make([]string, 0, len(exemptPaths))
+	for path := range exemptPaths {
+		if filepath.Ext(path) != ".md" {
+			t.Fatalf("exempt prose path is not Markdown: %s", path)
+		}
+		paths = append(paths, path)
+	}
+	sort.Strings(paths)
+
+	for _, relativePath := range paths {
+		t.Run(relativePath, func(t *testing.T) {
+			path := filepath.Join(repositoryRoot, relativePath)
+			command := exec.Command(
+				"prettier",
+				"--prose-wrap",
+				"never",
+				"--check",
+				path,
+			)
+			output, err := command.CombinedOutput()
+			if err != nil {
+				t.Fatalf(
+					"check unwrapped prose in %s: %v\n%s",
+					relativePath,
+					err,
+					output,
+				)
+			}
+		})
+	}
+}
 
 func TestExistingRepositoryPathsSkipsDeletedFiles(t *testing.T) {
 	repositoryRoot := t.TempDir()
@@ -127,11 +173,17 @@ func TestScopeForPath(t *testing.T) {
 		path      string
 		wantScope validationScope
 	}{
+		{path: "AGENTS.md", wantScope: skipFile},
+		{path: "CODING_RULES.md", wantScope: skipFile},
+		{path: "CONCEPTS_STANDARDS.md", wantScope: skipFile},
+		{path: "README.md", wantScope: skipFile},
+		{path: "REFERENCE_LINKS.md", wantScope: skipFile},
+		{path: "VALIDATION.md", wantScope: skipFile},
 		{path: "dsa/CONCEPTS.md", wantScope: validateWholeFile},
 		{path: "main.go", wantScope: validateWholeFile},
 		{path: "main.go.template", wantScope: validateWholeFile},
 		{path: "script.sh", wantScope: validateWholeFile},
-		{path: "README.md", wantScope: validateCodeBlocks},
+		{path: "dsa/README.md", wantScope: validateCodeBlocks},
 		{path: "data.csv", wantScope: skipFile},
 	}
 

@@ -84,21 +84,22 @@ technology, zoom, translated text, and missing optional enhancement.
 
 #### How it works
 
-Start with the browser's existing contracts. **Semantic HTML** chooses
-an element by what it means and does, not by its default appearance.
-A button performs an action, a link navigates, a heading names a
-section, and a label names a form control. CSS may change presentation
-without replacing those contracts.
+Start with the browser's existing contracts. **Semantic Hypertext
+Markup Language (HTML)** chooses an element by what it means and does,
+not by its default appearance. A button performs an action, a link
+navigates, a heading names a section, and a label names a form
+control. Cascading Style Sheets (CSS) may change presentation without
+replacing those contracts.
 
 The browser turns the document into several connected views. The
 Document Object Model (DOM) represents nodes and attributes. The
 render tree represents boxes that need visual layout. An
 **accessibility tree** exposes relevant roles, names, descriptions,
-states, values, and relationships to platform accessibility APIs.
-Assistive technologies such as screen readers consume that platform
-information. A node can exist in the DOM while being absent from
-visual or accessibility output, so hidden-state rules must be
-intentional.
+states, values, and relationships through platform accessibility
+application programming interfaces (APIs). Assistive technologies
+such as screen readers consume that platform information. A node can
+exist in the DOM while being absent from visual or accessibility
+output, so hidden-state rules must be intentional.
 
 Build the document outline before individual controls:
 
@@ -191,8 +192,8 @@ Give non-text content an equivalent purpose:
   context. Decorative images use empty alternative text so they do not
   repeat nearby content.
 - Icon-only controls need a name that describes the action, not the
-  icon's shape. Inline SVG may need an explicit name when it carries
-  information.
+  icon's shape. Inline Scalable Vector Graphics (SVG) may need an
+  explicit name when it carries information.
 - Prerecorded video needs captions for speech and meaningful sound;
   audio information needs a transcript or equivalent. Describe visual
   information that the audio does not convey when the workflow needs
@@ -241,37 +242,45 @@ screen.
 
 First input: a valid email `nolan@example.com` in a form with a
 visible `Email` label, native email validation, a `Subscribe` button,
-and an existing empty `role="status"` region. Expected output: one
-save runs, the button is unavailable while pending, and visible status
-becomes `Subscription saved`.
+`submit.disabled = false`, and an existing empty `role="status"`
+region. Expected output: one save runs, the function returns `saved`,
+`submit.disabled` returns to `false`, and visible status becomes
+`Subscription saved`.
 
-1. **Before:** Focus is on the labeled email input. The native form
-   owns Enter-key submission and the email satisfies its constraint.
-   **Decision:** Activate the native submit action. **After:** one
-   `submit` event reaches the handler. **Known correct:** keyboard and
-   pointer activation share one path.
-2. **Before:** Submission is pending. **Decision:** Disable duplicate
-   submission and set visible status to `Saving`. **After:** one save
-   owns the pending state and another submit returns `ignored`.
-   **Known correct:** repeated intent cannot start another save.
-3. **Before:** The request succeeds. **Decision:** Replace the status
-   text with `Subscription saved`, then enable the button in cleanup.
-   **After:** the result is visible and the polite status can announce
-   it. **Known correct:** the workflow has one terminal result and is
-   ready for a later submission.
+1. **Before:** Focus is on the labeled email input, status is empty,
+   and `submit.disabled` is `false`. The email satisfies its native
+   constraint. **Decision:** Activate the native submit action.
+   **After:** one `submit` event reaches the handler with those
+   values.
+   **Known correct:** keyboard and pointer activation share one path.
+2. **Before:** No save owns the form and `submit.disabled` is `false`.
+   **Decision:** Set it to `true`, set status to `Saving`, and start
+   the save. **After:** one save owns the form; another call reads
+   `true` and returns `ignored`. **Known correct:** repeated intent
+   cannot start another save.
+3. **Before:** The request succeeds while `submit.disabled` is `true`
+   and status is `Saving`. **Decision:** Set status to
+   `Subscription saved`, return `saved`, and restore
+   `submit.disabled` to `false` in cleanup. **After:** the result is
+   visible, the polite status can announce it, and the form is ready
+   for a later submission. **Known correct:** success has one terminal
+   result and cannot leave the form pending.
 
-Failure input: the save rejects. Expected output: visible status is
-`Could not save the subscription`, the button is enabled again, and
-the email value remains for correction or retry.
+Failure input: the save rejects. Expected output: the function returns
+`failed`, visible status is `Could not save the subscription`,
+`submit.disabled` returns to `false`, and the email value remains for
+correction or retry.
 
-1. **Before:** The save owns pending state and then rejects.
-   **Decision:** Convert that failure into the explicit error status.
-   **After:** the draft remains and the error is visible.
-   **Known correct:** a transport failure does not erase user input.
-2. **Before:** The error status is set while the button is disabled.
-   **Decision:** Run the same cleanup as success. **After:** the
-   button is enabled. **Known correct:** no terminal path traps the
-   form in a pending state.
+1. **Before:** The save owns the form, `submit.disabled` is `true`,
+   status is `Saving`, and the request rejects. **Decision:** Set the
+   explicit error status and return `failed`. **After:** the draft
+   remains and the error is visible. **Known correct:** a transport
+   failure does not erase user input.
+2. **Before:** The error is visible and `submit.disabled` is `true`.
+   **Decision:** Cleanup restores `submit.disabled` to `false`.
+   **After:** the button is enabled and the draft remains available.
+   **Known correct:** no terminal path traps the form in pending
+   state.
 
 Second input: a toolbar has buttons `[Bold, Italic, Underline]`.
 `Bold` has DOM focus and `tabindex="0"`; its peers have `-1`. Press
@@ -295,19 +304,22 @@ activation key is used.
    moves between components.
 
 Internationalization boundary input: locale `ar-EG`, direction `rtl`,
-item count `2`, and price `2599` minor Egyptian-pound units. Expected
-output: the document declares Arabic and right-to-left direction, the
-complete plural message is selected for Arabic, and price formatting
-uses explicit locale and currency rather than concatenated symbols.
+item count `2`, and price `2599` minor Egyptian-pound units with
+currency code `EGP`. Expected output: Arabic plural rules select
+category `two`; the price is `25.99` major units; and the formatted
+price has code points `U+200F U+0662 U+0665 U+066B U+0669 U+0669`,
+then `U+00A0 U+062C U+002E U+0645 U+002E U+200F`.
 
-1. **Before:** the count, amount, locale, and currency are data
-   without display text. **Decision:** select a complete localized
-   plural message and format `25.99` with `Intl.NumberFormat` for
-   `ar-EG` and `EGP`. **After:** grammar, digits, separators, and
-   currency placement come from one locale contract.
-   **Known correct:** code did not assume English word order or a
-   currency symbol position.
-2. **Before:** Arabic text contains a user-provided Latin product ID.
+1. **Before:** Count is `2`; amount is `2599` minor units; locale is
+   `ar-EG`; currency is Egyptian pound (`EGP`); and no display text
+   exists. **Decision:** Select plural category `two`, convert minor
+   units to `25.99` major units, and format the price for that locale
+   and currency. **After:** the catalog supplies its complete `two`
+   message and the formatter supplies the stated code-point sequence.
+   **Known correct:** code did not assume English grammar, digits,
+   separators, or currency position.
+2. **Before:** Arabic text contains a user-provided Latin product
+   identifier (ID).
    **Decision:** isolate the product ID's direction inside the Arabic
    sentence. **After:** neighboring punctuation keeps its intended
    order. **Known correct:** language choice and direction boundaries
@@ -350,7 +362,9 @@ This example requires a native form `#subscription`, a labeled
 required email input, a submit button, and an existing
 `<p id="status" role="status"></p>`. Native constraint validation runs
 before the `submit` event. Production save code must also send the
-value to a server that validates it.
+value to a server that validates it. Only `submitSubscription` may
+change `submit.disabled`; therefore `true` means one save owns the
+form, while `false` means a call may claim it.
 
 ```typescript
 type SubmissionControls = Readonly<{
@@ -358,11 +372,12 @@ type SubmissionControls = Readonly<{
   submit: Pick<HTMLButtonElement, "disabled">;
 }>;
 
-type SaveSubscription = () => Promise<void>;
+type SaveSubscription = (formData: FormData) => Promise<void>;
 type SubmissionResult = "failed" | "ignored" | "saved";
 
 async function submitSubscription(
   controls: SubmissionControls,
+  formData: FormData,
   save: SaveSubscription,
 ): Promise<SubmissionResult> {
   // One pending save owns the controls until its terminal cleanup.
@@ -371,7 +386,7 @@ async function submitSubscription(
   controls.status.textContent = "Saving";
 
   try {
-    await save();
+    await save(formData);
     controls.status.textContent = "Subscription saved";
     return "saved";
   } catch {
@@ -391,15 +406,17 @@ if (!form || !statusElement || !submit) {
   throw new Error("subscription form is incomplete");
 }
 
-async function saveSubscription(): Promise<void> {
+async function saveSubscription(formData: FormData): Promise<void> {
   // The real boundary would submit FormData to the authorized server.
+  void formData;
   await Promise.resolve();
 }
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   const controls = { status: statusElement, submit };
-  void submitSubscription(controls, saveSubscription);
+  const formData = new FormData(form);
+  void submitSubscription(controls, formData, saveSubscription);
 });
 ```
 
@@ -507,7 +524,7 @@ machine contracts from user-facing language.
   https://www.w3.org/TR/WCAG22/)
 - [ARIA Authoring Practices Guide](
   https://www.w3.org/WAI/ARIA/apg/)
-- [W3C internationalization techniques](
+- [World Wide Web Consortium internationalization techniques](
   https://www.w3.org/International/techniques/authoring-html)
 
 [quality]: #b3-testing-performance-and-frontend-observability
@@ -537,8 +554,9 @@ prevents rebinding; it does not freeze the referenced object.
 
 Use strict equality, `===` and `!==`, unless a coercing comparison is
 deliberately required. A **nullish** value is only `null` or
-`undefined`; a **falsy** value also includes `0`, `NaN`, `""`, and
-`false`. The distinction decides whether `??` or `||` is correct.
+`undefined`; a **falsy** value also includes `0`, Not-a-Number
+(`NaN`), `""`, and `false`. The distinction decides whether `??` or
+`||` is correct.
 
 `let` and `const` create block-scoped bindings. A function remembers
 the lexical bindings visible where the function was created. That
@@ -553,9 +571,10 @@ dependency graph analyzable before evaluation. Dynamic `import()`
 loads a module through a Promise when the path is actually reached.
 
 Synchronous JavaScript uses an execution stack. One callback runs to
-completion before another callback starts on the same agent. The
-browser's **event loop** coordinates that execution with input,
-networking, timers, and rendering:
+completion before another callback starts on the same **agent**, an
+independent JavaScript execution environment. The browser's
+**event loop** coordinates that execution with input, networking,
+timers, and rendering:
 
 - A **task** runs event handlers, timer callbacks, and other platform
   work from a selected task source.
@@ -574,8 +593,10 @@ Browser APIs perform work outside the current JavaScript callback and
 queue a later result. `AbortController` sends a cancellation signal to
 APIs that honor it, but cancellation is cooperative. A server may have
 already committed a write. Web Workers run in another agent and cannot
-touch the document directly. Messages cross the worker boundary by
-structured cloning or by transferring supported ownership.
+touch the document directly. The **structured clone algorithm** copies
+supported message data. Transferring a supported object such as an
+`ArrayBuffer` instead moves control of its backing storage and
+detaches the sender's buffer.
 
 Objects remain in memory while reachable. Event listeners, timers,
 module state, and closures can retain an otherwise unused subtree.
@@ -592,27 +613,44 @@ delay timer, then records `task:end`. Expected output:
 1. **Before:** The task begins with `events = []`. **Decision:** Push
    `task:start`, queue the Promise reaction, then queue the explicit
    microtask. **After:** `events = [task:start]`; the microtask queue
-   contains `promise`, then `queued`. **Known correct:** Neither
-   microtask can interrupt the running task.
+   contains callbacks that append `microtask:promise`, then
+   `microtask:queued`. **Known correct:** Neither microtask can
+   interrupt the running task.
 2. **Before:** The same task still owns the stack. **Decision:** Queue
    the timer task and push `task:end`. **After:**
    `events = [task:start, task:end]`; both microtasks and the timer
-   are pending. **Known correct:** All synchronous work finished in
-   source order.
+   task are pending in their respective queues. **Known correct:** All
+   synchronous work finished in source order.
 3. **Before:** The stack is empty and the microtask queue is
-   `[promise, queued]`. **Decision:** Drain it from oldest to newest.
-   **After:** `events` ends with `microtask:promise`, then
-   `microtask:queued`. **Known correct:** The microtask queue is empty
-   before another task starts.
+   `[append microtask:promise, append microtask:queued]`.
+   **Decision:** Drain it from oldest to newest. **After:**
+   `events = [task:start, task:end, microtask:promise,`
+   `microtask:queued]`; the microtask queue is empty and the timer
+   task is still pending. **Known correct:** No later task started
+   before the checkpoint finished.
 4. **Before:** The microtask queue is empty. The timer later becomes
    runnable. **Decision:** Run its callback and append `task:timer`.
    **After:** The expected five-item sequence is complete.
    **Known correct:** A zero delay did not bypass task ordering.
 
-Closure boundary example: create `readQuery = () => query` while
-`query` is `"ca"`, then assign `query = "cat"`. Calling `readQuery()`
-returns `"cat"` because it reads the captured binding. Copy
-`const submittedQuery = query` when a stable snapshot is required.
+Closure boundary input: `query` starts as `"ca"`. Create
+`readQuery = () => query` and `submittedQuery = query`, then assign
+`query = "cat"`. Expected output: `readQuery()` returns `"cat"`, while
+`submittedQuery` remains `"ca"`.
+
+1. **Before:** The `query` binding stores `"ca"`. **Decision:** Create
+   the closure and copy the primitive into `submittedQuery`.
+   **After:** `readQuery` refers to the `query` binding, while
+   `submittedQuery` stores its own `"ca"`. **Known correct:** The
+   closure and the snapshot have different data contracts.
+2. **Before:** `query` and `submittedQuery` both read `"ca"`.
+   **Decision:** Assign `"cat"` to the `query` binding. **After:**
+   `query` reads `"cat"`; `submittedQuery` still reads `"ca"`.
+   **Known correct:** Rebinding did not mutate the copied primitive.
+3. **Before:** The closure still refers to the `query` binding.
+   **Decision:** Call `readQuery()`. **After:** It returns `"cat"`.
+   **Known correct:** A closure reads the current captured binding,
+   not a creation-time copy.
 
 #### Why it works
 
@@ -621,6 +659,11 @@ observing a half-finished synchronous update. When that callback ends,
 the HTML event-loop contract drains the microtask queue before the
 next task. Queue insertion order therefore establishes the two
 microtask results in the trace.
+
+The trace assumes no other code writes to `events`. Its callbacks add
+only finite work and do not requeue themselves, so both microtasks and
+the timer finish. The awaiting function can then return the complete
+collection.
 
 Closures stay connected to lexical bindings, so later reads observe
 the binding's current value. Promises schedule reactions instead of
@@ -675,8 +718,10 @@ observeEventOrder().then((events) => {
 // A closure reads its captured binding, not a creation-time copy.
 let query = "ca";
 const readQuery = (): string => query;
+const submittedQuery = query;
 query = "cat";
 console.assert(readQuery() === "cat");
+console.assert(submittedQuery === "ca");
 ```
 
 #### Work and memory
@@ -688,9 +733,10 @@ but adds scheduling overhead and does not reduce total computation.
 
 Each queued callback and closure retains its function plus reachable
 captured state. An unbounded microtask chain can retain data, consume
-CPU, and postpone rendering and input indefinitely. Workers add their
-own runtime memory; cloning a message copies supported data, while
-transferring an `ArrayBuffer` moves its backing storage.
+central processing unit (CPU) time, and postpone rendering and input
+indefinitely. Workers add their own runtime memory; cloning a message
+copies supported data, while transferring an `ArrayBuffer` moves its
+backing storage.
 
 #### When to use it
 
@@ -728,7 +774,8 @@ operation identity and idempotency for uncertain writes.
 - Long microtask chains can block rendering as surely as a long task.
 - A detached DOM node remains retained through listeners or closures.
 - `postMessage` cannot structured-clone functions or DOM nodes.
-- String indexes count UTF-16 code units, not visible graphemes.
+- String indexes count 16-bit Unicode Transformation Format (UTF-16)
+  code units, not user-perceived characters called grapheme clusters.
 - Module imports are live bindings, not copied export snapshots.
 
 #### Related material
@@ -802,12 +849,18 @@ Optional properties differ from properties whose values include
 The `satisfies` operator checks an expression against a type while
 retaining the expression's more specific inferred type.
 
-At a network, storage, URL, worker-message, or user-input boundary,
-validate the runtime value first. A validator may be hand-written or
-generated from one owning schema, but its success type and actual
-checks must agree. After validation, copy or normalize fields when the
-application needs a stable snapshot rather than a mutable external
-object.
+At a network, storage, Uniform Resource Locator (URL), worker-message,
+or user-input boundary, validate the runtime value first. A validator
+may be hand-written or generated from one owning schema, but its
+success type and actual checks must agree. After validation, copy or
+normalize fields when the application needs a stable snapshot rather
+than a mutable external object.
+
+After the object check, this entry uses a record with the lookup
+contract `property name -> unchecked boundary value`. A key selects
+one property, and its stored fact is only the value that arrived. For
+example, `record.items` means "the unchecked value under `items`"; it
+does not mean a validated string array until the element checks pass.
 
 At this book's dated snapshot, TypeScript 7 is the native compiler and
 uses strict and modern module defaults. Version 7.0 does not expose a
@@ -817,7 +870,7 @@ workspace compiler and verify the complete toolchain before upgrading.
 
 #### Step-by-step examples
 
-Input: unknown JSON
+Input: the parsed value from JavaScript Object Notation (JSON) text
 `{"kind":"ready","requestID":"r7","items":["lamp","desk"]}`.
 Expected output: a trusted `ready` state containing request `r7` and a
 copied two-item string array.
@@ -840,10 +893,24 @@ copied two-item string array.
    is `{ kind: "ready", requestID: "r7", items: ["lamp", "desk"] }`.
    **Known correct:** The application owns a validated snapshot.
 
-Failure example: input
-`{"kind":"ready","requestID":"r8","items":["lamp",2]}` is
-rejected at the array check. Silently filtering out `2` would accept a
-corrupt response and change its meaning.
+Failure input:
+`{"kind":"ready","requestID":"r8","items":["lamp",2]}`.
+Expected output: parsing throws `items must contain only strings` and
+returns no trusted state.
+
+1. **Before:** The whole parsed value is unchecked. **Decision:**
+   Apply the object, `kind`, and `requestID` checks. **After:** The
+   ready variant and request `r8` are confirmed; `record.items` is
+   still an unchecked value. **Known correct:** The failure has not
+   been hidden by an earlier assertion.
+2. **Before:** `record.items` is the array `["lamp", 2]`.
+   **Decision:** Visit every element; `"lamp"` is a string, but `2`
+   is not. **After:** `isStringArray` returns `false`.
+   **Known correct:** The complete array did not earn `string[]`.
+3. **Before:** The item predicate is false. **Decision:** Throw the
+   stated error instead of filtering or coercing `2`. **After:** No
+   `LoadState` is returned. **Known correct:** Corrupt input cannot
+   become a different, apparently valid response.
 
 #### Why it works
 
@@ -852,6 +919,11 @@ the exact fact the type system later relies on. The object check makes
 key lookup safe, the literal check selects one union alternative, and
 the item predicate proves every array element. Copying prevents later
 external mutation from invalidating the accepted snapshot.
+
+The input object and its array are finite. Each check either rejects
+immediately or advances to the next field or item, so validation ends.
+If all checks finish, the constructed snapshot contains only the
+facts those checks established.
 
 Within application code, the discriminant connects each state to its
 available fields. Exhaustive `never` checking makes the compiler
@@ -954,12 +1026,12 @@ types and project boundaries remain valuable design constraints.
 
 #### When to use it
 
-Use discriminated unions for mutually exclusive UI, request, workflow,
-and reducer states. Use `unknown` and runtime validation whenever a
-value crosses a trust or persistence boundary. Use generics when an
-API must preserve an observable relationship between caller-chosen
-types. Use `satisfies` for checked configuration that should retain
-literal inference.
+Use discriminated unions for mutually exclusive user interface (UI),
+request, workflow, and reducer states. Use `unknown` and runtime
+validation whenever a value crosses a trust or persistence boundary.
+Use generics when an API must preserve an observable relationship
+between caller-chosen types. Use `satisfies` for checked configuration
+that should retain literal inference.
 
 Enable strict checking and choose additional indexed-access and
 optional-property rules deliberately for new code. Migrate older code
@@ -1021,14 +1093,16 @@ without duplicating a write.
 A URL identifies where and how to address a resource. Its scheme and
 authority select the network endpoint; its path and query identify the
 target used by the application. The fragment stays in the user agent
-and is not sent in an HTTP request.
+and is not sent in a Hypertext Transfer Protocol (HTTP) request.
 
 Before an HTTPS request can carry application data, the client usually
 resolves a host, establishes a transport connection, and negotiates
 Transport Layer Security (TLS). Reused connections can avoid some of
-that setup. HTTP/2 multiplexes messages over a connection using TCP.
-HTTP/3 uses QUIC over UDP. Loss in one stream need not block delivery
-of other streams in the same way. All versions share HTTP semantics.
+that setup. HTTP/2 can carry several message streams over one
+Transmission Control Protocol (TCP) connection. HTTP/3 uses QUIC over
+User Datagram Protocol (UDP). Loss in one stream need not block
+delivery of other streams in the same way. All versions share HTTP
+semantics.
 
 An HTTP request has a method, target, fields called headers, and
 optionally content. A response has a status code, headers, and
@@ -1049,10 +1123,14 @@ or an abort. A successful status still does not prove that decoded
 content matches the application contract.
 
 An HTTP cache stores a response with metadata and reuses it only when
-the request and policy allow. `Cache-Control: max-age=60` makes a
-response fresh for a bounded time. `no-cache` allows storage but
-requires validation before reuse. `no-store` requests that caches not
-store the response.
+the request and policy allow. Its lookup contract is
+`request cache key -> stored response and metadata`. The URL and any
+selected request fields choose an entry. For example, a catalog URL
+plus its locale must select only the representation for that locale.
+
+`Cache-Control: max-age=60` makes a response fresh for 60 seconds.
+`no-cache` allows storage but requires validation before reuse.
+`no-store` requests that caches not store the response.
 
 A validator such as `ETag: "v4"` names a selected representation. A
 later request can send `If-None-Match: "v4"`; a `304 Not Modified`
@@ -1063,8 +1141,9 @@ and feature variants need deliberate cache boundaries.
 
 Compression reduces transferred bytes but costs CPU and decoded
 memory. Streaming lets a consumer process chunks before the full body
-arrives, but application framing, cancellation, partial failure, and
-backpressure still need contracts. Aborting a request stops the
+arrives. Application framing, cancellation, partial failure, and a
+rule for slowing a producer when its consumer cannot keep up, called
+**backpressure**, still need contracts. Aborting a request stops the
 client's interest; it does not prove the server reversed completed
 work.
 
@@ -1073,17 +1152,19 @@ Choose a live-update transport from the direction and delivery need:
 - Polling repeats ordinary HTTP requests. It is simple and cacheable,
   but idle clients still make requests and updates arrive only at the
   polling interval.
-- Server-Sent Events use `EventSource` for a UTF-8 server-to-client
-  event stream. The browser reconnects and can send a last event ID;
-  client-to-server work still uses a separate request.
+- Server-Sent Events use `EventSource` for an 8-bit Unicode
+  Transformation Format (UTF-8) server-to-client event stream. The
+  browser reconnects and can send a last event ID; client-to-server
+  work still uses a separate request.
 - WebSocket keeps one bidirectional connection. The application
   must define authentication, message schemas, heartbeat, reconnect,
   resume, capacity, and slow-consumer policy. The browser API
   does not provide stream backpressure.
 - WebTransport can provide several streams and datagrams over HTTP/3.
   Use it only when those modes and target-browser support solve a
-  measured need. WebRTC better fits peer media or data, but
-  it adds signaling, connectivity, and privacy work.
+  measured need. Web Real-Time Communication (WebRTC) better fits peer
+  media or data, but it adds signaling, connectivity, and privacy
+  work.
 
 Every live stream can disconnect, repeat, omit, or delay application
 events. Give resumable events an ordered cursor, make repeated events
@@ -1114,10 +1195,28 @@ transferring the JSON body again.
    `["lamp", "desk"]`. **Known correct:** The application receives a
    validated representation rather than stale or empty content.
 
-Failure example: if locale comes from `Accept-Language` instead of the
-query, the response must vary on that field or use another distinct
-cache key. Otherwise an English response can be reused for a
-Vietnamese request.
+Failure input: `/catalog` has cached `{"locale":"en-US"}` from a
+request with `Accept-Language: en-US`. A later request uses the same
+URL with `Accept-Language: vi-VN`. Expected failure when the cache key
+ignores that field: it returns the `en-US` body. Expected correction
+with `Vary: Accept-Language`: the later request receives and stores
+`{"locale":"vi-VN"}` under a distinct match.
+
+1. **Before:** The cache matches only `/catalog`; its stored body is
+   `{"locale":"en-US"}`. **Decision:** Look up the `vi-VN` request
+   using only that incomplete key. **After:** The cache returns the
+   `en-US` body. **Known correct:** The trace exposes the collision;
+   the response does not represent the requested locale.
+2. **Before:** The origin selects content from `Accept-Language`.
+   **Decision:** Return `Vary: Accept-Language` so that field joins
+   the cache match. **After:** The `en-US` and `vi-VN` requests select
+   distinct entries. **Known correct:** Every representation input is
+   now part of cache identity.
+3. **Before:** No `vi-VN` entry exists under the corrected key.
+   **Decision:** Fetch the origin response and store
+   `{"locale":"vi-VN"}` with its metadata. **After:** The later
+   request receives the `vi-VN` body. **Known correct:** Reuse cannot
+   cross the demonstrated locale boundary.
 
 #### Why it works
 
@@ -1251,7 +1350,8 @@ identity, authorization, persistence, ordering, or recovery.
 - A zero-byte `304` is useful only with a matching stored body.
 - `Vary: *` prevents normal reuse of the response.
 - Redirects can change methods, origins, credentials, and cache state.
-- A CDN key that omits authorization or locale can leak wrong data.
+- A content delivery network key that omits authorization or locale
+  can leak wrong data.
 - Aborting a request does not prove a server write was rolled back.
 - `EventSource` has a constrained request API; plan credentials and
   cross-origin policy around the actual browser interface.
@@ -1267,7 +1367,8 @@ identity, authorization, persistence, ordering, or recovery.
 - [TypeScript type modeling and runtime boundaries](
   #a3-typescript-type-modeling-and-runtime-boundaries)
 - [Server data, routing, caching, and forms][data]
-- [HTTP Semantics, RFC 9110](https://www.rfc-editor.org/rfc/rfc9110)
+- [HTTP Semantics, Request for Comments (RFC) 9110](
+  https://www.rfc-editor.org/rfc/rfc9110)
 - [HTTP Caching, RFC 9111](https://www.rfc-editor.org/rfc/rfc9111)
 - [Server-Sent Events](
   https://html.spec.whatwg.org/multipage/server-sent-events.html)
@@ -1281,9 +1382,10 @@ identity, authorization, persistence, ordering, or recovery.
 
 Browser code combines data from URLs, storage, windows, frames,
 third-party scripts, and authenticated servers. The application must
-decide which principal owns each value, which code may read or send
-it, how long it may remain, and how untrusted text stays data rather
-than becoming executable code.
+decide which security identity, called a **principal**, owns each
+value, which code may read or send it, how long it may remain, and how
+untrusted text stays data rather than becoming executable code. An
+origin, account, or service can be a principal.
 
 #### How it works
 
@@ -1316,8 +1418,8 @@ Storage is subject to implementation-defined quotas, eviction, user
 clearing, private modes, and partitioning. Persistent-storage requests
 can reduce automatic eviction where supported but cannot override user
 control. Modern browsers increasingly partition third-party state by
-the top-level site. Partitioned cookies, often called CHIPS, key
-embedded cookie state by that top-level context.
+the top-level site. Cookies Having Independent Partitioned State
+(CHIPS) key embedded cookie state by that top-level context.
 
 A **service worker** is origin-scoped browser code that can mediate
 requests for pages inside its registration scope. It is event-driven
@@ -1371,11 +1473,13 @@ different parsing rules; one generic escape function cannot cover all
 destinations.
 
 Content Security Policy (CSP) restricts allowed resource and script
-execution. Nonces or hashes support a strict script policy;
-`frame-ancestors` controls which pages may embed the response. Trusted
-Types can require dangerous DOM sinks to receive values created by an
-approved policy. These controls reduce impact but do not replace safe
-APIs, validation, and output handling.
+execution. A **nonce** is an unpredictable value used once; a response
+can put it in both a strict script policy and each allowed script.
+Hashes can authorize exact script content. `frame-ancestors` controls
+which pages may embed the response. Trusted Types can require
+dangerous DOM sinks to receive values created by an approved policy.
+These controls reduce impact but do not replace safe APIs, validation,
+and output handling.
 
 Cookie-authenticated writes need CSRF defenses such as suitable
 `SameSite` policy plus a request token or verified origin contract.
@@ -1394,11 +1498,12 @@ often keeps identity-provider tokens out of JavaScript. OAuth 2.0
 delegates access; OpenID Connect adds an identity layer for login. A
 browser-only client is public and cannot protect a client secret. When
 it participates directly, use the authorization code flow with Proof
-Key for Code Exchange (PKCE), exact redirect URIs, and current OAuth
-security guidance. Validate `state`, issuer, and the OpenID Connect
-nonce where their protocols require them. Never put access tokens in
-URLs, and avoid durable script-readable token storage when exposure to
-origin script is outside the threat model.
+Key for Code Exchange (PKCE), exact redirect Uniform Resource
+Identifiers (URIs), and current OAuth security guidance. Validate
+`state`, issuer, and the OpenID Connect nonce where their protocols
+require them. Never put access tokens in URLs, and avoid durable
+script-readable token storage when exposure to origin script is
+outside the threat model.
 
 Passkeys use Web Authentication (WebAuthn). An authenticator creates
 or uses a public-key credential scoped to a relying party. The server
@@ -1435,9 +1540,21 @@ accepted only from that origin, source, and order.
    **Known correct:** A valid message for an old or parallel checkout
    cannot complete this order.
 
-Adversarial example: `event.origin.endsWith("pay.example")` is unsafe
-because a hostile host can satisfy an imprecise suffix test. Parse
-configured URLs and compare their exact serialized origins.
+Adversarial input: the known frame has navigated to
+`https://attackerpay.example` and sends the valid `order-17` payload.
+Expected output: exact origin comparison rejects it. The unsafe check
+`event.origin.endsWith("pay.example")` instead returns `true`.
+
+1. **Before:** The source window identity matches, but its current
+   origin is `https://attackerpay.example`. **Decision:** Apply the
+   suffix check. **After:** It returns `true` for the hostile origin.
+   **Known correct:** Window identity and payload shape cannot repair
+   an imprecise origin rule.
+2. **Before:** The hostile origin still has the valid-looking payload.
+   **Decision:** Compare it with the exact serialized origin
+   `https://pay.example`. **After:** The comparison is false and no
+   payment state changes. **Known correct:** Only the configured
+   principal may complete the order.
 
 Second input: worker `v7` controls an open catalog page. Worker `v8`
 has a versioned shell cache, `/assets/app.8f3.js` is immutable, the
@@ -1499,7 +1616,10 @@ uncertain until an idempotent server confirms its stable operation ID.
 #### TypeScript example
 
 An actual message handler supplies `sourceMatches` from
-`event.source === paymentFrame.contentWindow`.
+`event.source === paymentFrame.contentWindow`. After the object check,
+the record lookup contract is
+`property name -> unchecked message field`; A.3 owns the general
+boundary-validation explanation.
 
 ```typescript
 type MessageEnvelope = Readonly<{
@@ -1555,9 +1675,10 @@ console.assert(rejectedPayment === null);
 
 #### Work and memory
 
-Exact origin, source, type, and order comparisons take constant work
-for this fixed message shape. A validator for a collection must also
-bound and visit that collection. Never parse or allocate an unbounded
+Let `s` be the total characters compared across the origin, type, and
+order fields. The fixed-shape checks use work proportional to `s` and
+constant extra memory. A validator for a collection must also bound
+and visit that collection. Never parse or allocate an unbounded
 message body before enforcing size and rate limits at the closest
 available boundary.
 
@@ -1605,7 +1726,8 @@ resistance and the recovery design justify it.
 
 #### When not to use it
 
-Do not store bearer credentials in script-readable storage when an XSS
+Do not store credentials that work for anyone who possesses them,
+called **bearer credentials**, in script-readable storage when an XSS
 attacker must not read them. Do not treat browser storage as an
 authoritative database or guaranteed durable queue. Do not depend on
 unpartitioned third-party state for a core workflow.
@@ -1705,10 +1827,12 @@ size can therefore prevent a track or flex item from shrinking.
 The **cascade** chooses one value when declarations compete. First
 discard rules whose selectors or conditions do not match. Then compare
 origin and importance, cascade layer, selector specificity, scope
-proximity when scopes are used, and finally source order. Transitions
-and animations have their own cascade positions. For ordinary author
-rules, named layers make precedence explicit; unlayered normal rules
-override normal layered rules.
+proximity when scopes are used, and finally source order. Specificity
+compares selector categories in a fixed order. Scope proximity
+prefers the rule whose scope root is fewer ancestor steps away.
+Transitions and animations have their own cascade positions. For
+ordinary author rules, named layers make precedence explicit;
+unlayered normal rules override normal layered rules.
 
 Choose a layout tool by relationship:
 
@@ -1724,6 +1848,13 @@ Container queries describe the space given to one component. Relative
 units, `minmax()`, `min()`, `max()`, and `clamp()` let values change
 within deliberate bounds. Logical properties such as
 `margin-inline-start` follow the writing direction.
+
+A root-em unit (`rem`) is a multiple of the root element's font size.
+With a `16px` root size, `28rem` is `448px` and `36rem` is `576px`.
+In a grid, one fractional unit (`1fr`) receives one share of remaining
+space. `minmax(0, 1fr)` therefore permits a track to shrink to zero
+before assigning it one share; content rules still decide how its text
+wraps.
 
 After styles are known, the browser computes geometry during layout,
 draws pixels during paint, and combines eligible layers during
@@ -1758,10 +1889,29 @@ narrow container and an image-and-copy grid in the wide container.
    a two-column grid with a bounded image track. **Known correct:**
    DOM and keyboard order stay aligned while presentation adapts.
 
-Boundary example: a product name containing one long URL can force a
-grid wider than its container. Use a shrinkable track such as
-`minmax(0, 1fr)` and an intentional wrapping rule for user content.
-Do not hide overflow until the content-loss policy is understood.
+Boundary input: a `28rem` card has this unbroken product name:
+
+`AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`
+
+Expected failure without shrink and wrap rules: the name's intrinsic
+minimum makes the card overflow horizontally. Expected corrected
+output: the card stays within `28rem` and the name wraps.
+
+1. **Before:** The copy track uses its automatic content minimum and
+   the name has no ordinary break point. **Decision:** Lay out the
+   unbroken name with those defaults. **After:** The copy track
+   remains wider than the available card space. **Known correct:** The
+   trace exposes intrinsic sizing, not an arbitrary viewport
+   breakpoint.
+2. **Before:** The track cannot shrink and the name cannot wrap.
+   **Decision:** Use `minmax(0, 1fr)`, set the grid item's minimum
+   inline size to `0`, and allow wrapping anywhere. **After:** The
+   track may shrink and the name gains emergency break points.
+   **Known correct:** No content has been hidden or discarded.
+3. **Before:** The corrected rules apply inside the `28rem` card.
+   **Decision:** Re-run layout with the same name. **After:** The name
+   wraps and the card stays within its container. **Known correct:**
+   The correction handles content pressure without changing DOM order.
 
 #### Why it works
 
@@ -1773,12 +1923,18 @@ the selected flow algorithm. The container condition depends only on
 the component's available inline size, so the same component can work
 in a sidebar and a main region without knowing the viewport.
 
+For the boundary input, a zero track minimum permits shrinkage and
+`overflow-wrap: anywhere` supplies break points. Both conditions are
+needed: a shrinkable track alone can still show unbroken overflow, and
+wrapping alone may not defeat a grid item's automatic minimum.
+
 #### TypeScript example
 
-The CSS owns presentation. The TypeScript creates semantic content in
-one document update; it does not measure widths or choose a layout.
+The CSS owns presentation. TypeScript installs those rules and creates
+semantic content; it does not measure widths or choose a layout.
 
-```css
+```typescript
+const productCardStyles = String.raw`
 @layer reset, base, components;
 
 @layer reset {
@@ -1821,6 +1977,12 @@ one document update; it does not measure widths or choose a layout.
     }
   }
 }
+`;
+
+// Install declarative rules once; rendering never inspects width.
+const productCardStyle = document.createElement("style");
+productCardStyle.textContent = productCardStyles;
+document.head.append(productCardStyle);
 ```
 
 ```typescript
@@ -1918,11 +2080,13 @@ its layout.
 > keyboard order. A card that looks first can still be reached last.
 > Keep meaningful DOM order aligned with the intended interaction.
 
-- `100vw` can include scrollbar width and create horizontal overflow.
+- One hundred viewport-width units (`100vw`) can include scrollbar
+  width and create horizontal overflow.
 - `height: 100%` has no effect without a definite containing height.
 - A flex or grid item may need `min-inline-size: 0` to shrink.
 - Percentage padding is resolved from a containing inline size.
-- `z-index` cannot escape an ancestor's stacking context.
+- `z-index` cannot escape an ancestor's local painting group, called
+  a stacking context.
 - Fixed pixel heights clip zoomed, translated, or user-sized text.
 - Hover-only disclosure excludes keyboards and touch interactions.
 - Motion needs a reduced-motion policy, not merely a shorter duration.
@@ -1940,12 +2104,13 @@ its layout.
 
 #### The problem it solves
 
-Application source contains TypeScript, JSX, styles, assets, package
-imports, and code for routes that most users never open. Browsers need
-resolved JavaScript and asset URLs, not the repository's source graph.
-A production toolchain must turn one reviewed dependency graph into
-compatible, cacheable artifacts without hiding missing modules,
-shipping unnecessary code, or mixing files from different releases.
+Application source contains TypeScript, JavaScript XML (JSX), styles,
+assets, package imports, and code for routes that most users never
+open. Browsers need resolved JavaScript and asset URLs, not the
+repository's source graph. A production toolchain must turn one
+reviewed dependency graph into compatible, cacheable artifacts without
+hiding missing modules, shipping unnecessary code, or mixing files
+from different releases.
 
 #### How it works
 
@@ -1965,9 +2130,9 @@ not rewrite emitted imports or configure another host by itself.
 TypeScript checking and JavaScript delivery are separate jobs. Type
 annotations and type-only imports are erased. Runtime values remain.
 The `target` setting controls which JavaScript syntax may be emitted;
-it does not add missing browser APIs. Syntax transforms, API
-polyfills, and behavior fallbacks are three separate compatibility
-decisions.
+it does not add missing browser APIs. Syntax transforms, code that
+supplies a missing API, called a **polyfill**, and behavior fallbacks
+are three separate compatibility decisions.
 
 A package manifest states requested dependencies. A lockfile records
 one resolved dependency graph, including transitive versions and
@@ -2044,10 +2209,29 @@ statically imports `chart`. Expected output: the first-load chunk owns
    **Known correct:** An old page can still request an older retained
    admin hash during the deployment window.
 
-Failure example: publishing the new HTML before `app.8fd3.js` reaches
-every serving location creates an entry failure. Deleting the old
-admin chunk immediately can break a tab that loaded the earlier entry
-and requests admin later.
+Failure input: old page `app.7c1.js` can later request
+`admin.55bb.js`; new HTML references `app.8fd3.js`. The new entry has
+not reached one serving location, and the old admin chunk is removed.
+Expected failure: a new visit cannot load `app.8fd3.js`, while an old
+tab cannot load `admin.55bb.js`. Expected correction: upload the new
+entry before its HTML and retain both old assets through the stated
+deployment window.
+
+1. **Before:** One serving location lacks `app.8fd3.js`.
+   **Decision:** Publish HTML that already references that hash.
+   **After:** A new visit at that location receives a missing entry.
+   **Known correct:** A document reference cannot make an absent asset
+   available.
+2. **Before:** An open tab runs `app.7c1.js` and has not opened admin.
+   **Decision:** Delete `admin.55bb.js`, then let the tab request
+   admin.
+   **After:** Its lazy import fails. **Known correct:** The old page's
+   dependency graph remains fixed after a new release is published.
+3. **Before:** Both failure paths are known. **Decision:** Upload all
+   new hashed assets, publish their HTML only after availability, and
+   retain old assets for the deployment window. **After:** New visits
+   and old lazy imports resolve. **Known correct:** Every published
+   reference names an available artifact.
 
 #### Why it works
 
@@ -2067,6 +2251,10 @@ graph was fixed before the deployment.
 
 This small planner exposes the graph rule. A real bundler also handles
 nested dynamic boundaries, shared chunks, CSS, assets, and transforms.
+Its main lookup contract is `module ID -> declared module`. For
+example, key `catalog` selects its static import `price`. The output
+map uses `lazy root ID -> sorted static closure`; key `admin` stores
+`[admin, chart]` for this input.
 
 ```typescript
 type BuildModule = Readonly<{
@@ -2111,7 +2299,9 @@ function planFirstLoad(
         throw new Error(`missing module: ${currentID}`);
       }
       collected.add(currentID);
-      pending.push(...currentModule.staticImports);
+      for (const staticImportID of currentModule.staticImports) {
+        pending.push(staticImportID);
+      }
     }
     return collected;
   }
@@ -2156,16 +2346,43 @@ const initialList = firstLoadPlan.initial.join(",");
 const adminList = firstLoadPlan.lazyByRoot.get("admin")?.join(",");
 console.assert(initialList === "catalog,main,price");
 console.assert(adminList === "admin,chart");
+
+const expectedMissingModuleMessage = "missing module: missing";
+let missingModuleRejected = false;
+try {
+  planFirstLoad(
+    [
+      {
+        dynamicImports: [],
+        id: "main",
+        staticImports: ["missing"],
+      },
+    ],
+    "main",
+  );
+} catch (error: unknown) {
+  if (error instanceof Error) {
+    const hasExpectedMissingModuleMessage =
+      error.message === expectedMissingModuleMessage;
+    missingModuleRejected = hasExpectedMissingModuleMessage;
+  }
+}
+console.assert(missingModuleRejected);
 ```
 
 #### Work and memory
 
-For `v` reachable modules and `e` import edges, graph planning visits
-each relevant module and edge a bounded number of times, so work is
-`O(v + e)` and graph state is `O(v + e)`. Parsing, transforming,
-minifying, and source-map generation add work proportional to source
-size and tool behavior. Persistent build caches trade disk for less
-repeated work and need versioned invalidation.
+Let `m` be all declared modules. Let `v0` and `e0` be the modules and
+static edges reached from the initial entry. For each of `r` lazy
+roots, let `vi` and `ei` be that root's reached modules and edges.
+Building the map visits `m`; collecting closures visits the initial
+graph once and each lazy graph once. The total work is
+`O(m + v0 + e0 + sum(vi + ei))`. Memory including duplicated output
+closures is `O(m + v0 + sum(vi))`. A real bundler may share common
+lazy dependencies instead. Parsing, transforming, minifying, and
+source-map generation add work proportional to source size and tool
+behavior. Persistent build caches trade disk for less repeated work
+and need versioned invalidation.
 
 Runtime cost is different from build cost. Count compressed bytes,
 requests, parse and compile time, execution, CSS discovery, and memory
@@ -2270,6 +2487,12 @@ and `key` when supplied. A stable key says which sibling is the same
 logical item across insertion, deletion, and reordering. Keys are
 local to one sibling list; they are not globally unique IDs. Changing
 a key intentionally resets that subtree's state and DOM.
+
+The state lookup contract is
+`component type and sibling position or key -> retained hook state`.
+The address selects one mounted subtree; the stored fact is that
+subtree's state. For example, `Row` with key `A` maps to A's draft
+even after the row moves to another list position.
 
 Each render receives a fixed **state snapshot**. Calling a state
 setter queues work; it does not change variables or event handlers
@@ -2402,11 +2625,27 @@ becomes ready.
    **After:** React renders and commits B's name. **Known correct:**
    The prop, request state, and product share identity B.
 
-Identity boundary example: for rows `[A, B]`, keys `A` and `B` keep
-each draft with its row when the list becomes `[B, A]`. Position keys
-`0` and `1` preserve state at the positions instead, so A's draft can
-appear in B's row. Changing a form key from `A` to `B` is appropriate
-when that draft must intentionally reset for a new record.
+Identity boundary input: rows are
+`[{ id: A, draft: alpha }, { id: B, draft: beta }]`, then reorder to
+`[B, A]`. Expected output with keys `A` and `B`: B still owns `beta`
+and A still owns `alpha`. Expected failure with position keys `0` and
+`1`: B receives `alpha` and A receives `beta`.
+
+1. **Before:** Key `A` selects draft `alpha`; key `B` selects draft
+   `beta`. **Decision:** Reorder the elements while preserving those
+   semantic keys. **After:** The first row is B with `beta`; the
+   second is A with `alpha`. **Known correct:** Position changed, but
+   each logical identity retained its own state.
+2. **Before:** The same drafts are instead stored under position keys
+   `0` and `1`. **Decision:** Reorder the records while retaining
+   those positional addresses. **After:** Position `0` now renders B
+   with A's `alpha`; position `1` renders A with B's `beta`.
+   **Known correct:** The trace exposes that position identity is the
+   wrong contract for movable records.
+3. **Before:** A form truly changes from record A to record B and must
+   discard A's draft. **Decision:** Change its key from `A` to `B`.
+   **After:** React creates fresh state for B. **Known correct:** A
+   key change deliberately resets state when product identity changes.
 
 #### Why it works
 
@@ -2548,7 +2787,8 @@ semantic value that must never be forgotten.
 > design so that value is not reactive.
 
 - Calling Hooks conditionally changes their call order across renders.
-- I/O or shared mutation during render leaks abandoned work.
+- Input/output (I/O) or shared mutation during render leaks abandoned
+  work.
 - Three snapshot-based replacements do not equal three updater calls.
 - Array indexes are unsafe keys when items reorder or are inserted.
 - Defining a component inside another component resets its identity.
@@ -2608,8 +2848,10 @@ Start by assigning every fact one authoritative owner:
   the ordering of concurrent writes.
 - A server-data cache owns local snapshots of server records, their
   freshness, in-flight reads, and invalidation policy.
-- A form owns an unconfirmed draft, dirty and touched fields, client
-  feedback, pending submission, and server validation errors.
+- A form owns an unconfirmed draft, fields changed from their initial
+  values (**dirty** fields), fields the user has visited (**touched**
+  fields), client feedback, pending submission, and server validation
+  errors.
 - A component owns temporary interaction that is neither shareable
   nor durable, such as an open disclosure or pointer hover.
 
@@ -2701,8 +2943,9 @@ shared cache optimistically.
 
 Use native form semantics even when JavaScript enhances submission. A
 `form` groups controls and supports keyboard submission. Labels name
-controls; submit buttons use the intended `type`; `FormData` includes
-successful named controls. Disabled controls and unchecked checkboxes
+controls; submit buttons use the intended `type`. `FormData` includes
+named controls that satisfy the HTML submission rules, called
+**successful controls**. Disabled controls and unchecked checkboxes
 are omitted, and file inputs yield `File` values. Parse every entry as
 untrusted input and place limits on text and files.
 
@@ -2782,10 +3025,28 @@ confirmed order or an explicit unresolved state.
    invalidates affected order queries, and resets the draft.
    **Known correct:** Recovery converges on one server result.
 
-Validation boundary: quantity `0` may fail immediately for guidance,
-but the server still rejects it independently. A server field error
-keeps the original draft and associates the message with the quantity
-control instead of clearing the form.
+Validation boundary input: the draft contains quantity `0`. Expected
+browser output: immediate guidance and no ordinary submission.
+Adversarial input: a caller bypasses that check and submits `0`
+directly. Expected server output: a quantity field error, no order,
+and the original draft retained for correction.
+
+1. **Before:** The browser draft stores quantity `0`. **Decision:**
+   Apply the client rule that quantity must be at least `1`.
+   **After:** The quantity control shows guidance and ordinary
+   submission stops. **Known correct:** The user receives fast help
+   without treating client code as authority.
+2. **Before:** A direct request carrying `0` reaches the server
+   despite the browser rule. **Decision:** Run the same domain
+   validation at the server boundary. **After:** The server returns a
+   stable quantity field error and creates no order.
+   **Known correct:** Bypassing the interface cannot bypass the
+   invariant.
+3. **Before:** The form receives the server field error and still owns
+   the quantity `0` draft. **Decision:** Associate the error with that
+   control and preserve the draft. **After:** The user can change the
+   same value and resubmit. **Known correct:** Rejection does not
+   erase the input needed for recovery.
 
 #### Why it works
 
@@ -2945,9 +3206,10 @@ effects.
 
 Use a server-data cache when reads need deduplication, freshness,
 invalidation, prefetching, retries, or reuse across observers. Use
-form state for drafts and field feedback. Use pessimistic
-confirmation for consequential writes and optimistic display for
-predictable, reversible interactions where latency would harm use.
+form state for drafts and field feedback. Wait for server confirmation
+before displaying a consequential write, a policy called
+**pessimistic confirmation**. Use optimistic display for predictable,
+reversible interactions where latency would harm use.
 
 #### When not to use it
 
@@ -2963,9 +3225,10 @@ applications sometimes use normalized entity stores.
 
 #### Common mistakes and edge cases
 
-> **Warning:** A cache key missing `userId`, locale, filter, or page
-> can show one request's data in another request's view. Include every
-> representation input, then enforce authorization independently.
+> **Warning:** A cache key missing `accountID`, locale, filter, or
+> page can show one request's data in another request's view. Include
+> every representation input, then enforce authorization
+> independently.
 
 - Duplicate search parameters can make client and server parse
   different values.
@@ -3103,18 +3366,19 @@ Field data proves distribution; laboratory traces help explain cause.
 The current Core Web Vitals are:
 
 - **Largest Contentful Paint (LCP)** measures loading. Its good
-  threshold is at most `2.5s`.
+  threshold is at most 2.5 seconds.
 - **Interaction to Next Paint (INP)** for responsiveness, with a good
-  threshold of at most `200ms`.
+  threshold of at most 200 milliseconds.
 - **Cumulative Layout Shift (CLS)** for unexpected visual movement,
-  with a good threshold of at most `0.1`.
+  with a unitless good threshold of at most `0.1`.
 
-Evaluate these at the 75th percentile and segment mobile and desktop.
-These are current shared thresholds, not a complete product budget.
-Also measure server response, first content, route transitions, task
-or animation-frame blocking, memory, and business actions such as time
-to search results or checkout confirmation. Refresh definitions
-against the linked source when the technology snapshot changes.
+Evaluate these at the 75th percentile, abbreviated **p75**, and
+segment mobile and desktop. These are current shared thresholds, not
+a complete product budget. Also measure server response, first
+content, route transitions, task or animation-frame blocking, memory,
+and business actions such as time to search results or checkout
+confirmation. Refresh definitions against the linked source when the
+technology snapshot changes.
 
 Do not average away slow users. Report percentiles and sample counts.
 Then segment by route template, release, device class, browser,
@@ -3194,19 +3458,21 @@ order after retry.
    is not the only evidence for the owned risk.
 
 Second input: candidate release `r42` has four mobile checkout
-samples. LCP values are `[1800, 2100, 2300, 2600]ms`, INP values are
-`[130, 170, 260, 310]ms`, and CLS values are
+samples. LCP values in milliseconds are
+`[1800, 2100, 2300, 2600]`, INP values in milliseconds are
+`[130, 170, 260, 310]`, and unitless CLS values are
 `[0.02, 0.05, 0.08, 0.12]`. Expected output: the teaching evaluator
 passes LCP and CLS but fails INP because its 75th percentile is
-`260ms`, above the `200ms` threshold.
+260 milliseconds, above the 200-millisecond threshold.
 
 1. **Before:** The LCP samples are unsorted. **Decision:** Sort and
    select nearest rank `ceil(0.75 * 4) = 3`. **After:** LCP p75 is
-   `2300ms`. **Known correct:** It passes the `2500ms` threshold.
+   2,300 milliseconds. **Known correct:** It passes the
+   2,500-millisecond threshold.
 2. **Before:** INP samples are unsorted. **Decision:** Apply the same
-   rank to `[130, 170, 260, 310]`. **After:** INP p75 is `260ms`.
-   **Known correct:** The candidate fails responsiveness even though
-   its fastest half looks healthy.
+   rank to `[130, 170, 260, 310]`. **After:** INP p75 is 260
+   milliseconds. **Known correct:** The candidate fails responsiveness
+   even though its fastest half looks healthy.
 3. **Before:** CLS samples are unsorted. **Decision:** Select the
    third sorted value. **After:** CLS p75 is `0.08`.
    **Known correct:** It passes the `0.1` threshold.
@@ -3224,10 +3490,23 @@ passes LCP and CLS but fails INP because its 75th percentile is
    **Known correct:** A code change is not successful until user
    evidence improves.
 
-Privacy boundary: if a failing URL contains `?email=a@example.test`,
-record route template `/checkout`, release `r42`, and a random
-correlation ID. Do not send the raw URL, email, form draft, token, or
-DOM text to make diagnosis easier.
+Privacy boundary input: a failed request has URL
+`/checkout?email=a@example.test`, release `r42`, and a random
+correlation ID `c17`. Expected telemetry output: route template
+`/checkout`, release `r42`, and correlation ID `c17`, with no raw URL,
+email, form draft, token, or DOM text.
+
+1. **Before:** The failure context contains both permitted release
+   data and private URL content. **Decision:** Map the URL to its
+   route template and copy only allowlisted fields. **After:** The
+   event is
+   `{ route: "/checkout", release: "r42", correlationID: "c17" }`.
+   **Known correct:** The email and raw URL never enter the event.
+2. **Before:** The bounded event is ready for reporting.
+   **Decision:** Validate its versioned schema before enqueueing it.
+   **After:** Only the three declared fields enter the bounded queue.
+   **Known correct:** Diagnosis keeps stable context without
+   collecting the user's form or document content.
 
 #### Why it works
 
@@ -3252,7 +3531,11 @@ from known contract through real outcome.
 
 This teaching evaluator shows the percentile and threshold decision.
 Production evaluation also needs sufficient samples, cohort rules,
-metric attribution, and a maintained Web Vitals implementation.
+metric attribution, and a maintained Web Vitals implementation. Its
+sample lookup contract is `vital name -> observed numeric samples`.
+The threshold lookup contract is `vital name -> maximum good value`.
+LCP and INP values use milliseconds; CLS values are unitless. Thus
+`INP -> 200` means an INP p75 at or below 200 milliseconds passes.
 
 ```typescript
 const vitalNames = ["LCP", "INP", "CLS"] as const;
@@ -3341,6 +3624,14 @@ console.assert(resultByName.get("INP")?.percentile75 === 260);
 console.assert(resultByName.get("INP")?.passes === false);
 console.assert(resultByName.get("CLS")?.percentile75 === 0.08);
 console.assert(resultByName.get("CLS")?.passes === true);
+
+let emptySamplesRejected = false;
+try {
+  nearestRankPercentile([], 0.75);
+} catch {
+  emptySamplesRejected = true;
+}
+console.assert(emptySamplesRejected);
 ```
 
 #### Work and memory
@@ -3352,10 +3643,11 @@ browser matrices are expensive and should cover risk deliberately.
 Parallel work reduces elapsed time but increases CPU, memory, ports,
 accounts, and fixture-isolation requirements.
 
-For `n` metric samples, the example copies and sorts each collection,
-using `O(n log n)` comparison work and `O(n)` additional memory.
-Production percentile systems normally aggregate or sketch bounded
-distributions instead of retaining every sample in one browser.
+For `n` samples in one metric, the example copies and sorts that
+collection, using `O(n log n)` comparison work and `O(n)` additional
+memory. It repeats that work for each of the three metrics. Production
+percentile systems normally aggregate or sketch bounded distributions
+instead of retaining every sample in one browser.
 
 Measurement itself consumes main-thread work, memory, and network.
 Bound observation, serialize small schemas, batch responsibly, sample
@@ -3572,16 +3864,38 @@ recommendations reveal later without replacing the product.
    work completes. **After:** Product and recommendations are visible.
    **Known correct:** Every displayed region describes product `p1`.
 
-Failure example: if the server formats a price with `en-US` but the
-first client render uses an inferred `vi-VN` locale, text can differ
-during hydration. Serialize the chosen locale or the formatted value
-as part of the initial snapshot instead of guessing twice.
+Hydration failure input: the server uses locale `en-US` and emits
+price text `$25.99`. The first client render infers `vi-VN` and emits
+the same amount as `25,99 U+00A0 US$`, where `U+00A0` is a nonbreaking
+space. Expected failure: the first client text differs from the server
+text. Expected correction: the initial snapshot carries `en-US` or
+the already formatted `$25.99`, and both renders use that value.
 
-Missing-route example: request `/products/gone` has no product.
-Expected output: a useful not-found document with HTTP status `404`, a
-not-found title, and no product structured data. Returning that same
-page with `200` would be a soft 404: the transport would claim a
-resource exists while the visible output says it does not.
+1. **Before:** Server HTML contains `$25.99`; the client has not
+   hydrated. **Decision:** Infer `vi-VN` independently for the first
+   client render. **After:** The client describes different text.
+   **Known correct:** Equal numeric data alone does not make
+   serialized interface output equal.
+2. **Before:** The locale choice belongs to the route snapshot.
+   **Decision:** Serialize that choice or its formatted result and use
+   it for both first renders. **After:** Server and client both
+   describe `$25.99`. **Known correct:** Hydration begins from one
+   authoritative display snapshot.
+
+Missing-route input: request `/products/gone` has no product. Expected
+output: a useful not-found document with HTTP status `404`, a
+not-found title, and no product structured data.
+
+1. **Before:** Route parameter `gone` is valid text but no record
+   exists. **Decision:** Return the not-found document with status
+   `404` and omit product metadata. **After:** Transport and visible
+   output both say the product is absent. **Known correct:** No
+   structured data claims a missing product exists.
+2. **Before:** The same not-found document is available.
+   **Decision:** Consider returning it with status `200`. **After:**
+   That alternative is a soft 404: transport says the resource exists
+   while visible output says it does not. **Known correct:** The
+   demonstrated `404` branch preserves one route truth.
 
 #### Why it works
 
@@ -3607,7 +3921,10 @@ navigation contract even when client-side routing enhances them.
 
 This boundary mapper removes a server-only field and formats the price
 once. The same returned snapshot must drive server HTML and the first
-client render.
+client render. The input contract is
+`priceCents -> integer number of United States dollar cents`.
+For example, `2599` means 2,599 cents; `2599 / 100 = 25.99` major
+units, which `en-US` and `USD` format as `$25.99`.
 
 ```typescript
 type ProductRecord = {
@@ -3848,21 +4165,26 @@ Use a small number of roles with one-way dependency rules:
 The intended import direction is:
 
 ```text
-application -> feature -> design system -> platform
-      |           +---------------------> platform
-      +----------------> design system
-      +---------------------------------> platform
+app/routes [application]
+  -> checkout/view [feature]
+  -> design-system/dialog [design system]
+  -> platform/dom [platform]
+
+checkout/view -> design-system/dialog -> platform/dom
 ```
 
-An arrow means "may import." Public entry points make that permission
-explicit. Prevent deep imports and cycles with package exports, path
-rules, a dependency-graph check, or equivalent build enforcement.
-Code review alone does not reliably preserve an architectural rule.
+An arrow means "may import." These concrete modules follow the general
+application-to-feature-to-shared-capability direction. Public entry
+points make that permission explicit. Prevent deep imports and cycles
+with package exports, path rules, a dependency-graph check, or
+equivalent build enforcement. Code review alone does not reliably
+preserve an architectural rule.
 
 A repository boundary and a runtime boundary solve different
-problems. A folder, workspace package, or monorepo can enforce imports
-and ownership while still producing one deployment. Split a package
-when it has a stable public contract, owner, test boundary, or release
+problems. A folder, workspace package, or one repository containing
+several projects, called a **monorepo**, can enforce imports and
+ownership while still producing one deployment. Split a package when
+it has a stable public contract, owner, test boundary, or release
 need. Do not publish a package merely because two files share a name.
 A monorepo centralizes source and tooling; it does not automatically
 create modular code.
@@ -3956,11 +4278,11 @@ semantic or component intent, not a raw blue value.
 
 The Design Tokens Community Group Format Module 2025.10 is the first
 stable exchange format for typed tokens, groups, aliases, and
-extensions. It is a Community Group report, not a W3C Recommendation.
-Use it when tool interoperability helps, while keeping naming,
-ownership, theme policy, and generated output under product control.
-Its separate resolver work remains a draft and is not required for a
-sound token architecture.
+extensions. It is a Community Group report, not a World Wide Web
+Consortium (W3C) Recommendation. Use it when tool interoperability
+helps, while keeping naming, ownership, theme policy, and generated
+output under product control. Its separate resolver work remains a
+draft and is not required for a sound token architecture.
 
 Resolve themes by changing semantic assignments, not by adding a
 `dark` branch inside every component. Treat light, dark,
@@ -4002,7 +4324,8 @@ supported range and test its edges. A version number communicates the
 release, but a changelog, examples, deprecation period, and migration
 tool explain how to adopt it.
 
-Choose a **micro-frontend** only when independently operating teams
+Split one product into independently deployed frontend applications,
+called **micro-frontends**, only when independently operating teams
 need independent delivery and that autonomy outweighs runtime cost.
 Define one shell owner and contracts for routing, authentication,
 navigation, shared dependencies, styling, communication, telemetry,
@@ -4172,6 +4495,9 @@ within that boundary are allowed; imports to another role must follow
 the declared direction. Each module `id` must be unique. The lookup
 contract is `module ID -> boundary and layer`. For example,
 `checkout/view` maps to the checkout boundary in the feature layer.
+The policy lookup is
+`source layer -> allowed cross-boundary target layers`. For example,
+`feature` stores `[design-system, platform]`.
 
 ```typescript
 type ProductLayer = "application" | "feature";
@@ -4431,11 +4757,12 @@ engineer's memory or authority.
 #### How it works
 
 Treat delivery as a controlled state transition. At every stage, know
-which version serves which cohort, which data shapes remain valid,
-which measurements permit the next step, and which action follows a
-breach. A **migration** is complete only when the new path owns the
-workflow, no supported consumer needs the old contract, compatibility
-code and controls are removed, and the final state is documented.
+which version serves which **cohort**, a defined group of users or
+requests, which data shapes remain valid, which measurements permit
+the next step, and which action follows a breach. A **migration** is
+complete only when the new path owns the workflow, no supported
+consumer needs the old contract, compatibility code and controls are
+removed, and the final state is documented.
 
 Separate three operations that are often called a release:
 
@@ -4457,7 +4784,8 @@ Before changing production, write a small change contract:
 1. State the user or system outcome and the current baseline.
 2. Name the owner, affected surfaces, dependencies, and cohorts.
 3. List assumptions, failure modes, privacy or security risk, and the
-   largest plausible blast radius.
+   largest plausible set of affected users and systems, called the
+   **blast radius**.
 4. Define preconditions, automated checks, rollout stages, minimum
    observation, and representative success and guardrail signals.
 5. Set advance, hold, rollback, and roll-forward conditions before
@@ -4484,8 +4812,9 @@ shape:
 
 1. **Expand:** Add the new field, endpoint, token, event, or reader
    while the old contract still works.
-2. **Migrate:** move bounded cohorts, backfill or translate stored
-   state, compare outcomes, and reconcile differences.
+2. **Migrate:** move bounded cohorts, run a bounded job that converts
+   existing stored records (a **backfill**) or translate stored state,
+   compare outcomes, and reconcile differences.
 3. **Contract:** after the supported overlap window and evidence show
    old use is gone, remove the old path and compatibility control.
 
@@ -4602,12 +4931,13 @@ hides whether it is a defect, risk, deliberate tradeoff, or obsolete
 idea.
 
 Use delivery measures to find constraints, not to rank individuals.
-DORA's current model measures five application- or service-level
-outcomes. Throughput uses change lead time, deployment frequency, and
-failed deployment recovery time. Instability uses change fail rate and
-deployment rework rate. Read them together, over time, in the local
-context. Turning one measure into a quota invites batching,
-relabeling, or other behavior that makes the number less useful.
+DevOps Research and Assessment (DORA) currently measures five
+application- or service-level outcomes. Throughput uses change lead
+time, deployment frequency, and failed deployment recovery time.
+Instability uses change fail rate and deployment rework rate. Read
+them together, over time, in the local context. Turning one measure
+into a quota invites batching, relabeling, or other behavior that
+makes the number less useful.
 
 #### Step-by-step examples
 
@@ -4679,10 +5009,28 @@ defined safety window.
    **Known correct:** readers stop depending on the field before the
    writer contracts it.
 
-Failure boundary: if the migration had irreversibly rewritten stored
-amounts with a different unit, switching application code back would
-not restore meaning. The plan would halt new exposure, preserve the
-new schema, and roll forward with a compatible reader or repair.
+Irreversible boundary input: old storage has `total = 2599`, measured
+in cents, so it means `$25.99`. A migration overwrites that field with
+`25990`, measured in mills, where one mill is one-tenth of a cent.
+Expected output: halt new exposure and roll forward with a compatible
+reader or repair. Do not restore old code that would read `25990` as
+cents and display `$259.90`.
+
+1. **Before:** Old code reads `2599` cents as `$25.99`.
+   **Decision:** Overwrite the same storage location with `25990`
+   mills and remove the old representation. **After:** The stored
+   number has a new unit and no cents copy remains. **Known correct:**
+   The migration changed data meaning, not only application code.
+2. **Before:** Old code still interprets `total` as cents.
+   **Decision:** Evaluate rollback against the new stored value.
+   **After:** Old code would display `$259.90`. **Known correct:** A
+   code rollback cannot reconstruct the discarded unit contract.
+3. **Before:** New exposure is halted and the mills data remains.
+   **Decision:** Roll forward with a reader that converts
+   `25990 / 1000 = 25.99` dollars, or run a verified repair.
+   **After:** The displayed amount returns to `$25.99` without
+   misreading stored data. **Known correct:** Recovery preserves the
+   only representation that still exists.
 
 Third input: release `r60` keeps exception rate flat but lowers mobile
 checkout completion from `0.980` to `0.920`. Expected output: declare

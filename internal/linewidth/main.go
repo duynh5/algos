@@ -16,6 +16,15 @@ import (
 
 const maximumLineWidth = 70
 
+var exemptPaths = map[string]struct{}{
+	"AGENTS.md":             {},
+	"CODING_RULES.md":       {},
+	"CONCEPTS_STANDARDS.md": {},
+	"README.md":             {},
+	"REFERENCE_LINKS.md":    {},
+	"VALIDATION.md":         {},
+}
+
 type validationScope int
 
 const (
@@ -263,6 +272,10 @@ func openingFenceMarker(line string) string {
 
 func scopeForPath(path string) validationScope {
 	normalizedPath := filepath.ToSlash(path)
+	_, isExempt := exemptPaths[normalizedPath]
+	if isExempt {
+		return skipFile
+	}
 	_, isConceptGuide := conceptGuidePaths[normalizedPath]
 	if isConceptGuide {
 		return validateWholeFile

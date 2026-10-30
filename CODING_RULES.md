@@ -1,24 +1,13 @@
 # AI Code Generation Rules
 
-These rules are mandatory whenever an AI agent creates or modifies
-content expressed as code syntax in this repository. This includes
-source code, tests, scripts, configuration, queries, command examples,
-generated scaffolding, and code examples embedded in documentation. It
-does not include ordinary prose, raw data, lockfiles, or verbatim
-third-party content. Workflow-specific instructions in `AGENTS.md` add
-to these rules and take precedence when they are more specific.
+These rules are mandatory whenever an AI agent creates or modifies content expressed as code syntax in this repository. This includes source code, tests, scripts, configuration, queries, command examples, generated scaffolding, and code examples embedded in documentation. It does not include ordinary prose, raw data, lockfiles, or verbatim third-party content. Workflow-specific instructions in `AGENTS.md` add to these rules and take precedence when they are more specific.
 
 ## Physical Line Width
 
-- Keep every physical line in code files at no more than 70 Unicode
-  characters.
-- Apply the limit to source code, tests, scripts, templates,
-  configuration, queries, generated scaffolding, comments, and code
-  examples embedded in documentation.
-- Ordinary prose outside the active concept guides has no physical
-  line-width limit.
-- Represent long URLs, paths, identifiers, and serialized values
-  without creating a physical code line over 70 characters.
+- Keep every physical line in code files at no more than 70 Unicode characters.
+- Apply the limit to source code, tests, scripts, templates, configuration, queries, generated scaffolding, comments, and code examples embedded in documentation.
+- Ordinary prose outside the active concept guides has no physical line-width limit.
+- Represent long URLs, paths, identifiers, and serialized values without creating a physical code line over 70 characters.
 - Run `go run ./internal/linewidth` after modifying code.
 
 ## Preserve Intent and Existing Behavior
@@ -32,18 +21,10 @@ to these rules and take precedence when they are more specific.
 ## Structure and Maintainability
 
 - Prefer clear, direct code over clever or compressed implementations.
-- Write code so a reader can follow each non-obvious operation from
-  local names, control flow, and nearby comments without reconstructing
-  hidden intermediate steps.
-- Make non-obvious state transitions explicit. Prefer named intermediate
-  values or separate statements when a compact expression hides what is
-  read, changed, preserved, or returned.
-- Keep a concise standard idiom when it is clearer than expanded code.
-  When index arithmetic, a sentinel, a bit operation, a fallback table,
-  mutation, or a compound condition depends on an invariant, explain the
-  invariant and why the operation is safe immediately before it.
-- Do not add temporary values or comments to self-evident operations.
-  Explicitness means exposing necessary reasoning, not narrating syntax.
+- Write code so a reader can follow each non-obvious operation from local names, control flow, and nearby comments without reconstructing hidden intermediate steps.
+- Make non-obvious state transitions explicit. Prefer named intermediate values or separate statements when a compact expression hides what is read, changed, preserved, or returned.
+- Keep a concise standard idiom when it is clearer than expanded code. When index arithmetic, a sentinel, a bit operation, a fallback table, mutation, or a compound condition depends on an invariant, explain the invariant and why the operation is safe immediately before it.
+- Do not add temporary values or comments to self-evident operations. Explicitness means exposing necessary reasoning, not narrating syntax.
 - Prefer explicit, role-based identifiers even when they are longer. Name a count, index, boundary, or state by what it measures and where it applies; for example, use `numNodesInCurrentLayer` instead of `levelSize` and `currentIndex` instead of `i`.
 - Avoid abbreviations such as `cur`, `prev`, and `idx`, vague names whose role is not evident, and single-letter identifiers. Use conventional mathematical symbols only when the surrounding explanation defines the same notation, or when an external interface requires the name.
 - Name mappings and indexed collections by both the stored fact and its lookup dimension when that relationship is not otherwise obvious; for example, use `distanceByVertex` or `earlierIndexByValue` instead of `distance` or `seen`.
@@ -86,10 +67,7 @@ Comment agent-generated code so a learner can follow every meaningful logical bl
 - Add or update only the tests related to the requested change.
 - Cover the main successful path, relevant boundaries and adversarial cases, and at least one meaningful failure or exit path when applicable.
 - Run the narrowest useful validation first, then broaden it when the change crosses package, workflow, or repository boundaries.
-- Treat clarity as a review requirement, not a formatter result. During
-  review, trace each non-obvious expression and state change from its
-  local names and comments; formatting, compilation, and tests alone do
-  not establish compliance.
+- Treat clarity as a review requirement, not a formatter result. During review, trace each non-obvious expression and state change from its local names and comments; formatting, compilation, and tests alone do not establish compliance.
 - Format Go code with `gofmt`. Run the workflow-specific commands required by `AGENTS.md`, followed by `go test ./...` when the change affects buildable Go packages or shared behavior.
 - Review the final diff for accidental changes and verify that implementation, tests, comments, and documentation agree.
 - Turn repeated or correctness-sensitive manual validation into a deterministic script, fixture, test, or documented command when practical.

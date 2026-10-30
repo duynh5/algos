@@ -1,8 +1,9 @@
 # Backend Engineering in Go
 
 This guide owns the active backend teaching material. The lessons use
-one evolving Order API to connect transport contracts, data safety,
-architecture, and production operations.
+one evolving Order application programming interface (API) to connect
+transport contracts, data safety, architecture, and production
+operations.
 
 ## Contents
 
@@ -40,7 +41,8 @@ architecture, and production operations.
 - [Scaling and tenancy](#24-data-scaling-caching-and-tenant-isolation)
 - [Privacy and supply
   chain](#25-security-privacy-and-software-supply-chain)
-- [Cloud and IAM](#26-cloud-infrastructure-and-iam)
+- [Cloud and identity/access management
+  (IAM)](#26-cloud-infrastructure-and-iam)
 - [Platform operations](#27-orchestration-and-platform-operations)
 - [Reliability and
   cost](#28-reliability-engineering-incidents-and-cost)
@@ -82,17 +84,18 @@ in the active entries or the cross-cutting review questions below.
   evidence justifies its cost.
 - Treat a deployed service as an operating-system process. Account for
   its arguments, environment, identity, permissions, signals, exit
-  codes, filesystem, memory, CPU, threads, file descriptors, and
-  sockets. Containers isolate resources; they do not remove them.
+  codes, filesystem, memory, central processing unit (CPU), threads,
+  file descriptors, and sockets. Containers isolate resources; they
+  do not remove them.
 - Treat reading as orientation. Competence requires implementation,
   negative tests, concurrency tests, operational evidence, and an
   explanation of why the result stays correct during failure.
 - Separate confirmed facts, assumptions, open questions, and deferred
   scope. A plausible guess must not silently become a public contract.
 - Prefer one reproducible path from a clean clone to a running
-  service. Local and continuous-integration commands should exercise
-  the same formatter, analysis, tests, race checks, vulnerability
-  checks, build, and smoke tests.
+  service. Local and continuous integration (CI) commands should
+  exercise the same formatter, analysis, tests, race checks,
+  vulnerability checks, build, and smoke tests.
 - Use an architecture decision record for choices with lasting
   tradeoffs. Record the context, alternatives, decision,
   consequences, and evidence that would cause reconsideration.
@@ -123,9 +126,10 @@ in the active entries or the cross-cutting review questions below.
 - Maps return zero values for absent keys, so use the comma-`ok` form
   when absence differs from a stored zero. Initialize before writes,
   never depend on iteration order, and synchronize concurrent access.
-- Strings are immutable bytes, normally UTF-8. Choose deliberately
-  among byte counts, code points, and grapheme-like visible
-  characters; arbitrary byte truncation can split encoded text.
+- Strings are immutable bytes, normally Unicode Transformation Format
+  8-bit (UTF-8). Choose deliberately among byte counts, code points,
+  and grapheme-like visible characters; arbitrary byte truncation can
+  split encoded text.
 - Structs group values. Use a pointer when mutation, identity, or
   meaningful absence requires sharing; do not use one by default.
   Embedding promotes members for composition but is not inheritance.
@@ -175,7 +179,8 @@ in the active entries or the cross-cutting review questions below.
   already occurred.
 - State machines make allowed transitions, terminal states, and late
   or duplicate actions explicit. Invariants state what must always be
-  true independently of HTTP, Go, or SQL.
+  true independently of Hypertext Transfer Protocol (HTTP), Go, or
+  Structured Query Language (SQL).
 - A bounded context owns a coherent model and vocabulary. It can be a
   package in a modular monolith and is not automatically a service.
 - Architecture assigns reasons to change. Transport values,
@@ -197,9 +202,10 @@ in the active entries or the cross-cutting review questions below.
 
 ### HTTP contracts and service lifecycle
 
-- Trace a request through DNS, TCP, Transport Layer Security (TLS), a
-  proxy or load balancer, the Go server, application code, database,
-  and downstream clients. Know which layer owns each timeout, pool,
+- Trace a request through Domain Name System (DNS), Transmission
+  Control Protocol (TCP), Transport Layer Security (TLS), a proxy or
+  load balancer, the Go server, application code, database, and
+  downstream clients. Know which layer owns each timeout, pool,
   identity check, and error.
 - Treat HTTP method, target, headers, representation, status, caching,
   pagination, limits, ordering, and retry semantics as one public
@@ -208,8 +214,8 @@ in the active entries or the cross-cutting review questions below.
   decode input, validate the transport envelope, call one use case,
   and map its known outcomes to stable responses.
 - Enforce media type, body size, unknown-field rejection, and exactly
-  one JSON value. Client-side validation never makes server-side
-  validation optional.
+  one JavaScript Object Notation (JSON) value. Client-side validation
+  never makes server-side validation optional.
 - Separate syntax checks, business validation, authentication,
   authorization, conflict, not-found, dependency failure, and
   internal failure. Use stable machine-readable problem details and a
@@ -244,8 +250,9 @@ in the active entries or the cross-cutting review questions below.
   unique and check constraints, nullability, and exact data types are
   the final integrity barrier when application checks race.
 - Missing, empty, and zero have different meanings. Store money as
-  exact decimal values or integer minor units, event time as a UTC
-  instant, and civil scheduling with its named time zone.
+  exact decimal values or integer minor units, event time as a
+  Coordinated Universal Time (UTC) instant, and civil scheduling with
+  its named time zone.
 - Historical facts keep the values used at the time. For example, an
   order item stores the charged price rather than depending on the
   product's current price.
@@ -254,7 +261,8 @@ in the active entries or the cross-cutting review questions below.
   unused indexes still impose costs.
 - Parameter binding separates data from SQL. Object-relational tools
   do not remove the need to inspect generated queries, row counts,
-  lock behavior, or the N+1 query pattern.
+  lock behavior, or the N+1 query pattern: one initial query followed
+  by one additional query for every returned item.
 - A connection pool is bounded shared concurrency. Configure its
   size, acquisition deadline, lifetime, health, and relationship to
   database capacity. Acquire late and release early.
@@ -349,8 +357,8 @@ in the active entries or the cross-cutting review questions below.
   goroutine, lock, or blocking costs. None replaces the others.
 - Instrument stable boundaries with correlation and trace context.
   Keep secrets and personal data out of telemetry, and keep
-  high-cardinality values such as user IDs and raw URLs out of metric
-  labels.
+  high-cardinality values such as user identifiers (IDs) and raw
+  uniform resource locators (URLs) out of metric labels.
 - Useful service signals cover traffic, error, latency distributions,
   and saturation. A service-level indicator measures user-visible
   behavior; a service-level objective sets its target over a window;
@@ -574,9 +582,9 @@ in the active entries or the cross-cutting review questions below.
   according to the provider's retry contract. Support verification
   key rotation with an overlap window.
 - Subscriber-controlled URLs create server-side request forgery risk.
-  Require HTTPS, reject private and link-local destinations after
-  resolution, revalidate redirects, defend against DNS rebinding, and
-  restrict runtime egress.
+  Require Hypertext Transfer Protocol Secure (HTTPS), reject private
+  and link-local destinations after resolution, revalidate redirects,
+  defend against DNS rebinding, and restrict runtime egress.
 - Stream large objects directly to object storage with short-lived,
   narrow upload grants, random keys, authorization, size and type
   limits, checksums, encryption, lifecycle policy, and asynchronous
@@ -693,6 +701,7 @@ their contents, while slices, maps, and pointers may still reach
 shared storage. **Ownership** says who may change that storage. An
 interface stores both a dynamic type and a value, so an interface
 holding a typed nil pointer is itself non-nil.
+A stock-keeping unit (SKU) is the product's stable catalog identifier.
 
 ### Step-by-step examples
 
@@ -718,12 +727,24 @@ after change:  product.Tags -> array A [coffee, sale]
    reads `"coffee"`. **Known correct:** The clone cannot observe the
    source's later mutation.
 
+Focused lookup input: prices contain SKU `FREE` with price `0` but do
+not contain SKU `MISSING`. Expected output: `LookupPrice("FREE")`
+returns `(0, true)` and `LookupPrice("MISSING")` returns `(0, false)`.
+
+1. **Before:** `FREE` is present with a deliberate zero price.
+   **Decision:** Read the map value and presence result. **After:**
+   Return `(0, true)`. **Known correct:** Zero remains valid data.
+2. **Before:** `MISSING` is absent. **Decision:** Read both map return
+   values. **After:** Return `(0, false)`. **Known correct:** The
+   presence result distinguishes absence from the zero value.
+
 ### Why it works
 
-The invariant is that no mutable backing storage crosses an ownership
-boundary unintentionally. A deep-enough copy establishes independent
-storage. Every later mutation reaches only the selected owner's data,
-so the invariant is preserved for the lifetime of both values.
+The fact that must stay true is that no mutable backing storage
+crosses an ownership boundary unintentionally. This ownership
+invariant is true after `Clone` allocates independent storage. Every
+later mutation reaches only the selected owner's data, so the fact
+remains true for the lifetime of both values.
 
 ### Go example
 
@@ -754,16 +775,20 @@ SKU distinct from a deliberately stored zero price.
 
 ### Work and memory
 
-Cloning takes `O(t)` time and space for `t` tags. Copying the outer
-struct is constant work. Map lookup is `O(1)` average time and uses no
-new storage. Converting a string to `[]rune` costs `O(n)` time and
-space; simple byte indexing does not.
+Let `t` be the number of tags. Cloning visits and stores every tag, so
+it takes `O(t)` time and `O(t)` extra memory. Copying the outer struct
+takes constant work. A map lookup usually examines a constant amount
+of map state, so it takes `O(1)` average time and no growing extra
+memory. For a string containing `b` bytes, conversion to `[]rune`
+visits those bytes and stores the decoded code points, taking `O(b)`
+time and `O(b)` worst-case extra memory. Simple byte indexing does not
+allocate.
 
 ### When to use it
 
-Apply these rules at package, goroutine, cache, persistence, and API
-boundaries. They are especially useful when collections outlive the
-call that supplied them.
+- A mutable collection crosses a package or goroutine boundary.
+- A cache or stored value outlives the call that supplied it.
+- An API must distinguish a missing value from a stored zero value.
 
 ### When not to use it
 
@@ -773,18 +798,32 @@ reason about when their size and lifetime are small.
 
 ### Common mistakes and edge cases
 
-- Treating slice assignment as an element copy.
-- Writing to a nil map or depending on randomized map iteration order.
-- Truncating Unicode by treating a byte index as a character index.
-- Returning a typed nil through an interface and comparing it to nil.
-- Shadowing an outer error with `:=` and checking the wrong variable.
+> **Warning:** After `copyOfTags := product.Tags`, changing
+> `copyOfTags[0]` also changes `product.Tags[0]` when both slices
+> share one backing array. Allocate and copy the elements when the
+> receiver needs independent ownership.
+
+> **Warning:** `var prices map[string]int; prices["tea"] = 4` panics
+> because a nil map cannot accept writes. Initialize the map before a
+> write, and sort copied keys when output order must be stable.
+
+> **Warning:** Cutting `"caf\u00e9"` at an arbitrary byte position can
+> split the final encoded character. Decode code points or use a
+> text-boundary library that matches the required unit.
+
+> **Warning:** Returning `(*CatalogError)(nil)` as an `error` creates
+> a non-nil interface because it still carries a dynamic type. Return
+> a literal nil interface when no error occurred.
+
+> **Warning:** `result, err := load()` inside a nested block can
+> create a new `err`; the outer `err` then remains unchanged. Assign
+> with `=` when the existing error variable owns the later check.
 
 ### Related material
 
-See [Go language refresher][go-refresher],
-[Go backend foundations][go-foundations],
-[errors and cancellation](#2-go-errors-resources-and-cancellation),
-and [language portability](#32-language-portability).
+See [Go backend foundations][go-foundations],
+[Go concurrency](#3-go-concurrency-and-executable-verification), and
+[language portability](#32-language-portability).
 
 ## 2. Go errors, resources, and cancellation
 
@@ -820,13 +859,29 @@ then canceled. Expected output: an error that
    `context.Canceled`. **Known correct:** Added operation context did
    not erase the original error identity.
 
+Focused cleanup example: `open` returns a reader containing `"tea"`;
+its `Close` method increments `closeCount`. Expected output:
+`data="tea"`, `err=nil`, and `closeCount=1`.
+
+1. **Before:** No reader is open and `closeCount=0`. **Decision:**
+   `ReadProduct` calls `open`, checks the error, and immediately
+   schedules `Close`. **After:** The reader is owned by
+   `ReadProduct`. **Known correct:** Every successful acquisition now
+   has one release path.
+2. **Before:** The reader is open. **Decision:** `io.ReadAll` reads
+   `"tea"`, then the function returns. **After:** The deferred close
+   runs and `closeCount=1`. **Known correct:** Both success and an
+   early read failure pass through the same cleanup path.
+
 ### Why it works
 
-The invariant is that each acquired resource has exactly one owner and
-one release path. Last-in-first-out defers mirror nested acquisition.
-Cancellation is cooperative: each blocking layer observes the same
-signal and returns. Error wrapping preserves the causal chain while
-adding the operation that failed.
+The fact that must stay true is that each acquired resource has one
+owner and one release path. This ownership invariant holds because a
+defer is arranged only after acquisition succeeds. Deferred calls run
+from the most recently arranged call backward, which matches nested
+acquisition. Cancellation is cooperative: each blocking layer
+observes the same signal and returns. Error wrapping preserves the
+causal chain while adding the operation that failed.
 
 ### Go example
 
@@ -837,9 +892,32 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 )
 
 var ErrNotFound = errors.New("product not found")
+
+func ReadProduct(
+	open func() (io.ReadCloser, error),
+) (data []byte, err error) {
+	reader, err := open()
+	if err != nil {
+		return nil, fmt.Errorf("open product: %w", err)
+	}
+	// The function owns reader after a successful open, so every return
+	// path must close it and preserve a meaningful close failure.
+	defer func() {
+		closeErr := reader.Close()
+		if err == nil && closeErr != nil {
+			err = fmt.Errorf("close product: %w", closeErr)
+		}
+	}()
+	data, err = io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("read product: %w", err)
+	}
+	return data, nil
+}
 
 func Await(
 	ctx context.Context,
@@ -857,8 +935,10 @@ func Await(
 }
 ```
 
-The ordinary path returns a product. The failure paths retain either
-absence or cancellation identity through the wrapper.
+Valid product strings are non-empty, and `results` remains open until
+it sends a result. The ordinary path returns that product. The failure
+paths retain either absence or cancellation identity through the
+wrapper. `ReadProduct` gives an opened reader one cleanup path.
 
 ### Work and memory
 
@@ -869,8 +949,9 @@ latency belongs in the complexity discussion.
 
 ### When to use it
 
-Use this pattern for I/O, locks, queues, timers, database operations,
-and remote calls whose caller may stop waiting or classify failure.
+- Input/output (I/O), database, or network work acquires a resource.
+- A lock, queue, timer, or remote call can outlive the caller's wait.
+- A caller must classify a wrapped failure by its original identity.
 
 ### When not to use it
 
@@ -880,16 +961,33 @@ errors as panics.
 
 ### Common mistakes and edge cases
 
-- Wrapping with `%v`, which loses the traversable error chain.
-- Deferring cleanup before checking whether acquisition succeeded.
-- Ignoring row iteration, body-close, or buffered-write errors.
-- Creating loop-scoped defers that retain every resource until return.
-- Replacing a request context with `context.Background` mid-call.
-- Returning a typed-nil error through the `error` interface.
+> **Warning:** `fmt.Errorf("load: %v", context.Canceled)` produces
+> text that `errors.Is` cannot traverse. Use `%w` when callers must
+> retain the original error identity.
+
+> **Warning:** Scheduling `file.Close()` before checking a failed open
+> can call a method on an invalid file. Check acquisition first, then
+> arrange cleanup and handle any meaningful close error.
+
+> **Warning:** If row iteration returns two rows and then a protocol
+> error, returning those two rows without checking `rows.Err()` turns
+> a failed query into partial success. Check the terminal iterator
+> error before publishing the result.
+
+> **Warning:** Deferring each close in a loop over 10,000 files
+> retains all successful opens until the outer function returns. Put
+> one iteration in a helper so each defer runs before the next
+> acquisition.
+
+> **Warning:** Replacing a canceled request context with
+> `context.Background()` lets downstream work continue after the
+> caller leaves. Pass the request context through every blocking
+> layer.
 
 ### Related material
 
-See [Go backend foundations][go-foundations],
+See [Go values and ownership](
+#1-go-values-program-structure-and-ownership),
 [HTTP lifecycle](#6-http-contracts-and-process-lifecycle), and
 [synchronous communication](#20-synchronous-service-communication).
 
@@ -905,6 +1003,7 @@ and then create the same SKU.
 
 Imagine two clerks trying to sell the last ticket. Locking only the
 cash drawer is not enough; the check and sale must be protected as one
+decision. A **mutex** is a one-at-a-time lock around that complete
 decision. Each goroutine also needs an owner, a stopping rule, and a
 test that proves the business result.
 
@@ -929,8 +1028,9 @@ the map contains one product.
 
 ### Why it works
 
-The invariant is that a SKU is inserted at most once. It holds for the
-empty store. Mutual exclusion makes check-and-insert one indivisible
+The fact that must stay true is that a stock-keeping unit (SKU) is
+inserted at most once. This uniqueness invariant holds for the empty
+store. Mutual exclusion makes check-and-insert one indivisible
 transition, so a successful insert preserves uniqueness. Joining every
 goroutine makes the test terminate only after all outcomes are known.
 
@@ -942,6 +1042,7 @@ package catalog
 import (
 	"errors"
 	"sync"
+	"testing"
 )
 
 var ErrDuplicate = errors.New("duplicate product")
@@ -964,22 +1065,77 @@ func (store *Store) Create(sku string) error {
 	store.products[sku] = sku
 	return nil
 }
+
+func (store *Store) Size() int {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	return len(store.products)
+}
+
+func TestStoreCreateContention(t *testing.T) {
+	store := NewStore()
+	start := make(chan struct{})
+	outcomes := make(chan error, 2)
+	var workers sync.WaitGroup
+
+	// Make both workers eligible from one deterministic signal. The
+	// production mutex, rather than a test sleep, chooses the winner.
+	workers.Add(2)
+	for workerNumber := 0; workerNumber < 2; workerNumber++ {
+		go func() {
+			defer workers.Done()
+			<-start
+			outcomes <- store.Create("TEA-001")
+		}()
+	}
+	close(start)
+	workers.Wait()
+
+	// Outcome order is irrelevant; the business result is exactly one
+	// success, one duplicate, and one stored product.
+	successCount := 0
+	duplicateCount := 0
+	for resultNumber := 0; resultNumber < 2; resultNumber++ {
+		resultErr := <-outcomes
+		switch {
+		case resultErr == nil:
+			successCount++
+		case errors.Is(resultErr, ErrDuplicate):
+			duplicateCount++
+		default:
+			t.Fatalf("unexpected error: %v", resultErr)
+		}
+	}
+	if successCount != 1 || duplicateCount != 1 {
+		t.Fatalf(
+			"got %d successes and %d duplicates",
+			successCount,
+			duplicateCount,
+		)
+	}
+	if store.Size() != 1 {
+		t.Fatalf("got %d products, want 1", store.Size())
+	}
+}
 ```
 
-A contention test should release two workers from one start channel,
-join them with `sync.WaitGroup`, and assert one nil and one duplicate.
+The test releases two workers from one start channel, joins them with
+`sync.WaitGroup`, and checks the complete business outcome.
 
 ### Work and memory
 
-Map access is `O(1)` average time. Lock wait depends on contention and
-critical-section duration. The store uses `O(n)` memory for `n` SKUs;
-each live goroutine also consumes stack and scheduler resources, which
-is why concurrency must be bounded.
+One map access usually examines a constant amount of map state, so it
+takes `O(1)` average time. Lock wait depends on contention and the
+critical-section duration. Let `n` be the number of stored SKUs. The
+map retains one entry per SKU, so it uses `O(n)` memory. Each live
+goroutine also consumes stack and scheduler resources, which is why
+concurrency must be bounded.
 
 ### When to use it
 
-Use it for shared in-process state, bounded worker coordination, and
-characterizing an invariant before moving enforcement to PostgreSQL.
+- Several goroutines read and change one in-process business rule.
+- A bounded worker group needs explicit start, stop, and join signals.
+- A test must reproduce contention without depending on sleep timing.
 
 ### When not to use it
 
@@ -989,12 +1145,30 @@ already serial, tiny, or governed by a stricter external limit.
 
 ### Common mistakes and edge cases
 
-- Locking the lookup and insert separately.
-- Starting unbounded goroutines or failing to join an error path.
-- Letting receivers close a channel owned by the sender.
-- Treating a buffered channel as an infinite queue.
-- Using atomics for an invariant that spans several values.
-- Using sleeps as synchronization or overclaiming race-detector proof.
+> **Warning:** If A unlocks after finding no `TEA-001` and B performs
+> the same unlocked check before either insert, both calls can report
+> success. Hold one mutex across the complete check-and-insert rule.
+
+> **Warning:** Starting one goroutine per item for a million-item
+> input creates a million stacks and scheduler tasks. Use a worker
+> limit and join every success, cancellation, and error path.
+
+> **Warning:** If a receiver closes `outcomes` while a worker can
+> still send, the worker panics. The sender that knows no more values
+> can arrive should close the channel, or the coordinator should wait
+> for every sender first.
+
+> **Warning:** A buffer of 100 entries still blocks the 101st send
+> when no receiver drains it. Define queue capacity and overload
+> behavior instead of treating buffering as unlimited storage.
+
+> **Warning:** Atomically changing `reserved` without coordinating
+> `available` can expose a pair that violates their shared total. Use
+> one lock around every value in the business invariant.
+
+> **Warning:** A 10 ms sleep can pass on one machine and assert before
+> work finishes on another. Use signals and joins; race-detector
+> silence proves only that it found no memory race in that execution.
 
 ### Related material
 
@@ -1024,7 +1198,8 @@ distinctions that affect behavior.
 
 Input: order `O-42` is `placed` and owned by `C-17`. First `C-99`,
 then `C-17`, asks to cancel it. Expected output: `C-99` is rejected
-without a state change; `C-17` changes the order to `canceled`.
+without a state change; `C-17` changes the order to `canceled` and
+records exactly one `OrderCanceled` event.
 
 1. **Before:** `status=placed`, `owner=C-17`, and actor `C-99` sends
    `Cancel`. **Decision:** Compare actor and owner before changing
@@ -1041,12 +1216,18 @@ without a state change; `C-17` changes the order to `canceled`.
 
 ### Why it works
 
-The invariant is that only the owning customer may perform a legal
-order transition. Every command names its actor, target, and expected
-state. The transition table covers every current state and reaches a
-terminal accepted or rejected result, so there is no implicit path.
+The fact that must stay true is that only the owning customer may
+perform a legal order transition. This authorization invariant holds
+because every command names its actor, target, and expected state. The
+transition table covers every current state and reaches a terminal
+accepted or rejected result, so there is no implicit path. Recording
+the event only after the state check also prevents a rejected command
+from announcing a change.
 
 ### Go example
+
+Assume order and customer identifiers are non-empty, and all status
+changes go through methods that enforce the transition rules.
 
 ```go
 package order
@@ -1056,40 +1237,53 @@ import "errors"
 var ErrCannotCancel = errors.New("order cannot be canceled")
 
 type Status string
+type Event string
 
 const (
-	Placed   Status = "placed"
-	Canceled Status = "canceled"
+	Placed        Status = "placed"
+	Canceled      Status = "canceled"
+	OrderCanceled Event  = "order_canceled"
 )
 
 type Order struct {
 	CustomerID string
 	Status     Status
+	Events     []Event
 }
 
 func (order *Order) Cancel(customerID string) error {
-	if order.CustomerID != customerID || order.Status != Placed {
+	// Authorization is checked before lifecycle state so neither
+	// rejection can mutate the order or announce an event.
+	if order.CustomerID != customerID {
+		return ErrCannotCancel
+	}
+	if order.Status != Placed {
 		return ErrCannotCancel
 	}
 	order.Status = Canceled
+	order.Events = append(order.Events, OrderCanceled)
 	return nil
 }
 ```
 
 The ordinary case performs one legal transition. Wrong ownership or
-state returns a stable domain error and leaves the order unchanged.
+state returns a stable domain error and leaves both status and events
+unchanged.
 
 ### Work and memory
 
-A direct state transition is constant time and space. Discovery work
-grows with the number of distinct stories and stakeholders, not code
-size. Event histories and large rule tables require explicit bounds
-and indexes when they become runtime data.
+A direct status check and update takes constant work. Appending one
+event usually takes constant work, but it can allocate when the slice
+grows. Let `e` be the number of retained events. The event history
+uses `O(e)` result memory; the transition itself needs only constant
+extra working memory. Discovery work grows with the number of distinct
+stories and stakeholders, not code size.
 
 ### When to use it
 
-Use this process when requirements contain lifecycle words, contested
-resources, permissions, money, or coordination with another system.
+- Requirements use lifecycle words such as placed or canceled.
+- A command depends on ownership, permissions, money, or stock.
+- Another system must react to a named fact after a legal transition.
 
 ### When not to use it
 
@@ -1099,19 +1293,34 @@ often the honest model.
 
 ### Common mistakes and edge cases
 
-- Turning every noun into an entity or every method into a service.
-- Naming database writes as events before the business action commits.
-- Letting an aggregate span data that cannot change atomically.
-- Modeling only the happy path and leaving rejection semantics hidden.
-- Treating a diagram as final evidence instead of testing real
-  stories.
+> **Warning:** Giving a shipping address an identity when only its
+> fields matter creates needless lifecycle rules. Model it as a value
+> object unless the product must track that exact address over time.
+
+> **Warning:** Publishing `OrderCanceled` before the transaction
+> commits can announce a cancellation that later rolls back. Record
+> publication intent with the business change and publish after
+> commit.
+
+> **Warning:** An aggregate that requires one atomic change across two
+> independently owned services cannot enforce its own rule. Keep the
+> immediate invariant under one owner or model a durable workflow.
+
+> **Warning:** If the model specifies only `placed -> canceled`, a
+> second cancel has no defined result. Name the rejected outcome and
+> test that status and events remain unchanged.
+
+> **Warning:** A diagram that omits the `C-99` rejection does not
+> prove the ownership rule. Replay concrete accepted and rejected
+> stories in executable tests.
 
 ### Related material
 
-See [domain discovery][domain-reference],
-[service construction](#5-architecture-and-service-construction),
-and [distributed
-workflows](#21-distributed-workflows-and-eventual-consistency).
+See [service construction](
+#5-architecture-and-service-construction),
+[contested state](#8-business-transactions-and-contested-state), and
+[distributed workflows](
+#21-distributed-workflows-and-eventual-consistency).
 
 <a id="2-data-transactions-and-architecture"></a>
 
@@ -1139,8 +1348,9 @@ concrete parts when the service starts.
 ### Step-by-step examples
 
 Input: one HTTP request contains order `O-42` with quantity `0`; a
-second contains quantity `2`. Expected output: the invalid request
-returns `ErrInvalidQuantity` without storage; the valid request calls
+second contains quantity `2`; a scheduled job submits `O-43` with
+quantity `0`. Expected output: both invalid commands return
+`ErrInvalidQuantity` without storage, while the valid command calls
 `Save` once with a domain `Order`.
 
 1. **Before:** The handler has untrusted JSON for quantity `0`.
@@ -1152,20 +1362,24 @@ returns `ErrInvalidQuantity` without storage; the valid request calls
    `Store` interface. **After:** The concrete store receives one
    domain value. **Known correct:** HTTP and persistence details do
    not enter the policy.
-3. **Before:** A scheduled job owns the same typed command.
+3. **Before:** A scheduled job owns command `ID=O-43, Quantity=0`.
    **Decision:** Call the same use case without an HTTP handler.
-   **After:** Validation and storage behavior are unchanged.
-   **Known correct:** The business operation keeps one owner across
-   adapters.
+   **After:** The job receives `ErrInvalidQuantity`, and `Save` still
+   has one total call. **Known correct:** Both adapters use the same
+   business rule.
 
 ### Why it works
 
-The invariant is that business decisions depend only on inward-facing
-contracts. Adapters translate at the edge and the composition root is
-the only place that knows the complete graph. Each dependency can
-therefore change or be replaced without reversing the policy boundary.
+The fact that must stay true is that business decisions depend only on
+inward-facing contracts. This dependency invariant holds because
+adapters translate at the edge and the composition root is the only
+place that knows the complete graph. Each dependency can therefore
+change or be replaced without reversing the policy boundary.
 
 ### Go example
+
+Assume a trusted boundary supplies non-empty order identifiers. The
+use case owns quantity validation and domain-value construction.
 
 ```go
 package orders
@@ -1179,6 +1393,11 @@ var ErrInvalidQuantity = errors.New("quantity must be positive")
 
 type Store interface {
 	Save(context.Context, Order) error
+}
+
+type PlaceCommand struct {
+	ID       string
+	Quantity int
 }
 
 type Order struct {
@@ -1196,10 +1415,16 @@ func NewService(store Store) Service {
 
 func (service Service) Place(
 	ctx context.Context,
-	order Order,
+	command PlaceCommand,
 ) error {
-	if order.Quantity <= 0 {
+	if command.Quantity <= 0 {
 		return ErrInvalidQuantity
+	}
+	// Translate the accepted command into the domain value expected by
+	// the use-case-owned storage contract.
+	order := Order{
+		ID:       command.ID,
+		Quantity: command.Quantity,
 	}
 	return service.store.Save(ctx, order)
 }
@@ -1210,17 +1435,18 @@ the store; a valid order delegates exactly once.
 
 ### Work and memory
 
-Layering adds constant call and translation overhead. Total work still
-comes from validation, database access, and external calls. Excessive
-mapping and broad interfaces add allocations and change surface
-without
-improving isolation.
+The quantity check, two-field translation, and extra function call do
+a fixed amount of local work and retain one small domain value. The
+storage operation still dominates variable latency and resource use.
+For larger payloads, translation work and memory grow with the fields
+actually copied. Duplicate models and broad interfaces add that cost
+without improving isolation.
 
 ### When to use it
 
-Use these boundaries for services with durable policy, multiple entry
-points, or infrastructure that changes independently of business
-rules.
+- Durable business policy must stay independent of HTTP and storage.
+- HTTP, jobs, or commands invoke the same business operation.
+- Infrastructure changes independently of the rules it supports.
 
 ### When not to use it
 
@@ -1229,15 +1455,30 @@ network services merely to imitate an architecture diagram.
 
 ### Common mistakes and edge cases
 
-- Defining repository interfaces in the implementation package.
-- Allowing handlers to begin transactions or assemble domain policy.
-- Hiding dependency construction in globals or package initialization.
-- Returning database records directly as public transport contracts.
-- Calling a package modular while it mutates another package's tables.
+> **Warning:** If a PostgreSQL package defines a broad repository
+> interface, every consumer inherits storage-shaped methods it does
+> not need. Define the smallest interface beside the consuming use
+> case.
+
+> **Warning:** If the HTTP handler saves `Quantity=0` before calling
+> `Place`, transport code has bypassed the rule. Let one use case own
+> validation and its transaction boundary.
+
+> **Warning:** Opening a database from package initialization makes a
+> unit test depend on hidden configuration and startup order. Build
+> concrete dependencies explicitly in the composition root.
+
+> **Warning:** Returning a nullable database row as the public order
+> response leaks storage representation into the API. Translate into
+> an intentional transport contract at the edge.
+
+> **Warning:** A catalog package that updates the orders table can
+> violate order rules without calling the owner. Modularity requires
+> exclusive mutation through the owning package contract.
 
 ### Related material
 
-See [service core][service-core],
+See [domain modeling](#4-domain-discovery-and-modeling),
 [HTTP lifecycle](#6-http-contracts-and-process-lifecycle),
 [relational data](#7-relational-modeling-and-postgresql-access), and
 [service extraction](#19-service-boundary-discovery-and-extraction).
@@ -1262,38 +1503,56 @@ in-flight work finish or cancel it, then close owned resources.
 
 ### Step-by-step examples
 
-Input: `POST /v1/orders` with valid JSON and operation key `K1`.
-Expected output: one order response or one stable documented error.
+Input: authenticated customer `C-17` sends `POST /v1/orders` with
+media type `application/json` and body
+`{"sku":"TEA-001","quantity":2}`. Expected output: status `201` and
+body `{"id":"O-42","sku":"TEA-001","quantity":2}`.
 
 1. **Before:** The server has untrusted bytes and headers.
    **Decision:** Enforce the body limit and expected media type.
    **After:** Oversized or incompatible input is rejected early.
    **Known correct:** Later decoding cannot exceed the stated bound.
-2. **Before:** JSON syntax is valid. **Decision:** Validate required
-   fields and caller authorization. **After:** One typed command
-   reaches the use case. **Known correct:** Transport and access
-   failures cannot enter logic.
-3. **Before:** The use case returns a known outcome. **Decision:** Map
-   it to one status and stable machine code. **After:** The client can
-   choose a documented next action. **Known correct:** Internal error
-   details remain private.
+2. **Before:** The decoded fields are `sku=TEA-001` and `quantity=2`.
+   **Decision:** Validate required fields and authorize `C-17` to
+   create the order. **After:** One typed command reaches the use
+   case. **Known correct:** Transport and access failures cannot enter
+   business logic.
+3. **Before:** The use case returns order `O-42`. **Decision:** Map
+   that created result to the documented status and representation.
+   **After:** The client receives the exact `201` response above.
+   **Known correct:** The public result contains no internal error or
+   persistence details.
 
-Failure example: a second JSON value after the first is rejected
-rather than silently ignored.
+Failure input: the request body is
+`{"sku":"TEA-001","quantity":2} {"quantity":9}`. Expected output:
+status `400`, machine code `invalid_json`, and no use-case call.
 
-Focused shutdown example: input is a termination signal while request
-`R1` is running. Expected output: no new request is admitted, `R1`
-drains within the deadline, and owned dependencies close.
+1. **Before:** The decoder has the full two-value body. **Decision:**
+   Decode the first value into the request shape. **After:** The first
+   object is decoded, but bytes for a second object remain.
+   **Known correct:** The request is not accepted until the decoder
+   proves that input has ended.
+2. **Before:** One complete object remains unread. **Decision:**
+   Decode once more and require an end-of-file (EOF) result.
+   **After:** The second value makes that check fail. The handler
+   returns `invalid_json`. **Known correct:** No trailing value is
+   ignored and no command reaches the use case.
 
-1. **Before:** Readiness is true and `R1` is active. **Decision:** On
-   the signal, set readiness false before shutdown starts.
-   **After:** Load balancers stop sending new requests.
-   **Known correct:** The
+Focused shutdown example: input is a termination signal with a
+five-second shutdown deadline while request `R1` has 200 ms of work
+left. Expected output: no new request is admitted, `R1` finishes, and
+owned dependencies close before five seconds pass.
+
+1. **Before:** Readiness is true, the listener is accepting, and `R1`
+   is active. **Decision:** Set readiness false and stop new accepts.
+   **After:** Readiness advertises draining, the listener admits no
+   new request, and `R1` remains active. **Known correct:** The local
    draining set cannot grow through normal admission.
-2. **Before:** `R1` is still active and the shutdown deadline remains.
-   **Decision:** Wait for `R1` rather than closing its dependencies.
-   **After:** `R1` finishes and the server closes owned resources.
-   **Known correct:** Accepted work finished within bounded shutdown.
+2. **Before:** `R1` has 200 ms left and the five-second deadline
+   remains. **Decision:** Wait for `R1` before closing its
+   dependencies. **After:** `R1` finishes, then the server closes
+   owned resources. **Known correct:** Accepted work finished within
+   the bounded shutdown interval.
 
 ### Why it works
 
@@ -1312,6 +1571,8 @@ after draining or keep using a resource after shutdown completes.
 ### Go example
 
 This complete package fragment owns strict decoding for one request.
+The destination must be a non-nil decode target, and the response
+writer and request must belong to the current HTTP exchange.
 
 ```go
 package requestjson
@@ -1356,9 +1617,9 @@ serialization are additional dimensions and need separate limits.
 
 ### When to use it
 
-Use an explicit contract for every browser-facing or service-facing
-operation, especially authenticated writes, pagination, uploads, and
-work that clients may retry.
+- A browser or service caller needs stable success and error shapes.
+- An authenticated write needs bounded decoding and authorization.
+- Pagination, uploads, retries, or shutdown expose lifecycle rules.
 
 ### When not to use it
 
@@ -1368,16 +1629,37 @@ stream when a streaming protocol is the actual requirement.
 
 ### Common mistakes and edge cases
 
-> **Warning:** CORS allows selected browser origins to read a
-> response. It does not authenticate or authorize the caller.
+> **Warning:** Cross-Origin Resource Sharing (CORS) allows selected
+> browser origins to read a response. It does not authenticate or
+> authorize the caller; enforce identity and action permission on the
+> server.
 
-- A `200` status with an error-shaped body creates two contracts.
-- Retrying writes without idempotency can duplicate state.
-- Liveness checks must not depend on external services.
-- Offset pagination becomes unstable under concurrent insertion.
-- Logging raw bodies or credentials can leak private data.
-- Starting `ListenAndServe` in an unobserved goroutine hides failure.
-- Unlimited graceful shutdown can prevent deployment completion.
+> **Warning:** Returning status `200` with `{"error":"not_found"}`
+> makes callers choose between the status and body. Use one documented
+> status and one stable error representation for that outcome.
+
+> **Warning:** Repeating an unkeyed order-creation request after a
+> timeout can create two orders. Give one logical write a durable
+> idempotency identity before clients retry it.
+
+> **Warning:** A liveness check that fails whenever PostgreSQL is down
+> can restart every healthy process in a loop. Keep liveness local;
+> expose dependency inability through readiness and telemetry.
+
+> **Warning:** With offset `20`, an insertion before the current page
+> can shift one earlier record into the next response. Use a stable
+> total order and a cursor for mutation-prone collections.
+
+> **Warning:** Logging the raw login body exposes credentials to every
+> log reader and sink. Record bounded, allowlisted metadata instead.
+
+> **Warning:** Starting `ListenAndServe` in an unobserved goroutine
+> can hide an immediate bind failure while the process appears
+> healthy. Return the error to the lifecycle owner.
+
+> **Warning:** Waiting forever for `R1` can block a deployment
+> indefinitely. Set a shutdown deadline, propagate its cancellation,
+> and report work that did not drain.
 
 ### Related material
 
@@ -1389,7 +1671,6 @@ stream when a streaming protocol is the actual requirement.
 [frontend-network]:
   ../frontend/CONCEPTS.md#a3-networking-storage-and-browser-security
 [data-lesson]: #8-business-transactions-and-contested-state
-[production-lesson]: #3-production-and-distributed-systems
 
 ## 7. Relational modeling and PostgreSQL access
 
@@ -1414,24 +1695,28 @@ one returns the stable duplicate conflict, and one row exists.
 
 1. **Before:** No `TEA-001` row exists; both statements bind the SKU
    as data. **Decision:** PostgreSQL evaluates both inserts against
-   the same unique constraint. **After:** One statement claims the
-   unique value while the other waits or conflicts. **Known correct:**
-   Application timing cannot create two committed copies.
-2. **Before:** A row with `TEA-001` is committed. **Decision:** Map
-   the losing constraint error to the documented conflict.
-   **After:** The table contains one valid row and the caller gets a
-   stable outcome.
-   **Known correct:** The SKU never became SQL syntax and every writer
-   faced the same integrity rule.
+   the same unique constraint. **After:** A claims the candidate
+   unique value while B waits for A's outcome. **Known correct:** B
+   cannot commit a duplicate while the conflict is unresolved.
+2. **Before:** A owns the candidate value and B is waiting.
+   **Decision:** A commits; PostgreSQL then rechecks B against the
+   committed row. **After:** B's `ON CONFLICT DO NOTHING` returns no
+   row, which the adapter maps to `ErrDuplicate`. **Known correct:**
+   The table contains one row, the SKU remained data rather than SQL
+   syntax, and both writers faced the same integrity rule.
 
 ### Why it works
 
-The invariant is that every stored product has required fields and one
-unique SKU. Constraints run in the same atomic statement as the write,
-so every writer preserves the rule. Parameter binding separates data
-from query structure, and explicit cleanup returns scarce connections.
+The fact that must stay true is that every stored product has required
+fields and one unique SKU. This integrity invariant holds because
+constraints run in the same atomic statement as the write, so every
+writer faces the rule. Parameter binding separates data from query
+structure, and explicit cleanup returns scarce connections.
 
 ### Go example
+
+Assume `products.sku` is unique and non-null, `products.name` is
+non-null, and the configured PostgreSQL driver uses `$1` parameters.
 
 ```go
 package catalog
@@ -1439,7 +1724,11 @@ package catalog
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 )
+
+var ErrDuplicate = errors.New("duplicate product")
 
 type Product struct {
 	SKU  string
@@ -1456,53 +1745,93 @@ func ScanProduct(row RowScanner) (Product, error) {
 	return product, err
 }
 
-func Find(
+func Create(
 	ctx context.Context,
 	database *sql.DB,
-	sku string,
+	product Product,
 ) (Product, error) {
-	const query = `SELECT sku, name FROM products WHERE sku = $1`
-	row := database.QueryRowContext(ctx, query, sku)
-	return ScanProduct(row)
+	const query = `
+		INSERT INTO products (sku, name)
+		VALUES ($1, $2)
+		ON CONFLICT (sku) DO NOTHING
+		RETURNING sku, name
+	`
+	// Binding keeps both fields as data. The unique constraint remains
+	// authoritative when concurrent callers use the same SKU.
+	row := database.QueryRowContext(
+		ctx,
+		query,
+		product.SKU,
+		product.Name,
+	)
+	created, err := ScanProduct(row)
+	if errors.Is(err, sql.ErrNoRows) {
+		return Product{}, ErrDuplicate
+	}
+	if err != nil {
+		return Product{}, fmt.Errorf("create product: %w", err)
+	}
+	return created, nil
 }
 ```
 
-The bound parameter is ordinary data. The caller must classify
-`sql.ErrNoRows` separately from an unavailable or canceled database.
+The bound parameters are ordinary data. `sql.ErrNoRows` has one local
+meaning because this statement returns no row only when the unique
+conflict path does nothing. Other database errors keep their cause.
 
 ### Work and memory
 
-With a selective B-tree index, lookup is commonly `O(log n)` plus row
-access. Without it, a scan is `O(n)`. Result memory grows with rows
-read;
-streaming still holds a connection, so result size and time need
-bounds.
-Every index consumes write work, storage, cache, and vacuum effort.
+Let `n` be the number of indexed rows and `r` the number returned. A
+B-tree is a balanced search index; following its levels commonly
+takes `O(log n)` lookup work plus row access. Without a useful index,
+visiting all rows takes `O(n)` work. Collecting results retains `O(r)`
+result memory, while streaming can keep extra application memory
+bounded but holds a connection until all `r` rows are consumed. An
+index also adds write work, storage, cache pressure, and vacuum
+effort.
 
 ### When to use it
 
-Use relational storage for durable, constrained facts with joins,
-transactions, and operational recovery requirements.
+- Facts must survive process and machine restarts.
+- Keys, checks, relationships, or uniqueness enforce shared rules.
+- Queries need joins, transactions, or operational recovery.
 
 ### When not to use it
 
-Do not add an index for every column, open a transaction for one
-atomic
-statement, or store an opaque document when individual fields govern
-integrity and access paths.
+Do not add an index without a measured access path, wrap one atomic
+statement in a needless transaction, or hide fields in an opaque
+document when those fields govern integrity and lookup.
 
 ### Common mistakes and edge cases
 
-- Treating application validation as a substitute for constraints.
-- Using `SELECT *` and silently coupling scans to schema order.
-- Forgetting `rows.Close` or `rows.Err` on streamed results.
-- Concatenating values into SQL or logging sensitive parameters.
-- Shipping a destructive migration before all readers stop using data.
-- Ignoring pool saturation, lock waits, vacuum, and restore testing.
+> **Warning:** Two processes can both pass an application-only
+> `sku not found` check before either inserts `TEA-001`. Keep the
+> unique constraint as the final shared integrity rule.
+
+> **Warning:** `SELECT *` can change scan order after a column is
+> added, placing a name into the wrong destination. Select named
+> columns in the same order that `Scan` expects.
+
+> **Warning:** Returning early after the second streamed row without
+> closing `rows` can retain its connection; ignoring `rows.Err()` can
+> publish partial success after an iteration failure. Close and check.
+
+> **Warning:** Concatenating SKU `"x' OR true --"` into a query
+> changes query structure. Bind it as a parameter, and keep sensitive
+> bound values out of logs.
+
+> **Warning:** Dropping `legacy_price` while an old application still
+> reads it breaks mixed-version deployment. Add compatible state,
+> migrate and verify readers, then remove it after the rollback
+> window.
+
+> **Warning:** Raising each of 20 process pools to 100 connections can
+> offer 2,000 sessions to a database sized for far fewer. Budget the
+> total pool, observe waits, and prove restore separately from backup.
 
 ### Related material
 
-See [PostgreSQL and relational data][postgres-reference],
+See [architecture](#5-architecture-and-service-construction),
 [contested state](#8-business-transactions-and-contested-state), and
 [advanced PostgreSQL](#15-advanced-postgresql-operation-and-recovery).
 
@@ -1529,19 +1858,31 @@ stock `0`.
 
 1. **Before:** Stock is `1` and neither request owns it. **Decision:**
    A performs an atomic decrement conditioned on stock at least `1`.
-   **After:** A changes stock to `0` and owns the reservation.
-   **Known correct:** Stock has never been negative.
-2. **Before:** B evaluates the same condition against current stock
-   `0`. **Decision:** Its conditional update affects no row.
-   **After:** B returns the expected business conflict.
-   **Known correct:** No second reservation exists.
-3. **Before:** A writes its order and commits. **Decision:** Publish
-   success only after commit. **After:** Order and inventory become
-   visible together. **Known correct:** The database contains no
-   partial successful order.
+   **After:** A's transaction sees stock `0` and holds the row lock;
+   B's competing update waits. **Known correct:** No committed stock
+   value is negative.
+2. **Before:** A has uncommitted stock `0`, its row lock, and no order
+   yet. **Decision:** Insert A's order and commit the transaction.
+   **After:** Stock `0` and A's order become visible together; B can
+   continue. **Known correct:** No partial successful order was
+   published.
+3. **Before:** B resumes after A commits. **Decision:** PostgreSQL
+   rechecks B's condition against stock `0`. **After:** B affects no
+   row and returns `ErrInsufficient`. **Known correct:** Exactly one
+   reservation exists and final stock is `0`.
 
-Failure example: if order insertion fails after the decrement,
-rollback restores inventory to `1`.
+Failure input: stock is `1`, A's conditional decrement succeeds, and
+A's order insert returns an error. Expected output: stock `1`, no
+order, and the insert error.
+
+1. **Before:** A's transaction sees stock `1`. **Decision:** Apply the
+   conditional decrement. **After:** A's transaction sees stock `0`,
+   but no other transaction can see that uncommitted value.
+   **Known correct:** The incomplete reservation is not public.
+2. **Before:** Stock `0` is uncommitted and the order insert fails.
+   **Decision:** Return the error and roll back the transaction.
+   **After:** Committed stock is still `1` and no order exists.
+   **Known correct:** Failure removed every partial change.
 
 ### Why it works
 
@@ -1549,83 +1890,155 @@ The conditional write makes the inventory rule part of the same atomic
 database decision as the change. The transaction hides partial state
 and either publishes both records or neither. The use case owns this
 boundary because repositories cannot coordinate a business action by
-committing independently.
+committing independently. Assuming the SKU identifies one inventory
+row and both statements use the same transaction, every path ends in
+commit or rollback.
 
 ### Go example
 
-This in-memory fragment demonstrates the same invariant. The database
-lesson replaces the mutex with a transaction and conditional SQL.
+Assume `inventory.sku` is unique, `orders.id` is unique, and positive
+quantities are required. Both statements run through one transaction.
 
 ```go
 package inventory
 
 import (
+	"context"
+	"database/sql"
 	"errors"
-	"sync"
+	"fmt"
 )
 
 var ErrInsufficient = errors.New("insufficient inventory")
 
-type Store struct {
-	mu       sync.Mutex
-	quantity int
-}
-
-func NewStore(quantity int) *Store {
-	return &Store{quantity: quantity}
-}
-
-func (store *Store) Reserve(quantity int) error {
+func Reserve(
+	ctx context.Context,
+	database *sql.DB,
+	orderID string,
+	sku string,
+	quantity int,
+) (err error) {
 	if quantity <= 0 {
 		return errors.New("quantity must be positive")
 	}
-	store.mu.Lock()
-	defer store.mu.Unlock()
-	if store.quantity < quantity {
+	transaction, err := database.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin reservation: %w", err)
+	}
+	// Every return after BeginTx must close the transaction. Rollback
+	// after Commit returns sql.ErrTxDone and needs no further action.
+	defer func() {
+		rollbackErr := transaction.Rollback()
+		if errors.Is(rollbackErr, sql.ErrTxDone) {
+			return
+		}
+		if rollbackErr != nil {
+			err = errors.Join(
+				err,
+				fmt.Errorf("rollback reservation: %w", rollbackErr),
+			)
+		}
+	}()
+
+	const updateInventory = `
+		UPDATE inventory
+		SET quantity = quantity - $1
+		WHERE sku = $2 AND quantity >= $1
+	`
+	result, err := transaction.ExecContext(
+		ctx,
+		updateInventory,
+		quantity,
+		sku,
+	)
+	if err != nil {
+		return fmt.Errorf("reserve inventory: %w", err)
+	}
+	changedRows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("count reserved inventory: %w", err)
+	}
+	if changedRows == 0 {
 		return ErrInsufficient
 	}
-	store.quantity -= quantity
+	if changedRows != 1 {
+		return fmt.Errorf("reserved %d inventory rows", changedRows)
+	}
+
+	const insertOrder = `
+		INSERT INTO orders (id, sku, quantity)
+		VALUES ($1, $2, $3)
+	`
+	if _, err := transaction.ExecContext(
+		ctx,
+		insertOrder,
+		orderID,
+		sku,
+		quantity,
+	); err != nil {
+		return fmt.Errorf("insert order: %w", err)
+	}
+	if err := transaction.Commit(); err != nil {
+		return fmt.Errorf("commit reservation: %w", err)
+	}
 	return nil
 }
 ```
 
 ### Work and memory
 
-The in-memory operation does constant work and retains constant extra
-memory. A database transaction also pays connection, lock-wait, log,
-index, and network costs. Sorting `n` lock targets costs `O(n log n)`
-but can give concurrent transactions one consistent lock order.
+For one indexed SKU, the application issues a fixed number of
+statements and retains constant extra memory. Database work also pays
+connection, lock-wait, write-ahead-log, index, and network costs. Let
+`k` be the number of resources a larger operation must lock. Retaining
+the target list uses `O(k)` memory. Sorting it takes `O(k log k)`
+comparison work and gives concurrent transactions one lock order; an
+in-place sort avoids a second `O(k)` target copy.
 
 ### When to use it
 
-Use a transaction when one business invariant spans multiple reads or
-writes. Use conditional writes or locks for inventory, balances,
-quotas, unique allocation, and state-machine transitions.
+- One business result spans several reads or writes.
+- Inventory, balances, quotas, or allocation face concurrent claims.
+- A state transition must publish all changes together or none.
 
 ### When not to use it
 
 Do not hold a database transaction open across a slow external network
-call. Do not add repository interfaces without a real boundary. For
-cross-service actions, use durable workflow and compensation instead
-of pretending one local transaction covers every service.
+call. For cross-service actions, use durable workflow and compensation
+instead of pretending one local transaction covers every service.
 
 ### Common mistakes and edge cases
 
-> **Warning:** Reading stock and decrementing it in separate unlocked
-> statements lets two requests both approve the last unit.
+> **Warning:** Reading stock `1` and decrementing it in separate
+> statements lets A and B both approve the last unit. Use one atomic
+> condition or lock the row inside the owning transaction.
 
-- Application validation cannot replace database constraints.
-- Retrying a whole transaction needs bounded policy and idempotency.
-- Locking resources in different orders can deadlock.
-- A successful commit can still have an uncertain client outcome.
-- Long transactions retain locks and old row versions.
+> **Warning:** An application-only `quantity >= 0` check can race with
+> another writer. Keep non-negative stock and uniqueness constraints
+> in the database as the final shared barrier.
+
+> **Warning:** Retrying an aborted transaction without an attempt or
+> time bound can amplify overload; retrying an unsafe effect can
+> repeat it. Retry the whole operation only under bounded, idempotent
+> policy.
+
+> **Warning:** If A locks account 1 then 2 while B locks 2 then 1,
+> each can wait for the other. Sort lock targets into one total order.
+
+> **Warning:** A client timeout during `Commit` does not prove the
+> transaction failed. Reconcile by a stable operation identity before
+> repeating an ambiguous write.
+
+> **Warning:** Waiting on a remote payment call while holding the
+> inventory row lock blocks unrelated reservations and retains old row
+> versions. Finish external work outside the short transaction.
 
 ### Related material
 
 - [Relational modeling](#7-relational-modeling-and-postgresql-access)
-- [Architecture and service construction](
-  #5-architecture-and-service-construction)
-- [Production and distributed systems][production-lesson]
+- [Idempotency](#13-idempotency-and-ambiguous-write-outcomes)
+- [Distributed workflows](
+  #21-distributed-workflows-and-eventual-consistency)
 
 ## 9. Identity, authorization, and API security
 
@@ -1637,9 +2050,10 @@ intended data boundary.
 
 ### How it works
 
-Showing an ID proves who you are; a locked door still decides whether
-you may enter. **Authentication** establishes identity, while
-**authorization** checks the person, action, resource, and situation.
+Reception verifies a badge to establish who is present; a locked door
+still decides whether that person may enter. **Authentication**
+establishes identity. **Authorization** checks the person, action,
+resource, and situation.
 Input validation, output encoding, secret handling, and browser policy
 remain separate controls, so one failure does not remove every
 defense.
@@ -1647,47 +2061,104 @@ defense.
 ### Step-by-step examples
 
 Input: authenticated user `U-7` requests `DELETE /orders/O-42`; the
-order is owned by `U-9`. Expected output: a stable forbidden result,
-no order mutation, and no token value in logs.
+order is owned by `U-9`. Expected output: the same stable `not_found`
+result used for an absent order, with no order mutation.
 
 1. **Before:** The route contains `O-42` and the verified principal is
-   `U-7`. **Decision:** Load the order and compare its owner with the
-   principal inside the use case. **After:** The comparison is
-   `U-9 != U-7`. **Known correct:** An order ID is not permission.
-2. **Before:** Authorization has failed and the order is unchanged.
-   **Decision:** Return the stable forbidden outcome and log only the
-   request, actor, and order identifiers. **After:** No delete reaches
-   storage and no credential is recorded. **Known correct:** The
-   response and telemetry preserve both access control and secrecy.
+   `U-7`. **Decision:** Attempt one delete scoped by both
+   `order=O-42` and `owner=U-7`. **After:** The predicate matches no
+   row because the stored owner is `U-9`. **Known correct:** Knowing
+   an order ID did not grant permission.
+2. **Before:** The scoped delete reports no match and the order is
+   unchanged. **Decision:** Map that result to the same `not_found`
+   outcome as an absent order. **After:** The caller learns no private
+   ownership fact. **Known correct:** Access control and
+   non-enumeration both hold.
 
 ### Why it works
 
-The invariant is that every protected state change has an
-authenticated
-principal and a positive resource-specific authorization decision.
-Enforcement after resource lookup prevents identifier substitution,
-and
-independent input and output controls limit injection and disclosure.
+The fact that must stay true is that every protected state change has
+an authenticated principal and a positive resource-specific
+authorization decision. This access invariant holds because the
+mutation predicate includes both resource and principal identities.
+A non-match changes nothing and uses the same public result for an
+absent or differently owned order. Independent input and output
+controls limit injection and disclosure.
 
 ### Go example
 
-See the typed principal and role guard in
-[the service examples][service-examples]. Its
-[tests][service-tests] exercise an allowed administrator, a forbidden
-role, and a missing principal.
+Assume authentication has already produced a trusted, non-empty
+principal subject. The store implements `DeleteOwned` as one atomic
+delete whose predicate includes both order and owner identifiers.
 
+```go
+package orderaccess
+
+import (
+	"context"
+	"errors"
+	"fmt"
+)
+
+var (
+	ErrNotFound        = errors.New("order not found")
+	ErrUnauthenticated = errors.New("authentication required")
+)
+
+type Principal struct {
+	Subject string
+}
+
+type Store interface {
+	DeleteOwned(
+		context.Context,
+		string,
+		string,
+	) (bool, error)
+}
+
+func DeleteOrder(
+	ctx context.Context,
+	store Store,
+	principal Principal,
+	orderID string,
+) error {
+	if principal.Subject == "" {
+		return ErrUnauthenticated
+	}
+	// Combining resource and owner in one predicate prevents a caller
+	// from mutating a known identifier owned by another principal.
+	deleted, err := store.DeleteOwned(
+		ctx,
+		orderID,
+		principal.Subject,
+	)
+	if err != nil {
+		return fmt.Errorf("delete owned order: %w", err)
+	}
+	if !deleted {
+		return ErrNotFound
+	}
+	return nil
+}
+```
 
 ### Work and memory
 
-Token verification is usually linear in credential size plus constant
-cryptographic work. Resource authorization adds its lookup or join.
-Password hashing is intentionally expensive and must have bounded
-concurrency so it cannot exhaust CPU or memory.
+Let `c` be the credential size and `n` the number of indexed orders.
+Parsing visits `c` bytes, so it takes `O(c)` work and may retain
+`O(c)` decoded data. Cryptographic verification has an additional
+algorithm- and key-dependent cost bounded by server configuration. A
+B-tree lookup for an owned order commonly adds `O(log n)` work and
+constant result memory. Password hashing is intentionally expensive;
+bound its concurrency so configured CPU and memory cost cannot exhaust
+the process.
 
 ### When to use it
 
-Use layered controls for every non-public operation and every boundary
-that accepts browser, partner, file, webhook, or database input.
+- A non-public operation changes or reveals a protected resource.
+- Permission depends on both the actor and the loaded object.
+- A browser, partner, file, webhook, or database supplies input.
 
 ### When not to use it
 
@@ -1696,18 +2167,30 @@ only at route level when ownership depends on the loaded object.
 
 ### Common mistakes and edge cases
 
-- Accepting an algorithm or key choice directly from an untrusted
-  token.
-- Omitting audience, issuer, expiry, clock-skew, or revocation checks.
-- Logging secrets, reset links, session cookies, or full request
-  bodies.
-- Returning different details that reveal whether a private object
-  exists.
-- Trusting a proxy identity header without a verified trust boundary.
+> **Warning:** Letting a token select an unexpected algorithm or key
+> can turn attacker-controlled metadata into verification policy. Pin
+> allowed algorithms, issuers, audiences, and key sources in trusted
+> server configuration.
+
+> **Warning:** A correctly signed token for audience `billing` is not
+> authority for the orders API. Check issuer, audience, time window,
+> intended use, and current revocation policy together.
+
+> **Warning:** Logging an `Authorization` header or password-reset URL
+> gives log readers a usable credential. Allowlist safe telemetry
+> fields and redact secrets before any sink.
+
+> **Warning:** Returning `forbidden` for `O-42` but `not_found` for an
+> absent ID reveals that the private order exists. Use one policy and
+> response shape when existence itself is sensitive.
+
+> **Warning:** Trusting `X-User-ID` from the public internet lets a
+> caller choose its identity. Accept an identity header only from an
+> authenticated proxy on a verified, restricted network path.
 
 ### Related material
 
-See [identity and API security][security-reference],
+See [HTTP contracts](#6-http-contracts-and-process-lifecycle),
 [privacy and supply
 chain](#25-security-privacy-and-software-supply-chain),
 and [production integrations](#29-production-integration-boundaries).
@@ -1717,9 +2200,8 @@ and [production integrations](#29-production-integration-boundaries).
 ### The problem it solves
 
 Tests become slow or flaky when time, randomness, networks, global
-state,
-and goroutine ordering are uncontrolled. Passing examples then provide
-little evidence about failures or concurrent invariants.
+state, and goroutine ordering are uncontrolled. Passing examples then
+provide little evidence about failures or concurrent invariants.
 
 ### How it works
 
@@ -1730,76 +2212,93 @@ where real storage or protocols matter.
 
 ### Step-by-step examples
 
-Input: inventory is `1`; two workers each call `Reserve(1)` after one
-start signal. Expected output: one success, one insufficient result,
-and final inventory `0`, independent of scheduling.
+Input: the clock always returns `2026-01-02T03:04:05Z`, the identifier
+source always returns `order-123`, the repository records saves, and
+the service receives quantity `2`. Expected output: order
+`{ID:order-123, Quantity:2, PlacedAt:2026-01-02T03:04:05Z}` and one
+recorded save of that exact order.
 
-1. **Before:** Both workers are blocked on `start`; inventory is `1`.
-   **Decision:** Close `start` once so both calls become eligible.
-   **After:** The workers contend through production synchronization.
-   **Known correct:** No sleep guesses when either worker begins.
-2. **Before:** One worker owns the reservation transition and the
-   other waits. **Decision:** Join both workers and collect both
-   outcomes. **After:** No assertion runs while work is unfinished.
-   **Known correct:** The test observes the complete result.
-3. **Before:** Outcomes may arrive in either order. **Decision:** Sort
-   them before comparison. **After:** Assert one success, one
-   insufficient result, and inventory `0`. **Known correct:** The
-   assertion depends on behavior, not scheduler order.
+1. **Before:** Time and identifier generation would otherwise vary on
+   each run. **Decision:** Construct the service with the fixed clock,
+   fixed identifier source, and recording repository. **After:** All
+   three outside choices have test-owned behavior. **Known correct:**
+   The service cannot read the wall clock or generate a surprise ID.
+2. **Before:** The repository is empty and quantity is `2`.
+   **Decision:** Call `Place`. **After:** The returned order has the
+   exact expected fields and the repository contains that one order.
+   **Known correct:** The same setup produces the same public result
+   and side effect on every run.
 
-Failure example: inject storage failure before commit. The expected
-output is two failure outcomes and unchanged inventory `1`.
+Failure input: the same service receives quantity `0` after the
+successful call. Expected output: `ErrInvalidQuantity` and the
+repository still contains only `order-123`.
+
+1. **Before:** The repository contains one order. **Decision:** Call
+   `Place` with quantity `0`. **After:** Validation returns
+   `ErrInvalidQuantity` before time, identifier, or repository use.
+   **Known correct:** The rejected call adds no side effect.
 
 ### Why it works
 
-The invariant is that test inputs fully determine observable results.
-Explicit signals define the relevant happens-before edges, while
-public
-outcome assertions remain independent of internal scheduling. Each
-test
-terminates through a join or bounded context.
+The fact that must stay true is that test inputs fully determine
+observable results. This determinism invariant holds because every
+outside choice is supplied through an explicit dependency. Assertions
+check public results and side effects rather than private call order.
+Concurrency tests apply the same rule with explicit signals, joins,
+and bounded contexts.
 
 ### Go example
 
 See the deterministic placement service in
 [the service examples][service-examples]. Its
-[tests][service-tests] inject time and identity, then prove invalid
+[tests][service-tests] inject time and identifiers, then prove invalid
 input makes no repository call.
-
 
 ### Work and memory
 
-Table tests cost the sum of their cases. Integration setup often
-dominates
-runtime. Fuzzing and race detection multiply execution and memory, so
-CI
-needs explicit time, worker, corpus, and package bounds.
+Table-test work is the sum of the work for each case, while retained
+fixtures and results determine memory use. Integration setup can
+dominate runtime. Fuzzing and race detection multiply execution and
+memory, so CI needs explicit time, worker, corpus, and package bounds.
 
 ### When to use it
 
-Use deterministic seams for policy, error mapping, deadlines, retries,
-state transitions, and any concurrency regression that must be
-replayed.
+- Time, identifiers, randomness, or outside systems affect an output.
+- Policy, error mapping, deadlines, retries, or transitions need
+  proof.
+- A concurrency regression must replay without guessed sleep timing.
 
 ### When not to use it
 
-Do not mock a database query whose correctness depends on PostgreSQL,
-or
-assert private call order when the public outcome is the real
-contract.
+Do not mock a query whose correctness depends on PostgreSQL behavior;
+use a real PostgreSQL integration test. Do not assert private call
+order when the public outcome is the real contract.
 
 ### Common mistakes and edge cases
 
-- Sleeping until work is probably complete.
-- Sharing mutable fixtures across parallel tests.
-- Treating race-detector silence as a business-invariant proof.
-- Building a fake more complex than the production dependency
-  contract.
-- Omitting cleanup, failure injection, cancellation, and retry cases.
+> **Warning:** Sleeping 10 ms before an assertion can pass locally and
+> run before the worker finishes under load. Signal readiness and join
+> completion explicitly.
+
+> **Warning:** Two parallel cases that append to one shared fixture
+> can change each other's expected counts. Give each case independent
+> state or synchronize the shared invariant.
+
+> **Warning:** A race-detector pass can coexist with two successful
+> reservations of the last item. Assert the business outcome as well
+> as running the detector.
+
+> **Warning:** A fake that reimplements PostgreSQL locking can
+> disagree with the real database while tests stay green. Fake only
+> the narrow boundary; use integration tests for database semantics.
+
+> **Warning:** Testing only the successful save misses validation,
+> cancellation, storage failure, retry, and cleanup paths. Add cases
+> for each behavior the contract promises.
 
 ### Related material
 
-See [testing and operations][testing-reference],
+See [service construction](#5-architecture-and-service-construction),
 [Go concurrency](#3-go-concurrency-and-executable-verification), and
 [resilience experiments][resilience-experiments].
 
@@ -1820,14 +2319,18 @@ payloads or reproducing production locally.
 
 Think of tracking a package. Logs record events, metrics show the
 system-wide pattern, and traces follow one request through each stop.
+Each timed operation in a trace is a **span**; parent and child spans
+record causal nesting.
 Health checks, timeouts, rate limits, and profiles turn that evidence
 into safe operating controls.
 
 ### Step-by-step examples
 
 Input: request `R-8` reaches a database call whose 100 ms deadline
-expires. Expected output: an unavailable response, one bounded outcome
-metric, and correlated log and trace records without private data.
+expires. Expected output: status `503` with code
+`dependency_unavailable`; one outcome counter for route
+`/v1/orders/{id}`; and correlated log and trace records without
+private data.
 
 1. **Before:** `R-8` has a request span and the database attempt has
    not started. **Decision:** Create a child span with dependency name
@@ -1835,21 +2338,22 @@ metric, and correlated log and trace records without private data.
    request. **Known correct:** Causal context crosses the boundary.
 2. **Before:** The database exceeds 100 ms. **Decision:** Classify the
    deadline as dependency unavailability. **After:** Return the stable
-   unavailable response and increment one low-cardinality counter.
-   **Known correct:** Error text did not become a metric label.
+   `503` response and increment one counter whose route and outcome
+   labels come from small fixed sets. **Known correct:** Error text
+   did not become an unbounded metric label.
 3. **Before:** The request has finished. **Decision:** Emit one event
-   with `R-8`, outcome, and duration. **After:** Log, metric, and
-   trace agree on the failure. **Known correct:** No private value
-   entered telemetry.
+   with route `/v1/orders/{id}`, request `R-8`, method `GET`, and code
+   `dependency_unavailable`. **After:** Log, metric, and trace agree
+   on the failure. **Known correct:** No private value entered
+   telemetry.
 
 ### Why it works
 
-The invariant is that each important operation produces enough stable,
-non-secret evidence to classify its outcome. Shared correlation
-preserves
-causal context, and bounded dimensions keep the telemetry system
-operable
-under the same failure it is meant to explain.
+The fact that must stay true is that each important operation produces
+enough stable, non-secret evidence to classify its outcome. This
+observability invariant holds because shared correlation preserves
+causal context and bounded dimensions keep the telemetry system
+operable under the same failure it is meant to explain.
 
 ### Go example
 
@@ -1858,40 +2362,53 @@ See the bounded access-event builder in
 [tests][service-tests] accept stable public fields and reject an
 authorization field before it reaches telemetry.
 
-
 ### Work and memory
 
-Each signal adds serialization, allocation, and export work.
-Histograms,
-span volume, and label combinations can grow rapidly. Sample
-intentionally,
-bound queues, and ensure telemetry backpressure cannot stop request
-work.
+Serialization and export work grow with the bytes in each allowed
+event. Let `q` be the export queue capacity and `b` the maximum event
+size. The queue retains at most `O(q * b)` bytes. Metric-series count
+grows with combinations of label values, while trace storage grows
+with sampled span volume and retention. Bound labels, queues, event
+size, sampling, profiles, and retention so telemetry backpressure
+cannot stop request work.
 
 ### When to use it
 
-Use these controls for every production service, worker, scheduler,
-and
-integration boundary with an operator or reliability objective.
+- A production service, worker, or scheduler needs diagnosis.
+- One operation crosses process, queue, or dependency boundaries.
+- An operator needs a safe control for overload or recovery.
 
 ### When not to use it
 
 Do not log every payload, create per-user metric labels, or make
-liveness
-depend on a remote service whose outage a restart cannot repair.
+liveness depend on a remote service whose outage a restart cannot
+repair. Prefer bounded fields and aggregate dimensions.
 
 ### Common mistakes and edge cases
 
-- Logging an error without operation, outcome, or correlation fields.
-- Reporting ready before migrations or required local initialization.
-- Hiding listener or exporter failures in abandoned goroutines.
-- Allowing telemetry queues or profiles to consume unbounded
-  resources.
-- Alerting on implementation noise instead of user-visible symptoms.
+> **Warning:** A log containing only `timeout` cannot identify the
+> operation or affected request. Record a route template, stable
+> outcome, and correlation ID without copying private payloads.
+
+> **Warning:** Reporting ready before a required migration finishes
+> can send traffic to code whose table is missing. Keep readiness
+> false until required local initialization succeeds.
+
+> **Warning:** Starting a listener or exporter in an abandoned
+> goroutine can hide a bind or authentication failure. Return its
+> terminal error to the lifecycle owner.
+
+> **Warning:** An unbounded span-export queue grows during an exporter
+> outage and can exhaust process memory. Cap the queue and define
+> drop, sampling, and alert behavior.
+
+> **Warning:** Paging on one brief CPU spike can wake an operator
+> while users remain unaffected. Alert on sustained user impact or
+> imminent exhaustion with a documented action.
 
 ### Related material
 
-See [testing and operations][testing-reference],
+See [deterministic testing](#10-deterministic-backend-testing),
 [delivery and
 recovery](#12-delivery-deployment-and-recovery-readiness),
 and [reliability
@@ -1902,88 +2419,155 @@ engineering](#28-reliability-engineering-incidents-and-cost).
 ### The problem it solves
 
 A locally correct binary can fail because its artifact is
-unrepeatable,
-configuration is unsafe, a migration is incompatible, rollout lacks a
-stop signal, or backups cannot actually restore service.
+unrepeatable, configuration is unsafe, a migration is incompatible,
+rollout lacks a stop signal, or backups cannot actually restore
+service.
 
 ### How it works
 
 Seal one package, then move that same package through inspection and
 into production. The package is an immutable build artifact; secrets
 stay outside it. Deploy through compatible stages, watch explicit
-health criteria, and practise rollback and data restore before an
+health criteria, and practice rollback and data restore before an
 emergency.
 
 ### Step-by-step examples
 
-Input: immutable version B receives 5% of traffic with a 1% error-rate
-stop threshold; B reaches 3%. Expected output: rollout stops and all
-traffic returns to healthy version A.
+Input: immutable version B receives 5% of traffic; version A receives
+95%; the stop threshold is a 1% B error rate; the next stage is 25%;
+and B remains at 0.4% for the observation window. Expected output: B
+advances to 25% and A serves 75% without a rebuild.
 
 1. **Before:** A serves 95%, B serves 5%, and both read the expanded
    schema. **Decision:** Observe B for the defined window. **After:**
-   B's measured error rate is 3%. **Known correct:** The comparison
-   uses the stated canary cohort and threshold.
-2. **Before:** B exceeds the 1% stop threshold. **Decision:** Stop new
-   admission to B and route traffic to A. **After:** A serves 100%.
-   **Known correct:** The rollback did not require a rebuild or an
-   incompatible schema reversal.
-3. **Before:** User success has recovered. **Decision:** Record the
-   threshold breach and preserve B's evidence. **After:** The rollout
-   remains stopped for diagnosis. **Known correct:** Recovery was
-   verified rather than inferred from ending the deployment.
+   B's measured error rate is 0.4%. **Known correct:** The comparison
+   uses only the stated canary cohort and window.
+2. **Before:** B is below the 1% stop threshold. **Decision:** Advance
+   the existing artifact to the 25% stage. **After:** A serves 75%
+   and B serves 25%. **Known correct:** The rollout followed its
+   predeclared gate without rebuilding B.
+
+Focused failure input: A serves 95%, B serves 5%, and B reaches 3%
+against the 1% threshold. After rollback, A remains at 0.2% errors for
+ten minutes. Expected output: B receives 0%, A receives 100%, the
+rollout stays stopped, and recovery evidence records the ten-minute
+healthy window.
+
+1. **Before:** B serves 5% and its measured error rate is 3%.
+   **Decision:** Apply the 1% stop threshold. **After:** Stop B and
+   route all traffic to A. **Known correct:** The reversal reused the
+   healthy artifact and compatible expanded schema.
+2. **Before:** B receives no new traffic and A serves 100%.
+   **Decision:** Observe A for ten minutes before declaring recovery.
+   **After:** A remains at 0.2%, and the rollout stays stopped for
+   diagnosis. **Known correct:** Recovery was measured rather than
+   inferred from ending exposure.
 
 ### Why it works
 
-The invariant is that every deployment step has an observable
-acceptance
-condition and a compatible reversal. Immutable artifacts remove
-rebuild
+The fact that must stay true is that every deployment step has an
+observable acceptance condition and a compatible reversal. This
+delivery invariant holds because immutable artifacts remove rebuild
 variance, staged schemas preserve mixed-version operation, and restore
 tests replace assumptions about recoverability with measured evidence.
 
 ### Go example
 
-See the typed configuration parser in
-[the service examples][service-examples]. Its
-[tests][service-tests] cover valid startup, missing required values,
-and secret-safe failure text.
+Assume traffic percentages are between 0 and 100, the current split
+adds to 100, and A and B remain schema-compatible during reversal.
 
+```go
+package rollout
+
+type Decision string
+
+const (
+	Advance  Decision = "advance"
+	Rollback Decision = "rollback"
+)
+
+type State struct {
+	StablePercent    int
+	CandidatePercent int
+	StopErrorPercent float64
+	Stopped          bool
+}
+
+func Evaluate(
+	state *State,
+	candidateErrorPercent float64,
+	nextCandidatePercent int,
+) Decision {
+	if state.Stopped {
+		return Rollback
+	}
+	if candidateErrorPercent > state.StopErrorPercent {
+		// A threshold breach ends candidate exposure but preserves the
+		// immutable artifact and evidence for diagnosis.
+		state.StablePercent = 100
+		state.CandidatePercent = 0
+		state.Stopped = true
+		return Rollback
+	}
+	// A passing gate advances only to the predeclared next stage.
+	state.CandidatePercent = nextCandidatePercent
+	state.StablePercent = 100 - nextCandidatePercent
+	return Advance
+}
+```
+
+Typed startup configuration is a separate delivery boundary. See
+[the service examples][service-examples] and their
+[tests][service-tests] for valid startup, missing required values, and
+secret-safe failure text.
 
 ### Work and memory
 
-Build and scan cost scales with dependency and artifact size. Canary
-time
-depends on traffic needed for a useful signal. Backups cost storage
-and I/O;
-restore duration must fit the recovery objective under realistic
-volume.
+Let `a` be artifact bytes, `d` the dependency count, and `v` the
+volume of state to restore. Building, transferring, and scanning visit
+artifact data and dependency metadata, so their work grows with `a`
+and `d`; retained artifacts use storage proportional to `a`. Canary
+time depends on traffic needed for a useful signal. Backups use
+storage proportional to `v`, while restore time includes reading,
+validating, and replaying that realistic volume.
 
 ### When to use it
 
-Use this discipline for every deployable artifact and every persistent
-schema, queue, secret, or stateful dependency it changes.
+- One artifact moves through several environments or rollout stages.
+- A release changes a schema, queue, secret, or stateful dependency.
+- Recovery depends on rollback, roll-forward, backup, or restore.
 
 ### When not to use it
 
 Do not rebuild per environment, hide configuration defaults, or claim
-a
-rollback that cannot read the newly written schema or data
+a rollback that cannot read the newly written schema or data
 representation.
 
 ### Common mistakes and edge cases
 
-- Deploying destructive schema changes with the first application
-  version.
-- Using floating image tags or unverified build inputs.
-- Making readiness true before dependencies and listeners are usable.
-- Rotating a secret without overlap for in-flight credentials.
-- Calling a backup successful without a timed restore and integrity
-  check.
+> **Warning:** Dropping a column with the first new application
+> version breaks old instances still reading it. Expand compatibly,
+> migrate and verify, then contract after the rollback window.
+
+> **Warning:** Deploying image tag `latest` can select different bytes
+> in two environments. Promote one immutable artifact by digest and
+> verify its source and build provenance.
+
+> **Warning:** Reporting ready before the listener and required local
+> initialization succeed sends traffic to a process that cannot serve.
+> Keep readiness false until those preconditions hold.
+
+> **Warning:** Replacing a verification secret immediately rejects
+> requests signed just before rotation. Support an explicit overlap
+> window, then retire the old secret after measured expiry.
+
+> **Warning:** A backup that has never restored may be incomplete or
+> too slow for the recovery objective. Time a realistic restore and
+> verify both data and application invariants.
 
 ### Related material
 
-See [delivery readiness][delivery-reference],
+See [observability](#11-observability-and-operational-controls),
 [orchestration](#27-orchestration-and-platform-operations), and
 [incidents and cost](#28-reliability-engineering-incidents-and-cost).
 
@@ -1998,75 +2582,99 @@ charge or order, while refusing to retry may hide a successful result.
 
 A payment retry should behave like showing the same receipt number,
 not buying twice. An **idempotency key** identifies one logical write.
-Atomically store it with a fingerprint of the request and the durable
-result, so an identical retry replays the result while conflicting
-reuse is rejected.
+A **fingerprint** is a stable digest of every request field that
+changes the operation's meaning. Atomically store the scoped key,
+fingerprint, and durable result, so an identical retry replays the
+result while conflicting reuse is rejected.
 
 ### Step-by-step examples
 
-Input: create-order command `{item: "tea", quantity: 1}` uses key
-`K1`; its first response is lost and the client retries.
-Expected output: both attempts return `O-42`; one order exists.
+Input: customer `C-17` sends create-order command
+`{customer_id:"C-17", quantity:2}` with key `K1`; its first response
+is lost and the client retries. Expected output: both attempts return
+`O-42`; one order exists.
 
 1. **Before:** `K1` is absent. **Decision:** In one transaction, bind
-   `K1` to the command hash, create `O-42`, store its response, and
-   commit. **After:** The order and completed key record are durable.
-   **Known correct:** The semantic effect and replay information
-   cannot commit separately.
+   scope `C-17/create-order/K1` to the command fingerprint, create
+   `O-42`, store its response, and commit. **After:** The order and
+   completed key record are durable. **Known correct:** The semantic
+   effect and replay information cannot commit separately.
 2. **Before:** The client saw a timeout, but the completed record
    exists. **Decision:** Retry with `K1` and the same command.
    **After:** Return stored order `O-42` without creating an order.
    **Known correct:** Ambiguous delivery did not duplicate the effect.
-3. **Before:** `K1` is bound to the original hash. **Decision:** Try
-   `{item: "tea", quantity: 2}` with `K1`. **After:** Return a key
-   conflict. **Known correct:** One key cannot name two writes.
+
+Focused conflict input: `C-17` reuses `K1` with
+`{customer_id:"C-17", quantity:3}`. Expected output: key conflict,
+the original `O-42` response remains stored, and no second order.
+
+1. **Before:** `K1` is bound to the quantity-2 fingerprint.
+   **Decision:** Compare it with the canonical quantity-3 command.
+   **After:** The fingerprints differ, so return a key conflict.
+   **Known correct:** One scoped key cannot name two logical writes.
 
 ### Why it works
 
-The invariant is one durable semantic outcome per scoped key and
-request
-hash. A uniqueness constraint serializes competing claims, and
-recording
-the result in the same transaction prevents a committed action with an
-unclaimed key.
+The fact that must stay true is one durable semantic outcome per
+scoped key and fingerprint. This idempotency invariant holds because a
+uniqueness constraint serializes competing claims and the transaction
+records the business result with the key. Correct comparison assumes
+canonicalization includes every semantic field and the digest has
+adequate collision resistance for the system's threat model.
 
 ### Go example
 
-See canonical command fingerprinting in
+The typed command gives JavaScript Object Notation fields a stable
+order before Secure Hash Algorithm 256-bit (SHA-256) hashing. See
+canonical command fingerprinting in
 [the production examples][production-examples]. Its
 [tests][production-tests] distinguish a new operation, a compatible
 replay, and conflicting key reuse.
 
-
 ### Work and memory
 
-Each logical write adds a key lookup and durable record. Indexed
-access is
-commonly `O(log n)`. Storage grows with request volume times
-retention;
-cleanup needs bounded batches and must not race the supported retry
+Let `n` be retained key records, `c` canonical request bytes, and `b`
+stored response bytes. Fingerprinting visits `c` bytes, taking `O(c)`
+work. A B-tree key lookup commonly takes `O(log n)` work. Each record
+retains its key, digest, metadata, and `b` response bytes, so total
+storage grows with request volume, response size, and retention.
+Cleanup needs bounded batches and must not race the supported retry
 window.
 
 ### When to use it
 
-Use it for retried non-idempotent writes, payment-like effects, and
-any API
-where a committed response can be lost.
+- A client may retry a non-idempotent write after a timeout.
+- A payment-like effect needs one semantic result per operation.
+- A committed response can be lost before the caller receives it.
 
 ### When not to use it
 
 Do not treat in-memory locks, request IDs, or a read-before-write
-check as
-durable idempotency across processes and restarts.
+check as durable idempotency across processes and restarts. A
+naturally idempotent replacement write may need no stored response
+record.
 
 ### Common mistakes and edge cases
 
-- Reusing keys across tenants or operations.
-- Ignoring changed request bodies under an existing key.
-- Recording completion in a transaction separate from the business
-  write.
-- Expiring records before clients stop retrying.
-- Claiming exactly-once delivery rather than one semantic effect.
+> **Warning:** Using bare key `K1` for every customer lets one tenant
+> collide with another tenant's write. Scope the unique key by trusted
+> principal and operation.
+
+> **Warning:** Reusing `K1` after quantity changes from `2` to `3` can
+> replay the wrong order. Compare a canonical fingerprint and reject
+> changed input under an existing key.
+
+> **Warning:** Committing the order before its key record can leave a
+> successful order with no replay evidence after a crash. Commit the
+> business effect, fingerprint, and response in one transaction.
+
+> **Warning:** Deleting the record after one hour while clients retry
+> for 24 hours can turn a late retry into a second order. Derive
+> retention and cleanup from the documented retry window.
+
+> **Warning:** A broker or network can still deliver the same request
+> more than once. Claim one semantic effect within the scoped
+> boundary; do not describe the transport itself as exactly once.
 
 ### Related material
 
@@ -2105,71 +2713,167 @@ documented retryable overload result without allocating queued work.
    `workers=10/10` and `queue=20/20`; `R31` owns no server work.
    **Known correct:** Rejection preserved headroom for admitted work.
 
-Failure example: if every rejected client retries immediately, offered
-load grows. The retry response therefore includes delay and attempt
-bounds rather than inviting an immediate loop.
+Focused retry input: 100 rejected clients each allow one retry.
+Without delay they retry immediately; with policy they receive delays
+spread from 100 to 200 ms and retry only if their deadline still
+permits it. Expected output: the unsafe policy creates 100 immediate
+new attempts; the bounded policy creates none immediately and at most
+100 later.
+
+1. **Before:** All 100 clients have one retry left and capacity is
+   still full. **Decision:** Retry immediately without a delay check.
+   **After:** The service receives 100 new attempts, rejects them, and
+   completes no useful work. **Known correct:** The trace exposes one
+   full repeated wave caused only by retry policy.
+2. **Before:** The same 100 clients receive distinct bounded delays.
+   **Decision:** Each client waits and retries only if its remaining
+   deadline funds the delay and call. **After:** No attempt is
+   immediate and no client can exceed one later retry.
+   **Known correct:** Delay, deadline, and attempt bounds cap
+   amplification.
 
 ### Why it works
 
-The invariant is that in-flight and queued work never exceed proved
-capacity.
-Bounds preserve memory and scheduling headroom. Deadlines stop
-obsolete work,
-and randomized bounded retries prevent synchronized amplification.
+The fact that must stay true is that active and queued work never
+exceed proved capacity. This admission invariant holds because the
+capacity check and count change occur under one lock. Bounds preserve
+memory and scheduling headroom. Deadlines stop obsolete work, and
+randomized bounded retries prevent synchronized amplification.
 
 ### Go example
 
+Assume non-negative limits, valid initial counts, and exactly one
+`Complete` call for every active operation that finishes.
+
+```go
+package admission
+
+import "sync"
+
+type Result string
+
+const (
+	Active   Result = "active"
+	Queued   Result = "queued"
+	Rejected Result = "rejected"
+)
+
+type Capacity struct {
+	mu            sync.Mutex
+	active        int
+	maximumActive int
+	queued        int
+	maximumQueued int
+}
+
+func NewCapacity(
+	maximumActive int,
+	maximumQueued int,
+) *Capacity {
+	if maximumActive < 0 || maximumQueued < 0 {
+		panic("capacity limits must be non-negative")
+	}
+	return &Capacity{
+		maximumActive: maximumActive,
+		maximumQueued: maximumQueued,
+	}
+}
+
+func (capacity *Capacity) Admit() Result {
+	capacity.mu.Lock()
+	defer capacity.mu.Unlock()
+	if capacity.active < capacity.maximumActive {
+		capacity.active++
+		return Active
+	}
+	if capacity.queued < capacity.maximumQueued {
+		capacity.queued++
+		return Queued
+	}
+	return Rejected
+}
+
+func (capacity *Capacity) Complete() bool {
+	capacity.mu.Lock()
+	defer capacity.mu.Unlock()
+	if capacity.active == 0 {
+		panic("completion without active work")
+	}
+	if capacity.queued > 0 {
+		// Promote one queued operation while keeping the active count
+		// unchanged; the completed slot transfers to that operation.
+		capacity.queued--
+		return true
+	}
+	capacity.active--
+	return false
+}
+```
+
+`Complete` reports whether the scheduler should start one queued
+operation in the slot that just became free.
+
 See the bounded retry-delay policy in
 [the production examples][production-examples]. Its
-[tests][production-tests] cover an allowed retry and an exit when the
+[tests][production-tests] cover one allowed retry and an exit when the
 remaining deadline cannot fund another call.
-
 
 ### Work and memory
 
-Queue memory is `O(q)` for configured bound `q`; concurrency is `O(w)`
-for
-worker bound `w`. A retry policy multiplies worst-case calls by its
-attempt
-cap, so both latency and downstream load must include that factor.
+Let `q` be the queue limit, `w` the worker limit, and `a` the maximum
+attempts per logical call. Queue metadata and payload references use
+`O(q)` memory, while worker stacks and per-call state use `O(w)`
+memory. At most `w + q` operations are admitted. Retry policy can
+offer up to `a` calls per logical operation, so worst-case downstream
+load and latency must include that factor.
 
 ### When to use it
 
-Use it for every remote dependency, worker pool, expensive endpoint,
-and
-service with a latency or availability objective.
+- A worker pool or queue has a measured capacity ceiling.
+- A remote dependency or endpoint slows under offered load.
+- Retries and deadlines must fit one end-to-end objective.
 
 ### When not to use it
 
 Do not optimize from intuition, retry permanent errors, or use an
-unbounded
-queue to hide insufficient capacity.
+unbounded queue to hide insufficient capacity. Measure the bottleneck
+and reject predictably when accepted work cannot finish safely.
 
 ### Common mistakes and edge cases
 
-- Measuring only averages and missing tail latency or saturation.
-- Setting independent deadlines whose sum exceeds the caller budget.
-- Retrying at several layers and creating multiplicative attempts.
-- Opening a circuit globally when failures are tenant or dependency
-  scoped.
-- Rejecting after expensive parsing or allocation has already
-  occurred.
+> **Warning:** A 20 ms average can hide a 2 s slow tail while workers
+> and queues saturate. Measure latency distributions, utilization,
+> saturation, and completed throughput together.
+
+> **Warning:** Giving each of three dependencies the caller's full
+> one-second deadline lets sequential work consume three seconds.
+> Reserve completion time and derive smaller child budgets.
+
+> **Warning:** Three retries at both proxy and service layers can
+> turn one call into nine downstream attempts. Assign retry ownership
+> to one layer and cap total attempts and time.
+
+> **Warning:** Opening one global circuit for a single tenant's
+> failure rejects healthy tenants too. Scope isolation and circuit
+> state to the resource or dependency that actually fails.
+
+> **Warning:** Parsing a 50-mebibyte body before checking admission
+> spends memory and CPU on work that will be rejected. Enforce cheap
+> size and capacity limits before expensive decoding or allocation.
 
 ### Related material
 
-See [delivery readiness][delivery-reference],
+See [observability](#11-observability-and-operational-controls),
 [synchronous communication](#20-synchronous-service-communication),
-and
-[reliability
-engineering](#28-reliability-engineering-incidents-and-cost).
+and [Entry 28](#28-reliability-engineering-incidents-and-cost).
 
 ## 15. Advanced PostgreSQL operation and recovery
 
 ### The problem it solves
 
 Correct queries still fail operationally through pool exhaustion,
-deadlocks,
-table bloat, replication lag, unsafe migrations, or untested recovery.
+deadlocks, table bloat, replication lag, unsafe migrations, or
+untested recovery.
 
 ### How it works
 
@@ -2180,9 +2884,10 @@ need owners and measurements.
 
 ### Step-by-step examples
 
-Input: transaction A transfers from account 1 to 2 while B transfers
-from 2 to 1. Expected output: both lock accounts in order `1,2`, so
-one waits instead of forming a deadlock cycle.
+Input: accounts 1 and 2 each hold `100`; transaction A transfers `10`
+from 1 to 2 while B transfers `20` from 2 to 1. Expected output: both
+lock accounts in order `[1,2]`, both commit, and final balances are
+account 1=`110` and account 2=`90`.
 
 1. **Before:** Neither transaction owns a lock. **Decision:** Each
    sorts its account IDs as `[1,2]`. **After:** Both first request the
@@ -2190,58 +2895,109 @@ one waits instead of forming a deadlock cycle.
    no longer creates opposite lock order.
 2. **Before:** A owns account 1; B waits for account 1.
    **Decision:** A locks account 2, applies both changes, and commits.
-   **After:** A releases both locks. **Known correct:** No transaction
-   held account 2 while waiting for account 1.
+   **After:** Balances are `[90,110]`, and A releases both locks.
+   **Known correct:** No transaction held account 2 while waiting for
+   account 1.
 3. **Before:** B can now lock accounts 1 and 2. **Decision:** Re-read
-   the current balances and run its whole transaction. **After:** B
-   commits or returns a business conflict. **Known correct:** Waiting
-   did not permit a stale partial retry.
+   balances `[90,110]` and transfer `20` from 2 to 1. **After:** B
+   commits balances `[110,90]`. **Known correct:** Waiting did not
+   permit a stale partial retry.
+
+Focused recovery input: a 02:00 base backup contains account balance
+`100`; archived log records `+20` at 02:05, `-5` at 02:10, and an
+accidental delete at 02:13. The recovery target is 02:12. Expected
+output: the account exists with balance `115`; the delete is absent.
+
+1. **Before:** The recovery database is empty. **Decision:** Restore
+   the 02:00 base backup. **After:** The account exists with balance
+   `100`. **Known correct:** Replay starts from the backup's exact
+   state.
+2. **Before:** The next archived records are `+20` and `-5`.
+   **Decision:** Replay them in log order through 02:10. **After:**
+   The balance is `115`. **Known correct:** Every change before the
+   target has been applied once in order.
+3. **Before:** The next record is the 02:13 delete. **Decision:** Stop
+   replay at the 02:12 target and validate the account invariant.
+   **After:** The account still exists with balance `115`.
+   **Known correct:** Recovery did not replay the later deletion.
 
 ### Why it works
 
-The invariant is a consistent lock acquisition order and one atomic
-retry
-unit. A total order removes cyclic wait. Short lifetimes release locks
-and old
-versions, while verified restore procedures bound data loss and
-recovery time.
+The fact that must stay true during a transfer is that every
+transaction acquires shared locks in one total order and retries the
+whole transaction. This lock-order invariant removes cyclic wait.
+Short transaction lifetimes release locks and old row versions. For
+recovery, ordered log replay from a known backup reconstructs every
+change through the chosen target; validation proves the restored state
+before traffic returns.
 
 ### Go example
 
-See the configured PostgreSQL retry classifier in
-[the production examples][production-examples]. Its
+Assume a transfer involves two distinct positive account identifiers.
+
+```go
+package accountlocks
+
+func OrderedAccountIDs(
+	firstAccountID int64,
+	secondAccountID int64,
+) (int64, int64) {
+	if firstAccountID < secondAccountID {
+		return firstAccountID, secondAccountID
+	}
+	return secondAccountID, firstAccountID
+}
+```
+
+The transfer uses the returned order for every row lock, independent
+of transfer direction. The configured PostgreSQL retry classifier in
+[the production examples][production-examples] and its
 [tests][production-tests] accept serialization failure and reject a
 permanent constraint error.
 
-
 ### Work and memory
 
-Lock sorting costs `O(n log n)`. Pool memory and database sessions
-scale with
-the configured maximum across replicas. Indexes and retained row
-versions add
-storage, write amplification, cache pressure, and vacuum work.
+Let `n` be lock targets, `p` the connection limit per process, and `i`
+the process count. Retaining targets uses `O(n)` memory; sorting them
+takes `O(n log n)` comparison work, while two targets need only one
+comparison. The fleet can offer up to `p * i` database sessions.
+Indexes, retained row versions, backups, and archived logs add
+storage, write amplification, cache pressure, replay work, and vacuum
+work.
 
 ### When to use it
 
-Use it once PostgreSQL is a production dependency with concurrency,
-schema
-evolution, replicas, or recovery objectives.
+- Concurrent transactions lock more than one shared resource.
+- Pool limits, migrations, replicas, or bloat affect production.
+- Recovery has explicit data-loss and restore-time objectives.
 
 ### When not to use it
 
 Do not increase pool size to mask slow queries or route
-consistency-sensitive
-reads to a lagging replica.
+consistency-sensitive reads to a lagging replica. Fix the measured
+bottleneck or read from the authoritative source.
 
 ### Common mistakes and edge cases
 
-- Multiplying a safe per-process pool by too many application
-  instances.
-- Retrying only the final statement after a transaction aborts.
-- Holding transactions open during remote calls or user think time.
-- Running blocking migrations without lock and duration analysis.
-- Assuming a backup is usable without restoring and validating it.
+> **Warning:** A 20-connection pool across 100 instances can offer
+> 2,000 sessions even when the database limit is 500. Budget the fleet
+> total and bound acquisition wait.
+
+> **Warning:** Retrying only the final statement after PostgreSQL
+> aborts a transaction keeps earlier work invalid. Roll back and retry
+> the entire safe operation under an attempt and time bound.
+
+> **Warning:** Holding account locks while waiting for a user or
+> remote call blocks other transfers and retains old row versions.
+> Keep the transaction short and move external waits outside it.
+
+> **Warning:** Adding a non-null column with a table-wide rewrite can
+> block production traffic. Inspect lock level and duration, use a
+> compatible staged migration, and rehearse cancellation or recovery.
+
+> **Warning:** A backup can omit required logs or restore too slowly.
+> Restore it to an isolated environment, replay to a target, and
+> verify application and data invariants before relying on it.
 
 ### Related material
 
@@ -2255,45 +3011,50 @@ recovery](#12-delivery-deployment-and-recovery-readiness).
 ### The problem it solves
 
 In-process goroutines disappear on restart and cannot safely
-coordinate work
-across replicas. Jobs may be leased twice, abandoned, or retried
-forever.
+coordinate work across replicas. Jobs may be leased twice, abandoned,
+or retried forever.
 
 ### How it works
 
 Write a job on a durable ticket before promising it will be done. A
 worker leases a small batch, renews the lease while working, records
-attempts, and makes repeated effects safe. Jobs that always fail move
-to a reviewed holding area.
+attempts, and receives a unique attempt token that stale workers
+cannot reuse. Repeated effects need their own idempotency identity.
+Jobs that always fail move to a reviewed holding area, often called a
+**dead-letter state**.
 
 ### Step-by-step examples
 
-Input: job `J7` has effect key `E7`, lease duration 30 seconds, and a
-three-attempt limit. Worker A crashes after producing the effect but
-before completion. Expected output: worker B completes `J7` after
-lease expiry without producing `E7` twice.
+Input: durable job `J7` is `leased` with current token `8` and attempt
+count `2`; paused worker A resumes with stale token `7`, then current
+worker B completes with token `8`. Expected output: A receives
+`ErrStaleClaim`, B succeeds, and `J7.state=completed`.
 
-1. **Before:** `J7` is ready with no lease. **Decision:** A atomically
-   claims attempt 1 until `T+30s`. **After:** Only A may complete.
-   **Known correct:** One current owner is recorded.
-2. **Before:** A has stored effect `E7` but has not marked the job
-   complete. **Decision:** A crashes; no worker may claim before
-   `T+30s`. **After:** The expired lease makes `J7` ready again.
-   **Known correct:** A crash delayed progress but did not lose work.
-3. **Before:** B owns attempt 2 and finds `E7` already stored.
-   **Decision:** Treat the effect as complete and finalize `J7` under
-   B's lease. **After:** The job is complete with one effect.
-   **Known correct:** Lease recovery and effect idempotency cover
-   separate failure risks.
+1. **Before:** `J7.state=leased`, `J7.token=8`, and A holds token `7`.
+   **Decision:** A calls `Complete(7)`. **After:** The token mismatch
+   returns `ErrStaleClaim`; state and token remain unchanged.
+   **Known correct:** A paused former owner cannot finalize B's lease.
+2. **Before:** `J7` remains leased with token `8`. **Decision:** B
+   calls `Complete(8)`. **After:** State becomes `completed`.
+   **Known correct:** Only the current claim finalized the job.
+
+Focused exhaustion input: job `J8` is `leased` with token `2`, attempt
+count `3`, and maximum attempts `3`; its failure is retryable.
+Expected output: `Fail(2, true, 3)` succeeds and `J8.state=dead`.
+
+1. **Before:** `J8` is on its final allowed attempt. **Decision:**
+   Record the retryable failure with the current token. **After:** The
+   state becomes `dead` rather than `ready`. **Known correct:** The
+   job cannot enter a fourth attempt.
 
 ### Why it works
 
-The invariant is that only the current unexpired lease may finalize a
-job,
-while the semantic effect is idempotent across leases. Expiry
-guarantees
-abandoned work becomes eligible, and an attempt limit guarantees
-termination.
+The fact that must stay true is that only the current lease token may
+finalize or retry a job. This claim invariant holds because each
+transition compares the supplied token with durable state before
+mutation. Lease expiry makes abandoned work eligible for a new token,
+and the attempt limit moves repeated failure to a terminal state.
+Effect idempotency remains a separate invariant across those attempts.
 
 ### Go example
 
@@ -2302,35 +3063,51 @@ See the fenced job transition in
 [tests][production-tests] reject a stale claimant, accept the current
 claim, and terminate exhausted retryable work.
 
-
 ### Work and memory
 
-Claiming an indexed ready job is commonly `O(log n)`. Live work is
-bounded by
-worker count and batch size. History grows with retention; heartbeat
-frequency
-trades recovery delay against write load.
+Let `n` be retained jobs, `w` the worker count, and `b` the maximum
+claim batch. A B-tree lookup for ready work commonly takes `O(log n)`
+work. At most `w * b` jobs are leased by one worker fleet pass, so
+live payload and worker memory must be bounded at that scale. History
+storage grows with attempts and retention; more frequent heartbeats
+reduce recovery delay but add database writes.
 
 ### When to use it
 
-Use durable jobs for slow, retryable, scheduled, or fan-out work that
-must
-survive process and deployment failure.
+- Work must survive process, host, or deployment failure.
+- Slow, retryable, scheduled, or fan-out work need not block a
+  caller.
+- Operators need visible attempts, cancellation, replay, or
+  quarantine.
 
 ### When not to use it
 
 Do not enqueue work whose required state has not committed, or use a
-durable
-queue for trivial synchronous work whose result the caller requires
-now.
+durable queue for trivial synchronous work whose result the caller
+requires now.
 
 ### Common mistakes and edge cases
 
-- Acknowledging before the effect is durable.
-- Using a lease without checking ownership during completion.
-- Retrying validation failures forever.
-- Omitting payload versioning and deploy-time compatibility.
-- Running unbounded workers against a slower dependency.
+> **Warning:** Marking `J7` complete before its external effect is
+> durable can lose that effect after a crash. Persist or reconcile the
+> effect before acknowledging completion.
+
+> **Warning:** Accepting `Complete(7)` after token `8` was issued lets
+> a paused stale worker overwrite the current claim. Compare the
+> attempt token on every completion, extension, and failure
+> transition.
+
+> **Warning:** Retrying a malformed email address forever consumes
+> every attempt without a possible success. Classify permanent input
+> failure and move it to reviewed terminal state.
+
+> **Warning:** A new worker that cannot decode payload version 1 can
+> strand old jobs during deployment. Version payloads and keep readers
+> compatible through the queue's retention window.
+
+> **Warning:** Starting 1,000 workers against a dependency limited to
+> 50 calls creates local queueing and remote overload. Bound workers
+> from downstream capacity and observe queue age as well as length.
 
 ### Related material
 
@@ -2343,16 +3120,16 @@ See [reliable events](#17-reliable-event-publication-and-consumption),
 ### The problem it solves
 
 Writing business state and publishing a message as separate operations
-can
-lose the event or publish an event for a transaction that later rolls
-back.
-Consumers also receive duplicates and out-of-order messages.
+can lose the event or publish an event for a transaction that later
+rolls back. Consumers also receive duplicates and out-of-order
+messages.
 
 ### How it works
 
 When an order is saved, place its dispatch slip in the same locked
 transaction. An **outbox** publishes that slip later. Consumers use
-the event ID to avoid repeating effects and must tolerate late or
+an **inbox**, a durable record of handled event IDs stored with the
+local effect, to avoid repetition. They must also detect late or
 reordered delivery.
 
 ### Step-by-step examples
@@ -2374,14 +3151,32 @@ and the consumer applies one semantic effect.
    key. **After:** The transaction performs no second effect.
    **Known correct:** At-least-once delivery produced one result.
 
+Focused ordering input: order projection `O-42` is at version `4`;
+event version `6` arrives before version `5`. Expected output: version
+`6` waits as a gap, then versions `5` and `6` apply in order, leaving
+the projection at version `6`.
+
+1. **Before:** `currentVersion=4` and event `6` arrives. **Decision:**
+   Detect that expected version `5` is missing. **After:** Keep the
+   projection at `4` and retain event `6` for bounded reconciliation.
+   **Known correct:** The consumer did not invent the missing state.
+2. **Before:** `currentVersion=4`, event `6` is pending, and event `5`
+   arrives. **Decision:** Apply the expected event `5`. **After:**
+   `currentVersion=5`, and event `6` remains pending.
+   **Known correct:** The missing transition is now present.
+3. **Before:** `currentVersion=5` and pending event `6` is contiguous.
+   **Decision:** Apply event `6`. **After:** `currentVersion=6` and no
+   event is pending. **Known correct:** Delivery order did not change
+   transition order.
+
 ### Why it works
 
-The producer invariant is that business state and publication intent
-commit
-together. The consumer invariant is one local effect per event ID.
-Local
-transactions and unique constraints enforce both despite relay
-crashes.
+The producer fact that must stay true is that business state and
+publication intent commit together. This is the producer invariant.
+The consumer fact is one local effect per event ID; that is the
+consumer invariant. Local transactions and unique constraints enforce
+both despite relay crashes. Version checks prevent a later fact from
+silently skipping required earlier state.
 
 ### Go example
 
@@ -2390,35 +3185,48 @@ See the idempotent consumer transition in
 [tests][production-tests] apply the first event and ignore a duplicate
 without repeating the business effect.
 
-
 ### Work and memory
 
+Let `n` be retained outbox or inbox records and `b` the event bytes.
 Each event adds producer and consumer durable writes plus broker
-traffic.
-Indexed claims are commonly `O(log n)`. Outbox, inbox, and broker
-retention
-need bounded cleanup that preserves replay and audit windows.
+transfer of `b` bytes. A B-tree claim or deduplication lookup commonly
+takes `O(log n)` work. Durable storage grows with event volume, event
+size, consumer count, and retention. Pending gap buffers and cleanup
+batches need explicit bounds that preserve replay and audit windows.
 
 ### When to use it
 
-Use it when another component must eventually observe a committed
-local fact
-without a distributed transaction.
+- Another component must observe a committed local fact eventually.
+- Producer state and broker publication cannot share one transaction.
+- Consumers can receive duplicate, delayed, or reordered deliveries.
 
 ### When not to use it
 
 Do not publish speculative commands as committed facts or promise
-global
-ordering when only per-key partition order exists.
+global ordering when only per-key partition order exists. A direct
+local call is simpler when no durable asynchronous boundary is needed.
 
 ### Common mistakes and edge cases
 
-- Marking an outbox row sent before broker acknowledgement.
-- Performing consumer effects outside the inbox transaction.
-- Deduplicating only in process memory.
-- Removing or reinterpreting fields in an existing event version.
-- Assuming broker acknowledgement means every consumer applied the
-  event.
+> **Warning:** Marking `E9` sent before broker acknowledgement can
+> lose it if the process crashes before publish. Mark progress only
+> after acknowledgement and tolerate a repeated publish.
+
+> **Warning:** Applying a balance change before committing inbox key
+> `E9` can repeat the change after a crash. Commit the key and local
+> effect in one consumer transaction.
+
+> **Warning:** Remembering `E9` only in a process map forgets it after
+> restart and allows a duplicate effect. Store deduplication state for
+> the full replay window.
+
+> **Warning:** Reinterpreting `amount` from cents to dollars under the
+> same event version changes old facts. Add a compatible field or new
+> version with an owned migration policy.
+
+> **Warning:** Broker acknowledgement proves broker acceptance, not
+> that every consumer applied the event. Observe consumer lag, errors,
+> dead letters, and reconciliation separately.
 
 ### Related material
 
@@ -2431,45 +3239,47 @@ See [distributed foundations][distributed-reference],
 ### The problem it solves
 
 Across a network, delay is indistinguishable from failure, clocks
-disagree,
-messages repeat, and replicas observe different histories. Local
-reasoning no
-longer proves a global outcome.
+disagree, messages repeat, and replicas observe different histories.
+Local reasoning no longer proves a global outcome.
 
 ### How it works
 
 Coordinating offices by mail is different from sharing one desk:
 messages can be late, repeated, or lost. State the consistency and
 availability needed for each operation, then use stable IDs,
-increasing versions, leader or quorum rules, and reconciliation.
-Timing alone cannot create exactly-once delivery.
+increasing versions, and explicit coordination. A **quorum** is the
+minimum replica group whose responses decide an operation.
+**Reconciliation** compares divergent state and applies a named rule
+to converge it. Timing alone cannot create exactly-once delivery.
 
 ### Step-by-step examples
 
 Input: worker A holds lease token `7`, pauses past expiry, and resumes
-after worker B obtains token `8`. Expected output: storage accepts B's
-write and rejects A's later write.
+after worker B obtains token `8`. B writes value `"new"`; A later
+writes `"stale"`. Expected output: storage keeps value `"new"` with
+latest token `8` and rejects A's later write.
 
 1. **Before:** Storage's latest accepted token is `7`; A is paused.
    **Decision:** Expire A's lease and issue the next monotonic token
    `8` to B. **After:** B is the current owner. **Known correct:**
    Reassignment did not assume A had stopped running.
-2. **Before:** B writes with token `8`. **Decision:** Storage compares
-   `8 >= 7` and accepts the mutation. **After:** Its latest token is
-   `8`. **Known correct:** The current owner advanced the state.
-3. **Before:** A resumes with token `7`. **Decision:** Storage sees
-   `7 < 8` and rejects the mutation. **After:** B's value remains.
+2. **Before:** B writes `"new"` with token `8`. **Decision:** Storage
+   compares `8 >= 7` and accepts the mutation. **After:** Value is
+   `"new"`, and latest token is `8`. **Known correct:** The current
+   owner advanced the protected state.
+3. **Before:** A resumes and writes `"stale"` with token `7`.
+   **Decision:** Storage sees `7 < 8` and rejects the mutation.
+   **After:** Value remains `"new"`, and latest token remains `8`.
    **Known correct:** A stale process cannot regain authority merely
    by continuing to run.
 
 ### Why it works
 
-The invariant is that accepted mutations carry a token no lower than
-the
-latest accepted token. Durable monotonic allocation and storage-side
-checking
-preserve that order; timeouts affect liveness but cannot grant stale
-safety.
+The fact that must stay true is that accepted mutations carry a token
+no lower than the latest accepted token. This fencing invariant holds
+when token allocation is durable and strictly increasing and the
+protected resource stores and checks its latest token. Timeouts affect
+progress but cannot grant stale authority.
 
 ### Go example
 
@@ -2478,39 +3288,55 @@ See the storage-side fencing check in
 [tests][production-tests] accept a newer owner and reject a paused
 stale holder after reassignment.
 
-
 ### Work and memory
 
-Replication multiplies write, storage, and network work by replica
-count.
-Quorum latency follows the required response order statistic. Metadata
-for
-versions, deduplication, and reconciliation grows with keys and
-retention.
+Let `r` be replica count, `q` the required quorum responses, and `k`
+the tracked keys. Sending a write to every replica uses `O(r)` network
+and replica work and retains `O(r)` copies. Quorum latency waits for
+the `q`th response among those replicas, not necessarily the slowest.
+Version, deduplication, and reconciliation metadata use at least
+`O(k)` storage and grow further with retained history.
 
 ### When to use it
 
-Use these mechanics when state or work crosses process, machine,
-region, or
-broker boundaries and failures can be partial.
+- State or work crosses a process, machine, region, or broker
+  boundary.
+- A timeout can leave the outcome uncertain rather than simply
+  failed.
+- Replicas, leases, or messages can disagree, repeat, or arrive late.
 
 ### When not to use it
 
 Do not introduce consensus, distributed locks, or multi-region writes
-when a
-single transactional owner meets the real availability requirement.
+when a single transactional owner meets the real availability
+requirement.
 
 ### Common mistakes and edge cases
 
-- Treating a timeout as proof that an operation did not commit.
-- Using wall-clock order as causality or lease safety.
-- Calling at-least-once transport exactly-once processing.
-- Omitting fencing from a distributed lock or lease.
-- Quoting CAP without naming the operation and partition behavior.
+> **Warning:** A timeout after a payment write may mean the response
+> was lost after commit. Reconcile by stable operation identity before
+> deciding whether to repeat the effect.
+
+> **Warning:** A wall clock that reads 10:01 on A and 10:00 on B does
+> not prove A's event caused B's. Use causal or consensus-backed order
+> where the operation requires it, and monotonic time for durations.
+
+> **Warning:** At-least-once transport can deliver `E9` twice. A local
+> inbox can make one consumer effect idempotent, but it does not make
+> the transport itself exactly once.
+
+> **Warning:** A lease without fencing lets paused token `7` overwrite
+> token `8` after reassignment. Make the protected resource reject
+> every token below its latest accepted value.
+
+> **Warning:** Citing the Consistency, Availability, and Partition
+> tolerance (CAP) theorem without naming one operation hides the real
+> choice. State what that operation returns during a network
+> partition.
 
 ### Related material
 
-See [distributed foundations][distributed-reference],
+See [reliable events](#17-reliable-event-publication-and-consumption),
 [service communication](#20-synchronous-service-communication), and
 [distributed
 workflows](#21-distributed-workflows-and-eventual-consistency).
@@ -2520,45 +3346,64 @@ workflows](#21-distributed-workflows-and-eventual-consistency).
 ### The problem it solves
 
 Splitting code along technical layers creates chatty services and
-distributed
-transactions without establishing independent business ownership.
+distributed transactions without establishing independent business
+ownership.
 
 ### How it works
 
 A growing company does not create a department for every desk. Group
 work by business capability, rules, data, team ownership, and change
 patterns. Prove the boundary inside one modular application before
-turning it into a separate service.
+turning it into a separate service. A **facade** is a stable entry
+point that can route to old or candidate implementations during that
+proof.
 
 ### Step-by-step examples
 
-Input: the monolith owns invoice `I-42`; a candidate billing service
-must reproduce its read result before receiving writes.
-Expected output: mismatches block cutover; verified traffic moves in
-stages while exactly one system owns each write.
+Input: the monolith owns invoice `I-42` and reads
+`{total:500,status:"open"}`; the candidate billing service first reads
+`{total:450,status:"open"}`. After correction it reads the exact
+monolith value. Expected output: the mismatch keeps billing write
+traffic at 0%; after matching, the facade assigns the next `I-42`
+write only to billing.
 
 1. **Before:** The monolith owns all invoice writes. **Decision:**
    Send shadow reads through a facade to both paths, but return only
-   the monolith result. **After:** Differences are
-   recorded without creating two writers. **Known correct:** Shadowing
-   cannot mutate production ownership.
+   the monolith result. **After:** Record the `500` versus `450`
+   difference without creating two writers. **Known correct:**
+   Shadowing cannot mutate production ownership.
 2. **Before:** A mismatch for `I-42` is visible. **Decision:** Keep
-   routing at zero percent and correct the candidate. **After:** The
-   same request produces matching results.
-   **Known correct:** Evidence controls cutover.
-3. **Before:** Verification passes and the facade owns routing.
-   **Decision:** Move a bounded cohort to the service with one writer
-   selected per invoice. **After:** Traffic can expand or return to
-   the monolith. **Known correct:** Every stage retains single-write
-   ownership and a tested reversal.
+   billing writes at 0% and correct its projection. **After:** Both
+   reads return `{total:500,status:"open"}`. **Known correct:**
+   Evidence, rather than release age, controls cutover.
+3. **Before:** Reads match and the facade still routes `I-42` writes
+   to the monolith. **Decision:** Assign `I-42` to billing before its
+   next write. **After:** The facade routes that write only to billing
+   and records the ownership assignment. **Known correct:** Exactly
+   one system can mutate `I-42` at this stage.
+
+Focused seam input: the composition root first selects a local
+notification adapter and sends `"placed"`; it then selects a remote
+adapter that returns `publisher unavailable`. Expected output: the
+local adapter records one message, while the remote call returns the
+same error cause without a hidden local fallback.
+
+1. **Before:** The local adapter is selected and has no messages.
+   **Decision:** Call `Notify("placed")`. **After:** It contains one
+   `"placed"` message. **Known correct:** The use case depends only on
+   the narrow notification contract.
+2. **Before:** The remote adapter is selected and configured to fail.
+   **Decision:** Call `Notify("placed")`. **After:** The wrapped error
+   retains `publisher unavailable`, and no local path runs.
+   **Known correct:** Extraction did not hide the new failure mode.
 
 ### Why it works
 
-The invariant is single ownership of each durable mutation throughout
-the
-migration. The facade makes routing explicit, comparison supplies
-evidence,
-and staged cutover preserves a tested reversal at every transition.
+The fact that must stay true is single ownership of each durable
+mutation throughout migration. This ownership invariant holds because
+the facade makes routing explicit, comparison supplies evidence, and
+each assignment selects one writer. The adapter seam also exposes
+remote failure instead of silently changing product behavior.
 
 ### Go example
 
@@ -2567,38 +3412,52 @@ See the composition-root-selected notification adapter in
 [tests][distributed-tests] cover local success and unavailable remote
 delivery without hiding the failure.
 
-
 ### Work and memory
 
-Shadowing can nearly double read or compute work. Backfill is `O(n)`
-in moved
-records and needs bounded batches. Network extraction adds
-serialization,
-tail latency, telemetry, and failure-state costs to every call.
+Let `n` be records moved and `b` the bytes in one request and
+response. Shadowing can nearly double read, compute, and transfer
+work. A backfill visits `n` records, so it takes `O(n)` work. Use
+bounded batches rather than `O(n)` working memory. Each extracted
+call adds serialization and transfer of `b` bytes, tail latency,
+telemetry, and failure-state handling.
 
 ### When to use it
 
-Use extraction when ownership and independent delivery benefits are
-measured
-and exceed permanent distributed operational cost.
+- One business capability has clear data and operational ownership.
+- Independent scaling, delivery, or isolation has measured value.
+- An internal seam already proves the boundary and failure contract.
 
 ### When not to use it
 
 Do not split by table, controller, or repository, or extract merely
-because a
-codebase is large; improve internal boundaries first.
+because a codebase is large. Improve internal boundaries first when
+independent ownership or operations do not justify network cost.
 
 ### Common mistakes and edge cases
 
-- Allowing both old and new services to write the same records.
-- Migrating data without checksums or reconciliation.
-- Ignoring cross-boundary transactions until after cutover.
-- Comparing only happy-path responses during shadowing.
-- Removing the rollback path before a full operational window.
+> **Warning:** Letting both monolith and billing update `I-42` can
+> create divergent totals. Record one writer assignment and enforce it
+> at the routing and data boundaries.
+
+> **Warning:** Copying one million invoices without counts, checksums,
+> or reconciliation can silently omit records. Move bounded batches
+> and verify source and destination independently.
+
+> **Warning:** Extracting billing before deciding how order placement
+> and invoice creation coordinate creates a hidden distributed
+> transaction. Model the partial states and recovery path first.
+
+> **Warning:** Comparing only successful reads misses timeout, denied,
+> not-found, and malformed-data differences. Shadow representative
+> outcomes without allowing the candidate to mutate state.
+
+> **Warning:** Removing monolith routing after the first good cohort
+> leaves no tested reversal for a later incident. Keep an owned
+> rollback or roll-forward path through the full observation window.
 
 ### Related material
 
-See [service extraction][extraction-reference],
+See [domain modeling](#4-domain-discovery-and-modeling),
 [architecture](#5-architecture-and-service-construction), and
 [contract evolution](#22-contract-evolution-and-independent-delivery).
 
@@ -2637,41 +3496,55 @@ safety margin:       100 ms
 2. **Before:** 300 ms remains and the operation is idempotent.
    **Decision:** Start the one allowed retry with that smaller
    deadline. **After:** Attempt 2 succeeds in 180 ms.
-   **Known correct:**
-   Dependency work used 380 ms, within its 500 ms budget.
+   **Known correct:** Dependency work used 380 ms, within its 500 ms
+   budget.
 3. **Before:** 420 ms remains on the caller deadline. **Decision:**
    Finish local response work. **After:** The call completes within
    800 ms. **Known correct:** A third attempt cannot consume the
    reserved completion time.
 
+Focused timeout input: reservation call `reserve-O-43` is `pending`;
+its deadline expires after the remote service may have committed.
+Expected output: state `reconcile`, no claim that the reservation was
+rejected, and no immediate unkeyed retry.
+
+1. **Before:** `reserve-O-43.state=pending`, and the remote outcome is
+   unknown. **Decision:** Apply outcome `timed_out`. **After:** State
+   becomes `reconcile`. **Known correct:** A transport timeout did not
+   become a false business rejection or a duplicate effect.
+
 ### Why it works
 
-The invariant is that downstream attempts cannot outlive or exceed the
-caller's budget. Derived deadlines, bounded attempts, and cancellation
-preserve that limit, while classification prevents unsafe duplicate
-effects.
+The fact that must stay true is that downstream attempts cannot
+outlive or exceed the caller's budget. This deadline invariant holds
+because each child deadline is derived from remaining parent time,
+attempt count is bounded, and cancellation propagates. Outcome
+classification sends ambiguous writes to reconciliation instead of an
+unsafe retry.
 
 ### Go example
 
 See the remaining-deadline calculator and reservation reducer in
-[the distributed examples][distributed-examples]. Their
-[tests][distributed-tests] cover a reserved response and an ambiguous
-timeout that requires reconciliation.
-
+[the distributed examples][distributed-examples] and their
+[tests][distributed-tests]. The bounded backoff policy is in
+[the production examples][production-examples] with its
+[tests][production-tests]. Together they cover reserved completion,
+one funded retry, and an ambiguous timeout requiring reconciliation.
 
 ### Work and memory
 
-Worst-case calls equal the attempt cap. Latency includes each attempt
-plus
-backoff but remains under the parent deadline. Pools, queues, and
-concurrency
-limits bound sockets, goroutines, and downstream offered load.
+Let `a` be the attempt cap, `b` total transferred bytes, and `p` the
+connection-pool limit. One logical operation makes at most `a` calls;
+latency includes every attempt and backoff but remains under the
+parent deadline. Serialization and network work grow with `b`. The
+pool bounds live sockets at `p`; concurrency and queue limits likewise
+bound goroutines, retained requests, and downstream offered load.
 
 ### When to use it
 
-Use synchronous calls when the caller needs an immediate answer and
-the
-combined availability and latency budget is acceptable.
+- The caller cannot continue without an immediate remote answer.
+- Combined service availability meets the user-visible requirement.
+- End-to-end latency can fund the call and local completion reserve.
 
 ### When not to use it
 
@@ -2680,15 +3553,30 @@ non-idempotent writes without a durable key.
 
 ### Common mistakes and edge cases
 
-- Giving every hop the full original timeout.
-- Retrying at client, proxy, and server simultaneously.
-- Creating a new transport client per request.
-- Falling back to stale or partial data without a product contract.
-- Treating all 5xx, resets, and timeouts as the same retry condition.
+> **Warning:** Giving each sequential dependency the full 800 ms
+> caller deadline can make the chain run past the caller. Derive each
+> child budget from remaining time and reserve local completion work.
+
+> **Warning:** Three attempts at both proxy and service layers can
+> create nine downstream calls. Assign retry ownership to one layer
+> and cap attempts, delay, and total time.
+
+> **Warning:** Creating a new HTTP client for every request prevents
+> useful connection reuse and can exhaust sockets. Reuse a configured
+> client with bounded transport pools and timeouts.
+
+> **Warning:** Returning stale inventory as if it were current can
+> accept an impossible order. A fallback must have an explicit,
+> semantically honest product contract.
+
+> **Warning:** Retrying every 500-class response, reset, and timeout
+> can repeat permanent or ambiguous failures. Classify retryability
+> and require idempotency before repetition.
 
 ### Related material
 
-See [service extraction][extraction-reference],
+See [service extraction](
+#19-service-boundary-discovery-and-extraction),
 [performance and
 overload](#14-performance-capacity-retry-and-overload),
 and [distributed mechanics](#18-distributed-systems-mechanics).
@@ -2705,43 +3593,61 @@ repairable.
 
 Booking a trip may reserve a flight now and a hotel later. Store each
 step durably, advance one local action at a time, and undo only
-actions with a real business reversal. Show users when the workflow is
-still pending or has failed.
+actions with a real business reversal. This durable sequence of local
+actions is a **saga**. A **compensation** is a new, fallible business
+action, not a reversal of time. Show users when the workflow is still
+pending, compensated, or waiting for repair.
 
 ### Step-by-step examples
 
-Input: workflow `W42` starts in `pay`; payment succeeds, inventory
-reservation fails, and refund succeeds. Expected output: durable state
-moves through compensation to `canceled`, with one charge and refund.
+Input: order saga `O-42` starts at version `0` in
+`awaiting_payment`. It receives `payment_accepted` at version `1`, the
+same delivery again, then `inventory_reserved` at version `2`.
+Expected output: state `completed`, version `2`, with the duplicate
+causing no second change.
 
 ```text
-state:  pay -> reserve -> refund -> canceled
-effect:       charge     refund
+version: 0                  1                    2
+state:   awaiting_payment -> reserving --------> completed
+event:                      payment_accepted    inventory_reserved
 ```
 
-1. **Before:** `W42.state=pay` and no charge exists. **Decision:**
-   Commit the payment effect key and next state `reserve`. **After:**
-   One charge exists and inventory work is durable. **Known correct:**
-   A crash can replay without charging twice.
-2. **Before:** `W42.state=reserve` and inventory is unavailable.
-   **Decision:** Record rejection and commit next state `refund`.
-   **After:** The order remains visibly pending compensation.
-   **Known correct:** Partial success was not shown as complete.
-3. **Before:** `W42.state=refund` and the charge exists. **Decision:**
-   Apply the idempotent refund and store `canceled`. **After:** One
-   refund exists and the workflow is terminal. **Known correct:** Each
-   external effect has matching durable workflow state.
+1. **Before:** `state=awaiting_payment` and `version=0`. **Decision:**
+   Apply `payment_accepted` at the next version, `1`. **After:**
+   `state=reserving`, `version=1`, and `lastEvent=payment_accepted`.
+   **Known correct:** Durable workflow state now records the completed
+   payment step.
+2. **Before:** The saga is at version `1` with the same last event.
+   **Decision:** Apply duplicate `payment_accepted` at version `1`.
+   **After:** State and version remain unchanged. **Known correct:**
+   Repeated delivery did not repeat workflow progress.
+3. **Before:** `state=reserving` and `version=1`. **Decision:** Apply
+   `inventory_reserved` at the next version, `2`. **After:**
+   `state=completed`, `version=2`. **Known correct:** The saga reached
+   its terminal success through contiguous durable steps.
+
+Focused ordering input: after payment, `O-42` is `reserving` at
+version `1`; `inventory_reserved` arrives as version `3`, then is
+redelivered correctly as version `2`. Expected output: version `3` is
+rejected without change; version `2` completes the saga.
+
+1. **Before:** `state=reserving` and `version=1`. **Decision:** Try to
+   apply version `3`. **After:** Return `ErrOutOfOrder`; state remains
+   `reserving` at version `1`. **Known correct:** A missing step was
+   not silently skipped.
+2. **Before:** The same state now receives version `2`. **Decision:**
+   Apply the contiguous event. **After:** State becomes `completed` at
+   version `2`. **Known correct:** Later delivery restored progress
+   without rewriting history.
 
 ### Why it works
 
-The invariant is that every external effect has a durable
-corresponding
-workflow state and idempotency identity. A transition and its next
-message
-commit locally, so crashes can replay without losing progress. Finite
-states
-and attempt limits guarantee a terminal success, compensated, or
-repair state.
+The fact that must stay true is that every accepted event advances the
+workflow by exactly one version, unless it is the identical duplicate
+of the last accepted event. This version invariant prevents missing or
+conflicting steps. In production, each external effect also needs a
+durable workflow state and idempotency identity. Finite states and
+attempt limits end in success, compensation, or explicit repair.
 
 ### Go example
 
@@ -2750,39 +3656,54 @@ See the versioned saga reducer in
 [tests][distributed-tests] cover a valid transition, duplicate no-op,
 and out-of-order rejection.
 
-
 ### Work and memory
 
-Work is linear in attempted steps and retries. Durable state and audit
-history
-grow per workflow; indexes must support ready, timed-out, and repair
-states.
+Let `s` be workflow steps, `a` total delivery attempts, and `h` audit
+records. Transition work is `O(a)` because each attempt performs one
+bounded state check. The workflow retains constant current state,
+while audit storage is `O(h)`; `h` normally grows with `s` and `a`.
+Indexes must support ready, timed-out, and repair states.
 Completion latency includes every asynchronous wait and backoff.
 
 ### When to use it
 
-Use it for cross-service actions whose partial states are acceptable
-and can
-be compensated or repaired.
+- One business action spans independently committed service state.
+- Partial progress can be shown honestly, compensated, or repaired.
+- Messages may be duplicated, delayed, or delivered out of order.
 
 ### When not to use it
 
 Do not distribute an invariant that truly requires immediate atomicity
-when
-one transactional owner can satisfy it.
+when one transactional owner can satisfy it. A local transaction is
+simpler when every required change belongs to that owner.
 
 ### Common mistakes and edge cases
 
-- Calling compensation a rollback when an external fact already
-  escaped.
-- Keeping workflow state only in process memory.
-- Omitting late, duplicate, and out-of-order replies.
-- Hiding pending state from clients and operators.
-- Allowing choreography to form cycles with no accountable owner.
+> **Warning:** Calling a refund a rollback hides that the original
+> charge already happened and the refund can fail. Persist
+> compensation as a new state, attempts, and repair outcome.
+
+> **Warning:** Keeping `O-42` progress only in process memory loses
+> the current step on restart. Persist state, version, effect
+> identities, deadlines, and repair decisions.
+
+> **Warning:** Accepting version `3` while version `2` is missing can
+> skip a required effect. Reject or buffer gaps under a bounded,
+> observable reconciliation policy.
+
+> **Warning:** Showing an order as complete while refund is pending
+> gives the user a false terminal result. Expose pending, compensated,
+> failed, and repair states honestly.
+
+> **Warning:** Event choreography in which billing waits for inventory
+> while inventory waits for billing has no owner able to resolve the
+> cycle. Use explicit orchestration when interactions obscure
+> progress.
 
 ### Related material
 
-See [service extraction][extraction-reference],
+See [service extraction](
+#19-service-boundary-discovery-and-extraction),
 [reliable events](#17-reliable-event-publication-and-consumption), and
 [idempotency](#13-idempotency-and-ambiguous-write-outcomes).
 
@@ -2791,44 +3712,59 @@ See [service extraction][extraction-reference],
 ### The problem it solves
 
 Services deployed at different times must communicate while producers
-and
-consumers temporarily run different contract versions.
+and consumers temporarily run different contract versions.
 
 ### How it works
 
 Change a doorway while the shop stays open: add the wider path first,
 let old and new customers pass, and test the expectations of each
 consumer. Measure use of the old path and remove it only after every
-known consumer has moved. This is additive contract evolution.
+known consumer has moved. This is additive contract evolution. A
+field whose value comes from a fixed named set is an **enum**. Reserve
+an explicit unknown behavior for values a newer producer may add.
 
 ### Step-by-step examples
 
-Input: old producer P1 emits `{amount: 500}`; new producer P2 may emit
-`{amount: 500, currency: "USD"}`. Old consumer C1 ignores unknown
-fields; new consumer C2 defaults missing currency to `"USD"`.
-Expected output: all four producer-consumer pairs remain valid.
+Input: the decoder receives old response
+`{"id":"O-42","status":"placed"}`, then newer response
+`{"id":"O-43","status":"future","note":"new"}`. Expected output:
+the first becomes `{ID:O-42, Status:placed, Note:""}`; the second
+becomes `{ID:O-43, Status:unknown, Note:"new"}`.
 
-1. **Before:** P1 and C1 use only `amount`. **Decision:** Add optional
-   `currency` to P2 without changing `amount`. **After:** C1 reads P2
-   by ignoring the new field. **Known correct:** The old consumer's
-   interpretation is unchanged.
-2. **Before:** C2 receives P1 data with no currency. **Decision:** Use
-   the documented `"USD"` default. **After:** C2 produces the same
-   value as it would for P2's explicit field. **Known correct:** The
-   new consumer remains compatible with the old producer.
-3. **Before:** All four contract cases pass, but C1 still has traffic.
-   **Decision:** Keep the optional field and default. **After:** No
-   removal occurs until usage reaches zero. **Known correct:** Safe
-   deletion depends on observed consumers, not release age.
+1. **Before:** The old response omits optional `note`. **Decision:**
+   Decode known status `placed` and let the missing note use its empty
+   default. **After:** The result is the exact old-response value
+   above. **Known correct:** A new optional field is not required from
+   an old producer.
+2. **Before:** The newer response contains status `future` and note
+   `new`. **Decision:** Preserve the note and map the unrecognized
+   enum value to `unknown`. **After:** The result is the exact
+   newer-response value above. **Known correct:** New producer data
+   did not make the old status model claim a false known state.
+
+Focused deprecation input: telemetry shows 12 uses per minute of an
+old field, then zero uses for the full 30-day compatibility window.
+Expected output: keep the field at 12 uses; remove it only after zero
+use, owner approval, and successful old/new compatibility tests.
+
+1. **Before:** The old field still has 12 uses per minute.
+   **Decision:** Keep producing and reading it. **After:** No contract
+   shape changes. **Known correct:** Deployment age did not override
+   observed consumer use.
+2. **Before:** Use has remained zero for 30 days and compatibility
+   tests pass. **Decision:** Obtain owner approval and remove the old
+   field in the planned release. **After:** Only the supported shape
+   remains. **Known correct:** Evidence and policy defined the removal
+   point.
 
 ### Why it works
 
-The invariant is that every supported producer-consumer version pair
-shares
-one valid interpretation. Additive changes preserve the previous
-subset, and
-compatibility tests plus usage evidence make the safe removal point
-explicit.
+The fact that must stay true is that every supported producer-consumer
+version pair shares one valid interpretation. This compatibility
+invariant holds when additive changes preserve the previous subset and
+new consumers define defaults for absent fields. Explicit unknown
+handling prevents a new enum value from becoming a false known value.
+Compatibility tests and usage evidence define safe removal.
 
 ### Go example
 
@@ -2837,37 +3773,48 @@ See the compatible response decoder in
 [tests][distributed-tests] accept an absent optional field and map an
 unknown enum to an explicit fallback.
 
-
 ### Work and memory
 
-Compatibility cost grows with the supported version matrix. Keep the
-window
-bounded with explicit migration deadlines. Dual read or write paths
-add
-temporary CPU, storage, and reconciliation work.
+Let `p` be supported producer versions and `c` supported consumer
+versions. A complete compatibility matrix has `p * c` pairs, so test
+work grows with that product. The decoder visits response bytes and
+retains the decoded result. Keep the version window bounded with
+explicit migration deadlines. Dual read or write paths add temporary
+CPU, network, storage, and reconciliation work.
 
 ### When to use it
 
-Use it for public APIs, events, persisted payloads, and independently
-deployed
-services or clients.
+- Public APIs or events have independently deployed consumers.
+- Persisted payloads outlive the code version that wrote them.
+- A field, default, enum value, error, or timing rule must evolve.
 
 ### When not to use it
 
-Do not create a new version for an additive compatible field, or
-retain every
-historic behavior without an owned support policy.
+Do not create a new version for every additive compatible field, or
+retain every historic behavior without an owned support policy. Use a
+new version when meaning changes incompatibly.
 
 ### Common mistakes and edge cases
 
-- Changing meaning while preserving the same field name and type.
-- Testing schemas but not defaults, errors, ordering, or retry
-  semantics.
-- Removing a field based on deployment completion rather than
-  observed use.
-- Dual-writing without comparison and repair.
-- Letting undocumented consumers define permanent accidental
-  contracts.
+> **Warning:** Changing `amount` from cents to dollars while keeping
+> the same name and type makes old consumers misprice data. Add a new
+> field or version with an explicit migration.
+
+> **Warning:** Schema-only tests can pass while a new default, error,
+> ordering, or retry meaning breaks a consumer. Test every behavior
+> the consumer contract depends on.
+
+> **Warning:** Removing a field when the provider deploys can break a
+> consumer that releases next week. Measure use through the full
+> compatibility window before removal.
+
+> **Warning:** Dual-writing old and new fields without comparison can
+> let their values diverge silently. Compare, reconcile, and alert
+> until one representation is authoritative.
+
+> **Warning:** An undocumented caller can keep an accidental behavior
+> alive forever. Publish ownership and support policy, discover usage,
+> and give consumers a migration path and deadline.
 
 ### Related material
 
@@ -2880,45 +3827,62 @@ See [service extraction][extraction-reference],
 ### The problem it solves
 
 A distributed request can fail across several services, queues, and
-retries.
-Healthy local dashboards do not reveal the causal chain or prove
-recovery.
+retries. Healthy local dashboards do not reveal the causal chain or
+prove recovery.
 
 ### How it works
 
 Follow one delivery with the same tracking number across every depot.
-Correlation and trace context provide that number. Measure the
-user-visible promise, then run small failure drills with a stop rule
-and proof that the system recovered.
+A **distributed trace** links records for one operation across process
+boundaries. **Trace context** carries that link, while a correlation
+identifier can join a longer business flow. Measure a user-visible
+**steady state**, the acceptable operating range, then run a bounded
+failure drill. A **guardrail** is the automated limit that stops it.
 
 ### Step-by-step examples
 
-Input: checkout baseline success is 99.95%. Add 200 ms payment latency
-to one canary worker with a 99.5% abort guardrail. Expected output:
-the experiment either stays above 99.5% or restores baseline.
+Input: checkout success was 99.95% for the prior 30 minutes. Add
+200 milliseconds of payment latency to one canary for at most ten
+minutes. Abort if one one-minute window falls below 99.5%. Recovery
+requires three consecutive one-minute windows at or above 99.9%.
+Expected output: a 99.4% window stops injection; windows 99.91%,
+99.94%, and 99.92% then prove recovery.
 
-1. **Before:** Baseline is measured and only the named canary is in
-   scope. **Decision:** Enable the 200 ms delay. **After:** Linked
-   traces identify delayed payment attempts. **Known correct:** The
-   blast radius matches the approved target.
-2. **Before:** Success falls to 99.4%. **Decision:** The automated
-   guardrail disables injection. **After:** No new attempt receives
-   added latency. **Known correct:** The experiment stopped on the
-   stated user-visible threshold.
-3. **Before:** Injection is off. **Decision:** Observe checkout until
-   success returns to its baseline range. **After:** Recovery evidence
-   and traces are stored. **Known correct:** Ending the fault was not
-   mistaken for proving restoration.
+1. **Before:** Baseline is 99.95%, and only the named canary is in
+   scope. **Decision:** Enable the delay. **After:** Linked traces
+   mark delayed canary attempts. **Known correct:** The target and
+   ten-minute limit match the approved blast radius.
+2. **Before:** A one-minute window reports 99.4%. **Decision:** Apply
+   the abort guardrail. **After:** Injection is off, so no new attempt
+   receives the delay. **Known correct:** 99.4% is below 99.5%.
+3. **Before:** Injection is off and no recovery window has qualified.
+   **Decision:** Observe 99.91%, 99.94%, and 99.92%. **After:** Mark
+   the system recovered and retain the evidence. **Known correct:**
+   All three consecutive windows meet the 99.9% recovery rule.
+
+Focused envelope input: event `E9` has metadata
+`{"traceparent":"trace-1"}` and payload
+`{"order_id":"O-42"}`. Event `E10` has metadata
+`{"authorization":"secret"}`. Expected output: build `E9` with its
+trace context and reject `E10` with `ErrUnsafeMetadata`.
+
+1. **Before:** `E9` contains one allowlisted metadata name.
+   **Decision:** Copy the metadata and payload into the envelope.
+   **After:** Its `traceparent` is `trace-1`. **Known correct:** The
+   downstream consumer can continue the trace without shared mutable
+   input.
+2. **Before:** `E10` contains `authorization`. **Decision:** Reject
+   the envelope. **After:** No event is returned and the error wraps
+   `ErrUnsafeMetadata`. **Known correct:** Credentials did not become
+   durable event baggage.
 
 ### Why it works
 
-The invariant is that an experiment cannot exceed its approved scope
-or
-continue after a guardrail breach. Explicit targeting and automated
-abort
-preserve that boundary; before-and-after indicators prove restoration
-rather
-than merely ending the injection.
+The fact that must stay true is that an experiment cannot exceed its
+approved scope or continue after a guardrail breach. This experiment
+boundary invariant is preserved by explicit targeting, duration, and
+automated abort rules. A separate numerical recovery condition proves
+restoration instead of treating the end of injection as recovery.
 
 ### Go example
 
@@ -2927,61 +3891,68 @@ See the allowlisted event envelope in
 [tests][distributed-tests] preserve trace metadata and reject
 credential baggage.
 
-
 ### Work and memory
 
-Tracing and experiments add bounded signal volume and test traffic.
-Sampling,
-label cardinality, retention, and injection concurrency need hard
-limits.
-Analysis cost grows with services and attempts on the traced path.
+Let `s` be services on the path, `a` recorded attempts, `m` total
+metadata bytes, and `b` payload bytes. Envelope construction takes
+`O(m + b)` work and memory because it validates and copies both. Trace
+analysis is `O(s + a)` for a linear path representation. Sampling,
+label cardinality, retention, experiment duration, and concurrent
+injections need hard limits.
 
 ### When to use it
 
-Use it after baseline observability and recovery controls exist for a
-critical
-distributed path.
+- A critical operation crosses process or queue boundaries.
+- Operators can state an exact user-visible steady-state range.
+- A bounded failure hypothesis needs production-like evidence.
 
 ### When not to use it
 
-Do not inject unbounded production failure, experiment without an
-owner, or
-use chaos to discover basic missing timeouts that static review
-already shows.
+Do not inject production failure before ownership, observability,
+abort, and restoration controls exist. Static review and ordinary
+tests should find basic missing timeouts before an experiment does.
 
 ### Common mistakes and edge cases
 
-- Starting a new trace instead of propagating the parent or message
-  link.
-- Using high-cardinality identifiers as metric labels.
-- Defining steady state from internal health instead of user outcomes.
-- Running without a tested abort and restoration procedure.
-- Declaring success because the injection ended rather than service
-  recovered.
+> **Warning:** Starting a new trace after queue delivery severs the
+> causal chain. Propagate the parent or record a message link.
+
+> **Warning:** Using `order_id` as a metric label creates one series
+> per order and can exhaust monitoring capacity. Keep it in traces or
+> logs; use bounded metric dimensions.
+
+> **Warning:** Defining steady state as "pods are healthy" can miss a
+> broken checkout. Guard the user-visible success and latency promise.
+
+> **Warning:** A manual abort that has never been exercised can fail
+> during the drill. Test automatic stop and restoration before fault
+> injection begins.
+
+> **Warning:** Ending the delay at 99.4% does not prove recovery.
+> Require the stated post-fault windows and retain their evidence.
 
 ### Related material
 
 See [service extraction][extraction-reference],
 [observability](#11-observability-and-operational-controls), and
-[reliability
-engineering](#28-reliability-engineering-incidents-and-cost).
+[Entry 28](#28-reliability-engineering-incidents-and-cost).
 
 ## 24. Data scaling, caching, and tenant isolation
 
 ### The problem it solves
 
 Growing data and traffic pressure one database, while caches,
-partitions, and
-shared tenancy can introduce stale reads, hot keys, leakage, and
-migrations
-that are harder than the original bottleneck.
+partitions, and shared tenancy can introduce stale reads, hot keys,
+leakage, and migrations harder than the original bottleneck.
 
 ### How it works
 
-A cache is a convenient copy of the store's real price list, not a new
-source of truth. Say how fresh it must be and how it is replaced.
-Split data by an ownership key, and include the tenant identity in
-every storage and cache lookup.
+A **cache** is a temporary copy, not the authoritative source. Its
+**freshness contract** states how old a value may be and what events
+replace or invalidate it. A time to live (TTL) is only the maximum
+retention time; it does not synchronize a write immediately. Split
+data by an ownership key, and include the **tenant**, the customer or
+organization that owns the data, in every lookup and derived key.
 
 ### Step-by-step examples
 
@@ -3001,15 +3972,30 @@ B's product, and neither tenant can observe the other's value.
    remains valid. **Known correct:** Lookup, storage, and invalidation
    use the same ownership dimension.
 
+Focused key input: call `NewTenantCacheKey` with
+`("tenant-a", "product-1", 2)`, then with
+`("a:v1", "b", 2)` and `("a", "v2:b", 1)`. Expected output: the
+first key is `8:tenant-a:v2:9:product-1`; the delimiter cases produce
+different keys, `4:a:v1:v2:1:b` and `1:a:v1:4:v2:b`.
+
+1. **Before:** Tenant `tenant-a`, item `product-1`, and version `2`
+   are valid. **Decision:** Prefix each identity with its length.
+   **After:** Return `8:tenant-a:v2:9:product-1`. **Known correct:**
+   The version and both ownership components are encoded.
+2. **Before:** The two remaining inputs contain delimiters in
+   different components. **Decision:** Apply the same length-prefixed
+   encoding. **After:** Return the two distinct expected keys.
+   **Known correct:** Delimiters cannot move a boundary between tenant
+   and item.
+
 ### Why it works
 
-The invariant is that every derived location retains the authoritative
-tenant
-and object identity. Compound keys and storage policy preserve
-isolation. Length-prefixed components keep delimiters inside tenant or
-object
-identities from creating the same serialized key. Storage policy and
-bounded coalescing allow one refill while waiters share its result.
+The fact that must stay true is that every derived location retains
+the authoritative tenant and object identity. This isolation invariant
+is preserved by compound keys and matching storage policy.
+Length-prefixed components keep embedded delimiters from creating the
+same serialized key. A bounded refill coordinator can let waiters
+share one load without allowing an unbounded queue.
 
 ### Go example
 
@@ -3018,92 +4004,111 @@ See the typed tenant cache key in
 [tests][platform-tests] reject empty tenant identity and prove that
 delimiter-containing identities cannot alias.
 
-
 ### Work and memory
 
-Cache lookup is `O(1)` average and memory is bounded by configured
-entries or
-bytes. Partition routing is constant after metadata lookup. Resharding
-is
-`O(n)` in moved data and consumes source, destination, and network
-capacity.
+Let `t` be tenant-identifier bytes, `i` item-identifier bytes, `k`
+cached entries, and `n` items moved during resharding. Key
+construction takes `O(t + i)` work and output memory. Hash-cache
+lookup is `O(1)` on average and `O(k)` in the collision worst case;
+configured entry and byte limits bound retained memory. Resharding
+takes `O(n)` item operations plus the bytes copied, and consumes
+source, destination, and network capacity.
 
 ### When to use it
 
-Use these tools after measurements identify data volume, read load,
-locality,
-or isolation as the limiting dimension.
+- Measurements identify read load or data volume as the bottleneck.
+- Repeated reads can tolerate a written freshness contract.
+- Data must be partitioned while preserving tenant ownership.
 
 ### When not to use it
 
 Do not cache correctness-critical mutable state without a freshness
-contract,
-or shard before a single well-operated database is insufficient.
+contract. Do not shard before a single well-operated database is the
+measured limiting resource.
 
 ### Common mistakes and edge cases
 
-- Omitting tenant ID from a cache, queue, or deduplication key.
-- Treating TTL as precise invalidation.
-- Allowing cache stampedes or unbounded negative caching.
-- Choosing a time or geography key that concentrates current writes.
-- Using replicas for read-after-write paths without a consistency
-  policy.
+> **Warning:** Keying both tenants' `P1` as only `P1` lets one tenant
+> read the other's value. Include tenant identity in cache, queue,
+> deduplication, storage, and invalidation keys.
+
+> **Warning:** A five-minute TTL can serve an old price for nearly
+> five minutes after a write. Use explicit invalidation or versioned
+> keys when the freshness contract is tighter.
+
+> **Warning:** Letting 10,000 misses refill the same key can overload
+> the database; this synchronized surge is a cache stampede. Coalesce
+> refills with bounded waiters and cap negative-cache retention.
+
+> **Warning:** Partitioning writes by current hour sends all current
+> traffic to one partition. Choose and test a key with sufficient
+> write distribution and an owned resharding plan.
+
+> **Warning:** Reading a replica immediately after a write can return
+> the old value. Route read-after-write traffic according to an
+> explicit consistency policy.
 
 ### Related material
 
-See [scale and cloud operations][scale-reference],
+See [cloud operations](#26-cloud-infrastructure-and-iam),
 [advanced PostgreSQL](#15-advanced-postgresql-operation-and-recovery),
-and
-[privacy and supply
-chain](#25-security-privacy-and-software-supply-chain).
+and [Entry 25](#25-security-privacy-and-software-supply-chain).
 
 ## 25. Security, privacy, and software supply chain
 
 ### The problem it solves
 
 Production risk includes vulnerable dependencies, compromised builds,
-excess
-privilege, retained personal data, unsafe logs, and secrets that
-outlive their
-intended scope.
+excess privilege, retained personal data, unsafe logs, and secrets
+that outlive their intended scope.
 
 ### How it works
 
-Protect a system like a building: a **threat model** lists valuables,
-entrances, and likely misuse. Collect only needed data, give each
-actor the smallest useful privilege, and verify build inputs and
-signed artifacts through the **software supply chain**. Make deletion,
-key rotation, and incident response actions that can actually be run.
+Protect a system like a building: a **threat model** lists assets,
+entry points, likely misuse, and controls. **Least privilege** gives
+each identity only the actions and resources its work requires. This
+is part of identity and access management (IAM). Collect only needed
+data, and verify build inputs and signed artifacts through the
+**software supply chain**. Make deletion, key rotation, and incident
+response procedures executable and tested.
 
 ### Step-by-step examples
 
-Input: key v3 signs existing artifacts; key v4 is ready for rotation.
-Artifacts remain valid for 24 hours. Expected output: new artifacts
-use v4, old v3 artifacts verify during overlap, then v3 is retired.
+Input: construct rotation state with current version `v4` and accepted
+versions `v3` and `v4`. After the 24-hour overlap, no valid `v3`
+artifact remains. Expected output: both versions verify during
+overlap; after `Retire("v3")`, `v3` fails and `v4` still verifies.
 
-1. **Before:** Signing and verification both use v3. **Decision:**
-   Publish v4 to verifiers without changing the signing key.
-   **After:** Verifiers accept v3 and v4. **Known correct:** Adding
-   trust did not
-   invalidate existing artifacts.
-2. **Before:** Both keys verify. **Decision:** Switch new signatures
-   to v4 while retaining v3 verification for 24 hours. **After:** New
-   artifacts use v4; old artifacts still work. **Known correct:** The
-   rotation has a usable rollback window.
-3. **Before:** No valid v3 artifact remains. **Decision:** Revoke v3
-   and verify that v3 signatures fail. **After:** Only v4 is trusted.
-   **Known correct:** Retirement happened after measured expiry, not
-   immediately after publishing the new key.
+1. **Before:** Current version is `v4`, and both versions are
+   accepted. **Decision:** Check `Accepts("v3")` and `Accepts("v4")`
+   during the overlap. **After:** Both return true. **Known correct:**
+   New signing can use `v4` without invalidating an unexpired `v3`
+   artifact.
+2. **Before:** The overlap has elapsed and no valid `v3` artifact
+   remains. **Decision:** Call `Retire("v3")`. **After:** `v3` returns
+   false while `v4` returns true. **Known correct:** Retirement
+   removed only the old verification authority.
+
+Focused authorization input: allow only tuple
+`(order-worker, queue/orders, receive)`. Expected output: that tuple
+is allowed; `(order-worker, bucket/private, read)` is denied.
+
+1. **Before:** The authorizer contains one permission. **Decision:**
+   Check the exact allowed tuple. **After:** Return true.
+   **Known correct:** The declared work can proceed.
+2. **Before:** No private-bucket permission exists. **Decision:**
+   Check the excess tuple. **After:** Return false. **Known correct:**
+   Missing privilege fails closed instead of expanding the workload's
+   reach.
 
 ### Why it works
 
-The invariant is that every accepted artifact or credential chains to
-a
-currently trusted, auditable authority. Overlap preserves availability
-during
-rotation, while explicit retirement bounds exposure. Data minimization
-reduces
-the impact and compliance surface when another control fails.
+The fact that must stay true is that every accepted artifact,
+credential, or action chains to a currently trusted, auditable
+authority. This authority invariant is preserved by explicit
+permission tuples and accepted key sets. Overlap preserves
+availability during rotation, while retirement bounds exposure. Data
+minimization reduces impact when another control fails.
 
 ### Go example
 
@@ -3112,88 +4117,119 @@ See least-privilege authorization and overlap rotation in
 [tests][platform-tests] cover one allowed tuple, denied excess access,
 accepted overlap keys, and retirement.
 
-
 ### Work and memory
 
-Verification adds bounded cryptographic and metadata work. Scanning
-grows with
-dependency and artifact count. Encryption, audit logs, and retention
-copies
-consume storage; deletion must cover indexes, caches, backups, and
-replicas
-under their documented lifecycle.
+Let `p` be stored permission tuples, `k` accepted key versions, `d`
+dependencies scanned, and `b` artifact bytes. Permission and key-set
+lookups are `O(1)` on average and `O(p)` or `O(k)` in a hash-collision
+worst case; retained map memory is `O(p + k)`. Scanning grows with `d`
+and artifact verification with `b` plus the chosen algorithm's cost.
+Audit and retention copies consume storage; deletion must cover each
+copy under its documented lifecycle.
 
 ### When to use it
 
-Use it for every build and production system, with depth proportional
-to data
-sensitivity, privilege, exposure, and recovery cost.
+- A workload can reach production data or infrastructure.
+- A build consumes third-party code or produces deployable artifacts.
+- Personal data has collection, retention, export, or deletion duties.
 
 ### When not to use it
 
-Do not collect data for hypothetical future use or grant permanent
-broad
-credentials because rotation and policy design were postponed.
+Security controls are not optional. Scale their depth to sensitivity,
+privilege, exposure, and recovery cost; do not collect speculative
+data or grant permanent broad credentials to postpone policy design.
 
 ### Common mistakes and edge cases
 
-- Scanning dependencies without an owner or remediation deadline.
-- Signing an artifact after an untrusted step can still modify it.
-- Treating encryption as a substitute for authorization and
-  minimization.
-- Deleting the primary row while copies remain in caches or exports.
-- Rotating secrets without dual-read overlap or rollback.
+> **Warning:** A scanner finding a critical dependency with no owner
+> or deadline produces inventory, not risk reduction. Assign severity,
+> owner, due date, exception, and verification evidence.
+
+> **Warning:** Signing before an untrusted packaging step lets that
+> step alter the artifact after attestation. Sign the immutable output
+> that deployment will verify.
+
+> **Warning:** Encrypting a customer export does not authorize every
+> employee to read it. Enforce access policy and data minimization in
+> addition to encryption.
+
+> **Warning:** Deleting only the primary row leaves personal data in
+> caches, exports, indexes, replicas, or backups. Track each copy and
+> its deletion or expiry evidence.
+
+> **Warning:** Replacing `v3` with `v4` in one instant rejects valid
+> in-flight artifacts. Publish trust, switch issuance, observe the
+> bounded overlap, then retire the old version with rollback ready.
 
 ### Related material
 
 See [scale and cloud operations][scale-reference],
 [identity and security](#9-identity-authorization-and-api-security),
-and
-[cloud IAM](#26-cloud-infrastructure-and-iam).
+and [cloud IAM](#26-cloud-infrastructure-and-iam).
 
 ## 26. Cloud infrastructure and IAM
 
 ### The problem it solves
 
-Cloud APIs make infrastructure easy to create and equally easy to
-drift,
-overprivilege, expose publicly, or recreate differently during
-recovery.
+Cloud application programming interfaces (APIs) make infrastructure
+easy to create and equally easy to drift, overprivilege, expose
+publicly, or recreate differently during recovery.
 
 ### How it works
 
 Keep infrastructure as reviewed blueprints instead of hand-built
-rooms. Separate environments and failure areas deliberately. Give each
-workload a short-lived keycard that opens only the resources and
-actions required for its job.
+rooms. **Infrastructure as code** stores those declarations in a
+repeatable, reviewed form. Separate environments and **failure
+domains**, areas that can fail independently. Identity and access
+management (IAM) gives each **workload identity**, the authenticated
+identity of running software, short-lived credentials and permission
+for only its job.
 
 ### Step-by-step examples
 
-Input: workload identity `order-worker` requests `Receive` on queue Q
-and `Read` on bucket B using a short-lived credential.
-Expected output: queue access succeeds and bucket access is denied.
+Input: workload identity `order-worker` requests `receive` on
+`queue/orders` and `read` on `bucket/private` using a short-lived
+credential. Expected output: queue access succeeds and bucket access
+is denied.
 
 1. **Before:** The workload has no embedded cloud key. **Decision:**
    Exchange its deployment identity for a short-lived credential.
    **After:** The credential names `order-worker` and its expiry.
    **Known correct:** No static secret is stored.
-2. **Before:** Policy allows `Receive` on Q. **Decision:** Authorize
-   the queue request against workload, action, and resource.
+2. **Before:** Policy allows `receive` on `queue/orders`.
+   **Decision:** Authorize the queue request against workload, action,
+   and resource.
    **After:** One message is returned. **Known correct:** The action
    matches the declared need.
-3. **Before:** The same identity requests `Read` on B. **Decision:**
-   No policy statement matches that action and resource. **After:**
-   Access is denied and audited. **Known correct:** Successful queue
-   access did not imply broad cloud permission.
+3. **Before:** The same identity requests `read` on `bucket/private`.
+   **Decision:** Find no matching policy tuple. **After:** Access is
+   denied and audited. **Known correct:** Successful queue access did
+   not imply broad cloud permission.
+
+Focused diagnostic input: classify `ErrNetwork`, `ErrAuthorization`,
+and `errors.New("invalid order")`. Expected output: `network`,
+`authorization`, and `application`, in that order.
+
+1. **Before:** The first error wraps the network sentinel.
+   **Decision:** Test the network boundary first. **After:** Return
+   `network`. **Known correct:** Transport failure is not blamed on
+   application logic.
+2. **Before:** The second error wraps the authorization sentinel.
+   **Decision:** Test the authorization boundary. **After:** Return
+   `authorization`. **Known correct:** Denied policy is distinct from
+   authentication and connectivity.
+3. **Before:** `invalid order` matches no boundary sentinel.
+   **Decision:** Use the default category. **After:** Return
+   `application`. **Known correct:** An expected domain failure is not
+   reported as cloud infrastructure failure.
 
 ### Why it works
 
-The invariant is that deployed resources and permissions are
-reproducible from
-reviewed declarations, and every allowed action matches an explicit
-workload
-need. Short credential lifetime and narrow scope bound misuse after
-compromise.
+The facts that must stay true are that deployed resources can be
+reproduced from reviewed declarations and every allowed action matches
+an explicit workload need. These infrastructure and authority
+invariants make drift and excess privilege detectable. Short
+credential lifetime and narrow scope bound misuse after compromise.
 
 ### Go example
 
@@ -3202,58 +4238,71 @@ See the boundary-aware diagnostic classifier in
 [tests][platform-tests] preserve network, authorization, and
 application failure categories.
 
-
 ### Work and memory
 
-Plans scale with resource graph size and provider calls. Policy
-evaluation is
-small per request but audit volume grows with activity. Multi-zone or
-regional
-redundancy multiplies running cost, data transfer, and recovery
-coordination.
+Let `r` be resources in a plan, `e` dependency edges, `c` provider
+calls, and `a` audited actions. Planning traverses the resource graph
+in `O(r + e)` work before provider-specific calls, while apply work
+also depends on `c`. Retained plan state is `O(r + e)`; audit storage
+grows with `a`. Multi-zone or regional redundancy adds
+running cost, transfer, and recovery coordination.
 
 ### When to use it
 
-Use reviewed infrastructure and workload identity for every non-local
-environment, especially shared accounts and automated deployment
-systems.
+- A non-local environment must be reproducible and reviewable.
+- Multiple workloads share an account but require different access.
+- Recovery must recreate networks, data services, policy, and traffic.
 
 ### When not to use it
 
-Do not put changing application rollout logic into low-level
-infrastructure
-state, or use one administrator credential for all workloads.
+Do not put rapidly changing application rollout state into a
+low-level infrastructure state file. Never use one administrator
+credential for all workloads; split ownership and permissions.
 
 ### Common mistakes and edge cases
 
-- Applying an unreviewed plan or editing managed resources manually.
-- Sharing state files or broad roles across unrelated environments.
-- Assuming private addressing alone authenticates a caller.
-- Allowing unrestricted egress that bypasses dependency policy.
-- Designing redundancy without testing data restoration and traffic
-  failover.
+> **Warning:** Applying an unreviewed plan can expose a database or
+> destroy retained state. Review the exact plan and require approval
+> for high-impact changes.
+
+> **Warning:** Sharing one writable state file across development and
+> production lets a development action mutate production resources.
+> Isolate state, credentials, and approval boundaries.
+
+> **Warning:** A private network address does not prove which workload
+> called. Authenticate workload identity and authorize the exact
+> action and resource.
+
+> **Warning:** Unrestricted egress lets a compromised worker bypass
+> declared dependency controls. Restrict destinations and log denied
+> attempts with bounded metadata.
+
+> **Warning:** Multi-zone labels do not prove recovery. Restore data
+> and fail traffic in a timed exercise, then retain evidence that the
+> stated objective was met.
 
 ### Related material
 
-See [scale and cloud operations][scale-reference],
+See [data scaling][scale-reference],
 [delivery readiness](#12-delivery-deployment-and-recovery-readiness),
-and
-[platform operations](#27-orchestration-and-platform-operations).
+and [platform operations](#27-orchestration-and-platform-operations).
 
 ## 27. Orchestration and platform operations
 
 ### The problem it solves
 
-Schedulers can restart and scale processes, but poor requests, probes,
-shutdown, disruption policy, or queue signals turn automation into
-churn.
+Schedulers can restart and scale processes, but poor resource
+requests, health probes, shutdown, disruption policy, or queue signals
+turn automation into churn.
 
 ### How it works
 
-Run compute like a delivery fleet. Each unit declares the fuel and
-time it needs, reports when it is ready, and can be replaced without
-losing cargo. Scaling and maintenance act only on signals the workload
-can really honor.
+Run compute like a delivery fleet. An **orchestrator** places,
+replaces, and scales workload instances. A resource **request**
+reserves scheduling capacity; a **limit** bounds permitted use.
+Startup reports initialization. Readiness controls new traffic, and
+liveness reports whether the process itself must restart. Scaling and
+maintenance must act only on signals the workload can honor.
 
 ### Step-by-step examples
 
@@ -3262,10 +4311,10 @@ a 30-second grace period. Expected output: P1 admits no new work and
 either completes or releases `J7` before exit.
 
 1. **Before:** P1 is ready, owns `J7`, and has 30 seconds remaining.
-   **Decision:** Mark readiness false before beginning drain.
-   **After:** The scheduler stops routing new work to P1.
-   **Known correct:** The
-   draining workload cannot grow through normal admission.
+   **Decision:** Close local admission and mark readiness false before
+   draining. **After:** New work is rejected locally while endpoint
+   removal propagates. **Known correct:** The draining workload cannot
+   grow through normal admission.
 2. **Before:** P1 is unready and still owns `J7`. **Decision:** Finish
    its durable effect and acknowledge it before the grace deadline.
    **After:** `J7` is complete and P1 may exit. **Known correct:** The
@@ -3275,16 +4324,41 @@ either completes or releases `J7` before exit.
    **After:** The scheduler restores the desired replica count.
    **Known correct:** Replacement and drain preserve minimum capacity.
 
-Failure example: if `J7` cannot finish in time, P1 releases or lets
-its lease expire; it does not acknowledge unfinished work.
+Focused failure input: five seconds remain, and `J7` has not completed
+its durable effect. Expected output: P1 does not acknowledge `J7`; it
+releases ownership or exits and lets the lease expire.
+
+1. **Before:** P1 cannot prove durable completion before termination.
+   **Decision:** Withhold acknowledgement and release ownership when
+   supported. **After:** `J7` becomes eligible for another worker now
+   or after lease expiry. **Known correct:** Unfinished work was not
+   falsely recorded as complete.
+
+Focused health input: start with lifecycle `{Initialized:true,
+DependencyReady:true, Draining:false}`; then lose the dependency; then
+set `Draining:true`. Expected output: health begins
+`{Startup:true, Readiness:true, Liveness:true}`; dependency loss makes
+only readiness false; draining keeps readiness false.
+
+1. **Before:** Initialization and the dependency are ready, and drain
+   is false. **Decision:** Evaluate all three health dimensions.
+   **After:** Startup, readiness, and liveness are true.
+   **Known correct:** The instance may receive work.
+2. **Before:** The dependency becomes unavailable. **Decision:**
+   Re-evaluate without treating dependency loss as a dead event loop.
+   **After:** Startup and liveness remain true; readiness is false.
+   **Known correct:** Traffic stops without creating a restart loop.
+3. **Before:** The lifecycle enters drain. **Decision:** Evaluate
+   readiness with `Draining:true`. **After:** Readiness remains false.
+   **Known correct:** A terminating instance cannot re-enter service.
 
 ### Why it works
 
-The invariant is that only ready instances receive new work and every
-owned
-unit is completed or made eligible before process death. Probe
-separation and
-bounded drain preserve that lifecycle under restart and deployment.
+The facts that must stay true are that only ready instances admit new
+work and every owned unit is completed or made eligible before process
+death. These admission and ownership invariants survive restart and
+deployment through separate probes, local admission closure, durable
+leases, and bounded drain.
 
 ### Go example
 
@@ -3293,35 +4367,48 @@ See the startup, readiness, and liveness state object in
 [tests][platform-tests] cover healthy service, dependency loss, and
 draining without creating a restart loop.
 
-
 ### Work and memory
 
-Requests reserve cluster capacity; limits bound but can throttle or
-kill.
-Autoscaling lag requires headroom. Replicas and topology rules
-multiply
-baseline cost, while queue-based scaling must remain below downstream
-capacity.
+Let `r` be replicas, `q` queued work, and `d` the downstream
+concurrent capacity. Health evaluation uses constant work and state
+per instance. Requested cluster capacity grows with `r`; replica state
+is `O(r)`.
+Autoscaling lag requires measured headroom. A queue-based target must
+keep admitted concurrency at or below `d`, even when `q` is larger.
 
 ### When to use it
 
-Use orchestration once multiple deployable instances need automated
-placement,
-replacement, rollout, and capacity management.
+- Multiple instances need automated placement and replacement.
+- Rollouts must preserve capacity while old instances drain.
+- Queue or traffic signals can scale within downstream capacity.
 
 ### When not to use it
 
-Do not add a cluster when a simpler supervised deployment meets
-reliability
-needs, or use restarts to mask deterministic application defects.
+Do not add a cluster when a simpler supervised deployment meets the
+reliability need. Do not use restarts to mask deterministic
+application defects or missing backpressure.
 
 ### Common mistakes and edge cases
 
-- Using the same endpoint for startup, readiness, and liveness.
-- Marking ready before listeners and required local state are usable.
-- Setting limits without measuring runtime and burst behavior.
-- Scaling workers beyond database or partner capacity.
-- Ignoring termination grace while holding leases or serving requests.
+> **Warning:** Using dependency health for liveness restarts every pod
+> during a database outage and increases load. Remove traffic with
+> readiness while a responsive process stays live.
+
+> **Warning:** Marking ready before listeners and required local state
+> are usable routes requests into startup failures. Publish readiness
+> only after the instance can honor admission.
+
+> **Warning:** Setting a memory limit below measured bursts turns a
+> brief peak into repeated kills. Measure steady and burst use, then
+> test requests, limits, and degradation together.
+
+> **Warning:** Scaling 100 workers against a database capacity of 40
+> replaces a queue with database contention. Cap admitted concurrency
+> at the tightest downstream boundary.
+
+> **Warning:** A worker that acknowledges `J7` during forced shutdown
+> can lose unfinished work. Drain within grace, and withhold
+> acknowledgement until the durable effect is proven.
 
 ### Related material
 
@@ -3334,47 +4421,69 @@ See [scale and cloud operations][scale-reference],
 ### The problem it solves
 
 Without explicit objectives and ownership, teams optimize noisy
-metrics,
-repeat incidents, and spend unpredictably without knowing which cost
-buys a
-user-visible reliability improvement.
+metrics, repeat incidents, and spend unpredictably without knowing
+which cost buys a user-visible reliability improvement.
 
 ### How it works
 
-Run a service like a train line. A **service-level indicator**
-measures what riders experience; a **service-level objective** sets
-the target; and the allowed shortfall is an **error budget**. Alerts,
-runbooks, incident reviews, and cost should all connect to that same
-demand and service promise.
+Run a service like a train line. A **service-level indicator (SLI)**
+measures what riders experience. A **service-level objective (SLO)**
+sets the target, and its allowed shortfall is an **error budget**.
+A **burn rate** describes how quickly failures consume that budget.
+Alerts, runbooks, incident reviews, and cost should connect to the
+same demand and service promise.
 
 ### Step-by-step examples
 
 Input: checkout consumes 40% of its monthly error budget in one hour
-during a rollout. Expected output: the fast-burn alert pages, rollout
-stops, traffic reverts, and recovery is verified against the SLO.
+during a rollout. Its recovery rule requires three consecutive
+five-minute windows with success at least 99.9% and 95th-percentile
+latency at most 300 milliseconds. Expected output: the fast-burn alert
+pages, rollout stops, traffic reverts, and all three windows pass.
 
 1. **Before:** The release is active and the one-hour burn reaches
    40%. **Decision:** Page the on-call owner using the fast-burn rule.
-   **After:** One incident and commander own mitigation.
+   **After:** Open one incident and assign a commander.
    **Known correct:** The page represents user-visible budget use.
 2. **Before:** The release is the leading correlated change.
    **Decision:** Stop rollout and route traffic to the last healthy
    version. **After:** New exposure ends. **Known correct:** The
    rollback follows a documented mitigation.
-3. **Before:** Traffic has reverted. **Decision:** Observe success and
-   latency until they return to the SLO range. **After:** Recovery,
-   timeline, and evidence are recorded. **Known correct:** Follow-up
-   starts from measured conditions rather than personal blame.
+3. **Before:** Traffic has reverted. **Decision:** Observe three
+   qualifying five-minute windows. **After:** Record recovery, the
+   timeline, and the exact window evidence. **Known correct:** Both
+   numerical exit conditions passed before the incident recovered.
+
+Focused budget input: call `CalculateErrorBudget(1_000_000, 999_500,
+0.999)`. Expected output: 1,000 allowed misses, 500 consumed misses,
+and 500 remaining misses.
+
+1. **Before:** There are 1,000,000 eligible events and a 99.9% target.
+   **Decision:** Round `events * (1 - target)`. **After:** The budget
+   allows 1,000 misses. **Known correct:** The allowed shortfall is
+   0.1% of the eligible events.
+2. **Before:** 999,500 events are good. **Decision:** Subtract good
+   from eligible. **After:** 500 misses are consumed.
+   **Known correct:** One million minus 999,500 is 500.
+3. **Before:** 1,000 misses are allowed and 500 are consumed.
+   **Decision:** Subtract consumed from allowed. **After:** 500
+   remain. **Known correct:** Allowed, consumed, and remaining
+   reconcile.
+
+Focused failure input: call the same function with zero eligible
+events. Expected output: `ErrNoEligibleEvents` and no budget.
+
+1. **Before:** The denominator is zero. **Decision:** Reject before
+   division or target math. **After:** Return `ErrNoEligibleEvents`.
+   **Known correct:** No percentage was invented from an empty sample.
 
 ### Why it works
 
-The invariant is that reliability decisions use a user-visible
-objective and
-remaining budget. Burn rates connect short evidence to long targets,
-while
-owned actions and verification convert incident learning into changed
-system
-behavior.
+The fact that must stay true is that reliability decisions use a
+user-visible objective and the remaining error budget. This decision
+invariant ties short-window burn evidence to the long target. Owned
+mitigation and exact recovery checks turn incident response into a
+verifiable state change rather than a declaration.
 
 ### Go example
 
@@ -3383,37 +4492,48 @@ See the integer event-budget calculation in
 [tests][platform-tests] cover a 99.9 percent objective and reject a
 zero-event denominator.
 
-
 ### Work and memory
 
-Metric aggregation grows with signals and label cardinality.
-Redundancy and
-headroom add direct cost; incidents add human interruption cost. Unit
-economics
-must include shared infrastructure allocation and peak rather than
-only average
-demand.
+Let `e` be eligible events, `s` retained time-series samples, and `l`
+active label combinations. The budget calculation uses `O(1)` work and
+memory after counts are aggregated. Telemetry storage is `O(s)`, and
+aggregation work grows with samples and `l`. Redundancy and headroom
+add direct cost; unit economics must allocate shared infrastructure,
+third-party, incident, and peak-capacity costs.
 
 ### When to use it
 
-Use it for every production capability with a user, an on-call owner,
-or a
-material infrastructure and incident cost.
+- A production capability has a user-visible success or latency goal.
+- An on-call owner needs actionable page and recovery thresholds.
+- Reliability and cost tradeoffs need a shared numerical basis.
 
 ### When not to use it
 
-Do not create objectives no team can observe or act on, or reduce
-reliability
-to an availability percentage without latency and correctness.
+Do not create an objective no team can observe or act on. Do not
+reduce reliability to one availability percentage when latency,
+correctness, durability, or freshness also defines user success.
 
 ### Common mistakes and edge cases
 
-- Paging on CPU alone without a user symptom or exhaustion risk.
-- Setting every target to 100% and eliminating room for change.
-- Writing postmortems with no verified systemic action.
-- Ignoring third-party, egress, telemetry, and standby costs.
-- Optimizing average unit cost while peak capacity remains the
-  constraint.
+> **Warning:** Paging on central processing unit (CPU) use alone wakes
+> an operator without proving user harm or imminent exhaustion. Page
+> on a user symptom or a tested leading signal with an owned action.
+
+> **Warning:** Setting every target to 100% creates no error budget
+> and cannot distinguish ordinary risk from emergency risk. Choose a
+> target grounded in user need and achievable system behavior.
+
+> **Warning:** A review action reading "improve monitoring" has no
+> verifiable completion. Assign an owner, deadline, expected system
+> change, and test evidence.
+
+> **Warning:** Counting compute while omitting third-party, network
+> egress, telemetry, standby, and incident costs understates the
+> service. Allocate every material cost to a declared unit.
+
+> **Warning:** Optimizing average unit cost can remove the headroom
+> needed at peak demand. Model peak capacity and recovery reserve
+> before accepting the apparent saving.
 
 ### Related material
 
@@ -3425,49 +4545,60 @@ See [scale and cloud operations][scale-reference],
 
 ### The problem it solves
 
-Webhooks, files, email, search, analytics, and partner APIs have
-different
-trust, delivery, size, privacy, and failure semantics from internal
-calls.
+Webhooks, files, email, search, analytics, and partner application
+programming interfaces (APIs) have different trust, delivery, size,
+privacy, and failure semantics from internal calls.
 
 ### How it works
 
 Treat each outside system like a delivery company with its own forms
-and failures. A narrow adapter checks the sender and package, saves
-important work, prevents repeated effects, isolates bad input, and
-later compares results with the authoritative source.
+and failures. A **webhook** is an incoming request sent when an
+outside event occurs. A narrow **adapter** translates the contract and
+verifies origin. It bounds input, durably accepts work, and prevents
+repeated effects. **Reconciliation** later compares derived results
+with the authoritative source to find missed or divergent work.
 
 ### Step-by-step examples
 
-Input: a current, correctly signed webhook `E9` arrives twice with the
-same raw bytes. Expected output: both deliveries receive the same
-acceptance and one durable processing job exists.
+Input: a receiver allows 32 bytes and a five-minute replay window.
+At Unix time 1,000, correctly signed event `E-91` arrives twice with
+event time 1,000 and raw body `{"ok":true}`. Expected output: the
+first call returns `(true, nil)`, the duplicate returns
+`(false, nil)`, and pending work is exactly one.
 
-1. **Before:** `E9` is unseen and only raw request bytes are trusted
+1. **Before:** `E-91` is unseen and only raw request bytes are trusted
    for signature input. **Decision:** Check timestamp and signature
    before parsing. **After:** The authentic payload may be decoded.
    **Known correct:** Parsing did not change the bytes being verified.
-2. **Before:** No durable record exists for `E9`. **Decision:** Claim
-   its unique ID and enqueue work in one durable transaction.
-   **After:** Return the documented acceptance.
+2. **Before:** No accepted identity exists for `E-91`. **Decision:**
+   Claim its unique ID and add one work item under the same lock.
+   **After:** Return `(true, nil)` with pending work equal to one.
    **Known correct:** Acknowledgement follows durable ownership.
 3. **Before:** The second delivery has the same valid ID and payload.
-   **Decision:** Read the existing claim instead of enqueueing again.
-   **After:** Return the same acceptance with one job still present.
-   **Known correct:** Repeated transport produced one semantic effect.
+   **Decision:** Find the existing claim instead of adding work again.
+   **After:** Return `(false, nil)` with one work item still present.
+   **Known correct:** The result distinguishes duplicate transport
+   while preserving one semantic effect.
 
-Failure example: altered bytes or a stale timestamp are rejected
-before any event identity is claimed.
+Focused failure input: event `E-92` has the same time and body but
+signature `bad`; the verifier returns `bad signature`. Expected
+output: acceptance is false, the returned error wraps the verifier
+error, and pending work remains zero.
+
+1. **Before:** No identity has been claimed for `E-92`.
+   **Decision:** Verify the unchanged body and receive
+   `bad signature`. **After:** Return false with
+   `verify webhook: bad signature` before locking or recording the
+   identity. **Known correct:** Unauthenticated input did not become
+   durable work.
 
 ### Why it works
 
-The invariant is that only authenticated, bounded, schema-valid input
-becomes
-durable work, and each external identity has at most one semantic
-effect.
-Raw-byte verification establishes origin evidence; durable identity
-and later
-reconciliation cover transport loss and repetition.
+The facts that must stay true are that only authenticated, bounded,
+schema-valid input becomes durable work and each external identity has
+at most one semantic effect. These acceptance and identity invariants
+are established by raw-byte verification followed by an atomic claim.
+Reconciliation covers loss and divergence outside the normal path.
 
 ### Go example
 
@@ -3475,66 +4606,82 @@ See the bounded webhook receiver in
 [the delivery examples][delivery-examples]. Its
 [tests][delivery-tests] cover valid acceptance, signature failure, and
 duplicate acknowledgement without duplicate work.
-
+The in-memory lock models only the atomic decision. Production storage
+must commit the event identity and queued work together durably.
 
 ### Work and memory
 
-Signature checking and streaming are linear in bounded input size.
-Deduplication
-storage grows with event rate and replay window. Bulk imports need
-bounded
-batches; search and analytics copies add indexing, transfer, and
-deletion cost.
+Let `b` be bounded body bytes and `e` retained event identities.
+Signature checking and body copying take `O(b)` work. Hash-based
+identity lookup is `O(1)` on average and `O(e)` in the collision worst
+case; retained identity memory is `O(e)`. Bulk import memory must be
+bounded by batch bytes. Search and analytics copies add indexing,
+transfer, retention, and deletion work.
 
 ### When to use it
 
-Use explicit integration boundaries whenever data or effects cross an
-external
-trust, ownership, or delivery system.
+- Data crosses an external trust or ownership boundary.
+- Delivery can repeat, arrive late, or acknowledge before processing.
+- Search, email, analytics, or files have different truth semantics.
 
 ### When not to use it
 
-Do not make search or analytics the transactional source of truth, or
-perform
-slow partner work inside a local database transaction.
+Do not make search or analytics the transactional source of truth.
+Do not hold a local database transaction open across slow partner
+work; durably stage the external action instead.
 
 ### Common mistakes and edge cases
 
-- Parsing JSON before verifying the signature over original bytes.
-- Acknowledging a webhook before durable acceptance.
-- Loading an entire untrusted file into memory.
-- Treating email acceptance as delivery or analytics as exact
-  accounting.
-- Omitting reconciliation because the normal event path usually works.
+> **Warning:** Parsing JavaScript Object Notation (JSON) before
+> signature verification can normalize the signed bytes. Verify the
+> exact bounded request body first.
+
+> **Warning:** Returning success before claiming `E-91` and its work
+> lets a crash lose the event permanently. Acknowledge only after
+> durable acceptance.
+
+> **Warning:** Loading a 20-gigabyte partner file into memory permits
+> resource exhaustion. Stream into bounded batches with row and byte
+> limits, validation, and a quarantine path.
+
+> **Warning:** Treating email provider acceptance as user delivery,
+> or analytics as exact accounting, assigns authority to a derived
+> system. Record each system's actual guarantee.
+
+> **Warning:** A normally reliable event path can still lose or
+> diverge during outages and repairs. Reconcile on a bounded schedule
+> and make discrepancies owned and observable.
 
 ### Related material
 
-See [integrations and maintenance][integration-reference],
+See [idempotency](#13-idempotency-and-ambiguous-write-outcomes),
 [identity and security](#9-identity-authorization-and-api-security),
-and
-[reliable events](#17-reliable-event-publication-and-consumption).
+and [reliable events](#17-reliable-event-publication-and-consumption).
 
 ## 30. Maintenance and legacy-system evolution
 
 ### The problem it solves
 
 An old system often lacks tests, clear boundaries, current
-dependencies, or a
-safe migration path, yet it continues to carry valuable behavior and
-data.
+dependencies, or a safe migration path, yet it continues to carry
+valuable behavior and data.
 
 ### How it works
 
-Renovate an occupied house one room at a time. Observe current
-behavior, write tests that pin it down, create a safe seam, move one
-small path, compare results, and remove the old path only after a
-stable period.
+Renovate an occupied house one room at a time. A **characterization
+test** records existing observable behavior without claiming it is
+ideal. A **seam** is a boundary where behavior can be redirected. Put
+a **facade**, one stable interface over old and new paths, at that
+seam. Compare shadow results, stage traffic, and keep a tested
+reversal until the defined evidence window passes.
 
 ### Step-by-step examples
 
 Input: legacy pricing returns `$12` for product `P1`; the first
-candidate returns `$13`. Expected output: comparison blocks cutover
-until both return `$12`, then a bounded cohort moves behind a facade.
+candidate returns `$13`. Policy requires zero unexplained mismatches
+across 10,000 shadow requests before a 5% cohort may move. Expected
+output: comparison blocks the first cutover; after correction and
+10,000 matches, exactly 5% is eligible for candidate routing.
 
 1. **Before:** Only legacy pricing serves users. **Decision:** Record
    `$12` and other boundary outcomes as characterization cases.
@@ -3544,19 +4691,40 @@ until both return `$12`, then a bounded cohort moves behind a facade.
    `$13`. **Decision:** Record and classify the mismatch without
    routing users to the candidate. **After:** Cutover remains at zero.
    **Known correct:** Comparison cannot silently change production.
-3. **Before:** The corrected candidate returns `$12` across the cases.
-   **Decision:** Route a small cohort through the facade. **After:**
-   Matching traffic can expand or revert. **Known correct:** The old
-   path remains until the defined operational window passes.
+3. **Before:** The corrected candidate has 10,000 consecutive matches.
+   **Decision:** Route the policy's 5% cohort through the facade.
+   **After:** Candidate exposure is 5%, with reversal still enabled.
+   **Known correct:** The observed evidence and exposure equal the
+   stated gate.
+
+Focused repair input: record `{tenant-a, order-1, v4, old}` receives a
+dry-run request for the same tenant, ID, and version with value `new`.
+Expected output: checkpoint `tenant-a/order-1/v4`; execution succeeds
+but the record remains `{tenant-a, order-1, v4, old}`.
+
+1. **Before:** Scope and expected version match the record.
+   **Decision:** Build the repair plan with `DryRun:true`. **After:**
+   The checkpoint is `tenant-a/order-1/v4`. **Known correct:** The
+   checkpoint names the exact authority and version being assessed.
+2. **Before:** The dry-run plan is valid. **Decision:** Execute it.
+   **After:** Return nil without changing value or version.
+   **Known correct:** Planning evidence was produced without mutation.
+
+Focused failure input: the same record receives a request for
+`tenant-b`. Expected output: `ErrRepairScope` and no plan.
+
+1. **Before:** Record tenant is `tenant-a`; request tenant is
+   `tenant-b`. **Decision:** Reject during plan validation. **After:**
+   Return `ErrRepairScope`. **Known correct:** A maintenance tool did
+   not cross the declared tenant boundary.
 
 ### Why it works
 
-The invariant is that every migrated request has one authoritative
-result and
-a tested reversal until confidence is earned. Characterization
-establishes the
-baseline; facades and staged routing make each state observable and
-reversible.
+The facts that must stay true are that each migrated request has one
+authoritative result and each staged change has a tested reversal
+until confidence is earned. These authority and reversibility
+invariants are supported by characterization tests, facades,
+comparison gates, and bounded cohorts.
 
 ### Go example
 
@@ -3565,90 +4733,121 @@ See the tenant-scoped, version-guarded repair plan in
 [tests][delivery-tests] cover a dry run and reject an out-of-scope
 tenant.
 
-
 ### Work and memory
 
-Shadowing duplicates selected work. Backfill and comparison visit all
-`n` records and require rate limits, so they take `O(n)` work.
-Temporary adapters and dual paths increase code and operational load,
-so each needs an owner and removal
-condition.
+Let `n` be records in a backfill and `q` requests shadowed. Backfill
+and full comparison take `O(n)` work. Shadowing adds `O(q)` candidate
+executions and comparison records while enabled. Batch bytes,
+concurrency, and rate need hard bounds. Each temporary adapter, flag,
+and dual path needs an owner, deadline, and removal condition.
 
 ### When to use it
 
-Use it when preserving current service matters more than a fast
-rewrite and
-the existing behavior or data cannot be reconstructed confidently.
+- Existing behavior or data cannot be reconstructed confidently.
+- Service must remain available while one path moves at a time.
+- A facade can isolate change and provide a measured reversal.
 
 ### When not to use it
 
 Do not preserve unsafe behavior that violates a required security or
-integrity
-rule; isolate and correct it with an explicit migration decision.
+integrity rule. Isolate it, record the compatibility break, and
+correct it through an explicit migration decision.
 
 ### Common mistakes and edge cases
 
-- Rewriting from undocumented intent while ignoring actual behavior.
-- Adding broad mocks that encode implementation rather than outcomes.
-- Running dual writes without comparison, ordering, or repair.
-- Leaving temporary facades and feature flags with no removal owner.
-- Combining dependency, schema, and behavior changes in one release.
+> **Warning:** Rewriting from undocumented intent can remove behavior
+> customers depend on. Characterize actual boundaries before deciding
+> which observed behavior to preserve or deliberately break.
+
+> **Warning:** A broad mock that asserts internal call order freezes
+> the legacy implementation instead of its outcome. Pin boundary
+> inputs, outputs, errors, and durable effects.
+
+> **Warning:** Dual-writing without comparison, ordering, and repair
+> can leave two authorities after one partial failure. Name one source
+> of truth and reconcile every mismatch.
+
+> **Warning:** A facade or feature flag with no removal owner becomes
+> a permanent branch. Record its owner, expiry, evidence gate, and
+> delete path when it is introduced.
+
+> **Warning:** Combining dependency, schema, and behavior changes in
+> one release makes failure attribution and reversal ambiguous. Split
+> them into independently verifiable steps.
 
 ### Related material
 
 See [integrations and maintenance][integration-reference],
 [service extraction](#19-service-boundary-discovery-and-extraction),
-and
-[contract evolution](#22-contract-evolution-and-independent-delivery).
+and [Entry 22](#22-contract-evolution-and-independent-delivery).
 
 ## 31. Capstone delivery and engineering leadership
 
 ### The problem it solves
 
 Senior backend work must turn uncertain product and operational needs
-into a
-reviewable plan, delivered system, measurable launch, and maintained
-learning
-rather than only produce locally correct code.
+into a reviewable plan, delivered system, measurable launch, and
+maintained learning rather than only produce locally correct code.
 
 ### How it works
 
-Lead a large change like a construction project. State the goal,
-constraints, and rules that cannot break; compare real options; divide
-work into reversible milestones; name owners; and close with launch
-evidence and lasting documentation.
+Lead a large change like a construction project. Separate
+**evidence**, observed or tested facts, from **assumptions** that
+still need proof. State the goal, constraints, invariants, and
+non-goals. Compare real
+options; divide work into reversible **milestones**; name owners; and
+define numerical launch and rollback guardrails before exposure.
 
 ### Step-by-step examples
 
-Input: checkout timeout rate is 2%. Candidates are query
-optimization, more capacity, or one bounded queue. Expected output:
-a reviewed choice with guardrails, stages, and rollback ownership.
+Input: checkout timeout rate is 2% during 200-request-per-second
+bursts. Database utilization is 45%, query latency is stable, workers
+saturate, and the partner sustains 120 requests per second. Options
+are query optimization, double workers, or a 600-item queue admitting
+120 per second. Expected output: choose the queue, canary at 5%, and
+revert if either guardrail fails: timeout exceeds 1%, or
+95th-percentile queue wait exceeds 500 milliseconds in a five-minute
+window.
 
 1. **Before:** The symptom is measured but its cause is unconfirmed.
    **Decision:** Profile queries, saturation, and queue wait before
-   selecting an option. **After:** Evidence shows burst admission is
-   the limiting condition. **Known correct:** The proposal separates
-   evidence from assumptions.
+   selecting an option. **After:** Evidence shows worker saturation
+   and a 120-per-second partner limit. **Known correct:** Stable
+   queries and 45% database use do not support the query hypothesis.
 2. **Before:** Three options and their costs are visible.
-   **Decision:** Choose the bounded queue with latency, capacity, and
-   cost limits;
-   record why the other options do not fit. **After:** Each risk and
-   rollback trigger has an owner. **Known correct:** Reviewers can
-   challenge a real tradeoff rather than a predetermined answer.
-3. **Before:** A canary receives the first bounded cohort.
-   **Decision:** Expand only while timeout and queue-wait guardrails
-   hold. **After:** The rollout reaches its next milestone or reverts.
-   **Known correct:**
-   Delivery state follows evidence defined before launch.
+   **Decision:** Choose the 600-item queue with 120-per-second
+   admission; record why query work and more workers miss the limiting
+   boundary. **After:** Capacity, latency, overflow, and rollback have
+   owners. **Known correct:** The choice addresses measured burst
+   admission without exceeding the partner.
+3. **Before:** The queue receives a 5% canary. **Decision:** Expand
+   only while both five-minute guardrails hold. **After:** The rollout
+   advances or reverts to direct admission on the first breach.
+   **Known correct:** Delivery state follows criteria defined before
+   launch.
+
+Focused evidence input: validate contract `cancel is idempotent`, test
+`cancel_duplicate_test`, signal `cancel_outcomes_total`, runbook
+`cancel-recovery`, status `verified`, owner `orders-team`, and risk
+`inventory unavailable`. Expected output: validation succeeds; after
+clearing the runbook, it returns `runbook evidence is required`.
+
+1. **Before:** All seven evidence fields are non-empty. **Decision:**
+   Validate every required field. **After:** Return nil.
+   **Known correct:** Contract, verification, operation, ownership,
+   and risk are all reviewable.
+2. **Before:** The runbook is now empty. **Decision:** Validate in the
+   same order. **After:** Return `runbook evidence is required`.
+   **Known correct:** A verified claim cannot launch without its
+   recovery procedure.
 
 ### Why it works
 
-The invariant is that every material claim maps to evidence, every
-risk to an
-owner, and every rollout step to acceptance and reversal criteria.
-That makes
-technical judgment reviewable before cost is sunk and correctable
-afterward.
+The facts that must stay true are that every material claim maps to
+evidence, every risk maps to an owner, and every rollout step maps to
+acceptance and reversal criteria. These evidence and accountability
+invariants make technical judgment reviewable before cost is sunk and
+correctable afterward.
 
 ### Go example
 
@@ -3657,93 +4856,102 @@ See the typed requirement-evidence validator in
 [tests][delivery-tests] accept a complete evidence chain and reject a
 missing runbook.
 
-
 ### Work and memory
 
-Planning cost should scale with reversibility and blast radius. Small
-reversible
-changes need little ceremony; durable data, public contracts, privacy,
-or
-cross-team operations justify deeper review. Unbounded coordination is
-itself
-a delivery cost and needs decision deadlines.
+Let `o` be real options, `r` material risks, and `m` rollout
+milestones. The minimum review inventory grows with `o + r + m`, with
+evidence proportional to blast radius and irreversibility.
+Small reversible changes need little ceremony; durable data, public
+contracts, privacy, or cross-team operations justify deeper review.
+Bound coordination with decision owners and deadlines.
 
 ### When to use it
 
-Use this method for cross-boundary work, public or durable contracts,
-risky
-migrations, and projects whose operation spans several owners.
+- Work changes a public, durable, privacy, or ownership boundary.
+- A migration can cause costly or difficult-to-reverse effects.
+- Launch and operation span several accountable owners.
 
 ### When not to use it
 
-Do not create a large design process for a local reversible change, or
-mistake
-consensus for accountable decision ownership.
+Do not create a large design process for a local reversible change.
+Do not mistake consensus for accountable decision ownership; name the
+decision owner and record dissenting evidence.
 
 ### Common mistakes and edge cases
 
-- Presenting one option and calling the document a tradeoff analysis.
-- Leaving non-goals, data migration, rollback, or operational
-  ownership implicit.
-- Tracking tasks without testing an end-to-end capability.
-- Launching on schedule despite breached evidence-based guardrails.
-- Recording lessons without changing code, runbooks, tests, or
-  ownership.
+> **Warning:** Presenting only the preferred queue and calling the
+> document a tradeoff analysis hides whether alternatives were tested.
+> Compare at least the plausible options against the same constraints.
+
+> **Warning:** Leaving non-goals, migration, rollback, or operational
+> ownership implicit creates different plans in each reviewer's head.
+> State them and name the accountable owner.
+
+> **Warning:** Completing every project task does not prove checkout
+> works end to end. Make each milestone demonstrate a user-visible or
+> operational capability.
+
+> **Warning:** Launching on schedule after the timeout guardrail
+> breaches replaces evidence with calendar pressure. Stop or revert
+> according to the predeclared rule.
+
+> **Warning:** Recording a lesson without changing code, a test, a
+> runbook, or ownership cannot prevent recurrence. Close learning with
+> a verified system or process change.
 
 ### Related material
 
 See [integrations and maintenance][integration-reference],
 [architecture](#5-architecture-and-service-construction), and
-[reliability
-engineering](#28-reliability-engineering-incidents-and-cost).
+[Entry 28](#28-reliability-engineering-incidents-and-cost).
 
 ## 32. Language portability
 
 ### The problem it solves
 
 Backend principles survive a language change, but ownership,
-cancellation,
-errors, concurrency, runtime scheduling, and tooling appear through
-different
-syntax and defaults.
+cancellation, errors, concurrency, runtime scheduling, and tooling
+appear through different syntax and defaults.
 
 ### How it works
 
 Moving code to another language is like moving a recipe to a different
-kitchen. Keep the promised result and safety rules, but use the new
-kitchen's real tools. Map Go's values, errors, contexts, and
-goroutines to the target runtime instead of translating syntax word
-for word.
+kitchen. Preserve the **observable contract**, the results, errors,
+effects, timing, and resource lifetime a caller can detect. A
+**semantic gap** is a target-language default that differs from that
+contract. Map Go values, errors, contexts, and goroutines to owned
+target mechanisms instead of translating syntax word for word.
 
 ### Step-by-step examples
 
-Input: a database call would take 2 seconds, but its request is
-canceled after 100 ms.
-Expected output: in both languages, the call stops, returns the same
-canceled outcome, and releases work.
+Input: conformance case one returns value `placed` and no error. Case
+two runs a waiting operation with an already canceled context or
+target cancellation token. Expected output in both languages: case
+one is `{Value:"placed", Code:"ok"}`; case two is
+`{Value:"", Code:"canceled"}` and the wait has ended.
 
-1. **Before:** Go passes request context into the database driver.
-   **Decision:** Cancel at 100 ms. **After:** The driver stops and the
-   operation returns its stable canceled result. **Known correct:**
-   The conformance case records outcome and resource lifetime.
-2. **Before:** The target implementation has an owned cancellation
-   token. **Decision:** Pass it into the target driver and cancel at
-   100 ms. **After:** The driver returns the mapped canceled result.
-   **Known correct:** A timer did not merely stop the caller from
-   observing still-running work.
-3. **Before:** Both executions have ended. **Decision:** Compare
-   result, deadline behavior, and released resources. **After:** The
-   conformance test passes. **Known correct:** Equivalent semantics,
-   not similar syntax, define the successful port.
+1. **Before:** The Go operation returns `placed` and nil.
+   **Decision:** Map nil error to `OutcomeOK`. **After:** Return the
+   exact `placed` and `ok` outcome. **Known correct:** Ordinary
+   success preserves both value and status.
+2. **Before:** The Go waiting operation receives an already canceled
+   context. **Decision:** Let the operation observe cancellation and
+   map `context.Canceled` to `OutcomeCanceled`. **After:** Return
+   empty value and `canceled`. **Known correct:** The operation
+   stopped; the caller did not merely stop waiting for it.
+3. **Before:** The target runtime has an owned cancellation token.
+   **Decision:** Run the same two cases and map target outcomes to the
+   shared codes. **After:** Both exact outcomes match Go, and the wait
+   has ended. **Known correct:** Equivalent semantics, not similar
+   syntax, define the successful port.
 
 ### Why it works
 
-The invariant is an observable contract plus owned resource lifetime,
-not a Go
-keyword. Describing the semantic gap exposes where a target default
-would
-weaken that invariant; shared conformance cases then verify the
-adaptation.
+The fact that must stay true is the observable contract plus owned
+resource lifetime, not a Go keyword. This portability invariant is
+preserved by identifying semantic gaps and adapting them explicitly.
+Shared conformance cases then verify outcomes, cancellation, and
+release behavior on both runtimes.
 
 ### Go example
 
@@ -3752,57 +4960,61 @@ See the portable operation outcome contract in
 [tests][delivery-tests] preserve ordinary success and cancellation as
 stable outcomes.
 
-
 ### Work and memory
 
-Complexity must be recalculated for the target runtime: allocation,
-garbage
-collection, task or thread cost, string encoding, collection behavior,
-and I/O
-drivers can change constants or even effective bounds.
+The outcome adapter adds `O(1)` work and memory beyond the operation.
+For a port, let `n` be input bytes, `k` concurrent tasks, and `r`
+retained objects. Recalculate costs for allocation, garbage
+collection, task or thread scheduling, string encoding, collection
+behavior, and input/output (I/O) drivers; target defaults can change
+constants or effective bounds in `n`, `k`, or `r`.
 
 ### When to use it
 
-Use the matrix when moving a service, reviewing a polyglot design, or
-teaching
-a backend invariant across languages.
+- A service or library is moving to another runtime.
+- A multi-language system must share one boundary contract.
+- Review must compare ownership, errors, cancellation, or concurrency.
 
 ### When not to use it
 
-Do not choose a language from syntax familiarity alone or assume
-similarly
-named concurrency and cancellation features have identical guarantees.
+Do not choose a language from syntax familiarity alone. Do not assume
+similarly named concurrency, collection, or cancellation features have
+identical ownership and lifetime guarantees.
 
 ### Common mistakes and edge cases
 
-- Translating goroutines directly to threads without capacity
-  analysis.
-- Mapping Go error values to unchecked exceptions without contract
-  handling.
-- Assuming strings, maps, nulls, and value copies share Go semantics.
-- Dropping cancellation because the target library uses a different
-  API.
-- Comparing benchmarks without equivalent workload and runtime warmup.
+> **Warning:** Translating 100,000 goroutines to 100,000 operating
+> system threads can exhaust memory and scheduling capacity. Measure
+> the target task model and bound concurrency.
+
+> **Warning:** Mapping a Go domain error to an unchecked exception can
+> turn a declared outcome into process-level failure. Preserve the
+> boundary's stable error taxonomy explicitly.
+
+> **Warning:** Assuming target strings, maps, nulls, and value copies
+> share Go semantics can introduce aliasing or missing-value bugs.
+> Write conformance cases for each relied-on behavior.
+
+> **Warning:** Dropping cancellation because a library uses a
+> different API leaves work running after the request ends. Adapt the
+> owned token through every blocking boundary and verify release.
+
+> **Warning:** Comparing a warmed Go benchmark with a cold target
+> runtime measures setup differences, not the port. Use equivalent
+> workloads, warmup, limits, outputs, and measurement windows.
 
 ### Related material
 
-See [language portability][portability-reference],
-[Go ownership](#1-go-values-program-structure-and-ownership), and
-[Go cancellation](#2-go-errors-resources-and-cancellation).
+See [Go ownership](#1-go-values-program-structure-and-ownership),
+[Go cancellation](#2-go-errors-resources-and-cancellation), and
+[testing](#10-deterministic-backend-testing).
 
 [go-refresher]: #1-go-values-program-structure-and-ownership
 [go-foundations]: #2-go-errors-resources-and-cancellation
-[domain-reference]: #4-domain-discovery-and-modeling
-[service-core]: #5-architecture-and-service-construction
-[postgres-reference]: #7-relational-modeling-and-postgresql-access
-[security-reference]: #9-identity-authorization-and-api-security
-[testing-reference]: #10-deterministic-backend-testing
-[delivery-reference]: #12-delivery-deployment-and-recovery-readiness
 [distributed-reference]: #18-distributed-systems-mechanics
 [extraction-reference]: #19-service-boundary-discovery-and-extraction
 [scale-reference]: #24-data-scaling-caching-and-tenant-isolation
 [integration-reference]: #29-production-integration-boundaries
-[portability-reference]: #32-language-portability
 [service-examples]: examples/service.go
 [service-tests]: examples/service_test.go
 [production-examples]: examples/production.go

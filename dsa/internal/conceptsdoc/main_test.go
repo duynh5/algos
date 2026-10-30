@@ -185,6 +185,82 @@ func TestValidateTraceItemsAcceptsReplayableStep(t *testing.T) {
 	}
 }
 
+func TestValidateTraceItemsAcceptsPlainChainedStates(t *testing.T) {
+	prose := []byte(strings.Join([]string{
+		"### Step-by-step examples",
+		"",
+		"Initial state: count is zero.",
+		"",
+		"1. Decision: add one item.",
+		"   After: count is one.",
+		"   Known correct: one item exists.",
+		"2. Decision: add one item.",
+		"   After: count is two.",
+		"   Known correct: two items exist.",
+		"",
+		"### Why it works",
+	}, "\n"))
+
+	issues := validateTraceItems("guide.md", prose)
+	if len(issues) != 0 {
+		t.Fatalf("validateTraceItems() issues = %v", issues)
+	}
+}
+
+func TestValidateTraceItemsRejectsIncompleteChainedState(
+	t *testing.T,
+) {
+	prose := []byte(strings.Join([]string{
+		"### Step-by-step examples",
+		"",
+		"Initial state: count is zero.",
+		"",
+		"1. Decision: add one item.",
+		"   Known correct: one item exists.",
+		"",
+		"### Why it works",
+	}, "\n"))
+
+	issues := validateTraceItems("guide.md", prose)
+	if len(issues) != 1 ||
+		!strings.Contains(issues[0], "After") ||
+		strings.Contains(issues[0], "Before") {
+		t.Fatalf(
+			"chained trace issues = %v; want missing After only",
+			issues,
+		)
+	}
+}
+
+func TestValidateTraceItemsDoesNotApplyInitialStateRetroactively(
+	t *testing.T,
+) {
+	prose := []byte(strings.Join([]string{
+		"### Step-by-step examples",
+		"",
+		"1. Decision: add one item.",
+		"   After: count is one.",
+		"   Known correct: one item exists.",
+		"",
+		"Initial state: count is one.",
+		"",
+		"2. Decision: add one item.",
+		"   After: count is two.",
+		"   Known correct: two items exist.",
+		"",
+		"### Why it works",
+	}, "\n"))
+
+	issues := validateTraceItems("guide.md", prose)
+	if len(issues) != 1 ||
+		!strings.Contains(issues[0], "Before") {
+		t.Fatalf(
+			"retroactive state issues = %v; want missing Before",
+			issues,
+		)
+	}
+}
+
 func TestCollectTargetsRecognizesMultilineAnchor(t *testing.T) {
 	const legacyAnchor = "e4-distinguish-missing-keys-from-stored-" +
 		"values-" +

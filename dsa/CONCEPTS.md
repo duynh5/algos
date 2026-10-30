@@ -118,15 +118,16 @@ be brief, but it is not omitted merely because the topic is small:
 
 1.  **The problem it solves** states the input and desired result
     before naming the technique as the answer.
-2.  **How it works** starts with a familiar action or practical
-    situation, names the formal idea, and explains every rule or
-    distinction needed to understand the example without filler.
+2.  **How it works** builds one clear mental model in ordinary
+    language. It uses a familiar action when that makes the idea
+    easier to picture, then explains every rule or distinction needed
+    to understand the example without filler.
 3.  **Step-by-step examples** teach the procedure with an ordinary
     input and, when behavior changes, a boundary or deliberately
     tricky input.
 4.  **Why it works** uses plain language to identify what remains
     true, why each step is safe, why the process finishes, and why the
-    final saved values give the requested result, without filler.
+    final state gives the requested result, without filler.
 5.  **Go example** shows the smallest complete fragment or links to
     the complete reference implementation elsewhere in the guide.
 6.  **Work and memory** explains the costs in words before using
@@ -146,10 +147,10 @@ deeply nested `#####` pattern card uses
 
 ### Forms used in every entry
 
-- **Trace:** Use a numbered list. For repeated changes, give
-  each step a `Before`, `Decision`, `After`, and `Known correct`
-  statement. For comparisons or mappings, use concise bullets. Do
-  not create Markdown tables.
+- Trace: Show one `Initial state`, then use a numbered list of
+  `Decision`, `After`, and `Known correct` transitions. Each `After`
+  is the next step's input; do not repeat it as `Before`. Use concise
+  bullets for comparisons or mappings. Do not create Markdown tables.
 - **Warning:** Write `> **Warning:**` followed by the failing input or
   state and the correction. A warning without a concrete failure is
   incomplete.
@@ -225,48 +226,61 @@ hidden costs such as recursion, copied output, and preprocessing.
 
 #### How it works
 
-Finding a name by reading every page of a phone book gets much slower
-as the book grows; opening near the middle and discarding half does
-not. **Big-O notation** describes how work or memory grows with an
-input amount such as `n` values. **Auxiliary space** is the extra
-memory the method needs beyond its input and required output.
+Finding a name by reading every page of a sorted phone book gets much
+slower as the book grows. Opening near the middle and discarding the
+half that cannot contain the name needs only one more decision each
+time the book's size doubles. **Big-O notation** describes how work or
+memory grows with an input amount such as `n` values. **Auxiliary
+space** is the extra memory the method needs beyond its input and
+required output.
 
 #### Step-by-step examples
 
 Search for `9` in the sorted values `[1,3,5,7,9,11,13,15]`.
 The indexes run from `0` through `7`. Both methods should return
-`true`, but we will count how many values each method checks.
+`true`; the scan returns `(true,5)` because it checks five values.
 
-1.  **Method: Scan through the failed values**
-    - **Before:** Eight positions could contain the target.
-    - **Decision:** Compare `1`, `3`, `5`, and `7` with `9` in that
+Initial state: scan has `index=0`, `comparisons=0`,
+`result=unknown`.
+
+1.  Scan through the failed values
+    - Decision: Compare `1`, `3`, `5`, and `7` with `9` in that
       order. Each differs, so advance after each comparison.
-    - **After:** The scan reaches index `4` after 4 comparisons.
-    - **Known correct:** Indexes `0` through `3` are not the answer.
-2.  **Method: Finish the scan**
-    - **Before:** The current value is `9` at index `4`.
-    - **Decision:** Match and stop.
-    - **After:** Return `true`.
-    - **Known correct:** Index `4` contains the target; this method
+    - After: `index=4`, `comparisons=4`, `result=unknown`.
+    - Known correct: Indexes `0` through `3` are not the answer.
+2.  Finish the scan
+    - Decision: `values[4]==9`; stop.
+    - After: `index=4`, `comparisons=5`, `result=true`.
+    - Known correct: Index `4` contains the target; this method
       made 5 comparisons. A miss could require all 8.
-3.  **Method: Halving check `3`**
-    - **Before:** Indexes `0` through `7` are possible.
-    - **Decision:** `7 < 9`; indexes `0` through `3` are too small.
-    - **After:** Indexes `4` through `7` remain possible.
-    - **Known correct:** No discarded index can contain `9`; this
+
+Initial state: halving has `left=0`, `right=7`, `comparisons=0`,
+`result=unknown`.
+
+1.  Check midpoint `3`
+    - Decision: `values[3]=7 < 9`; discard indexes `0` through `3`.
+    - After: `left=4`, `right=7`, `comparisons=1`,
+      `result=unknown`.
+    - Known correct: No discarded index can contain `9`; this
       method has made 1 comparison.
-4.  **Method: Halving check `5`**
-    - **Before:** Indexes `4` through `7` remain possible.
-    - **Decision:** `11 > 9`; indexes `5` through `7` are too large.
-    - **After:** Only index `4` remains possible.
-    - **Known correct:** No discarded index can contain `9`; this
+2.  Check midpoint `5`
+    - Decision: `values[5]=11 > 9`; discard indexes `5` through `7`.
+    - After: `left=4`, `right=4`, `comparisons=2`,
+      `result=unknown`.
+    - Known correct: No discarded index can contain `9`; this
       method has made 2 comparisons.
-5.  **Method: Halving check `4`**
-    - **Before:** The only possible value is at index `4`.
-    - **Decision:** `9 == 9`; stop.
-    - **After:** Return `true`.
-    - **Known correct:** Index `4` contains the target; this method
+3.  Check midpoint `4`
+    - Decision: `values[4]=9`; match and stop.
+    - After: `left=4`, `right=4`, `comparisons=3`, `result=true`.
+    - Known correct: Index `4` contains the target; this method
       made 3 comparisons.
+
+The worst-case misses make the different growth visible:
+
+- With `values=1` through `8` and `target=9`, a scan checks all
+  `8` values. The same halving rule needs at most `4` checks.
+- With `values=1` through `16` and `target=17`, the scan doubles to
+  `16` checks. The halving search needs at most `5`, only one more.
 
 For empty input, a scan performs zero element comparisons and a
 halving search also stops immediately. That best case does not change
@@ -278,44 +292,81 @@ the scan's worst-case `O(n)` bound or the halving search's worst-case
 The count follows the program's control flow. A scan advances past at
 most one of `n` positions per comparison, so it performs no more than
 `n` comparisons. A halving search leaves at most half of the previous
-candidates after every failed comparison, so after `k` failures at
-most `n/2^k` candidates remain; the search stops once that quantity
-falls below one. Solving for `k` gives a logarithmic bound.
+candidates after every failed comparison. The number of times `n` can
+be halved before nothing remains is written `log n`, so the bound is
+`O(log n)`.
 
-Dropping constants and slower-growing terms preserves the comparison
-for large inputs: multiplying every input size by the same fixed
-amount does not change whether doubling `n` doubles, quadruples, or
-barely changes the work.
+Big-O keeps the part that controls growth for large inputs. If a
+method performs `3n + 20` operations, doubling `n` roughly doubles the
+work once `n` is large. The fixed multiplier `3` and fixed extra `20`
+do not change that linear growth, so the method is `O(n)`.
 
 #### Go example
 
-This scan makes the counted operation--one equality check per visited
-element--visible:
+Calling `containsWithComparisonCount` with the traced values and
+`target=9` returns `(true,5)`. The function makes the counted
+operation--one equality check per visited element--visible:
 
 ```go
-func contains(values []int, target int) bool {
+func containsWithComparisonCount(
+	values []int,
+	target int,
+) (bool, int) {
+	comparisons := 0
 	// Visit values from left to right. Each iteration performs the
 	// equality check whose count determines this linear scan's running
 	// time.
-	for _, value := range values {
-		if value == target {
-			// A match is enough to answer the question, so stop immediately.
-			return true
+	for index := range values {
+		comparisons++
+		if values[index] == target {
+			// A match is enough to answer the question, so return both the
+			// result and the work performed.
+			return true, comparisons
 		}
 	}
 	// Reaching the end means every element was checked without a match.
-	return false
+	return false, comparisons
+}
+
+func containsByHalvingWithComparisonCount(
+	values []int,
+	target int,
+) (bool, int) {
+	// Every possible match remains inside the inclusive boundaries.
+	left, right := 0, len(values)-1
+	comparisons := 0
+	for left <= right {
+		middle := left + (right-left)/2
+		comparisons++
+		switch {
+		case values[middle] < target:
+			// Sorted values through middle are too small.
+			left = middle + 1
+		case values[middle] > target:
+			// Sorted values from middle onward are too large.
+			right = middle - 1
+		default:
+			// Equality proves the target exists at middle.
+			return true, comparisons
+		}
+	}
+	// Crossing boundaries prove that no candidate index remains.
+	return false, comparisons
 }
 ```
+
+Calling the halving function with the same values and target returns
+`(true,3)`, matching the second trace.
 
 #### Work and memory
 
 Here `n` is the number of values. If the target is first, the function
 performs one comparison: best-case `O(1)` time. A missing or last
 target requires `n` comparisons, so the worst-case time is `O(n)`.
-A successful search can stop anywhere between those cases. The
-function stores only the current value, so extra memory is `O(1)`.
-The input slice is borrowed and no output collection is allocated.
+A successful search can stop anywhere between those cases. Each
+function stores only indexes and a comparison count, so extra memory
+is `O(1)`. The input slice is borrowed and no output collection is
+allocated.
 
 #### When to use it
 
@@ -384,33 +435,30 @@ length of the correct prefix. The slice expression `values[:write]`
 starts at index `0` and stops before index `write`, so it contains
 exactly that finished prefix.
 
-1.  **Step: Start**
-    - **Before:** `values=[0,5,0,2]`, `write=0`
-    - **Decision:** No values have been read.
-    - **After:** Unchanged.
-    - **Known correct:** `values[:0]=[]` contains all non-zero values
-      read so far.
-2.  **Step: `read=0`, value `0`**
-    - **Before:** `values=[0,5,0,2]`, `write=0`
-    - **Decision:** Skip `0` because it is not part of the result.
-    - **After:** `values=[0,5,0,2]`, `write=0`
-    - **Known correct:** The correct prefix is still `[]`.
-3.  **Step: `read=1`, value `5`**
-    - **Before:** `values=[0,5,0,2]`, `write=0`
-    - **Decision:** Write `5` at position `0`, then advance `write`.
-    - **After:** `values=[5,5,0,2]`, `write=1`
-    - **Known correct:** `values[:1]=[5]` is the non-zero input seen
+Initial state: `values=[0,5,0,2]`, `read=0`, `write=0`,
+`values[:write]=[]`.
+
+1.  Read value `0`
+    - Decision: Skip `0` because it is not part of the result.
+    - After: `values=[0,5,0,2]`, `read=1`, `write=0`,
+      `values[:write]=[]`.
+    - Known correct: The correct prefix is still empty.
+2.  Read value `5`
+    - Decision: Write `5` at position `0`, then advance `write`.
+    - After: `values=[5,5,0,2]`, `read=2`, `write=1`,
+      `values[:write]=[5]`.
+    - Known correct: `[5]` is the non-zero input seen
       so far, in order.
-4.  **Step: `read=2`, value `0`**
-    - **Before:** `values=[5,5,0,2]`, `write=1`
-    - **Decision:** Skip `0`.
-    - **After:** `values=[5,5,0,2]`, `write=1`
-    - **Known correct:** The correct prefix remains `[5]`.
-5.  **Step: `read=3`, value `2`**
-    - **Before:** `values=[5,5,0,2]`, `write=1`
-    - **Decision:** Write `2` at position `1`, then advance `write`.
-    - **After:** `values=[5,2,0,2]`, `write=2`
-    - **Known correct:** `values[:2]=[5,2]` is the complete result.
+3.  Read value `0`
+    - Decision: Skip `0`.
+    - After: `values=[5,5,0,2]`, `read=3`, `write=1`,
+      `values[:write]=[5]`.
+    - Known correct: The correct prefix remains `[5]`.
+4.  Read value `2`
+    - Decision: Write `2` at position `1`, then advance `write`.
+    - After: `values=[5,2,0,2]`, `read=4`, `write=2`,
+      `values[:write]=[5,2]`.
+    - Known correct: `[5,2]` is the complete result.
 
 For the boundary input `[0, 0]`, both steps skip their value. `write`
 remains `0`, so the returned prefix is `values[:0]`, or `[]`, as
@@ -513,11 +561,10 @@ that a loop terminates.
 
 #### The problem it solves
 
-Given nested input such as a directory or tree, or a calculation whose
-answer depends on a smaller input of the same kind, compute the whole
-answer from those smaller answers. The method must remember unfinished
-outer work while it solves an inner part, then resume that work when
-the smaller result is available.
+Given nested input such as directories inside directories, compute a
+whole answer from answers for the smaller nested parts. The method
+must remember unfinished outer work while it solves an inner part,
+then resume that work when the smaller result is available.
 
 #### How it works
 
@@ -530,97 +577,124 @@ waiting frames is the **recursion depth**.
 
 #### Step-by-step examples
 
-For `factorial(4)`, the expected result is `(24, true)`. The number is
-the factorial, and `true` says that the input was valid.
+Count files in this directory tree; expect `7`:
 
-1.  **Step: Call `4`**
-    - **Before:** `value=4`
-    - **Decision:** Not a base case; save `4 *` and solve `3`.
-    - **After:** The call for `4` waits with multiplier `4`, then the
-      function is called with `3`.
-    - **Known correct:** The answer is `4 * factorial(3)`.
-2.  **Step: Call `3`**
-    - **Before:** `value=3`
-    - **Decision:** Save `3 *` and solve `2`.
-    - **After:** Calls wait with multipliers `4` and `3`, then the
-      function is called with `2`.
-    - **Known correct:** The remaining input is smaller.
-3.  **Step: Call `2`**
-    - **Before:** `value=2`
-    - **Decision:** Save `2 *` and solve `1`.
-    - **After:** Calls wait with multipliers `4`, `3`, and `2`, then
-      the function is called with `1`.
-    - **Known correct:** The remaining input is smaller.
-4.  **Step: Call `1`**
-    - **Before:** `value=1`
-    - **Decision:** Base case; return factorial value `1`.
-    - **After:** The `2` frame resumes.
-    - **Known correct:** `factorial(1)=1`.
-5.  **Step: Return**
-    - **Before:** Saved multipliers are `2,3,4`
-    - **Decision:** Apply them in reverse frame order.
-    - **After:** Results are `2`, `6`, then `(24, true)`.
-    - **Known correct:** Each resumed call returns its factorial.
+```text
+root: 1 direct file
+|-- photos: 2 direct files
+`-- work: 1 direct file
+    `-- drafts: 3 direct files
+```
 
-For boundary input `0`, the function returns `(1, true)` immediately
-because there is one way to arrange no factors in a product. No
-recursive call is created. Input `-1` or `21` returns `(0, false)`
-before recursion begins.
+Each call starts `totalFiles` at its directory's direct-file count.
+A waiting frame records that total and which child comes next.
+
+Initial state: `active=root(start)`, `waiting=[]`, `returned=none`.
+
+1.  Enter `photos`
+    - Decision: Set root's `totalFiles=1`; save root's unfinished
+      `work` child, then call `photos`.
+    - After: `active=photos(start)`,
+      `waiting=[root(totalFiles=1,next=work)]`, `returned=none`.
+    - Known correct: Root's one direct file has been counted once.
+2.  Return from `photos`
+    - Decision: Set `totalFiles=2`. It has no children, so return
+      `2`.
+    - After: `active=root(totalFiles=1,next=work)`, `waiting=[]`,
+      `returned=2`.
+    - Known correct: The complete `photos` subtree contains `2`
+      files.
+3.  Enter `work`
+    - Decision: Add the returned `2`, making root's
+      `totalFiles=3`; save root, then call `work`.
+    - After: `active=work(start)`,
+      `waiting=[root(totalFiles=3,next=done)]`, `returned=none`.
+    - Known correct: Root's direct file and `photos` subtree account
+      for `3` files.
+4.  Enter `drafts`
+    - Decision: Set work's `totalFiles=1`; save work, then call its
+      `drafts` child.
+    - After: `active=drafts(start)`,
+      `waiting=[root(totalFiles=3,next=done),`
+      `work(totalFiles=1,next=done)]`, `returned=none`.
+    - Known correct: Work's one direct file has been counted once.
+5.  Return from `drafts`
+    - Decision: Set `totalFiles=3`. It has no children, so return
+      `3`.
+    - After: `active=work(totalFiles=1,next=done)`,
+      `waiting=[root(totalFiles=3,next=done)]`, `returned=3`.
+    - Known correct: The complete `drafts` subtree contains `3`
+      files.
+6.  Return from `work`
+    - Decision: Add the returned `3`, making work's
+      `totalFiles=4`; no children remain, so return `4`.
+    - After: `active=root(totalFiles=3,next=done)`, `waiting=[]`,
+      `returned=4`.
+    - Known correct: The complete `work` subtree contains `4`
+      files.
+7.  Return from `root`
+    - Decision: Add the returned `4`, making root's
+      `totalFiles=7`; no children remain, so return `7`.
+    - After: `active=none`, `waiting=[]`, `returned=7`.
+    - Known correct: All four directories have contributed their
+      files exactly once, so the full tree contains `7` files.
+
+A nil directory returns `0` without creating another call. A
+directory with no files and no children also returns `0` after its
+child loop performs no steps.
 
 #### Why it works
 
-For `n <= 1`, the direct answer is correct. For `n > 1`, suppose the
-smaller call correctly returns `(n-1)!`; multiplying it by `n` gives
-exactly `n!`. This argument applies repeatedly until the base case.
-Because `n` decreases by one and cannot decrease forever while
-remaining positive, the process finishes.
+A nil directory contributes no files. For a non-nil directory,
+`totalFiles` starts with exactly its direct files. Assuming a child
+call returns the complete count for that child subtree, adding the
+returned count preserves the meaning: `totalFiles` covers the direct
+files and every finished child. When no children remain, it is the
+count for the entire current subtree.
 
-Every unfinished call must remain available until its smaller call
-returns, which explains both the reverse return order and the stack
-memory.
+Every call moves to a child in a finite, acyclic directory tree, so
+the process reaches a directory with no children and eventually
+finishes. Each unfinished parent must remain available until its child
+returns, which explains both the return order and the stack memory.
 
 #### Go example
 
 ```go
-func factorial(value int64) (int64, bool) {
-	// Reject values whose factorial is undefined here or would exceed
-	// int64 before starting the recursive calls.
-	if value < 0 || value > 20 {
-		return 0, false
+type directoryNode struct {
+	NumDirectFiles   int
+	ChildDirectories []*directoryNode
+}
+
+func countFiles(directory *directoryNode) int {
+	// A missing directory contributes nothing and ends this branch.
+	if directory == nil {
+		return 0
 	}
-	// Zero and one terminate the recursion and both have factorial value
-	// one.
-	if value <= 1 {
-		return 1, true
+	// Begin with the files stored directly here. Each child call pauses
+	// this frame, returns its complete subtree count, and is added once.
+	totalFiles := directory.NumDirectFiles
+	for _, childDirectory := range directory.ChildDirectories {
+		totalFiles += countFiles(childDirectory)
 	}
-	// Leave this call waiting with the current multiplier while the
-	// smaller input computes the preceding factorial, then combine
-	// both results.
-	smallerFactorial, valid := factorial(value - 1)
-	if !valid {
-		return 0, false
-	}
-	return value * smallerFactorial, true
+	return totalFiles
 }
 ```
 
-The validity result prevents callers from confusing invalid input with
-the legitimate factorial value zero, which never occurs.
-
 #### Work and memory
 
-For a valid input `n`, the function creates one call for each value
-from `n` down to `1`, so it does `O(n)` work except for the
-constant-time base cases. At most `n` calls are unfinished together,
-so the call stack uses `O(n)` extra memory. Go does not promise to
-replace this shape with a constant-space loop.
+Let `d` be the number of directories and `h` the greatest number of
+directories on a root-to-leaf path. The function visits each directory
+and each parent-child link once, so it does `O(d)` work for a tree. At
+most `h` calls are unfinished together, so the call stack uses
+`O(h)` extra memory: `O(d)` for a one-child chain. It creates no
+result collection.
 
 #### When to use it
 
-Use recursion when the input is naturally nested, when each smaller
-problem asks for the same kind of answer as the whole problem, and
-when the maximum depth is safely bounded. Trees, split ranges, and
-choice exploration often have this shape.
+Use recursion when the input is naturally nested, each child asks for
+the same kind of answer as its parent, and the maximum depth is safely
+bounded. Directory trees, syntax trees, split ranges, and choice
+exploration often have this shape.
 
 #### When not to use it
 
@@ -631,13 +705,14 @@ processed in a chosen order.
 
 #### Common mistakes and edge cases
 
-> **Warning:** A base case such as `value <= 1` is not input
-> validation by itself. Without the preceding range check, `-1`
-> would incorrectly return the factorial value `1`.
+> **Warning:** Recursion needs input that eventually reaches a base
+> case. If `work` contains `root` as a child in the example, calls
+> alternate forever until the stack fails. Validate that links form a
+> tree or record visited directories when cycles are allowed.
 
-> **Warning:** Count paused calls as memory. `factorial(20)` creates
-> about 20 live frames at its deepest point even though it allocates
-> no slice.
+> **Warning:** Count paused calls as memory. A chain of `100,000`
+> one-child directories may exhaust the call stack even though the
+> function allocates no explicit stack slice.
 
 Repeated recursive calls can also redo the same smaller problem. Save
 repeated answers as described by [dynamic
@@ -649,6 +724,8 @@ rule with a loop.
 - [A.1 Complexity and resource
   accounting](#a1-complexity-and-resource-accounting) explains how
   to count extra memory.
+- [B.4.3 Recursive return contracts](#b43-recursive-return-contracts)
+  explains how a parent combines returned child answers.
 - [C.1.3.11 Divide and conquer](#c1311-divide-and-conquer) uses
   several smaller independent calls.
 - [D.8 Replacing recursion with a
@@ -677,16 +754,19 @@ called **bits**.
 
 Use a teaching limit of `127` and append digit `8`.
 
-1.  **Input: `value=11`**
-    - **Before:** Candidate is `11*10+8`
-    - **Decision:** `11 <= (127-8)/10`, or `11 <= 11`.
-    - **After:** Produce `118`.
-    - **Known correct:** The result is at most `127`.
-2.  **Input: `value=12`**
-    - **Before:** Candidate would be `12*10+8`
-    - **Decision:** `12 > 11`, so multiplying would be unsafe.
-    - **After:** Return failure without multiplying.
-    - **Known correct:** No unrepresentable result was evaluated.
+Initial state: `value=11`, `digit=8`, `limit=127`.
+
+1.  Accept the safe value
+    - Decision: `11 <= (127-8)/10`, or `11 <= 11`.
+    - After: `result=118`, `valid=true`.
+    - Known correct: The result is at most `127`.
+
+Initial state: `value=12`, `digit=8`, `limit=127`.
+
+1.  Reject the unsafe value
+    - Decision: `12 > (127-8)/10`, or `12 > 11`.
+    - After: `result=0`, `valid=false`; multiplication did not run.
+    - Known correct: No unrepresentable result was evaluated.
 
 At the boundary `value=12`, digit `7` is accepted because
 `12 <= (127-7)/10` and the result is exactly `127`.
@@ -784,8 +864,9 @@ digits are combined.
 
 A **bit** is a switch that is either `0` or `1`. An integer used as a
 row of these switches is a **bitmask**. AND (`&`) keeps shared `1`
-bits, OR (`|`) keeps either input's `1` bits, and XOR (`^`) keeps bits
-that differ. Bit clear (`&^`) turns off selected bits.
+bits, OR (`|`) keeps either input's `1` bits, and exclusive OR
+(**XOR**, `^`) keeps bits that differ. Bit clear (`&^`) turns off
+selected bits.
 
 #### Step-by-step examples
 
@@ -795,26 +876,46 @@ Start with read and execute enabled: binary `101`, which is decimal
 from left to right. Leading zeroes in masks keep all three positions
 visible.
 
-1.  **Step: Test write**
-    - **Before:** `flags=101`, mask `010`
-    - **Decision:** `101 & 010` is zero.
-    - **After:** Flags stay `101`.
-    - **Known correct:** Write is off.
-2.  **Step: Set write**
-    - **Before:** `flags=101`
-    - **Decision:** OR with `010` turns that bit on.
-    - **After:** `flags=111`
-    - **Known correct:** All three permissions are on.
-3.  **Step: Clear read**
-    - **Before:** `flags=111`, mask `001`
-    - **Decision:** `&^ 001` clears only bit `0`.
-    - **After:** `flags=110`
-    - **Known correct:** Write and execute remain on; read is off.
+Initial state: `flags=101`.
 
-For the cancellation input `[4,7,4]`, the running XOR values are `4`,
-`3`, and `7`; the two `4` values cancel. The same method fails for
-`[4,4,7,7]` if the task expects one unique value, because every value
-cancels and produces `0`.
+1.  Test write with mask `010`
+    - Decision: `101 & 010` is zero.
+    - After: `flags=101`, `writeEnabled=false`.
+    - Known correct: Write is off; no flag changed.
+2.  Set write with mask `010`
+    - Decision: `101 | 010` turns bit `1` on.
+    - After: `flags=111`.
+    - Known correct: All three permissions are on.
+3.  Clear read with mask `001`
+    - Decision: `111 &^ 001` clears only bit `0`.
+    - After: `flags=110`.
+    - Known correct: Write and execute remain on; read is off.
+
+For the cancellation input `[4,7,4]`, the expected unpaired value is
+`7`. Here, `unpaired` stores the XOR of `values[:index]`, the input
+prefix already processed. For example, after two values,
+`unpaired=3` means `4 ^ 7 = 3`.
+
+Initial state: `index=0`, `unpaired=0`.
+
+1.  Combine the first `4`
+    - Decision: Compute `0 ^ 4`.
+    - After: `index=1`, `unpaired=4`.
+    - Known correct: The processed prefix contains one unpaired
+      `4`.
+2.  Combine `7`
+    - Decision: Compute `4 ^ 7`.
+    - After: `index=2`, `unpaired=3`.
+    - Known correct: `unpaired=3` is the XOR of processed prefix
+      `[4,7]`.
+3.  Combine the second `4`
+    - Decision: Compute `3 ^ 4`.
+    - After: `index=3`, `unpaired=7`.
+    - Known correct: The equal `4` values cancel, leaving the
+      expected unpaired value `7`.
+
+For `[4,4,7,7]`, every value cancels and produces `0`. That input
+violates the promise that exactly one value appears once.
 
 #### Why it works
 
@@ -829,6 +930,12 @@ and XOR with zero leaves the other value unchanged. That argument is
 valid only when the input promise supplies exactly those pairs.
 
 #### Go example
+
+For the permission trace, `flags=0b101` and `bitPosition=1` produce
+the same `0b010` mask shown above. Calls to `hasBit(0b101, 1)`,
+`setBit(0b101, 1)`, and `clearBit(0b111, 0)` perform the three traced
+operations. The final function uses the exact cancellation input
+`values=[]uint64{4, 7, 4}` and returns `7`.
 
 ```go
 func hasBit(flags uint64, bitPosition uint) bool {
@@ -856,15 +963,26 @@ func clearBit(flags uint64, bitPosition uint) (uint64, bool) {
 	// the selected bit is cleared.
 	return flags &^ (uint64(1) << bitPosition), true
 }
+
+func unpairedValue(values []uint64) uint64 {
+	// unpaired stores the XOR of the input prefix already processed.
+	// Equal paired values cancel regardless of their input positions.
+	var unpaired uint64
+	for _, value := range values {
+		unpaired ^= value
+	}
+	return unpaired
+}
 ```
 
 #### Work and memory
 
-Each operation on one `uint64` performs bounded machine-word work and
-uses no growing storage, so it takes `O(1)` time and `O(1)` extra
-space. Repeating `x &= x-1` takes one step per set bit. Enumerating
-all `n`-bit masks still visits `2^n` subsets, and copying each chosen
-subset adds output work.
+Each permission operation on one `uint64` performs bounded
+machine-word work and uses no growing storage, so it takes `O(1)`
+time and `O(1)` extra space. For `n` input values,
+`unpairedValue` combines each value once, so it takes `O(n)` time and
+`O(1)` extra space. A loop that enumerates every `n`-bit mask still
+visits `2^n` subsets, and copying each chosen subset adds output work.
 
 #### When to use it
 
@@ -925,25 +1043,30 @@ rewrite is called **normalization**, and its unique result is a
 
 #### Step-by-step examples
 
-Add prices `$1.20`, `$2.35`, and `$0.45`. The expected exact total is
+Add the normalized prices `[]Cents{120,235,45}`, representing `$1.20`,
+`$2.35`, and `$0.45`. The expected exact total is `400` cents, or
 `$4.00`.
 
-1.  **Price: `$1.20`**
-    - **Before:** `total=0` cents
-    - **Decision:** Convert at the boundary to `120` cents.
-    - **After:** `total=120`
-    - **Known correct:** The first price is exact.
-2.  **Price: `$2.35`**
-    - **Before:** `total=120`
-    - **Decision:** Add integer `235`, not a floating-point value that
-      may be rounded inside the computer.
-    - **After:** `total=355`
-    - **Known correct:** The first two prices total `$3.55`.
-3.  **Price: `$0.45`**
-    - **Before:** `total=355`
-    - **Decision:** Add integer `45`.
-    - **After:** `total=400`
-    - **Known correct:** All prices total exactly `$4.00`.
+Initial state: `index=0`, `total=0` cents.
+
+1.  Add `$1.20`
+    - Decision: Read the normalized value `120` cents and add it.
+    - After: `index=1`, `total=120` cents.
+    - Known correct: The first price is exact.
+2.  Add `$2.35`
+    - Decision: Read and add the next normalized value, `235` cents.
+    - After: `index=2`, `total=355` cents.
+    - Known correct: The first two prices total `$3.55`.
+3.  Add `$0.45`
+    - Decision: Add integer `45`.
+    - After: `index=3`, `total=400` cents.
+    - Known correct: All prices total exactly `$4.00`.
+
+The representation changes a real equality decision. If `first=0.10`
+and `second=0.20` are stored in `float64` variables, then
+`first+second == 0.30` is false because the stored binary
+approximations do not add to the stored approximation of `0.30`.
+With cents, `10+20 == 30` is exactly true.
 
 The boundary value `$0.00` becomes zero cents and changes nothing. A
 price with more precision than the chosen unit, such as `$0.005`, must
@@ -960,8 +1083,10 @@ accepted amount.
 
 #### Go example
 
-The code accepts prices that are already stored as cents and requires
-their total to fit in `int64`.
+Calling `addPrices([]Cents{120, 235, 45})` uses the exact normalized
+input from the trace and returns `400`. Boundary code must convert
+accepted prices to cents before this function runs, and their total
+must fit in `int64`.
 
 ```go
 // Cents gives every stored price the same exact integer unit.
@@ -973,8 +1098,8 @@ func addPrices(prices []Cents) Cents {
 	var total Cents
 	// Add each already-normalized amount; no floating-point rounding
 	// occurs.
-	for _, price := range prices {
-		total += price
+	for index := range prices {
+		total += prices[index]
 	}
 	return total
 }
@@ -1035,38 +1160,43 @@ multiples does unnecessary work when the counts are large.
 
 ##### How it works
 
-If `18` and `12` are split into equally sized groups, the largest
+If `48` and `18` are split into equally sized groups, the largest
 possible group has `6` items. That value is the **greatest common
 divisor (GCD)**. The first positive number reached by both counting in
-steps of `18` and `12` is `36`; it is the **least common multiple
+steps of `48` and `18` is `144`; it is the **least common multiple
 (LCM)**. **Euclid's algorithm** finds the GCD by repeatedly replacing
 the larger question with its leftover part.
 
 ##### Step-by-step examples
 
-For `a=18` and `b=12`, the expected GCD is `6` and LCM is `36`.
+For `firstValue=48` and `secondValue=18`, the expected GCD is `6`
+and LCM is `144`.
 
-1.  **Step: 1**
-    - **Before:** `(a,b)=(18,12)`
-    - **Decision:** `18%12=6`; any common divisor of `18` and `12`
-      also divides `6`.
-    - **After:** `(12,6)`
-    - **Known correct:** The set of common divisors is unchanged.
-2.  **Step: 2**
-    - **Before:** `(12,6)`
-    - **Decision:** `12%6=0`.
-    - **After:** `(6,0)`
-    - **Known correct:** `6` divides both original values.
-3.  **Step: Stop**
-    - **Before:** `(6,0)`
-    - **Decision:** No remainder remains.
-    - **After:** GCD `6`
-    - **Known correct:** No larger common divisor was lost.
-4.  **Step: LCM**
-    - **Before:** GCD `6`
-    - **Decision:** Compute `18/6*12`.
-    - **After:** `36`
-    - **Known correct:** `36` is divisible by both values.
+Initial state: `(firstValue,secondValue)=(48,18)`, `gcd=unknown`,
+`lcm=unknown`.
+
+1.  Take the first remainder
+    - Decision: `48%18=12`; any common divisor of `48` and `18`
+      also divides `12`.
+    - After: `(firstValue,secondValue)=(18,12)`, `gcd=unknown`,
+      `lcm=unknown`.
+    - Known correct: The set of common divisors is unchanged.
+2.  Take the next remainder
+    - Decision: `18%12=6`; replace the pair again.
+    - After: `(firstValue,secondValue)=(12,6)`, `gcd=unknown`,
+      `lcm=unknown`.
+    - Known correct: The smaller pair still has exactly the original
+      common divisors.
+3.  Reach a zero remainder
+    - Decision: `12%6=0`; stop the GCD loop.
+    - After: `(firstValue,secondValue)=(6,0)`, `gcd=6`,
+      `lcm=unknown`.
+    - Known correct: `6` is the greatest common divisor.
+4.  Compute the LCM
+    - Decision: Compute `48/6*18`.
+    - After: `gcd=6`, `lcm=144`.
+    - Known correct: `144` is the smallest positive multiple shared
+      by both values.
 
 For boundary input `(0,12)`, the GCD loop returns `12`, while the LCM
 rule returns `0`. For `(0,0)`, this guide uses the programming
@@ -1074,20 +1204,23 @@ convention GCD `0`.
 
 ##### Why it works
 
-Dividing `a` by `b` gives some whole-number quotient `q` and remainder
-`r`, so `a = q*b + r`. A number divides both `a` and `b` exactly when
-it divides both `b` and `r`. Replacing `(a,b)` with `(b,r)` therefore
-keeps every shared divisor. Each nonzero remainder is smaller than
-`b`, so the process finishes. At `(g,0)`, `g` is the largest divisor
-that the original values share.
+Dividing `firstValue` by `secondValue` gives some whole-number
+quotient and a remainder. A number divides both values exactly when
+it divides `secondValue` and that remainder. Replacing the pair with
+`(secondValue, firstValue%secondValue)` therefore keeps every shared
+divisor. Each nonzero remainder is smaller than `secondValue`, so the
+process finishes. When `secondValue=0`, `firstValue` is the largest
+divisor that the original values share.
 
-For positive inputs, `a*b` contains the shared factors twice. Dividing
-one operand by the GCD removes one shared copy, producing the smallest
-value that contains the factors needed by both inputs.
+For positive inputs, `firstValue*secondValue` contains the shared
+factors twice. Dividing one operand by the GCD removes one shared
+copy, producing the smallest value that contains the factors needed
+by both inputs.
 
 ##### Go example
 
-The functions below require nonnegative inputs.
+The functions below require nonnegative inputs. For the traced input,
+`gcd(48, 18)` returns `6`, and `lcm(48, 18)` returns `(144, true)`.
 
 ```go
 import "math"
@@ -1125,9 +1258,9 @@ func lcm(firstValue, secondValue int64) (int64, bool) {
 
 Euclid's algorithm takes a number of remainder steps proportional to
 the logarithm of the smaller input. This is written
-`O(log(min(a,b)))`. It uses `O(1)` extra memory. LCM adds a fixed
-amount of work and no growing storage after the GCD. These bounds
-treat fixed-width integer operations as constant time.
+`O(log(min(firstValue,secondValue)))`. It uses `O(1)` extra memory.
+LCM adds a fixed amount of work and no growing storage after the GCD.
+These bounds treat fixed-width integer operations as constant time.
 
 ##### When to use it
 
@@ -1188,23 +1321,31 @@ positive factor greater than one, and its denominator is positive.
 
 Normalize `(6,-8)`; the expected result is `(-3,4)`.
 
-1.  **Step: Sign**
-    - **Before:** `(6,-8)`
-    - **Decision:** Denominator must be positive, so reverse both
+Initial state: `numerator=6`, `denominator=-8`,
+`greatestCommonDivisor=unknown`.
+
+1.  Normalize the sign
+    - Decision: The denominator must be positive, so reverse both
       signs.
-    - **After:** `(-6,8)`
-    - **Known correct:** The value is unchanged and the sign has one
+    - After: `numerator=-6`, `denominator=8`,
+      `greatestCommonDivisor=unknown`.
+    - Known correct: The value is unchanged and the sign has one
       location.
-2.  **Step: GCD**
-    - **Before:** Magnitudes `(6,8)`
-    - **Decision:** Euclid's algorithm returns `2`.
-    - **After:** Divisor `2`
-    - **Known correct:** `2` is the largest shared factor.
-3.  **Step: Reduce**
-    - **Before:** `(-6,8)`
-    - **Decision:** Divide both parts by `2`.
-    - **After:** `(-3,4)`
-    - **Known correct:** The pair has no remaining shared factor.
+2.  Find the shared factor
+    - Decision: Run Euclid's algorithm on magnitudes `(6,8)`.
+    - After: `numerator=-6`, `denominator=8`,
+      `greatestCommonDivisor=2`.
+    - Known correct: `2` is the largest shared factor.
+3.  Reduce both parts
+    - Decision: Divide numerator and denominator by `2`.
+    - After: `numerator=-3`, `denominator=4`,
+      `greatestCommonDivisor=2`.
+    - Known correct: `(-3,4)` has the canonical sign and no remaining
+      shared factor.
+
+The equivalent input `(-9,12)` also reduces to `(-3,4)`. A Go map
+therefore uses one key for both ratios instead of storing two entries
+for the same mathematical value.
 
 `(0,-8)` is the boundary form `(0,1)`: every nonzero denominator
 represents the same zero. `(1,0)` is invalid and returns failure.
@@ -1222,6 +1363,8 @@ fractions reach the same pair.
 
 The function requires neither input to equal `math.MinInt64`. The
 positive magnitude of that one value cannot be stored in `int64`.
+For the traced input, `normalizeFraction(6, -8)` returns
+`(-3, 4, true)`.
 
 ```go
 func normalizeFraction(
@@ -1259,8 +1402,9 @@ func normalizeFraction(
 			numeratorMagnitude%denominatorMagnitude
 	}
 	// Divide both parts by their GCD to obtain the unique reduced pair.
-	return numerator / numeratorMagnitude,
-		denominator / numeratorMagnitude,
+	greatestCommonDivisor := numeratorMagnitude
+	return numerator / greatestCommonDivisor,
+		denominator / greatestCommonDivisor,
 		true
 }
 ```
@@ -1321,8 +1465,9 @@ slope was rounded.
 
 ##### How it works
 
-Two hiking directions such as `2` steps up and `4` right, or `1` up
-and `2` right, point the same way. Divide both changes by their shared
+Two hiking directions such as `2` steps right and `4` up, or `1`
+right and `2` up, point the same way. Store horizontal change first
+and vertical change second, then divide both changes by their shared
 factor to make one exact **direction key**. When opposite travel
 counts as the same undirected line, choose one agreed sign. The
 integer pair avoids rounded decimal slopes.
@@ -1332,27 +1477,30 @@ integer pair avoids rounded decimal slopes.
 Use start `(1,1)` and points `(2,3)`, `(3,5)`, and `(0,-1)`. Every
 expected direction key is `(1,2)`.
 
-1.  **Point: `(2,3)`**
-    - **Before:** Change `(1,2)`
-    - **Decision:** GCD is `1`; sign is already canonical.
-    - **After:** Key `(1,2)`
-    - **Known correct:** The key represents this direction.
-2.  **Point: `(3,5)`**
-    - **Before:** Change `(2,4)`
-    - **Decision:** Divide both parts by GCD `2`.
-    - **After:** Key `(1,2)`
-    - **Known correct:** The longer arrow shares the same key.
-3.  **Point: `(0,-1)`**
-    - **Before:** Change `(-1,-2)`
-    - **Decision:** GCD is `1`, then reverse both signs because
+Initial state: `pointIndex=0`, `keys=[]`.
+
+1.  Normalize point `(2,3)`
+    - Decision: Its change from `(1,1)` is `(1,2)`; GCD is `1` and
+      the sign is canonical.
+    - After: `pointIndex=1`, `keys=[(1,2)]`.
+    - Known correct: The first key represents its exact direction.
+2.  Normalize point `(3,5)`
+    - Decision: Its change is `(2,4)`; divide both parts by GCD `2`.
+    - After: `pointIndex=2`, `keys=[(1,2),(1,2)]`.
+    - Known correct: The longer arrow shares the first key.
+3.  Normalize point `(0,-1)`
+    - Decision: Its change is `(-1,-2)`; GCD is `1`, then reverse
+      both signs because
       `changeX < 0`.
-    - **After:** Key `(1,2)`
-    - **Known correct:** The opposite arrow has the same undirected
+    - After: `pointIndex=3`, `keys=[(1,2),(1,2),(1,2)]`.
+    - Known correct: The opposite arrow has the same undirected
       line orientation through the start.
 
 For point `(1,1)`, both changes are zero, so the result is marked
 duplicate instead of inventing a slope. For `(1,5)`, the fixed
-vertical key is `(0,1)`.
+vertical key is `(0,1)`. Direct integer division would try to divide
+the vertical change by horizontal change `0`; the pair representation
+handles that input without division or a special floating-point key.
 
 ##### Why it works
 
@@ -1367,6 +1515,10 @@ a multiple of every direction and therefore cannot identify one.
 
 The coordinate differences must fit in `int64` and must not equal
 `math.MinInt64`; that value has no positive `int64` magnitude.
+Subtract the start before calling the function. In the trace, the
+three points produce calls `normalizeDirection(1, 2)`,
+`normalizeDirection(2, 4)`, and `normalizeDirection(-1, -2)`; each
+returns the key `(1,2)` with duplicate set to `false`.
 
 ```go
 // direction is comparable, so a normalized value can be used as a map
@@ -1433,11 +1585,11 @@ The boolean result reports a duplicate point.
 
 ##### Work and memory
 
-Coordinate subtraction takes a fixed amount of work. The GCD takes a
-number of remainder steps proportional to the logarithm of the
-smaller horizontal or vertical change. Normalizing one direction uses
-`O(1)` extra memory. A caller grouping `n` points must also count its
-map storage and lookups.
+A caller takes a fixed amount of work to subtract the start point from
+one other point. The GCD takes a number of remainder steps
+proportional to the logarithm of the smaller horizontal or vertical
+change. Normalizing one direction uses `O(1)` extra memory. A caller
+grouping `n` points must also count its map storage and lookups.
 
 ##### When to use it
 
@@ -1499,22 +1651,25 @@ division**; Go instead truncates toward zero.
 For `x=-7` and `m=3`, the normalized remainder should be `2` and the
 floor quotient should be `-3`.
 
-1.  **Result: Go operators**
-    - **Before:** `x=-7`, `m=3`
-    - **Decision:** Go truncates toward zero.
-    - **After:** `quotient=-2`, `remainder=-1`
-    - **Known correct:** `-7 = -2*3 + -1`.
-2.  **Result: Normalize remainder**
-    - **Before:** `remainder=-1`
-    - **Decision:** Add positive modulus `3`.
-    - **After:** `2`
-    - **Known correct:** The result is from `0` through `2` and
+Initial state: `x=-7`, `m=3`, `quotient=unknown`,
+`remainder=unknown`.
+
+1.  Apply Go's operators
+    - Decision: Divide and take the remainder using truncation toward
+      zero.
+    - After: `quotient=-2`, `remainder=-1`.
+    - Known correct: `-7 = -2*3 + -1`.
+2.  Normalize the remainder
+    - Decision: Add the positive modulus `3` to `-1`.
+    - After: `quotient=-2`, `remainder=-1`,
+      `normalizedRemainder=2`.
+    - Known correct: The normalized result is from `0` through `2` and
       differs from `-7` by a multiple of `3`.
-3.  **Result: Floor quotient**
-    - **Before:** `quotient=-2`, remainder negative
-    - **Decision:** Move one whole step downward.
-    - **After:** `-3`
-    - **Known correct:** `-3 <= -7/3 < -2`.
+3.  Convert to the floor quotient
+    - Decision: The original remainder is negative, so move the
+      truncated quotient one whole step downward.
+    - After: `normalizedRemainder=2`, `floorQuotient=-3`.
+    - Known correct: `-3 <= -7/3 < -2`.
 
 Boundary input `x=-6,m=3` has remainder zero. Its exact quotient is
 `-2`, so neither correction changes the result.
@@ -1529,6 +1684,11 @@ a fractional part. With positive `m`, a negative remainder identifies
 exactly that case, so subtracting one reaches the next lower integer.
 
 ##### Go example
+
+For the traced input, `normalizedRemainder(-7, 3)` returns
+`(2, true)`, and `floorDivide(-7, 3)` returns `(-3, true)`. The trace
+uses `m` for the positive second argument; the functions name that
+same role `modulus` or `divisor` according to the requested result.
 
 ```go
 func normalizedRemainder(value, modulus int64) (int64, bool) {
@@ -1623,23 +1783,22 @@ building the product.
 
 For `n=25`, the expected result is `6`.
 
-1.  **Step: First layer**
-    - **Before:** `remaining=25`, `zeroes=0`
-    - **Decision:** `25/5=5` counts one `5` from `5,10,15,20,25`.
-    - **After:** `remaining=5`, `zeroes=5`
-    - **Known correct:** Every number with at least one `5` has
+Initial state: `remaining=25`, `zeroes=0`.
+
+1.  Count the first factor layer
+    - Decision: `25/5=5` counts one `5` from `5,10,15,20,25`.
+    - After: `remaining=5`, `zeroes=5`.
+    - Known correct: Every number with at least one `5` has
       contributed once.
-2.  **Step: Second layer**
-    - **Before:** `remaining=5`, `zeroes=5`
-    - **Decision:** `5/5=1` counts the second `5` inside `25`.
-    - **After:** `remaining=1`, `zeroes=6`
-    - **Known correct:** Every factor of `25` has contributed its
+2.  Count the second factor layer
+    - Decision: `5/5=1` counts the second `5` inside `25`.
+    - After: `remaining=1`, `zeroes=6`.
+    - Known correct: Every factor of `25` has contributed its
       extra `5`.
-3.  **Step: Stop**
-    - **Before:** `remaining=1`
-    - **Decision:** It is smaller than `5`; no higher layer exists.
-    - **After:** Return `6`.
-    - **Known correct:** All factors of `5` in `25!` are counted.
+3.  Stop
+    - Decision: `remaining=1 < 5`; no higher layer exists.
+    - After: `result=6`.
+    - Known correct: All factors of `5` in `25!` are counted.
 
 For boundary inputs `0` through `4`, no factor of `5` occurs, so the
 loop does no work and returns `0`.
@@ -1656,16 +1815,18 @@ counted `5`s.
 
 ##### Go example
 
-The function requires `value >= 0`.
+The function requires `n >= 0`. For the traced input,
+`trailingZeroes(25)` returns `6`.
 
 ```go
-func trailingZeroes(value int64) int64 {
+func trailingZeroes(n int64) int64 {
+	remaining := n
 	var zeroes int64
 	// Each division counts multiples of 5, then the extra factors
 	// contributed by multiples of 25, 125, and so on.
-	for value >= 5 {
-		value /= 5
-		zeroes += value
+	for remaining >= 5 {
+		remaining /= 5
+		zeroes += remaining
 	}
 	return zeroes
 }
@@ -1724,49 +1885,55 @@ square root. For one number, try only possible small partners. For a
 whole range, start with every candidate and repeatedly cross out
 multiples. That range method is the **Sieve of Eratosthenes**. A
 **prime** is an integer greater than one whose only positive divisors
-are `1` and itself.
+are `1` and itself. In the sieve, `composite[value] -> whether a
+discovered prime divides value`. An initial `false` means only "not
+marked yet"; it means "confirmed prime" only after all possible
+smaller prime factors have been processed.
 
 ##### Step-by-step examples
 
 For trial division with `value=91`, the expected smallest factor is
 `7`.
 
-1.  **Step: Try the divisors that fail**
-    - **Before:** No divisor has been found.
-    - **Decision:** Test `2`, `3`, `4`, `5`, and `6` in order. Their
+Initial state: `divisor=2`, `smallestFactor=unknown`.
+
+1.  Reject the smaller divisors
+    - Decision: Test `2`, `3`, `4`, `5`, and `6` in order. Their
       remainders are `1`, `1`, `3`, `1`, and `1`, so advance after
       each test.
-    - **After:** The next candidate divisor is `7`.
-    - **Known correct:** No integer from `2` through `6` divides
+    - After: `divisor=7`, `smallestFactor=unknown`.
+    - Known correct: No integer from `2` through `6` divides
       `91`.
-2.  **Step: Try divisor `7`**
-    - **Before:** Divisors below `7` have failed.
-    - **Decision:** `91%7=0`, so `7` divides `91`.
-    - **After:** Return `7`; its paired factor is `91/7=13`.
-    - **Known correct:** Ascending order makes `7` the smallest
+2.  Accept divisor `7`
+    - Decision: `91%7=0`, so `7` divides `91`.
+    - After: `smallestFactor=7`, `pairedFactor=13`.
+    - Known correct: Ascending order makes `7` the smallest
       factor.
 
 For a sieve through `10`:
 
-1.  **Step: Keep `2`**
-    - **Before:** Nothing is marked.
-    - **Decision:** `2` is unmarked; cross out `4,6,8,10`.
-    - **After:** Even composites are marked.
-    - **Known correct:** `2` is prime; its composite multiples cannot
+Initial state: `prime=2`; for indexes `2..10`,
+`composite=[F,F,F,F,F,F,F,F,F]`.
+
+1.  Keep `2`
+    - Decision: `2` is unmarked; cross out `4,6,8,10`.
+    - After: `prime=3`; for indexes `2..10`,
+      `composite=[F,F,T,F,T,F,T,F,T]`.
+    - Known correct: `2` is prime; its composite multiples cannot
       be prime.
-2.  **Step: Keep `3`**
-    - **Before:** `3` is unmarked.
-    - **Decision:** Start at `3*3=9`; mark `9`.
-    - **After:** `9` is marked.
-    - **Known correct:** `3` is prime; smaller multiples were already
+2.  Keep `3`
+    - Decision: `composite[3]=F`; start at `3*3=9` and mark `9`.
+    - After: `prime=4`; for indexes `2..10`,
+      `composite=[F,F,T,F,T,F,T,T,T]`.
+    - Known correct: `3` is prime; smaller multiples were already
       handled.
-3.  **Step: Stop crossing**
-    - **Before:** Next candidate square exceeds `10`.
-    - **Decision:** Every composite has a factor at most its square
+3.  Stop crossing out values
+    - Decision: `prime=4` and `4*4 > 10`; every composite has a
+      factor at most its square
       root.
-    - **After:** Collect unmarked `2,3,5,7`.
-    - **Known correct:** These and only these values are prime through
-      `10`.
+    - After: Read indexes `2..10`; `primes=[2,3,5,7]`.
+    - Known correct: These and only these values remain unmarked after
+      every possible smaller prime factor was processed.
 
 For `limit < 2`, the result is empty. For `n=2`, trial division
 performs no candidate checks and reports `2` itself as prime.
@@ -1901,37 +2068,41 @@ remembered remainder never needs to grow with the full number.
 
 For digits `"1234"` and modulus `7`, the expected remainder is `2`.
 
-1.  **Digit: `'1'`**
-    - **Before:** `remainder=0`
-    - **Decision:** `(0*10+1)%7=1`
-    - **After:** `1`
-    - **Known correct:** Remainder of prefix `"1"` is `1`.
-2.  **Digit: `'2'`**
-    - **Before:** `1`
-    - **Decision:** `(1*10+2)%7=5`
-    - **After:** `5`
-    - **Known correct:** Remainder of `"12"` is `5`.
-3.  **Digit: `'3'`**
-    - **Before:** `5`
-    - **Decision:** `(5*10+3)%7=4`
-    - **After:** `4`
-    - **Known correct:** Remainder of `"123"` is `4`.
-4.  **Digit: `'4'`**
-    - **Before:** `4`
-    - **Decision:** `(4*10+4)%7=2`
-    - **After:** `2`
-    - **Known correct:** Remainder of the complete number is `2`.
+Initial state: `digitIndex=0`, `remainder=0`.
+
+1.  Read `'1'`
+    - Decision: Compute `(0*10+1)%7=1`.
+    - After: `digitIndex=1`, `remainder=1`.
+    - Known correct: The remainder of prefix `"1"` is `1`.
+2.  Read `'2'`
+    - Decision: Compute `(1*10+2)%7=5`.
+    - After: `digitIndex=2`, `remainder=5`.
+    - Known correct: The remainder of prefix `"12"` is `5`.
+3.  Read `'3'`
+    - Decision: Compute `(5*10+3)%7=4`.
+    - After: `digitIndex=3`, `remainder=4`.
+    - Known correct: The remainder of prefix `"123"` is `4`.
+4.  Read `'4'`
+    - Decision: Compute `(4*10+4)%7=2`.
+    - After: `digitIndex=4`, `remainder=2`.
+    - Known correct: The remainder of the complete input is `2`.
+
+The same updates process
+`"123456789012345678901234567891"`, which cannot fit in `int64`.
+With modulus `7`, they return remainder `1`, and the remembered
+remainder stays between `0` and `6` after every digit.
 
 Leading zeroes are harmless: `"0012"` follows extra zero states and
 still returns `5` modulo `7`. Empty text and `"12x"` are invalid.
 
 ##### Why it works
 
-Before each digit, `remainder` equals the numeric prefix modulo `m`.
-Appending digit `d` changes that prefix from `p` to `10p+d`. Replacing
-`p` by an equal remainder does not change the final remainder, so the
-update preserves the fact for the longer prefix. After the last digit,
-the prefix is the complete input.
+Before each digit, `remainder` equals the numeric prefix divided by
+`modulus`, keeping only the remainder. Appending `digit` multiplies
+the prefix by `10` and adds `digit`. Replacing the old prefix with its
+remainder does not change the new remainder, so the update preserves
+the fact for the longer prefix. After the last digit, that prefix is
+the complete input.
 
 ##### Go example
 
@@ -1946,7 +2117,7 @@ func decimalRemainder(digits string, modulus int64) (int64, bool) {
 	}
 	var remainder int64
 	for digitIndex := 0; digitIndex < len(digits); digitIndex++ {
-		// Validate and convert one ASCII decimal digit without parsing the
+		// Validate and convert one decimal digit byte without parsing the
 		// whole, potentially enormous, number.
 		if digits[digitIndex] < '0' || digits[digitIndex] > '9' {
 			return 0, false
@@ -1982,9 +2153,9 @@ the implementation uses a wider or explicitly checked operation.
 
 ##### Common mistakes and edge cases
 
-> **Warning:** Converting the whole text before taking `%m` fails
-> before the useful bounded operation runs. A 1,000-digit input cannot
-> fit in `int64`.
+> **Warning:** Converting the whole text before taking `% modulus`
+> fails before the useful bounded operation runs. A 1,000-digit input
+> cannot fit in `int64`.
 
 > **Warning:** Validate every byte. Treating `'x'-'0'` as a digit
 > silently corrupts the remembered remainder for `"12x"`.
@@ -2026,38 +2197,45 @@ Generate subsets of `[A,B]`. At each position, first exclude and then
 include the current value. The expected output order is
 `[[],[B],[A],[A,B]]`.
 
-1.  **Position and choice: Start**
-    - **Before:** `currentSubset=[]`, index `0`
-    - **Decision:** Explore both choices for `A`.
-    - **After:** First continue without `A`.
-    - **Known correct:** Subsets without `A` will be completed before
+Initial state: `currentIndex=0`, `currentSubset=[]`, `result=[]`.
+
+1.  Exclude `A`
+    - Decision: Continue to index `1` without appending `A`.
+    - After: `currentIndex=1`, `currentSubset=[]`, `result=[]`.
+    - Known correct: Subsets without `A` will be completed before
       subsets with `A`.
-2.  **Position and choice: Exclude `B`**
-    - **Before:** `currentSubset=[]`, index `1`
-    - **Decision:** Continue without `B`.
-    - **After:** Reach the end and save `[]`.
-    - **Known correct:** The subset containing neither value is saved.
-3.  **Position and choice: Include `B`**
-    - **Before:** Return to index `1` with `currentSubset=[]`.
-    - **Decision:** Append `B`, then reach the end.
-    - **After:** Save `[B]`, then remove `B` from the working subset.
-    - **Known correct:** Both subsets without `A` are now saved.
-4.  **Position and choice: Include `A`**
-    - **Before:** Return to index `0` with `currentSubset=[]`.
-    - **Decision:** Append `A` and continue to index `1`.
-    - **After:** `currentSubset=[A]`.
-    - **Known correct:** Every later result in this branch contains
+2.  Exclude `B`
+    - Decision: Reach index `2` without appending `B`; save a copy.
+    - After: `currentIndex=1`, `currentSubset=[]`, `result=[[]]`.
+    - Known correct: The subset containing neither value is saved.
+3.  Include `B`
+    - Decision: Append `B`, save `[B]` at index `2`, then undo `B`.
+    - After: `currentIndex=0`, `currentSubset=[]`,
+      `result=[[],[B]]`.
+    - Known correct: Both subsets without `A` are saved.
+4.  Include `A`
+    - Decision: Append `A` and continue to index `1`.
+    - After: `currentIndex=1`, `currentSubset=[A]`,
+      `result=[[],[B]]`.
+    - Known correct: Every later result in this branch contains
       `A`.
-5.  **Position and choice: Exclude `B` after `A`**
-    - **Before:** `currentSubset=[A]`, index `1`.
-    - **Decision:** Continue without `B`.
-    - **After:** Reach the end and save `[A]`.
-    - **Known correct:** The subset containing only `A` is saved.
-6.  **Position and choice: Include `B` after `A`**
-    - **Before:** Return to index `1` with `currentSubset=[A]`.
-    - **Decision:** Append `B`, then reach the end.
-    - **After:** Save `[A,B]` and return all four subsets.
-    - **Known correct:** Every include-or-exclude choice appears once.
+5.  Exclude `B` after `A`
+    - Decision: Reach index `2` without appending `B`; save a copy.
+    - After: `currentIndex=1`, `currentSubset=[A]`,
+      `result=[[],[B],[A]]`.
+    - Known correct: The subset containing only `A` is saved.
+6.  Include `B` after `A`
+    - Decision: Append `B`, save `[A,B]`, then undo both active
+      choices while returning.
+    - After: `currentIndex=done`, `currentSubset=[]`,
+      `result=[[],[B],[A],[A,B]]`.
+    - Known correct: Every include-or-exclude choice appears once.
+
+The workload grows before the input looks large. Exactly `20`
+distinct values require `2^20 = 1,048,576` returned subsets. Their
+contents hold `20*2^19 = 10,485,760` values in total, so even a
+perfect generator must construct and store that much requested
+output.
 
 For empty input, there is one subset--the empty subset--so the output
 is `[[]]`, not an empty list of answers.
@@ -2170,23 +2348,28 @@ factorials.
 
 For `C(5,2)`, the expected result is `10`.
 
-1.  **Step: Choose the shorter calculation**
-    - **Before:** `n=5`, `k=2`
-    - **Decision:** Keeping `2` items is shorter than naming the `3`
+Initial state: `n=5`, `requestedK=2`, `effectiveK=unknown`,
+`numChosenSoFar=0`, `result=1`.
+
+1.  Choose the shorter calculation
+    - Decision: Keeping `2` items is shorter than naming the `3`
       omitted items, so two loop steps are enough.
-    - **After:** Effective `k=2`, `result=1`
-    - **Known correct:** Every kept pair identifies one omitted group
+    - After: `effectiveK=2`, `numChosenSoFar=1`, `result=1`.
+    - Known correct: Every kept pair identifies one omitted group
       of three, and the reverse is also true.
-2.  **Step: `i=1`**
-    - **Before:** `result=1`
-    - **Decision:** Multiply by `4`, divide by `1`.
-    - **After:** `result=4`
-    - **Known correct:** This is `C(4,1)`.
-3.  **Step: `i=2`**
-    - **Before:** `result=4`
-    - **Decision:** Multiply by `5`, divide by `2`.
-    - **After:** `result=10`
-    - **Known correct:** This is `C(5,2)`.
+2.  Choose the first item
+    - Decision: Multiply by `4`, then divide by `1`.
+    - After: `numChosenSoFar=2`, `result=4`.
+    - Known correct: The stored count is `C(4,1)`.
+3.  Choose the second item
+    - Decision: Multiply by `5`, then divide by `2`.
+    - After: `numChosenSoFar=3`, `result=10`.
+    - Known correct: The stored count is `C(5,2)`.
+
+For `C(30,2)`, the same loop stores `29` after its first step and
+`435` after its second. The factorial formula tries to construct
+`30!` before canceling; that intermediate is larger than `int64` even
+though the final answer `435` is small.
 
 Pascal's recurrence reaches the same answer by marking `E` in
 `[A,B,C,D,E]`. A pair containing `E` chooses one partner from the
@@ -2213,6 +2396,12 @@ includes a marked value or excludes it. Those cases cannot overlap and
 cover every group.
 
 ##### Go example
+
+The mathematical input `n=5,k=2` maps to
+`combinationCount(numItems=5, numChosen=2)`, which returns a
+`big.Int` containing `10` and `true`. After the symmetry check,
+the code's `numChosen` is the trace's `effectiveK`; its
+`numChosenSoFar` and `result` have the same meanings as in the trace.
 
 ```go
 import "math/big"
@@ -2273,9 +2462,6 @@ the final count would fit.
 
 ##### Common mistakes and edge cases
 
-> **Warning:** `n!/(k!*(n-k)!)` can overflow at `n!` before division.
-> For `C(30,2)=435`, `30!` is already far outside `int64`.
-
 > **Warning:** In fixed-width code, `result*factor` can overflow
 > before the following exact division. Check or use arbitrary
 > precision for the intermediate, not only the final answer.
@@ -2317,29 +2503,33 @@ For the actual input `values=[1,1,2]` and `k=2`, the expected value
 outputs are `[[1,1],[1,2]]`. The labels `1a` and `1b` below refer only
 to the first and second input positions; both stored values are `1`.
 
-1.  **Choice: First value in the group**
-    - **Before:** `startIndex=0`, `currentCombination=[]`
-    - **Decision:** Choose index `0`, the first `1`.
-    - **After:** `currentCombination=[1]`, next start index `1`
-    - **Known correct:** Every result in this branch begins with `1`.
-2.  **Choice: Fill the second position with `1`**
-    - **Before:** `startIndex=1`, `currentCombination=[1]`
-    - **Decision:** This call fills a new output position, so choose
+Initial state: `startIndex=0`, `candidateIndex=0`,
+`currentCombination=[]`, `result=[]`.
+
+1.  Choose the first `1`
+    - Decision: Choose index `0` for the first output position.
+    - After: `startIndex=1`, `candidateIndex=1`,
+      `currentCombination=[1]`, `result=[]`.
+    - Known correct: Every result in this branch begins with `1`.
+2.  Choose the second `1`
+    - Decision: This call fills a new output position, so choose
       the second `1`.
-    - **After:** Emit `[1,1]`
-    - **Known correct:** The two positions can both be used.
-3.  **Choice: Fill the second position with `2`**
-    - **Before:** Remove the second `1`; combination is `[1]` again.
-    - **Decision:** In the same call, next choose index `2`.
-    - **After:** Emit `[1,2]`
-    - **Known correct:** The other displayed pair beginning with `1`
+    - After: `startIndex=1`, `candidateIndex=2`,
+      `currentCombination=[1]`, `result=[[1,1]]`.
+    - Known correct: The two equal-valued positions can both be used.
+3.  Choose `2`
+    - Decision: In the same call, choose index `2`.
+    - After: `startIndex=0`, `candidateIndex=1`,
+      `currentCombination=[]`, `result=[[1,1],[1,2]]`.
+    - Known correct: The other displayed pair beginning with `1`
       is included.
-4.  **Choice: Try the second `1` first**
-    - **Before:** Remove the first chosen `1`; combination is empty.
-    - **Decision:** The first call already tried an equal `1` for this
-      output position, so skip index `1`.
-    - **After:** Continue to index `2`; it cannot fill a pair alone.
-    - **Known correct:** Starting with the second `1` would repeat
+4.  Skip the second `1` at the first position
+    - Decision: The first call already tried an equal `1` for this
+      output position, so skip index `1`. Trying index `2` cannot fill
+      the second position, so return.
+    - After: `startIndex=0`, `candidateIndex=done`,
+      `currentCombination=[]`, `result=[[1,1],[1,2]]`.
+    - Known correct: Starting with the second `1` would repeat
       `[1,2]`, while `[1,1]` was already created in step 2.
 
 For `k=0`, the one valid combination is empty. For `k>len(values)`, no
@@ -2357,6 +2547,11 @@ may choose another copy of the value and preserve `[1,1]`. Every call
 starts farther right, so the search finishes.
 
 ##### Go example
+
+The trace's `k` is the code's `combinationLength`. Calling
+`uniqueCombinations([]int{1, 1, 2}, 2)` returns
+`[][]int{{1, 1}, {1, 2}}`. The code first copies and sorts `values`;
+the traced input is already in that sorted order.
 
 ```go
 import "sort"
@@ -2476,22 +2671,21 @@ processing**.
 
 For `value=120` and `limit=127`, the expected result is `(21,true)`.
 
-1.  **Step: Extract `0`**
-    - **Before:** `value=120`, `reversed=0`
-    - **Decision:** Append last digit `0`, then remove it.
-    - **After:** `value=12`, `reversed=0`
-    - **Known correct:** One source digit has moved.
-2.  **Step: Extract `2`**
-    - **Before:** `value=12`, `reversed=0`
-    - **Decision:** Append `2`.
-    - **After:** `value=1`, `reversed=2`
-    - **Known correct:** Removed suffix `20` is reversed as integer
+Initial state: `value=120`, `reversed=0`, `valid=true`.
+
+1.  Extract `0`
+    - Decision: Append last digit `0`, then remove it from `value`.
+    - After: `value=12`, `reversed=0`, `valid=true`.
+    - Known correct: One source digit has moved.
+2.  Extract `2`
+    - Decision: Append `2`, then remove it from `value`.
+    - After: `value=1`, `reversed=2`, `valid=true`.
+    - Known correct: Removed suffix `20` is reversed as integer
       `2`.
-3.  **Step: Extract `1`**
-    - **Before:** `value=1`, `reversed=2`
-    - **Decision:** Append `1`.
-    - **After:** `value=0`, `reversed=21`
-    - **Known correct:** Every digit has moved in reverse order.
+3.  Extract `1`
+    - Decision: Append `1`, then remove it from `value`.
+    - After: `value=0`, `reversed=21`, `valid=true`.
+    - Known correct: Every digit has moved in reverse order.
 
 An integer cannot retain a leading zero, so the result is `21`, not
 `021`. For the separate input `821` with limit `127`, the first two
@@ -2518,21 +2712,22 @@ Therefore every performed append stays within the allowed range.
 
 #### Go example
 
+Calling `reverseWithinLimit(120, 127)` follows the ordinary trace and
+returns `(21,true)`. Calling it with the focused overflow input
+`reverseWithinLimit(821, 127)` returns `(0,false)` before constructing
+`128`.
+
 ```go
-func reverseDigits(value, limit int64) (int64, bool) {
-	// This entry treats the minus sign as invalid rather than as a
-	// decimal digit.
+func reverseWithinLimit(value, limit int64) (int64, bool) {
+	// This entry accepts only the nonnegative values used by the trace.
 	if value < 0 || limit < 0 {
 		return 0, false
 	}
-
 	var reversed int64
 	for value > 0 {
-		// Remainder gives the rightmost digit. Whole-number division
-		// below removes that same digit.
 		digit := value % 10
-		// digit > limit handles a negative subtraction result. The
-		// second comparison checks the append before multiplying.
+		// Rearrange reversed*10+digit <= limit so the unsafe
+		// multiplication is never evaluated when it would overflow.
 		if digit > limit || reversed > (limit-digit)/10 {
 			return 0, false
 		}
@@ -2543,9 +2738,8 @@ func reverseDigits(value, limit int64) (int64, bool) {
 }
 ```
 
-Calls matching the examples are `reverseDigits(120,127)`, which
-returns `(21,true)`, and `reverseDigits(821,127)`, which returns
-`(0,false)`. Input zero returns `(0,true)` without entering the loop.
+The full fixed-`int64` implementation is owned by [E.6 Overflow-safe
+integer reversal](#e6-overflow-safe-integer-reversal).
 
 <a id="a85-work-and-memory"></a>
 
@@ -2629,31 +2823,34 @@ Start with `base := []int{10, 20, 30, 40}`. The expression
 appends below, the expected values are
 `base == [10, 99, 30, 50]` and `middle == [7, 30, 50, 60]`.
 
-1.  **Step: Create view**
-    - **Before:** `base=[10,20,30,40]`
-    - **Decision:** `[1:3]` exposes positions 1 and 2
-    - **After:** `middle=[20,30]`, length 2, capacity 3
-    - **Known correct:** Both slices refer to `base[1]` and `base[2]`
-2.  **Step: Replace**
-    - **Before:** `middle[0]=20`
-    - **Decision:** Write through the shared position
-    - **After:** `base=[10,99,30,40]`
-    - **Known correct:** `middle[0]` and `base[1]` are the same locker
-3.  **Step: Append `50`**
-    - **Before:** Length 2, capacity 3
-    - **Decision:** One unused shared position remains
-    - **After:** `base=[10,99,30,50]`, `middle=[99,30,50]`
-    - **Known correct:** The first append reused `base`
-4.  **Step: Append `60`**
-    - **Before:** Length equals capacity
-    - **Decision:** Growth requires new storage
-    - **After:** `middle=[99,30,50,60]`; `base` unchanged
-    - **Known correct:** Later `middle` writes cannot reach `base`
-5.  **Step: Replace again**
-    - **Before:** Separate storage
-    - **Decision:** Set `middle[0]=7`
-    - **After:** `middle=[7,30,50,60]`; `base=[10,99,30,50]`
-    - **Known correct:** The two slices no longer share storage
+Initial state: `base=[10,20,30,40]`, `middle=unset`,
+`storage=baseArray`.
+
+1.  Create the view
+    - Decision: Slice `base[1:3]`, exposing positions `1` and `2`.
+    - After: `base=[10,20,30,40]`, `middle=[20,30]`, `len=2`,
+      `cap=3`, `storage=baseArray`.
+    - Known correct: Both slices reach `base[1]` and `base[2]`.
+2.  Replace through the view
+    - Decision: Set `middle[0]=99` in shared storage.
+    - After: `base=[10,99,30,40]`, `middle=[99,30]`, `len=2`,
+      `cap=3`, `storage=baseArray`.
+    - Known correct: `middle[0]` and `base[1]` are one location.
+3.  Append `50`
+    - Decision: Reuse the one unused position within capacity.
+    - After: `base=[10,99,30,50]`, `middle=[99,30,50]`,
+      `len=3`, `cap=3`, `storage=baseArray`.
+    - Known correct: The append overwrote `base[3]`.
+4.  Append `60`
+    - Decision: Length equals capacity, so allocate new storage.
+    - After: `base=[10,99,30,50]`, `middle=[99,30,50,60]`,
+      `len=4`, `storage=middleArray`.
+    - Known correct: Later `middle` writes cannot reach `base`.
+5.  Replace through the new storage
+    - Decision: Set `middle[0]=7`.
+    - After: `base=[10,99,30,50]`, `middle=[7,30,50,60]`,
+      `storage=middleArray`.
+    - Known correct: The two slices no longer share storage.
 
 Boundary example: input values `[2, 1, 2]`, where every value must be
 between `0` and `2`, produce frequency slice `[0, 1, 2]`. Value `-1`
@@ -2745,7 +2942,8 @@ If `r` is the number of possible values, a frequency slice uses
   deliberately.
 - A nil slice and a non-nil empty slice both have length zero but can
   differ in JavaScript Object Notation (JSON) output and in an
-  application's public input/output contract, often called its API.
+  application's public input/output contract, or **application
+  programming interface (API)**.
 
 #### Related material
 
@@ -2782,36 +2980,30 @@ slice can rotate its values without building another slice.
 Rotate `[1, 2, 3, 4, 5]` right by `7`; the expected output is
 `[4, 5, 1, 2, 3]`.
 
-1.  **Step: Normalize**
-    - **Before:** `k=7`, `n=5`
-    - **Decision:** Rotations repeat every five moves.
-    - **After:** `k=2`
-    - **Known correct:** The requested result is unchanged.
-2.  **Step: Reverse all**
-    - **Before:** `[1,2,3,4,5]`
-    - **Decision:** Bring the final two values to the front in reverse
+Initial state: `values=[1,2,3,4,5]`, `numPositions=7`, `n=5`.
+
+1.  Normalize the rotation
+    - Decision: Rotations repeat every five moves; compute `7%5`.
+    - After: `values=[1,2,3,4,5]`, `numPositions=2`.
+    - Known correct: The requested result is unchanged.
+2.  Reverse all values
+    - Decision: Bring the final two values to the front in reverse
       order.
-    - **After:** `[5,4,3,2,1]`
-    - **Known correct:** The two result groups are now on the correct
+    - After: `values=[5,4,3,2,1]`, `numPositions=2`.
+    - Known correct: The two result groups are now on the correct
       sides, although their internal orders are reversed.
-3.  **Step: Reverse prefix**
-    - **Before:** `[5,4 | 3,2,1]`
-    - **Decision:** Restore the moved group's order.
-    - **After:** `[4,5 | 3,2,1]`
-    - **Known correct:** Output positions 0 and 1 are final.
-4.  **Step: Reverse suffix**
-    - **Before:** `[4,5 | 3,2,1]`
-    - **Decision:** Restore the other group's order.
-    - **After:** `[4,5,1,2,3]`
-    - **Known correct:** Every output position is final.
+3.  Reverse the prefix
+    - Decision: Restore the moved group's internal order.
+    - After: `values=[4,5 | 3,2,1]`, `numPositions=2`.
+    - Known correct: Output positions `0` and `1` are final.
+4.  Reverse the suffix
+    - Decision: Restore the other group's internal order.
+    - After: `values=[4,5,1,2,3]`, `numPositions=2`.
+    - Known correct: Every output position is final.
 
 Boundary example: rotating `[]` by any number of positions leaves it
 empty. The function must return before `numPositions %= len(values)`,
 because remainder by zero is invalid.
-
-For a three-way partition of `[3, 1, 4, 3, 2]` around pivot `3`, the
-regions eventually become `[1, 2 | 3, 3 | 4]`: smaller, equal, and
-greater.
 
 ##### Why it works
 
@@ -2884,8 +3076,6 @@ holds the result.
   permit it; Go's remainder keeps the dividend's sign.
 - Reversing `[left, right]` requires inclusive endpoints; mixing that
   with a half-open range can skip or repeat an element.
-- During three-way partitioning, every branch must grow a classified
-  region or shrink the unclassified region, or `[3]` can loop forever.
 
 ##### Related material
 
@@ -2928,30 +3118,40 @@ node. A **doubly linked list** also has a link to the previous node.
 Reverse `1 -> 2 -> 3 -> nil`; the expected output is
 `3 -> 2 -> 1 -> nil`.
 
-1.  **Step: 1**
-    - **Before:** `previous=nil`, `current=1 -> 2 -> 3`
-    - **Decision:** Save `2`, then point `1.Next` to `nil`
-    - **After:** `previous=1`, `current=2 -> 3`
-    - **Known correct:** `1` is a complete reversed prefix
-2.  **Step: 2**
-    - **Before:** `previous=1`, `current=2 -> 3`
-    - **Decision:** Save `3`, then point `2.Next` to `1`
-    - **After:** `previous=2 -> 1`, `current=3`
-    - **Known correct:** Nodes `1,2` are reversed without losing `3`
-3.  **Step: 3**
-    - **Before:** `previous=2 -> 1`, `current=3`
-    - **Decision:** Save `nil`, then point `3.Next` to `2`
-    - **After:** `previous=3 -> 2 -> 1`, `current=nil`
-    - **Known correct:** Every original node appears once in reverse
-      order
+Initial state: `previous=nil`, `current=1 -> 2 -> 3 -> nil`.
+
+1.  Reverse node `1`
+    - Decision: Save `2`, point `1.Next` to `nil`, and advance.
+    - After: `previous=1 -> nil`, `current=2 -> 3 -> nil`.
+    - Known correct: Node `1` is a complete reversed prefix.
+2.  Reverse node `2`
+    - Decision: Save `3`, point `2.Next` to `1`, and advance.
+    - After: `previous=2 -> 1 -> nil`, `current=3 -> nil`.
+    - Known correct: Nodes `1,2` are reversed without losing `3`.
+3.  Reverse node `3`
+    - Decision: Save `nil`, point `3.Next` to `2`, and advance.
+    - After: `previous=3 -> 2 -> 1 -> nil`, `current=nil`.
+    - Known correct: Every original node appears once in reverse
+      order.
+
+For local insertion, start with a held link to node `2` in
+`1 -> 2 -> 4 -> nil`; insert node `3` after it.
+
+Initial state: `current=2`, `newNode=3`,
+`list=1 -> 2 -> 4 -> nil`.
+
+1.  Reconnect two links
+    - Decision: Point `newNode.Next` to `4`, then point
+      `current.Next` to `newNode`.
+    - After: `current=2`, `newNode=3`,
+      `list=1 -> 2 -> 3 -> 4 -> nil`.
+    - Known correct: Insertion changed two links and moved no existing
+      node. A slice insertion at the same position must shift the
+      later values to open a slot.
 
 Boundary example: reversing `nil` performs no loop iteration and
 returns `nil`; reversing one node saves `nil`, leaves its link `nil`,
 and returns the same node.
-
-For digit lists with the ones digit first, `8 -> nil` plus `7 -> nil`
-writes `5` and carries `1`, then appends the remaining carry to
-produce `5 -> 1`.
 
 #### Why it works
 
@@ -2964,30 +3164,11 @@ the loop finishes. When `current` is nil, no nodes remain outside
 
 #### Go example
 
-```go
-type listNode struct {
-	Value int
-	Next  *listNode
-}
-
-func reverseList(head *listNode) *listNode {
-	var previous *listNode
-	current := head
-	for current != nil {
-		// Save the only route to the unvisited nodes before replacing
-		// current.Next.
-		next := current.Next
-		current.Next = previous
-		previous = current
-		current = next
-	}
-	return previous
-}
-```
-
-For nodes linked as `1 -> 2 -> 3 -> nil`, `reverseList` returns the
-node containing `3`. Following `Next` from that returned head produces
-`3 -> 2 -> 1 -> nil`, exactly as in the trace.
+The complete reusable implementation is owned by [E.4 Generic singly
+linked list](#e4-generic-singly-linked-list). Its `Reverse` function
+uses the same `previous`, `current`, and `next` roles as this trace.
+Calling `FromSlice([]int{1, 2, 3})` and passing its result to
+`Reverse` returns the traced `3 -> 2 -> 1 -> nil` list.
 
 #### Work and memory
 
@@ -3026,8 +3207,6 @@ calls.
   when the original head is still needed.
 - Fast and slow positions need a loop condition that proves both the
   fast node and its next link exist before moving two steps.
-- For two digit lists of different lengths, treat a missing digit as
-  zero and append a final nonzero carry.
 
 #### Related material
 
@@ -3058,107 +3237,116 @@ rule is **first in, first out (FIFO)**. A **deque**, short for
 double-ended queue, is a line with a door at each end, so values can
 enter or leave at either end.
 
+A queue stored in a slice can remember the next unread position
+instead of deleting the first element. The lookup contract is
+`nextQueueIndex -> oldest unread value`. For example, if
+`values=["", "B"]` and `nextQueueIndex=1`, the empty string marks a
+cleared slot and `"B"` is the next value to remove.
+
 #### Step-by-step examples
 
-Use vertices numbered `0` through `4`. Vertex `0` connects to `1` and
-`2`, vertex `1` to `3`, and vertex `2` to `4`. The exact neighbor-list
-input is `[[1,2],[3],[4],[],[]]`, the start is `0`, and the expected
-visit order is `[0,1,2,3,4]`. The explanation states each vertex's
-distance, but the queue stores only vertex numbers, like the code.
+Add `A` and `B` to an empty queue, remove one value, add `C`, and
+remove the rest. The expected removal order is `A`, `B`, `C`.
 
-1.  **Step: Visit `0`**
-    - **Before:** Queue `[0]`; output is empty.
-    - **Decision:** Remove oldest; append its unseen neighbors
-    - **After:** Queue `[1,2]`; output is `[0]`.
-    - **Known correct:** No distance-0 item remains.
-2.  **Step: Visit `1`**
-    - **Before:** Queue `[1,2]`; output is `[0]`.
-    - **Decision:** Append `3` behind existing distance-1 work.
-    - **After:** Queue `[2,3]`; output is `[0,1]`.
-    - **Known correct:** Vertex `1` has the fewest-link distance 1.
-3.  **Step: Visit `2`**
-    - **Before:** Queue `[2,3]`; output is `[0,1]`.
-    - **Decision:** Append `4`.
-    - **After:** Queue `[3,4]`; output is `[0,1,2]`.
-    - **Known correct:** Every distance-1 item leaves before distance
-      2.
-4.  **Step: Visit `3`**
-    - **Before:** Queue `[3,4]`; output is `[0,1,2]`.
-    - **Decision:** Vertex `3` has no neighbor to add.
-    - **After:** Queue `[4]`; output is `[0,1,2,3]`.
-    - **Known correct:** The other distance-2 vertex remains next.
-5.  **Step: Visit `4`**
-    - **Before:** Queue `[4]`; output is `[0,1,2,3]`.
-    - **Decision:** Vertex `4` has no neighbor to add.
-    - **After:** Queue is empty; output is `[0,1,2,3,4]`.
-    - **Known correct:** Every reachable vertex appears once in
-      increasing distance order.
+Initial state: `values=[]`, `nextQueueIndex=0`, `removed=[]`.
 
-Two-stack boundary trace, with the stack top at the right: add `A`,
-`B`, `C` to get input `[A,B,C]`. The first removal transfers to output
-`[C,B,A]` and returns `A`. Add `D` to input `[D]`; later removals
-return `B`, `C`, then transfer and return `D`. An empty removal must
-report failure rather than index outside either stack.
+1.  Add `A`
+    - Decision: Append the new arrival at the back.
+    - After: `values=[A]`, `nextQueueIndex=0`, `removed=[]`.
+    - Known correct: `A` is the oldest unread value.
+2.  Add `B`
+    - Decision: Append `B` behind `A`.
+    - After: `values=[A,B]`, `nextQueueIndex=0`, `removed=[]`.
+    - Known correct: The unread queue is `[A,B]`.
+3.  Remove the front
+    - Decision: Return `values[0]`, clear it, and advance the
+      unread position.
+    - After: `values=["",B]`, `nextQueueIndex=1`, `removed=[A]`.
+    - Known correct: The unread queue is `[B]`.
+4.  Add `C`
+    - Decision: Append `C` behind every unread value.
+    - After: `values=["",B,C]`, `nextQueueIndex=1`,
+      `removed=[A]`.
+    - Known correct: The unread queue is `[B,C]`.
+5.  Remove `B`, then `C`
+    - Decision: Apply the front-removal rule twice; reset when empty.
+    - After: `values=[]`, `nextQueueIndex=0`, `removed=[A,B,C]`.
+    - Known correct: Removal order equals arrival order.
+
+For a deque, start with `[B]`. Add at both ends, then remove at both
+ends. The expected removed values are `C`, then `A`; `[B]` remains.
+
+Initial state: `deque=[B]`, `removed=[]`.
+
+1.  Add `A` at the front
+    - Decision: Place `A` before the current front.
+    - After: `deque=[A,B]`, `removed=[]`.
+    - Known correct: `A` is the front and `B` is the back.
+2.  Add `C` at the back
+    - Decision: Place `C` after the current back.
+    - After: `deque=[A,B,C]`, `removed=[]`.
+    - Known correct: The earlier values keep their order.
+3.  Remove from the back
+    - Decision: Remove `C` at the back boundary.
+    - After: `deque=[A,B]`, `removed=[C]`.
+    - Known correct: The front side is unchanged.
+4.  Remove from the front
+    - Decision: Remove `A` at the front boundary.
+    - After: `deque=[B]`, `removed=[C,A]`.
+    - Known correct: The expected removals and remainder are
+      final.
+
+An empty queue or deque removal must report failure.
 
 #### Why it works
 
-The queue's defining fact is that unread items remain in arrival
-order. Adding only at the back and moving the front only forward
-preserves that fact. In the two-stack form, transfer reverses the
-input order once, putting its oldest item on top of the output stack.
-Delaying another transfer until that stack empties prevents newer
-items from passing older ones. Each removal reduces the unread queue,
-so processing finishes when no new items can be added.
+The unread slice begins in arrival order. Appending puts a new value
+after every unread value, and advancing `nextQueueIndex` removes only
+the oldest one. Both operations therefore preserve arrival order. A
+deque applies the same rule independently at its two boundaries:
+changing one end does not reorder the values between the ends.
 
 #### Go example
 
-This example requires `start` and every stored neighbor to be valid
-indices in `neighbors`.
+The zero value of `stringQueue` is empty and ready to use.
 
 ```go
-func breadthFirstOrder(start int, neighbors [][]int) []int {
-	// seen prevents duplicate queue entries. Marking start before
-	// traversal establishes that every queued vertex is already marked.
-	seen := make([]bool, len(neighbors))
-	queue := []int{start}
-	seen[start] = true
-	order := make([]int, 0, len(neighbors))
-	// nextQueueIndex advances without shifting queued values. Appends
-	// add newly discovered vertices at the back in first-in, first-out
-	// order.
-	nextQueueIndex := 0
-	for nextQueueIndex < len(queue) {
-		currentVertex := queue[nextQueueIndex]
-		order = append(order, currentVertex)
-		for _, neighboringVertex := range neighbors[currentVertex] {
-			if !seen[neighboringVertex] {
-				// Mark when enqueuing so another edge cannot
-				// enqueue the neighbor again.
-				seen[neighboringVertex] = true
-				queue = append(queue, neighboringVertex)
-			}
-		}
-		nextQueueIndex++
+type stringQueue struct {
+	values         []string
+	nextQueueIndex int
+}
+
+func (queue *stringQueue) add(value string) {
+	// New arrivals go behind every unread value.
+	queue.values = append(queue.values, value)
+}
+
+func (queue *stringQueue) remove() (string, bool) {
+	if queue.nextQueueIndex == len(queue.values) {
+		return "", false
 	}
-	return order
+	// Read and clear the oldest unread slot before moving the boundary.
+	value := queue.values[queue.nextQueueIndex]
+	queue.values[queue.nextQueueIndex] = ""
+	queue.nextQueueIndex++
+	if queue.nextQueueIndex == len(queue.values) {
+		// Reuse the slice after the queue becomes empty.
+		queue.values = queue.values[:0]
+		queue.nextQueueIndex = 0
+	}
+	return value, true
 }
 ```
 
-Marking on insertion ensures a node enters the queue at most once. The
-traced call is
-`breadthFirstOrder(0,[][]int{{1,2},{3},{4},{},{}})`.
-
 #### Work and memory
 
-For a slice queue, advancing `head` takes `O(1)` time. Across many
-appends, the average append takes `O(1)` time, although an occasional
-append copies the whole backing array. That array uses `O(n)` memory
-for `n` queued values and may retain already-read positions. In a
-two-stack queue, each value is pushed, transferred at most once, and
-popped once. Therefore `m` queue operations do `O(m)` total work,
-even though one removal may transfer `O(n)` values. A graph traversal
-also takes `O(V+E)` time: `V` is the number of vertices and `E` is the
-number of stored neighbor links.
+Advancing `nextQueueIndex` takes `O(1)` time. Across many additions,
+slice growth averages `O(1)` time per value, although one growth can
+copy all stored values. If `n` values have been stored since the last
+reset, the backing slice can use `O(n)` memory. A circular-buffer or
+linked-node deque can add or remove at either end in `O(1)` time and
+uses `O(n)` memory for `n` stored values. Prepending to an ordinary Go
+slice instead copies its existing values and takes `O(n)` time.
 
 #### When to use it
 
@@ -3183,9 +3371,10 @@ number of stored neighbor links.
 > alive. Clear removed pointers and periodically compact, or use a
 > circular buffer.
 
+> **Warning:** `append([]T{value}, deque...)` copies every existing
+> value. It does not provide constant-time front insertion.
+
 - Check for emptiness before front or back removal.
-- In graph search, marking only when removing allows two parents to
-  enqueue the same node; mark when adding it.
 - A circular buffer must distinguish full from empty even when head
   and tail positions match.
 - One operation can be slow even when the average cost across many
@@ -3198,8 +3387,8 @@ number of stored neighbor links.
   full search method and shortest-edge correctness argument.
 - [Monotonic deque](#c1329-monotonic-deque) removes expired and
   dominated candidates from opposite ends.
-- [Stack](#c1313-stack) provides the most-recent-first component of
-  the two-stack queue.
+- [Stack](#c1313-stack) contrasts most-recent-first processing with
+  a queue's oldest-first processing.
 - [Slice storage and retained
   memory](#d9-slice-storage-and-retained-memory) explains why
   advancing a head does not necessarily release storage.
@@ -3244,21 +3433,20 @@ Search for `10` in the pictured tree; the expected result is `true`.
     10
 ```
 
-1.  **Step: 1**
-    - **Before:** Current `8`
-    - **Decision:** `10 > 8`, so no left-subtree value can match
-    - **After:** Current `12`
-    - **Known correct:** The entire subtree at `4` is excluded
-2.  **Step: 2**
-    - **Before:** Current `12`
-    - **Decision:** `10 < 12`, so no right-subtree value can match
-    - **After:** Current `10`
-    - **Known correct:** Only `12`'s left subtree remains possible
-3.  **Step: 3**
-    - **Before:** Current `10`
-    - **Decision:** Values match
-    - **After:** Return `true`
-    - **Known correct:** The target exists
+Initial state: `target=10`, `current=8`, `result=pending`.
+
+1.  Compare with `8`
+    - Decision: `10 > 8`, so follow the right link.
+    - After: `target=10`, `current=12`, `result=pending`.
+    - Known correct: The subtree rooted at `4` cannot match.
+2.  Compare with `12`
+    - Decision: `10 < 12`, so follow the left link.
+    - After: `target=10`, `current=10`, `result=pending`.
+    - Known correct: Only `12`'s left subtree can still match.
+3.  Compare with `10`
+    - Decision: The values match, so return success.
+    - After: `target=10`, `current=10`, `result=true`.
+    - Known correct: The target exists.
 
 Boundary example: searching an empty tree starts at `nil` and returns
 `false`. Searching the pictured tree for `9` reaches `8`, `12`, `10`,
@@ -3286,16 +3474,17 @@ type TreeNode struct {
 
 func containsBST(root *TreeNode, target int) bool {
 	// The current subtree contains every value that could still match.
-	for root != nil {
-		if target == root.Value {
+	current := root
+	for current != nil {
+		if target == current.Value {
 			return true
 		}
-		if target < root.Value {
+		if target < current.Value {
 			// All right-subtree values are too large; keep only the left side.
-			root = root.Left
+			current = current.Left
 		} else {
 			// All left-subtree values are too small; keep only the right side.
-			root = root.Right
+			current = current.Right
 		}
 	}
 	// A nil link means the only possible search path ended without a
@@ -3369,30 +3558,39 @@ right), **postorder** (left, right, node), and **level order**
 
 ##### Step-by-step examples
 
-Use a tree with root `2`, left child `1`, and right child `3`.
-Preorder should return `[2,1,3]`.
+Use this tree; preorder should return `[1,2,4,3]`:
 
-1.  **Step: Record the root**
-    - **Before:** Current node is `2`; output is empty.
-    - **Decision:** Preorder handles node before children
-    - **After:** Output is `[2]`; next call receives node `1`.
-    - **Known correct:** Root `2` appears before both child subtrees.
-2.  **Step: Record the left child**
-    - **Before:** Current node is `1`; output is `[2]`.
-    - **Decision:** Record `1`; its two child links are `nil`, so both
-      child calls return without adding a value.
-    - **After:** Output is `[2,1]`; return to node `2`.
-    - **Known correct:** The complete left subtree follows its parent.
-3.  **Step: Record the right child**
-    - **Before:** Current node is `3`; output is `[2,1]`.
-    - **Decision:** Record `3`; both of its child links are `nil`.
-    - **After:** Output is `[2,1,3]`; traversal ends.
-    - **Known correct:** Every node appears once in node-left-right
+```text
+    1
+   / \
+  2   3
+ /
+4
+```
+
+Initial state: `current=1`, `output=[]`, `pending=[1]`.
+
+1.  Record the root
+    - Decision: Append `1`, then visit its left child first.
+    - After: `current=2`, `output=[1]`, `pending=[2,3]`.
+    - Known correct: Root `1` precedes both child subtrees.
+2.  Record node `2`
+    - Decision: Append `2`, then visit its left child `4`.
+    - After: `current=4`, `output=[1,2]`, `pending=[4,3]`.
+    - Known correct: Node `2` precedes its descendant `4`.
+3.  Record node `4`
+    - Decision: Append `4`; its two `nil` child calls add nothing.
+    - After: `current=3`, `output=[1,2,4]`, `pending=[3]`.
+    - Known correct: The complete left subtree follows root `1`.
+4.  Record node `3`
+    - Decision: Append `3`; its two `nil` child calls add nothing.
+    - After: `current=nil`, `output=[1,2,4,3]`, `pending=[]`.
+    - Known correct: Every node appears once in node-left-right
       order.
 
-The same tree gives inorder `[1,2,3]`, postorder `[1,3,2]`, and level
-order `[2,1,3]`. An empty tree produces an empty result in every
-order.
+The same tree gives inorder `[4,2,1,3]`, postorder `[4,2,3,1]`, and
+level order `[1,2,3,4]`. Each required order is now visibly
+different. An empty tree produces an empty result in every order.
 
 ##### Why it works
 
@@ -3405,6 +3603,13 @@ so every shallower level stays ahead of the deeper nodes it discovers.
 
 ##### Go example
 
+The trace's `pending` list makes the recursive call stack visible:
+its first node is the active call, followed by subtrees whose parent
+calls are waiting. The Go runtime stores that list in stack frames
+rather than in an explicit slice. The pictured nodes are the
+`TreeNode` input to `preorder`, and the function returns the traced
+`output=[1,2,4,3]`.
+
 ```go
 type TreeNode struct {
 	Value int
@@ -3413,7 +3618,7 @@ type TreeNode struct {
 }
 
 func preorder(root *TreeNode) []int {
-	order := []int{}
+	output := []int{}
 	var visit func(*TreeNode)
 	visit = func(node *TreeNode) {
 		// Nil children end their branch without contributing a value.
@@ -3423,12 +3628,12 @@ func preorder(root *TreeNode) []int {
 		// Preorder records the node before recursively visiting left and
 		// right. The shared order slice accumulates values across every
 		// call.
-		order = append(order, node.Value)
+		output = append(output, node.Value)
 		visit(node.Left)
 		visit(node.Right)
 	}
 	visit(root)
-	return order
+	return output
 }
 ```
 
@@ -3460,8 +3665,8 @@ largest number of nodes on one level, plus the `O(n)` output.
 ##### Common mistakes and edge cases
 
 > **Warning:** Appending the node between its recursive calls
-> implements inorder, not preorder; on root `2` with children `1` and
-> `3`, the results are `[1,2,3]` and `[2,1,3]` respectively.
+> implements inorder, not preorder. On the example tree, the results
+> are `[4,2,1,3]` and `[1,2,4,3]` respectively.
 
 - Decide whether nil roots return nil or a non-nil empty slice when
   output representation matters.
@@ -3501,30 +3706,51 @@ from this node down to a leaf." A `nil` subtree returns zero.
 ##### Step-by-step examples
 
 Use a tree whose root is `2`, whose left child is `1`, and whose right
-side is the chain `2 -> 3 -> 4`. The expected height is `3`.
+child is `3`; node `3` has right child `4`. The expected height is
+`3`.
 
-1.  **Step: Return from leaf `1`**
-    - **Before:** Both child calls receive `nil` and return `0`.
-    - **Decision:** Take the larger child height, `0`, and add node
-      `1`.
-    - **After:** The call for node `1` returns `1`.
-    - **Known correct:** The only downward path contains node `1`.
-2.  **Step: Return from leaf `4`**
-    - **Before:** Both child heights are `0`.
-    - **Decision:** Add node `4`.
-    - **After:** The call for node `4` returns `1`.
-    - **Known correct:** The only downward path contains node `4`.
-3.  **Step: Return from node `3`**
-    - **Before:** Left height is `0`; right height is `1` from node
-      `4`.
-    - **Decision:** Take `1` and add node `3`.
-    - **After:** The call for node `3` returns `2`.
-    - **Known correct:** Its longest path is `3 -> 4`.
-4.  **Step: Return from root `2`**
-    - **Before:** Left height is `1`; right height is `2`.
-    - **Decision:** Take `2` and add root `2`.
-    - **After:** Return `3`.
-    - **Known correct:** The longest full-tree path is `2 -> 3 -> 4`.
+Initial state: `active=treeHeight(2)`, `waiting=[]`,
+`returned=pending`.
+
+1.  Enter the left child
+    - Decision: Root `2` is non-nil, so call `treeHeight(1)` before
+      calculating `leftHeight`.
+    - After: `active=treeHeight(1)`,
+      `waiting=[node 2(leftHeight=pending)]`, `returned=pending`.
+    - Known correct: The root frame is saved until its left result is
+      available.
+2.  Return from leaf `1`
+    - Decision: Its two nil child calls return `0`; set
+      `leftHeight=0`, `rightHeight=0`, and return `1`.
+    - After: `active=treeHeight(2)`,
+      `waiting=[]`, `returned=1`, `node 2.leftHeight=1`.
+    - Known correct: Node `1`'s longest downward path has one node.
+3.  Enter node `3`, then node `4`
+    - Decision: Call `treeHeight(3)` for root `2`'s right child.
+      Node `3`'s nil left child returns `0`, so call its right child
+      `treeHeight(4)`.
+    - After: `active=treeHeight(4)`,
+      `waiting=[node 2(leftHeight=1),node 3(leftHeight=0)]`,
+      `returned=pending`.
+    - Known correct: Each waiting frame has saved every child result
+      obtained so far.
+4.  Return from leaf `4`
+    - Decision: Its two nil child calls return `0`; return `1`.
+    - After: `active=treeHeight(3)`,
+      `waiting=[node 2(leftHeight=1)]`, `returned=1`,
+      `node 3.leftHeight=0`, `node 3.rightHeight=1`.
+    - Known correct: Node `4`'s longest downward path has one node.
+5.  Return from node `3`
+    - Decision: Its right height `1` exceeds its left height `0`, so
+      return `1+1=2`.
+    - After: `active=treeHeight(2)`, `waiting=[]`, `returned=2`,
+      `node 2.leftHeight=1`, `node 2.rightHeight=2`.
+    - Known correct: Node `3`'s longest path is `3 -> 4`.
+6.  Return from root `2`
+    - Decision: Its right height `2` exceeds its left height `1`, so
+      return `1+2=3`.
+    - After: `active=none`, `waiting=[]`, `returned=3`.
+    - Known correct: The longest full-tree path is `2 -> 3 -> 4`.
 
 Boundary example: a nil root returns `0`. A one-sided `1 -> 2 -> 3`
 chain returns `3`, not `2`; every node on the path counts.
@@ -3635,21 +3861,22 @@ This tree is invalid:
     4
 ```
 
-1.  **Step: Root `8`**
-    - **Before:** No lower limit and no upper limit.
-    - **Decision:** `8` violates neither limit.
-    - **After:** Its right child must be larger than `8`.
-    - **Known correct:** Root `8` satisfies every restriction.
-2.  **Step: Node `10`**
-    - **Before:** Lower limit `8`; no upper limit.
-    - **Decision:** `10` is larger than `8`.
-    - **After:** Its left child must be above `8` and below `10`.
-    - **Known correct:** The path through `10` remains valid.
-3.  **Step: Node `4`**
-    - **Before:** Lower limit `8`; upper limit `10`.
-    - **Decision:** `4` is not larger than `8`.
-    - **After:** Return `false`.
-    - **Known correct:** A descendant violates the limit from ancestor
+Initial state: `node=8`, `lower=none`, `upper=none`,
+`result=pending`.
+
+1.  Validate root `8`
+    - Decision: `8` fits its bounds; inspect its right subtree.
+    - After: `node=10`, `lower=8`, `upper=none`,
+      `result=pending`.
+    - Known correct: Root `8` satisfies every restriction.
+2.  Validate node `10`
+    - Decision: `10 > 8`; inspect its left subtree with upper `10`.
+    - After: `node=4`, `lower=8`, `upper=10`, `result=pending`.
+    - Known correct: The path through `10` remains valid.
+3.  Reject node `4`
+    - Decision: `4` is not greater than lower bound `8`.
+    - After: `node=4`, `lower=8`, `upper=10`, `result=false`.
+    - Known correct: A descendant violates the bound from ancestor
       `8`.
 
 An empty tree is valid because it contains no violation. If
@@ -3765,7 +3992,10 @@ can turn an otherwise linear reconstruction into quadratic work.
 Preorder names a subtree's root first. Inorder places every
 left-subtree value before that root and every right-subtree value
 after it. One order chooses the root; the other cuts the remaining
-values into the two child regions.
+values into the two child regions. Build the lookup
+`inorderIndexByValue[value] -> position in inorder`. For example,
+inorder `[1,2,3]` produces `{1:0,2:1,3:2}`, so looking up value `2`
+returns its split position `1`.
 
 ##### Step-by-step examples
 
@@ -3777,38 +4007,46 @@ inorder:  [1, 2, 3]
 ```
 
 The expected tree has root `2`, left child `1`, and right child `3`.
+Scanning the supplied inorder input creates the complete lookup
+`inorderIndexByValue={1:0,2:1,3:2}` before reconstruction begins.
 
-1.  **Call: `build(0,3)`**
-    - **Before:** `nextPreorder=0`, whose value is `2`.
-    - **Decision:** Inorder index `1` is the root position.
-    - **After:** Create `2`; build `[0,1)` before `[2,3)`.
-    - **Known correct:** Inorder places `1` left of `2` and `3` right
-      of it.
-2.  **Call: `build(0,1)`**
-    - **Before:** `nextPreorder=1`, whose value is `1`.
-    - **Decision:** Its inorder index is `0`.
-    - **After:** Create `1`; build `[0,0)` and `[1,1)`.
-    - **Known correct:** Neither side contains a value.
-3.  **Call: `build(0,0)`**
-    - **Before:** `left` equals `right`.
-    - **Decision:** The range contains no value.
-    - **After:** Return `nil` for node `1`'s left link.
-    - **Known correct:** No preorder value is consumed.
-4.  **Call: `build(1,1)`**
-    - **Before:** `left` again equals `right`.
-    - **Decision:** The range contains no value.
-    - **After:** Return `nil` for node `1`'s right link.
-    - **Known correct:** Node `1` is now a complete leaf.
-5.  **Call: `build(2,3)`**
-    - **Before:** `nextPreorder=2`, whose value is `3`.
-    - **Decision:** Its inorder index is `2`.
-    - **After:** Create `3`; build `[2,2)` and `[3,3)`.
-    - **Known correct:** This range is the right subtree of `2`.
-6.  **Calls: `build(2,2)` and `build(3,3)`**
-    - **Before:** Each call has equal indexes.
-    - **Decision:** Both ranges are empty.
-    - **After:** Return two `nil` links for node `3`.
-    - **Known correct:** Node `3` is a leaf, and the tree is complete.
+Initial state: `nextPreorder=0`, `pending=[build(0,3)]`,
+`tree=empty`.
+
+1.  Build range `[0,3)`
+    - Decision: Take preorder value `2`; inorder index `1` splits it.
+    - After: `nextPreorder=1`,
+      `pending=[build(0,1),build(2,3)]`, `tree=2`.
+    - Known correct: Values left and right of index `1` belong to the
+      corresponding child subtrees.
+2.  Build range `[0,1)`
+    - Decision: Take preorder value `1`; inorder index `0` splits it.
+    - After: `nextPreorder=2`,
+      `pending=[build(0,0),build(1,1),build(2,3)]`,
+      `tree=2(left=1)`.
+    - Known correct: Node `1` occupies the root's left range.
+3.  Finish node `1`'s empty ranges
+    - Decision: Both ranges have equal endpoints, so return `nil`.
+    - After: `nextPreorder=2`, `pending=[build(2,3)]`,
+      `tree=2(left=1)`.
+    - Known correct: Node `1` is a leaf; no preorder value was used.
+4.  Build range `[2,3)`
+    - Decision: Take preorder value `3`; inorder index `2` splits it.
+    - After: `nextPreorder=3`,
+      `pending=[build(2,2),build(3,3)]`,
+      `tree=2(left=1,right=3)`.
+    - Known correct: Node `3` occupies the root's right range.
+5.  Finish node `3`'s empty ranges
+    - Decision: Both ranges have equal endpoints, so return `nil`.
+    - After: `nextPreorder=3`, `pending=[]`,
+      `tree=2(left=1,right=3)`.
+    - Known correct: Every traversal value has one final tree node.
+
+The lookup removes visible repeated work on a one-sided tree. For
+`preorder=[5,4,3,2,1]` and `inorder=[1,2,3,4,5]`, scanning each
+remaining inorder range from the left needs `5+4+3+2+1=15`
+comparisons. Building `inorderIndexByValue` scans the five values
+once, then each node obtains its split with one map lookup.
 
 Boundary example: two empty traversals produce nil. Duplicate
 traversals `preorder=[1,1]`, `inorder=[1,1]` can describe either a
@@ -3827,7 +4065,11 @@ stop.
 ##### Go example
 
 The two slices must have equal lengths, contain the same unique
-values, and describe a valid tree.
+values, and describe a valid tree. The trace's `preorder` and
+`inorder` are the code's `preorderValues` and `inorderValues`.
+Calling `buildTree([]int{2, 1, 3}, []int{1, 2, 3})` returns the
+pictured tree. The trace's `pending` ranges are recursive calls held
+by Go's call stack rather than an explicit collection in the code.
 
 ```go
 type TreeNode struct {
@@ -3934,29 +4176,38 @@ Record a temporary parent link for every child. Then each node can
 move in three possible directions: to its left child, right child, or
 parent. This turns the tree into an undirected graph for the query. A
 set of already reached node locations prevents walking back and forth
-over the same link.
+over the same link. The contracts are
+`parent[child] -> that child's parent node` and
+`seen[node] -> whether that node has entered the queue`.
 
 ##### Step-by-step examples
 
 Use a tree with root `8`; children `4` and `12`; children `2` and `6`
 under `4`; and children `10` and `14` under `12`. Find nodes two links
-from target node `4`. The expected output is `[12]`.
+from target node `4`. The expected output is `[12]`. Walking the tree
+first creates `parent={4:8,12:8,2:4,6:4,10:12,14:12}`. The search
+then derives `queue=[4]` and `seen={4}` directly from the target.
 
-1.  **Distance: 0**
-    - **Before:** Queue `[4]`, seen `{4}`
-    - **Decision:** Add children `2`,`6` and parent `8`
-    - **After:** Queue `[2,6,8]`
-    - **Known correct:** These and only these nodes are one link away
-2.  **Distance: 1**
-    - **Before:** Queue `[2,6,8]`
-    - **Decision:** `2`,`6` add nothing; `8` adds unseen `12`
-    - **After:** Queue `[12]`
-    - **Known correct:** All nodes up to distance 1 are complete
-3.  **Distance: 2**
-    - **Before:** Queue `[12]`
-    - **Decision:** Requested layer reached
-    - **After:** Return `[12]`
-    - **Known correct:** Every returned node is exactly two links away
+Initial state: `distance=0`, `queue=[4]`, `seen={4}`,
+`result=pending`.
+
+1.  Expand distance `0`
+    - Decision: Add unseen children `2`,`6` and parent `8`.
+    - After: `distance=1`, `queue=[2,6,8]`, `seen={2,4,6,8}`,
+      `result=pending`.
+    - Known correct: The queue contains exactly the nodes one link
+      away.
+2.  Expand distance `1`
+    - Decision: Nodes `2`,`6` add nothing; node `8` adds unseen `12`.
+    - After: `distance=2`, `queue=[12]`,
+      `seen={2,4,6,8,12}`, `result=pending`.
+    - Known correct: The queue contains exactly the nodes two links
+      away.
+3.  Return distance `2`
+    - Decision: The requested layer is ready, so return its values.
+    - After: `distance=2`, `queue=[12]`,
+      `seen={2,4,6,8,12}`, `result=[12]`.
+    - Known correct: Every returned node is exactly two links away.
 
 Boundary example: `targetDistance=0` returns the target itself. A nil
 target returns an empty result rather than trying to use a nil map key
@@ -4003,8 +4254,8 @@ func nodesAtDistance(
 			return
 		}
 		if node.Left != nil {
-			// Store the reverse of the left-child edge so BFS can later move
-			// upward.
+			// Store the reverse of the left-child edge so breadth-first
+			// search can later move upward.
 			parent[node.Left] = node
 		}
 		if node.Right != nil {
@@ -4130,7 +4381,10 @@ must also be preserved when the input defines them.
 A graph is a map of things and allowed moves. A thing is a **vertex**
 or **node**; a move is an **edge**. A grid is often an **implicit
 graph**: its neighbors are calculated from coordinates instead of
-stored as edge records.
+stored as edge records. In an adjacency list,
+`neighbors[vertex] -> every vertex reachable by one stored edge`.
+For example, `neighbors[2]=[0,3]` means vertex `2` has one-step moves
+to vertices `0` and `3`.
 
 #### Step-by-step examples
 
@@ -4144,26 +4398,24 @@ Use vertices `0` through `3` and two-way roads `0-1`, `0-2`, and
 3: [2]
 ```
 
-1.  **Step: Add `0-1`**
-    - **Before:** Empty lists
-    - **Decision:** Road is two-way
-    - **After:** `0:[1]`, `1:[0]`
-    - **Known correct:** Both allowed moves exist
-2.  **Step: Add `0-2`**
-    - **Before:** Above lists
-    - **Decision:** Add both directions
-    - **After:** `0:[1,2]`, `2:[0]`
-    - **Known correct:** Vertex `0` has both neighbors
-3.  **Step: Add `2-3`**
-    - **Before:** `2:[0]`, no neighbors for `3`
-    - **Decision:** Add both directions
-    - **After:** `2:[0,3]`, `3:[2]`
-    - **Known correct:** Every road is represented twice
+Initial state: `neighbors=[[],[],[],[]]`, `nextRoad=0-1`.
 
-A search from `0` schedules `1` and `2`, then reaches `3` through `2`.
-Boundary example: adding isolated vertex `4` creates another
-component. A search started only at `0` must not claim to have visited
-the whole graph.
+1.  Add road `0-1`
+    - Decision: Append each endpoint to the other's list.
+    - After: `neighbors=[[1],[0],[],[]]`, `nextRoad=0-2`.
+    - Known correct: Both allowed moves for road `0-1` exist.
+2.  Add road `0-2`
+    - Decision: Append each endpoint to the other's list.
+    - After: `neighbors=[[1,2],[0],[0],[]]`, `nextRoad=2-3`.
+    - Known correct: Vertex `0` has both of its neighbors.
+3.  Add road `2-3`
+    - Decision: Append each endpoint to the other's list.
+    - After: `neighbors=[[1,2],[0],[0,3],[2]]`, `nextRoad=none`.
+    - Known correct: Every road is represented in both directions.
+
+The lists show the allowed route `0 -> 2 -> 3`. Adding isolated vertex
+`4` with an empty neighbor list creates another component, a group
+with no route to or from the first four vertices.
 
 For vertex order `0,1,2,3`, the same graph's adjacency matrix is:
 
@@ -4183,10 +4435,11 @@ form is `[(0,1),(0,2),(2,3)]`.
 
 Each stored neighbor entry corresponds to one allowed directed move;
 adding both entries makes an undirected edge traversable both ways. A
-traversal that marks on scheduling processes every reachable node at
-most once. An outer loop starts the same argument in each still-unseen
-component. Grid neighbor formulas are equivalent when they generate
-exactly the allowed in-bounds moves.
+stored path is a sequence in which every next vertex appears in the
+current vertex's neighbor list. An empty neighbor list for vertex `4`
+therefore creates no path between it and the first component. Grid
+neighbor formulas are equivalent when they generate exactly the
+allowed in-bounds moves.
 
 #### Go example
 
@@ -4244,8 +4497,6 @@ neighbor entries per edge, which remains `O(V + E)` space.
 - Key clone maps by original node identity, not stored value; two
   nodes can both contain `7`.
 - Check row and column bounds separately for grid neighbors.
-- For path-specific [backtracking](#c1319-backtracking), restore a
-  cell after the path; for permanent reachability, do not restore it.
 - Account for graph construction and duplicate edges in total cost.
 
 #### Related material
@@ -4281,27 +4532,25 @@ slices**, whose rows have different lengths.
 
 For `[[1,2,3],[4,5,6]]`, query neighbors of `(0,2)`.
 
-1.  **Candidate: `(-1,2)`**
-    - **Before:** Row `-1`
-    - **Decision:** Valid row indexes run from `0` through `1`, so
+Initial state: `candidate=(-1,2)`, `validNeighbors=[]`.
+
+1.  Check `(-1,2)`
+    - Decision: Valid row indexes run from `0` through `1`, so
       row `-1` is outside them.
-    - **After:** Reject
-    - **Known correct:** No read occurred outside storage
-2.  **Candidate: `(1,2)`**
-    - **Before:** Row 1 exists, length 3
-    - **Decision:** Column 2 exists
-    - **After:** Accept value `6`
-    - **Known correct:** Down neighbor is valid
-3.  **Candidate: `(0,1)`**
-    - **Before:** Row 0 exists
-    - **Decision:** Column 1 exists
-    - **After:** Accept value `2`
-    - **Known correct:** Left neighbor is valid
-4.  **Candidate: `(0,3)`**
-    - **Before:** Row 0 length 3
-    - **Decision:** Column equals length
-    - **After:** Reject
-    - **Known correct:** Right edge is enforced
+    - After: `candidate=(1,2)`, `validNeighbors=[]`.
+    - Known correct: No read occurred outside storage.
+2.  Check `(1,2)`
+    - Decision: Row `1` and column `2` exist; accept value `6`.
+    - After: `candidate=(0,1)`, `validNeighbors=[6]`.
+    - Known correct: The down neighbor is valid.
+3.  Check `(0,1)`
+    - Decision: Row `0` and column `1` exist; accept value `2`.
+    - After: `candidate=(0,3)`, `validNeighbors=[6,2]`.
+    - Known correct: The left neighbor is valid.
+4.  Check `(0,3)`
+    - Decision: Column `3` equals row `0`'s length, so reject it.
+    - After: `candidate=done`, `validNeighbors=[6,2]`.
+    - Known correct: Every accepted position is inside its own row.
 
 Boundary example: in jagged `[[1,2],[]]`, position `(1,0)` has a valid
 row but an invalid column. Using the first row's length for all rows
@@ -4316,6 +4565,11 @@ intended adjacent position once; the checks reject only positions
 outside storage.
 
 #### Go example
+
+For the traced matrix, calls for candidates `(-1,2)`, `(1,2)`,
+`(0,1)`, and `(0,3)` return `false`, `true`, `true`, and `false` in
+that order. The caller appends a value to `validNeighbors` only after
+`inBounds` returns true.
 
 ```go
 func inBounds(matrix [][]int, row, column int) bool {
@@ -4391,23 +4645,40 @@ included, so the boundaries are called **inclusive**.
 
 ##### Step-by-step examples
 
-For `[[1,2,3],[4,5,6]]`, expected spiral order is `[1,2,3,6,5,4]`.
+For `[[1,2,3],[4,5,6],[7,8,9]]`, expected spiral order is
+`[1,2,3,6,9,8,7,4,5]`.
 
-1.  **Step: Top**
-    - **Before:** `top=0,bottom=1,left=0,right=2`
-    - **Decision:** Emit row 0
-    - **After:** Output `[1,2,3]`, `top=1`
-    - **Known correct:** Old top is complete
-2.  **Step: Right**
-    - **Before:** Remaining row 1
-    - **Decision:** Emit column 2
-    - **After:** Output `[1,2,3,6]`, `right=1`
-    - **Known correct:** Old right is complete
-3.  **Step: Bottom**
-    - **Before:** `top <= bottom`
-    - **Decision:** Emit row 1 right-to-left
-    - **After:** Output `[1,2,3,6,5,4]`, `bottom=0`
-    - **Known correct:** Every cell is complete
+Initial state: `top=0`, `bottom=2`, `left=0`, `right=2`,
+`output=[]`.
+
+1.  Emit the top edge
+    - Decision: Append row `0` from columns `0` through `2`.
+    - After: `top=1`, `bottom=2`, `left=0`, `right=2`,
+      `output=[1,2,3]`.
+    - Known correct: The old top edge is complete.
+2.  Emit the right edge
+    - Decision: Append column `2` from rows `1` through `2`.
+    - After: `top=1`, `bottom=2`, `left=0`, `right=1`,
+      `output=[1,2,3,6,9]`.
+    - Known correct: The old right edge is complete.
+3.  Emit the bottom edge
+    - Decision: Append row `2` from columns `1` down through `0`.
+    - After: `top=1`, `bottom=1`, `left=0`, `right=1`,
+      `output=[1,2,3,6,9,8,7]`.
+    - Known correct: The old bottom edge is complete.
+4.  Emit the left edge
+    - Decision: Append column `0` from rows `1` through `1`.
+    - After: `top=1`, `bottom=1`, `left=1`, `right=1`,
+      `output=[1,2,3,6,9,8,7,4]`.
+    - Known correct: The outer layer is complete; only center `5`
+      remains inside the boundaries.
+5.  Emit the inner layer
+    - Decision: Append the one-cell top edge at `(1,1)`. The right
+      edge is empty, so move `right` inward without appending.
+    - After: `top=2`, `bottom=1`, `left=1`, `right=0`,
+      `output=[1,2,3,6,9,8,7,4,5]`.
+    - Known correct: The boundaries crossed after every cell was
+      emitted exactly once.
 
 Boundary example: `[[1,2,3]]` emits its top edge and stops because
 `top` then passes `bottom`; it does not emit `3,2,1` again.
@@ -4469,9 +4740,9 @@ func spiralOrder(matrix [][]int) []int {
 
 ##### Work and memory
 
-Every cell is appended once, so time is `O(rows*cols)`. Boundary
-variables use `O(1)` extra memory, and the returned order uses
-`O(rows*cols)` result space.
+For `r` rows and `c` columns, every cell is appended once, so time is
+`O(r*c)`. Boundary variables use `O(1)` extra memory, and the returned
+order uses `O(r*c)` result space.
 
 ##### When to use it
 
@@ -4509,10 +4780,10 @@ variables use `O(1)` extra memory, and the returned order uses
 
 ##### The problem it solves
 
-Given a square matrix, rotate or otherwise transform each layer using
-the matrix's existing storage. A value cannot be written directly to
-its destination if that write would destroy another original value
-that still needs to move, so each cycle must preserve displaced data.
+Given a square matrix, rotate its values using the matrix's existing
+storage. A value cannot be written directly to its destination if
+that write would destroy another original value that still needs to
+move, so the transformation must preserve displaced data.
 
 ##### How it works
 
@@ -4526,16 +4797,16 @@ turn.
 
 Rotate `[[1,2],[3,4]]`; expected output is `[[3,1],[4,2]]`.
 
-1.  **Step: Transpose**
-    - **Before:** `[[1,2],[3,4]]`
-    - **Decision:** Swap `(0,1)` and `(1,0)`
-    - **After:** `[[1,3],[2,4]]`
-    - **Known correct:** Every value has exchanged row and column
-2.  **Step: Reverse rows**
-    - **Before:** `[[1,3],[2,4]]`
-    - **Decision:** Mirror each row
-    - **After:** `[[3,1],[4,2]]`
-    - **Known correct:** A value from row `r`, column `c` reaches row
+Initial state: `matrix=[[1,2],[3,4]]`, `phase=transpose`.
+
+1.  Transpose
+    - Decision: Swap cells `(0,1)` and `(1,0)`.
+    - After: `matrix=[[1,3],[2,4]]`, `phase=reverseRows`.
+    - Known correct: Every value has exchanged row and column.
+2.  Reverse rows
+    - Decision: Mirror each row around its center.
+    - After: `matrix=[[3,1],[4,2]]`, `phase=done`.
+    - Known correct: A value from row `r`, column `c` reaches row
       `c`, column `n-1-r`, its clockwise destination.
 
 Boundary example: a 1-by-1 matrix remains unchanged. A 2-by-3
@@ -4635,7 +4906,11 @@ goal; existing boundary cells must safely store the markers instead.
 Use the matrix's first row and first column as a notepad. An interior
 zero marks its row at column zero and its column at row zero. Two
 booleans remember whether the notepad row and column themselves
-originally contained zero.
+originally contained zero. After discovery,
+`matrix[row][0] -> whether that interior row contained an original
+zero`, and `matrix[0][column] -> whether that interior column
+contained an original zero`. Thus `matrix[1][0]=0` means row `1`
+must become zero; it is a marker, not a newly discovered input zero.
 
 ##### Step-by-step examples
 
@@ -4648,32 +4923,59 @@ original           markers recorded       final
 [7 8 9]            [7 8 9]                [7 8 0]
 ```
 
-1.  **Step: Inspect `(1,2)`**
-    - **Before:** Original zero
-    - **Decision:** Record row 1 at `(1,0)` and column 2 at `(0,2)`
-    - **After:** Marker cells become zero
-    - **Known correct:** The affected row and column are remembered
-2.  **Step: Apply marker to `(1,1)`**
-    - **Before:** Row marker `(1,0)` is zero.
-    - **Decision:** Cell `(1,1)` shares the marked row.
-    - **After:** Change its value from `5` to `0`.
-    - **Known correct:** Original row `1` contained a zero.
-3.  **Step: Apply marker to row `2`**
-    - **Before:** Row marker `(2,0)` is `7`.
-    - **Decision:** Keep `(2,1)=8`; column marker `(0,2)` is zero, so
+Initial state: `matrix=[[1,2,3],[4,5,0],[7,8,9]]`,
+`firstRowZero=false`, `firstColumnZero=false`, `phase=mark`.
+
+1.  Record the zero at `(1,2)`
+    - Decision: Set row marker `(1,0)` and column marker `(0,2)`.
+    - After: `matrix=[[1,2,0],[0,5,0],[7,8,9]]`,
+      `firstRowZero=false`, `firstColumnZero=false`, `phase=apply`.
+    - Known correct: The affected row and column are remembered.
+2.  Apply the row marker
+    - Decision: Marker `(1,0)` is zero, so set `(1,1)` to zero.
+    - After: `matrix=[[1,2,0],[0,0,0],[7,8,9]]`,
+      `firstRowZero=false`, `firstColumnZero=false`, `phase=apply`.
+    - Known correct: Every interior cell in row `1` is final.
+3.  Apply the column marker
+    - Decision: Keep `(2,1)=8`; marker `(0,2)` is zero, so
       change `(2,2)` from `9` to `0`.
-    - **After:** The interior cells in row `2` are `[8,0]`.
-    - **Known correct:** Only column `2` was marked for this row.
-4.  **Step: Finish borders**
-    - **Before:** Original flags are false
-    - **Decision:** Apply saved border decisions
-    - **After:** Final matrix shown
-    - **Known correct:** Every required cell, and no other cell, is
+    - After: `matrix=[[1,2,0],[0,0,0],[7,8,0]]`,
+      `firstRowZero=false`, `firstColumnZero=false`, `phase=borders`.
+    - Known correct: Every interior cell in row `2` is final.
+4.  Finish the borders
+    - Decision: Neither saved flag requires another change.
+    - After: `matrix=[[1,2,0],[0,0,0],[7,8,0]]`,
+      `firstRowZero=false`, `firstColumnZero=false`, `phase=done`.
+    - Known correct: Every required cell, and no other cell, is
       zero.
 
-Boundary example: if `(0,1)` is originally zero, the separate
-first-row flag is required; cell `(0,0)` cannot simultaneously encode
-both the first row and first column facts.
+For boundary matrix `[[1,0],[3,4]]`, expect `[[0,0],[3,0]]`.
+
+Initial state: `matrix=[[1,0],[3,4]]`, `firstRowZero=false`,
+`firstColumnZero=false`, `phase=saveBorders`.
+
+1.  Save the border facts
+    - Decision: The original zero at `(0,1)` sets
+      `firstRowZero=true`; the first column has no zero.
+    - After: `matrix=[[1,0],[3,4]]`, `firstRowZero=true`,
+      `firstColumnZero=false`, `phase=apply`.
+    - Known correct: The first-row decision is saved before marker
+      cells change roles.
+2.  Apply the column marker
+    - Decision: Marker `(0,1)` is zero, so set `(1,1)` to zero.
+    - After: `matrix=[[1,0],[3,0]]`, `firstRowZero=true`,
+      `firstColumnZero=false`, `phase=borders`.
+    - Known correct: Column `1` is final without treating its new
+      zero as fresh input.
+3.  Restore the first row
+    - Decision: The saved flag is true, so zero row `0`.
+    - After: `matrix=[[0,0],[3,0]]`, `firstRowZero=true`,
+      `firstColumnZero=false`, `phase=done`.
+    - Known correct: The original border zero affected both its row
+      and column exactly once.
+
+An original zero in the first column needs the symmetric saved flag;
+cell `(0,0)` cannot encode both border decisions by itself.
 
 ##### Why it works
 
@@ -4748,9 +5050,9 @@ func setZeroes(matrix [][]int) {
 
 ##### Work and memory
 
-The passes inspect `rows*columns` cells a constant number of times, so
-time is `O(rows*columns)`. Two booleans and loop positions use `O(1)`
-extra memory; the matrix stores its own markers.
+For `r` rows and `c` columns, the passes inspect all `r*c` cells a
+constant number of times, so time is `O(r*c)`. Two booleans and loop
+positions use `O(1)` extra memory; the matrix stores its own markers.
 
 ##### When to use it
 
@@ -4805,34 +5107,37 @@ new status. Storing both meanings temporarily in each input cell is an
 ##### Step-by-step examples
 
 Suppose a one-row rule says a cell becomes live when exactly one old
-neighbor is live. Input `[1,1,0]` should simultaneously become
-`[1,1,1]`.
+neighbor is live. Input `[1,1,1,0]` should simultaneously become
+`[1,0,1,1]`.
 
-1.  **Step: Cell 0**
-    - **Before:** The encoded row is `[1,1,0]`.
-    - **Decision:** Cell 0 has one old live neighbor, so it stays
+Initial state: `encoded=[1,1,1,0]`, `cell=0`, `phase=encode`.
+
+1.  Encode cell `0`
+    - Decision: It has one old live neighbor, so it stays
       live.
-    - **After:** The encoded row remains `[1,1,0]`.
-    - **Known correct:** Cell 0's next status is recorded.
-2.  **Step: Cell 1**
-    - **Before:** The encoded row is `[1,1,0]`.
-    - **Decision:** Cell 1 has one old live neighbor, so it stays
-      live.
-    - **After:** The encoded row remains `[1,1,0]`.
-    - **Known correct:** Cells 0 and 1 have their next status
-      recorded.
-3.  **Step: Cell 2**
-    - **Before:** The encoded row is `[1,1,0]`.
-    - **Decision:** Cell 2 has one old live neighbor, so it becomes
-      live.
-    - **After:** The encoded row becomes `[1,1,2]`.
-    - **Known correct:** Code `2` preserves old value 0 and records
-      new value 1.
-4.  **Step: Finalize**
-    - **Before:** The encoded row is `[1,1,2]`.
-    - **Decision:** Replace every temporary code with its new value.
-    - **After:** The final row is `[1,1,1]`.
-    - **Known correct:** Every cell now shows the result for the same
+    - After: `encoded=[1,1,1,0]`, `cell=1`, `phase=encode`.
+    - Known correct: Cell `0`'s next status is recorded.
+2.  Encode cell `1`
+    - Decision: It has two old live neighbors, so encode `3` for
+      old live and new dead.
+    - After: `encoded=[1,3,1,0]`, `cell=2`, `phase=encode`.
+    - Known correct: Cell `1`'s old live state remains decodable.
+3.  Encode cell `2`
+    - Decision: Decode left neighbor `3` as old live and right
+      neighbor `0` as old dead; exactly one was live, so stay live.
+    - After: `encoded=[1,3,1,0]`, `cell=3`, `phase=encode`.
+    - Known correct: Cell `2` used one consistent old generation,
+      not cell `1`'s new dead state.
+4.  Encode cell `3`
+    - Decision: Its old live left neighbor makes it become live, so
+      encode `2` for old dead and new live.
+    - After: `encoded=[1,3,1,2]`, `cell=done`, `phase=finalize`.
+    - Known correct: Both kinds of state change are recorded without
+      losing an old value.
+5.  Finalize
+    - Decision: Replace every temporary code with its new value.
+    - After: `encoded=[1,0,1,1]`, `cell=done`, `phase=done`.
+    - Known correct: Every cell now shows the result for the same
       next round.
 
 Boundary example: an empty grid performs neither pass. If input may
@@ -4850,6 +5155,9 @@ old-state decisions remain.
 ##### Go example
 
 The function requires every input value to be `0` or `1`.
+The trace's `encoded` slice is the code's `values`, and its `cell`
+is `cellIndex`. Starting with `values := []int{1, 1, 1, 0}` and
+calling `updateRow(values)` mutates it to `[]int{1, 0, 1, 1}`.
 
 ```go
 func updateRow(values []int) {
@@ -4941,42 +5249,48 @@ next-state grid would use `O(n)` additional space.
 
 #### The problem it solves
 
-Given an operation set that needs incompatible strengths, such as
-constant-time lookup plus ordered eviction, store the same logical
-items in two cooperating data structures. Every insertion, update,
-and removal must change both views together so neither contains stale
-or missing information.
+Given operations that need incompatible strengths, such as finding
+and removing a value quickly while also selecting by numeric position,
+store the same logical items in two cooperating data structures. Every
+insertion, update, and removal must repair both views before the
+operation finishes.
 
 #### How it works
 
-Pair an address book with a waiting line. The book finds a person
-quickly; the line records arrival order. **Composing data structures**
-means combining such views and defining the rule that keeps them in
-agreement.
+Store the values densely in a slice so a numeric position is direct.
+Also store `value -> slice position` in a map so a value is direct.
+**Composing data structures** means combining such views and defining
+the rule that keeps them in agreement.
 
 #### Step-by-step examples
 
-A structure for fast removal and random choice stores
+A structure for fast removal by value and direct selection by position
+stores
 `values=[10,20,30]` and
 `indexByValue={10:0,20:1,30:2}`. Delete `20`; expected retained values
 are `[10,30]` with map `{10:0,30:1}`. This set requires its stored
 values to be unique.
 
-1.  **Step: Locate**
-    - **Before:** Map says `20 -> 1`
-    - **Decision:** Direct lookup finds the removal position
-    - **After:** `removeIndex=1`
-    - **Known correct:** No scan is needed
-2.  **Step: Move last**
-    - **Before:** Last is `30` at 2
-    - **Decision:** Fill position 1 and repair `30`'s index
-    - **After:** Slice `[10,30,30]`, map has `30 -> 1`
-    - **Known correct:** Every retained position already agrees
-3.  **Step: Shrink**
-    - **Before:** Last slot is spare
-    - **Decision:** Drop it and delete key `20`
-    - **After:** `[10,30]`, `{10:0,30:1}`
-    - **Known correct:** Both views agree completely
+Initial state: `values=[10,20,30]`,
+`indexByValue={10:0,20:1,30:2}`, `removeIndex=unknown`.
+
+1.  Locate `20`
+    - Decision: Read its stored position from `indexByValue`.
+    - After: `values=[10,20,30]`,
+      `indexByValue={10:0,20:1,30:2}`, `removeIndex=1`.
+    - Known correct: No scan is needed.
+2.  Move the final value
+    - Decision: Copy `30` to index `1` and repair its map entry.
+    - After: `values=[10,30,30]`,
+      `indexByValue={10:0,20:1,30:1}`, `removeIndex=1`.
+    - Known correct: Retained positions `0` and `1` agree; the
+      spare final slot and removed key still need deletion.
+3.  Shrink
+    - Decision: Drop the duplicate final slice slot and delete map
+      key `20`.
+    - After: `values=[10,30]`, `indexByValue={10:0,30:1}`,
+      `removeIndex=1`.
+    - Known correct: Both views agree completely.
 
 Boundary example: deleting final value `30` from `[10,20,30]` moves it
 onto itself, then shrinks and deletes its key. The same steps remain
@@ -4998,16 +5312,16 @@ rule. Each operation changes only a fixed number of positions.
 `initialValues` must contain no duplicates.
 
 ```go
-// RandomSet keeps the invariant indexByValue[values[i]] == i.
-type RandomSet struct {
+// indexedSet keeps the invariant indexByValue[values[i]] == i.
+type indexedSet struct {
 	values       []int
 	indexByValue map[int]int
 }
 
-func newRandomSet(initialValues []int) RandomSet {
+func newIndexedSet(initialValues []int) indexedSet {
 	// The input promise requires unique values. Copy them so later
 	// changes do not modify the caller's slice.
-	set := RandomSet{
+	set := indexedSet{
 		values:       append([]int(nil), initialValues...),
 		indexByValue: make(map[int]int, len(initialValues)),
 	}
@@ -5017,7 +5331,7 @@ func newRandomSet(initialValues []int) RandomSet {
 	return set
 }
 
-func (set *RandomSet) Remove(value int) bool {
+func (set *indexedSet) remove(value int) bool {
 	// The map finds the removal slot without scanning the slice.
 	removeIndex, exists := set.indexByValue[value]
 	if !exists {
@@ -5038,23 +5352,31 @@ func (set *RandomSet) Remove(value int) bool {
 	delete(set.indexByValue, value)
 	return true
 }
+
+func (set *indexedSet) valueAt(position int) (int, bool) {
+	if position < 0 || position >= len(set.values) {
+		return 0, false
+	}
+	// Dense slice storage provides direct selection by valid position.
+	return set.values[position], true
+}
 ```
 
 The traced operation is
-`set := newRandomSet([]int{10,20,30}); set.Remove(20)`. It returns
+`set := newIndexedSet([]int{10,20,30}); set.remove(20)`. It returns
 `true` and leaves the two internal views exactly as shown above.
+Calling `set.valueAt(1)` then returns `(30,true)`.
 
 #### Work and memory
 
 Map lookup, one slice replacement, and map updates take expected
 `O(1)` time; "expected" relies on ordinary hash-map behavior and is
 not a worst-case per-operation guarantee. The two views store `O(n)`
-values. An LRU cache also uses `O(n)` map and list storage. Two heaps
-use `O(n)` total storage and `O(log n)` time per insertion.
+values. Selecting a valid slice position also takes `O(1)` time.
 
 #### When to use it
 
-- Required operations have conflicting access-order needs.
+- Required operations have conflicting lookup needs.
 - A clear rule can relate the structures after every operation.
 - The memory for multiple views is justified by repeated faster
   operations.
@@ -5073,11 +5395,6 @@ use `O(n)` total storage and `O(log n)` time per insertion.
 > `30 -> 2` makes the next removal index outside the shortened slice.
 
 - Initialize maps before assignment.
-- An LRU access must update both map membership and list recency.
-- State whether random choice must be uniform and use an unbiased
-  valid index.
-- For two heaps, maintain both size balance and ordering between
-  halves.
 
 #### Related material
 
@@ -5107,38 +5424,41 @@ the time or memory limit.
 Keep a small scoreboard and update it when each value arrives. An
 **online algorithm** maintains a valid answer without assuming future
 input. A **prefix** is everything received so far. A **batch
-algorithm** waits for the complete input before beginning.
+algorithm** waits for the complete input before beginning. Here,
+`counts[value] -> number of received copies of value`, while the queue
+stores first occurrences in arrival order. For example,
+`counts['a']=2` means `a` is no longer unique.
 
 #### Step-by-step examples
 
 For stream `a, b, a, a, b`, report the first non-repeating letter
 after each arrival; expected reports are `a, a, b, b, no value`.
 
-1.  **Arrival: `a`**
-    - **Before:** Counts `{}`, queue `[]`
-    - **Decision:** First occurrence; count and enqueue
-    - **After:** `{a:1}`, `[a]`, report `a`
-    - **Known correct:** Front is earliest unique item
-2.  **Arrival: `b`**
-    - **Before:** `{a:1}`, `[a]`
-    - **Decision:** First occurrence; enqueue behind `a`
-    - **After:** `{a:1,b:1}`, `[a,b]`, report `a`
-    - **Known correct:** Older unique `a` remains first
-3.  **Arrival: `a`**
-    - **Before:** `{a:1,b:1}`, `[a,b]`
-    - **Decision:** Count becomes 2; discard repeated front
-    - **After:** `{a:2,b:1}`, `[b]`, report `b`
-    - **Known correct:** Queue front is again earliest unique item
-4.  **Arrival: `a`**
-    - **Before:** `{a:2,b:1}`, `[b]`
-    - **Decision:** Count becomes 3; do not enqueue a repeated value
-    - **After:** `{a:3,b:1}`, `[b]`, report `b`
-    - **Known correct:** Removed `a` stays out; unique `b` stays first
-5.  **Arrival: `b`**
-    - **Before:** `{a:3,b:1}`, `[b]`
-    - **Decision:** Count becomes 2; discard repeated front
-    - **After:** `{a:3,b:2}`, `[]`, report no value
-    - **Known correct:** No received letter occurs exactly once
+Initial state: `counts={}`, `queue=[]`, `reports=[]`.
+
+1.  Receive `a`
+    - Decision: Increment its count and enqueue its first occurrence.
+    - After: `counts={a:1}`, `queue=[a]`, `reports=[a]`.
+    - Known correct: The front is the earliest unique item.
+2.  Receive `b`
+    - Decision: Increment its count and enqueue its first occurrence.
+    - After: `counts={a:1,b:1}`, `queue=[a,b]`, `reports=[a,a]`.
+    - Known correct: Older unique `a` remains first.
+3.  Receive `a`
+    - Decision: Its count becomes `2`; discard the repeated front.
+    - After: `counts={a:2,b:1}`, `queue=[b]`,
+      `reports=[a,a,b]`.
+    - Known correct: The front is again the earliest unique item.
+4.  Receive `a`
+    - Decision: Its count becomes `3`; do not enqueue it again.
+    - After: `counts={a:3,b:1}`, `queue=[b]`,
+      `reports=[a,a,b,b]`.
+    - Known correct: Removed `a` stays out; unique `b` stays first.
+5.  Receive `b`
+    - Decision: Its count becomes `2`; discard the repeated front.
+    - After: `counts={a:3,b:2}`, `queue=[]`,
+      `reports=[a,a,b,b,none]`.
+    - Known correct: No received letter occurs exactly once.
 
 Boundary example: stream `a, a` reports `a`, then no value. The queue
 becomes empty after the second arrival; code must represent "none"
@@ -5265,31 +5585,33 @@ Suppose numbers arrive one at a time. Keep only the largest three seen
 so far. After `8, 2, 5, 9, 1`, the retained values should be
 `{5, 8, 9}`.
 
-1.  **Step: Choose what to store**
-    - **Before:** No structure has been chosen.
-    - **Decision:** Only three values are needed, and the smallest of
+Initial state: `k=3`, `structure=unselected`, `retained=unset`,
+`nextValues=[8,2,5,9,1]`.
+
+1.  Choose what to store
+    - Decision: Only three values are needed, and the smallest of
       those three must be easy to replace.
-    - **After:** Choose a min-heap that holds at most three values. A
-      min-heap keeps its smallest value at the top.
-    - **Known correct:** The structure supports the two needed jobs:
+    - After: `k=3`, `structure=minHeap`, `retained={}`,
+      `nextValues=[8,2,5,9,1]`.
+    - Known correct: The structure supports the two needed jobs:
       find the smallest retained value and replace it.
-2.  **Step: Process `8,2,5`**
-    - **Before:** The heap is empty and has room for three values.
-    - **Decision:** Keep all three values.
-    - **After:** The heap stores `{2,5,8}`, with `2` at the top.
-    - **Known correct:** Fewer than four values have arrived, so none
+2.  Process `8,2,5`
+    - Decision: The heap has room, so keep all three values.
+    - After: `k=3`, `structure=minHeap`, `retained={2,5,8}`,
+      `nextValues=[9,1]`.
+    - Known correct: Fewer than four values have arrived, so none
       should be discarded.
-3.  **Step: Process `9`**
-    - **Before:** The smallest retained value is `2`.
-    - **Decision:** `9` is larger, so replace `2` with `9`.
-    - **After:** The heap stores `{5,8,9}`, with `5` at the top.
-    - **Known correct:** These are the largest three values seen.
-4.  **Step: Process `1`**
-    - **Before:** The smallest retained value is `5`.
-    - **Decision:** `1` is smaller than all three retained values, so
+3.  Process `9`
+    - Decision: `9` exceeds heap minimum `2`, so replace `2`.
+    - After: `k=3`, `structure=minHeap`, `retained={5,8,9}`,
+      `nextValues=[1]`.
+    - Known correct: These are the largest three values seen.
+4.  Process `1`
+    - Decision: `1` is smaller than heap minimum `5`, so
       discard it.
-    - **After:** The heap still stores `{5,8,9}`.
-    - **Known correct:** `1` cannot be one of the largest three.
+    - After: `k=3`, `structure=minHeap`, `retained={5,8,9}`,
+      `nextValues=[]`.
+    - Known correct: `1` cannot be one of the largest three.
 
 Here, `k` means the number of values to keep. When `k=0`, the answer
 is empty, so do not read the heap's top. If the program must return
@@ -5359,6 +5681,8 @@ func largestValues(values []int, numToKeep int) []int {
 }
 ```
 
+The trace's `k` is the code's `numToKeep`, and its `retained` values
+are stored in the `kept` min-heap. Calling
 `largestValues([]int{8,2,5,9,1},3)` returns `[5,8,9]`. The function
 returns an empty slice when `numToKeep` is zero or negative.
 
@@ -5476,33 +5800,32 @@ questions; each answer rules out methods that do not fit.
 
 ##### Step-by-step examples
 
-For sorted values `[1, 2, 4, 7, 11]`, target `9`, and a request for
-any pair of values, the expected output may be `[2, 7]`.
+For a problem allowing up to `100000` values, consider sorted sample
+`[1,2,4,7,11]`, target `9`, and a request for any pair of values. The
+expected sample output may be `[2,7]`.
 
-1.  **Check: Output**
-    - **Before:** No method is chosen.
-    - **Decision:** Only values, not original positions, are required.
-    - **After:** Reordering would be allowed, though the input is
-      already sorted.
-    - **Known correct:** Original positions are not part of the
+Initial state: `sorted=true`, `maxN=100000`, `output=values`,
+`method=unknown`.
+
+1.  Check the output contract
+    - Decision: Only values are required, so reordering is allowed.
+    - After: `sorted=true`, `maxN=100000`, `output=values`,
+      `reorderingAllowed=true`, `method=unknown`.
+    - Known correct: Original positions are not part of the
       requested answer.
-2.  **Check: Shape**
-    - **Before:** The input is a sorted sequence.
-    - **Decision:** A sum that is too small can be increased by moving
-      the left position; a sum that is too large can be decreased by
-      moving the right position.
-    - **After:** Keeping one position at each end is a possible
-      method.
-    - **Known correct:** Sorted order can justify discarding pairs
+2.  Check the input shape
+    - Decision: A small sum can increase by moving the left position;
+      a large sum can decrease by moving the right position.
+    - After: `sorted=true`, `maxN=100000`, `output=values`,
+      `reorderingAllowed=true`, `method=twoPointersCandidate`.
+    - Known correct: Sorted order can justify discarding pairs
       after each move.
-3.  **Check: Limits**
-    - **Before:** Checking every pair can take about `n*n` checks.
-    - **Decision:** With `n=100,000`, that could be about ten billion
-      checks, so reject it. Moving each end position only inward takes
-      at most one pass.
-    - **After:** Open the two-pointer card and verify why each move is
-      safe.
-    - **Known correct:** The remaining method can fit the input size.
+3.  Check the limits
+    - Decision: About five billion pair checks are too many;
+      inward-only pointers take at most one pass.
+    - After: `sorted=true`, `maxN=100000`, `output=values`,
+      `reorderingAllowed=true`, `method=twoPointers`.
+    - Known correct: The selected method can fit the input size.
 
 For unsorted `[2, 7, 11, 15]` when original indices are required,
 sorting would hide the requested positions unless pairs are copied.
@@ -5521,8 +5844,10 @@ of the cards fit, use the simple direct method instead.
 
 Selection produces a plan rather than reusable code. For the example
 above, see [E.9 Sorted two-pointer pair
-search](#e9-sorted-two-pointer-pair-search). A version needing the
-original positions would use the map behavior explained in
+search](#e9-sorted-two-pointer-pair-search). On the traced input, it
+returns indexes `(1,3,true)`; reading those positions produces the
+requested values `[2,7]`. A version needing original positions from
+unsorted input would use the map behavior explained in
 [D.4 Map presence and sets](#d4-map-presence-and-sets).
 
 ##### Work and memory
@@ -5582,7 +5907,10 @@ would allow that repeated work to be saved or skipped.
 Solve a tiny input by hand. Describe the simplest correct algorithm,
 then mark calculations it repeats or information it throws away. Those
 details point toward an improvement before you need to recall a formal
-method name.
+method name. For the example below,
+`prefixSum[endExclusive] -> sum of values before endExclusive`.
+An inclusive right boundary becomes `endExclusive=right+1`; for
+`right=3`, lookup position `4` includes indexes `0` through `3`.
 
 ##### Step-by-step examples
 
@@ -5590,28 +5918,27 @@ For `[2,4,1,3]`, suppose many queries ask for the sum from index
 `left` through index `right`, including both ends. One query uses
 `left=1` and `right=3`, so it asks for `4+1+3` and should return `8`.
 
-1.  **Step: Direct attempt**
-    - **Before:** No saved totals exist.
-    - **Decision:** Add values at indexes `1`, `2`, and `3`:
+Initial state: `method=direct`, `savedTotals=[]`, `answers=[]`.
+
+1.  Answer `[1,3]` directly
+    - Decision: Add values at indexes `1`, `2`, and `3`:
       `4+1+3`.
-    - **After:** Return `8`.
-    - **Known correct:** Every value in the requested range was
+    - After: `method=direct`, `savedTotals=[]`, `answers=[8]`.
+    - Known correct: Every value in the requested range was
       counted once.
-2.  **Step: Notice repeated work**
-    - **Before:** A later query asks for indexes `0` through `2`.
-    - **Decision:** Adding `2+4+1` repeats additions that the first
+2.  Answer `[0,2]` directly
+    - Decision: Add `2+4+1`; this repeats additions from the first
       query already used.
-    - **After:** The overlapping work is identified.
-    - **Known correct:** The direct method still works, but every
+    - After: `method=direct`, `savedTotals=[]`, `answers=[8,7]`.
+    - Known correct: The direct method works, but every
       query rebuilds totals from individual values.
-3.  **Step: Save totals from the beginning**
-    - **Before:** No running totals are stored.
-    - **Decision:** Store `[0,2,6,7,10]`. Entry `i` is the sum of all
-      values before index `i`.
-    - **After:** The total through index `3` is `10`; the total before
-      index `1` is `2`; subtracting gives `8`.
-    - **Known correct:** Subtraction removes exactly the values before
-      `left`, leaving indexes `1` through `3`.
+3.  Save totals from the beginning
+    - Decision: Store `[0,2,6,7,10]`; entry `i` sums values before
+      index `i`.
+    - After: `method=prefixSum`, `savedTotals=[0,2,6,7,10]`,
+      `answers=[8,7]`.
+    - Known correct: `savedTotals[4]-savedTotals[1]=8` removes values
+      before index `1` and leaves indexes `1` through `3`.
 
 For one query only, the setup may cost as much as the direct scan.
 The observation then does not justify extra storage.
@@ -5735,44 +6062,85 @@ prefix**; checking it from left to right is a **common-prefix scan**.
 ###### Step-by-step examples
 
 For `strs = ["flower", "flow", "flight"]`, the expected output is
-`"fl"`.
+`"fl"`:
 
-1.  **Check column `0`**
-    - **Before:** `column=0`; the proven prefix is `""`; and the
-      reference byte is `'f'`.
-    - **Decision:** Compare row `1` and row `2` with `'f'`. Both
-      contain `'f'` at column `0`.
-    - **After:** Advance to `column=1`.
-    - **Known correct:** Every string shares prefix `"f"`.
-2.  **Check column `1`**
-    - **Before:** The proven prefix is `"f"`; the reference byte is
-      `'l'`.
-    - **Decision:** Both later rows contain `'l'` at column `1`.
-    - **After:** Advance to `column=2`.
-    - **Known correct:** Every string shares prefix `"fl"`.
-3.  **Find the first mismatching column**
-    - **Before:** The reference byte is `'o'`; row `1` also has
-      `'o'`, but row `2` has `'i'`.
-    - **Decision:** The mismatch prevents any shared prefix from
-      including column `2`.
-    - **After:** Return `strs[0][:2]`
-    - **Known correct:** No shared prefix can include column `2`;
-      `"fl"` is longest.
+```text
+column:   0 1 2 3 4 5
+strs[0]:  f l o w e r
+strs[1]:  f l o w
+strs[2]:  f l i g h t
+```
 
-For the boundary input `["dog", ""]`, row `1` ends before column `0`.
-The scan returns `strs[0][:0]`, or `""`, without reading past the
-empty string. For no input strings, it also returns `""` before
-choosing a candidate.
+Each state shows the current `column`, the `row` being checked, the
+`expectedByte` from `strs[0]`, and the known common prefix. `prefix`
+means `strs[0][:column]`, already matched by every row.
+
+Initial state: `column=0`, `row=1`, `expectedByte='f'`,
+`prefix=""`.
+
+1.  Match row `1`, column `0`
+    - Decision: `strs[1][0]=='f'`; advance `row`.
+    - After: `column=0`, `row=2`, `expectedByte='f'`,
+      `prefix=""`.
+    - Known correct: Rows `0` and `1` match at column `0`.
+2.  Match row `2`, column `0`
+    - Decision: `strs[2][0]=='f'`; finish the column.
+    - After: `column=1`, `row=1`, `expectedByte='l'`,
+      `prefix="f"`.
+    - Known correct: Every string shares prefix `"f"`.
+3.  Match row `1`, column `1`
+    - Decision: `strs[1][1]=='l'`; advance `row`.
+    - After: `column=1`, `row=2`, `expectedByte='l'`,
+      `prefix="f"`.
+    - Known correct: Rows `0` and `1` match through column `1`;
+      every row still shares prefix `"f"`.
+4.  Match row `2`, column `1`
+    - Decision: `strs[2][1]=='l'`; finish the column.
+    - After: `column=2`, `row=1`, `expectedByte='o'`,
+      `prefix="fl"`.
+    - Known correct: Every string shares prefix `"fl"`.
+5.  Match row `1`, column `2`
+    - Decision: `strs[1][2]=='o'`; advance `row`.
+    - After: `column=2`, `row=2`, `expectedByte='o'`,
+      `prefix="fl"`.
+    - Known correct: Rows `0` and `1` match through column `2`;
+      every row still shares prefix `"fl"`.
+6.  Reject row `2`, column `2`
+    - Decision: `strs[2][2]=='i'`; `'i' != 'o'`, so stop.
+    - After: `result=strs[0][:2]="fl"`.
+    - Known correct: Columns `0` and `1` match everywhere; column
+      `2` does not. Therefore `"fl"` is longest.
+
+For the boundary input `strs=["dog",""]`, the expected output is
+`""`.
+
+Initial state: `column=0`, `row=1`, `len(strs[1])=0`,
+`prefix=""`.
+
+1.  Stop before indexing the empty row
+    - Decision: `column >= len(strs[1])`; do not index row `1`.
+    - After: `result=strs[0][:0]=""`.
+    - Known correct: No byte exists to match at column `0`.
+
+For `strs=[]`, the expected output is also `""`.
+
+Initial state: `len(strs)=0`.
+
+1.  Handle no input rows
+    - Decision: The empty-input guard runs before `strs[0]`.
+    - After: `result=""`; neither loop starts.
+    - Known correct: No missing row is indexed.
 
 ###### Why it works
 
 Before each `column`, every string shares exactly the already-proven
 part `strs[0][:column]`. This fact is true initially because
 every string has the empty prefix. If every row reaches the column and
-matches `expected`, appending that byte preserves the fact. If a row
-ends or differs, a prefix containing that column cannot be shared, and
-a prefix cannot skip the failed column, so the already-proven prefix
-is the longest possible answer.
+matches `expectedByte`, advancing `column` adds that byte to the known
+prefix and preserves the fact. If a row ends or differs, a prefix
+containing that column cannot be shared, and a prefix cannot skip the
+failed column, so the already-proven prefix is the longest possible
+answer.
 
 Each successful outer step advances `column`, and `column` is bounded
 by the first string's length, so the scan finishes. If no check fails,
@@ -5783,7 +6151,7 @@ exist because the first string itself ends there.
 
 The complete implementation is in [E.7 Common-prefix
 scan](#e7-common-prefix-scan). Its variables `column`, `row`, and
-`expected` match the trace above. Its documented rules say that it
+`expectedByte` match the trace above. Its documented rules say that it
 compares byte prefixes and returns `""` for empty input.
 
 ###### Work and memory
@@ -5865,17 +6233,17 @@ A smaller value immediately before a larger value is subtracted, so
 the input values `[1,5]` should produce `4`. Scanning from right to
 left makes the right neighbor available.
 
-1.  **Position `1`**
-    - **Before:** `total=0`; there is no value to the right.
-    - **Decision:** Add the rightmost value `5`.
-    - **After:** `total=5`, `right=5`.
-    - **Known correct:** The processed ending part has value `5`.
-2.  **Position `0`**
-    - **Before:** Current value is `1`; `right=5`.
-    - **Decision:** Subtract `1` because it is smaller than the value
+Initial state: `index=1`, `total=0`, `right=none`.
+
+1.  Process position `1`
+    - Decision: Add rightmost value `5`; it has no right neighbor.
+    - After: `index=0`, `total=5`, `right=5`.
+    - Known correct: The processed suffix has value `5`.
+2.  Process position `0`
+    - Decision: Subtract `1` because it is smaller than the value
       immediately to its right.
-    - **After:** `total=4`, `right=1`.
-    - **Known correct:** Every input value has been processed under
+    - After: `index=done`, `total=4`, `right=1`.
+    - Known correct: Every input value has been processed under
       the Roman numeral rule.
 
 For one value `[5]`, add it directly; a nonexistent neighbor must not
@@ -5892,7 +6260,8 @@ edge each time, so the scan finishes.
 
 The complete implementation is owned by [E.8 Directional
 scan](#e8-directional-scan), whose right-to-left variables match this
-trace.
+trace. Calling `SumWithSmallerLeftValuesSubtracted([]int{1, 5})`
+returns the traced result `4`.
 
 ###### Work and memory
 
@@ -5952,23 +6321,22 @@ facts are the **state**. Following the rules directly is
 A robot begins at `(0,0)` facing north. For `move, right, move`,
 expect position `(1,1)` facing east.
 
-1.  **Command: First `move`**
-    - **Before:** Position `(0,0)`, facing north.
-    - **Decision:** Moving north adds one to `y`.
-    - **After:** Position `(0,1)`, facing north.
-    - **Known correct:** The stored values match the process after one
+Initial state: `position=(0,0)`, `direction=north`, `next=move`.
+
+1.  Apply the first `move`
+    - Decision: Moving north adds one to `y`.
+    - After: `position=(0,1)`, `direction=north`, `next=right`.
+    - Known correct: The state matches the process after one
       command.
-2.  **Command: `right`**
-    - **Before:** Position `(0,1)`, facing north.
-    - **Decision:** Turn east without changing either coordinate.
-    - **After:** Position `(0,1)`, facing east.
-    - **Known correct:** The stored values match the process after two
+2.  Apply `right`
+    - Decision: Turn east without changing either coordinate.
+    - After: `position=(0,1)`, `direction=east`, `next=move`.
+    - Known correct: The state matches the process after two
       commands.
-3.  **Command: Final `move`**
-    - **Before:** Position `(0,1)`, facing east.
-    - **Decision:** Moving east adds one to `x`.
-    - **After:** Position `(1,1)`, facing east.
-    - **Known correct:** All three commands have been applied in
+3.  Apply the final `move`
+    - Decision: Moving east adds one to `x`.
+    - After: `position=(1,1)`, `direction=east`, `next=none`.
+    - Known correct: All three commands have been applied in
       order.
 
 With no commands, the starting state is also the final state.
@@ -5985,6 +6353,16 @@ with no rule is outside the accepted process, so rejecting the whole
 sequence is correct.
 
 ###### Go example
+
+The code stores north, east, south, and west as direction values `0`,
+`1`, `2`, and `3`. The lookup contracts are
+`horizontalStepByDirection[direction] -> change in x` and
+`verticalStepByDirection[direction] -> change in y`. Thus direction
+`1` selects horizontal step `1` and vertical step `0`, which means
+east. The trace's position `(x,y)` is stored as `xCoordinate` and
+`yCoordinate`. Calling
+`runRobot([]string{"move", "right", "move"})` returns coordinates
+`(1,1)`, direction `1` (east), and `true`.
 
 ```go
 type robot struct{ xCoordinate, yCoordinate, direction int }
@@ -6018,7 +6396,6 @@ func runRobot(commands []string) (robot, bool) {
 }
 ```
 
-Direction values `0` through `3` mean north, east, south, and west.
 The boolean is false when a command is neither `move` nor `right`.
 
 ###### Work and memory
@@ -6072,30 +6449,38 @@ the key used to ask for it.
 A coat-check ticket lets you find one coat without searching every
 rack. A **hash map** similarly stores a value under a key. A **set**
 is like a guest list: it records only whether each name is present.
+For the pair search below,
+`indexByValue[value] -> an earlier index containing that value`. For
+example, `indexByValue[2]=0` means input index `0` held `2`.
 
 ###### Step-by-step examples
 
-For `[2,7,11,15]` and target `9`, expect indices `[0,1]`.
+For `[2,7,11,15]` and target `9`, expect `(0,1,true)`.
 
-1.  **Index `0`**
-    - **Before:** Current value is `2`; `seen={}`.
-    - **Decision:** Needed value `9-2=7` is absent, so store `2 -> 0`.
-    - **After:** `seen={2:0}`.
-    - **Known correct:** No earlier position exists, so no pair can
+Initial state: `index=0`, `indexByValue={}`, `result=pending`.
+
+1.  Process index `0`
+    - Decision: Needed value `7` is absent, so store `2 -> 0`.
+    - After: `index=1`, `indexByValue={2:0}`, `result=pending`.
+    - Known correct: No earlier position exists, so no pair can
       end at index `0`.
-2.  **Index `1`**
-    - **Before:** Current value is `7`; `seen={2:0}`.
-    - **Decision:** Needed value `9-7=2` exists at index `0`.
-    - **After:** Return `[0,1]`.
-    - **Known correct:** Values `2` and `7` total `9`, and their
+2.  Process index `1`
+    - Decision: Needed value `2` exists at index `0`.
+    - After: `index=1`, `indexByValue={2:0}`,
+      `result=(0,1,true)`.
+    - Known correct: Values `2` and `7` total `9`, and their
       positions are distinct.
 
 For `[3,3]`, querying before insertion lets the second `3` find the
 first while preventing index `0` from pairing with itself.
 
+The missing-target input `[1,2,3,4,5]` with target `20` makes the
+saved lookup useful: a direct pair search checks all `10` pairs. The
+map scan performs one complement lookup for each of the `5` values.
+
 ###### Why it works
 
-Before `currentIndex`, the map contains exactly the defined facts from
+Before `index`, the map contains exactly the defined facts from
 earlier positions. A successful complement lookup therefore proves a
 valid earlier partner; an unsuccessful lookup proves no retained
 earlier partner exists. Storing the current value then preserves the
@@ -6105,26 +6490,12 @@ against every possible earlier partner, so no valid pair exists.
 
 ###### Go example
 
-The mathematical difference `target-value` must fit in `int`.
-
-```go
-func pairIndices(values []int, target int) (int, int, bool) {
-	// earlierIndexByValue maps each earlier value to an index where it
-	// occurred.
-	earlierIndexByValue := make(map[int]int, len(values))
-	for currentIndex, value := range values {
-		// If target-value appeared earlier, the two distinct indices form a
-		// pair.
-		if earlierIndex, found := earlierIndexByValue[target-value]; found {
-			return earlierIndex, currentIndex, true
-		}
-		// Insert only after lookup so a value cannot pair with its own
-		// index.
-		earlierIndexByValue[value] = currentIndex
-	}
-	return 0, 0, false
-}
-```
+The complete implementation is owned by [E.3 Hash-map complement
+lookup](#e3-hash-map-complement-lookup). Its `indexByValue` map has
+the same stored-fact contract as the trace, and it checks that map
+before inserting the current value. Calling
+`PairSumIndices([]int{2, 7, 11, 15}, 9)` returns `(0,1,true)`.
+Its mathematical difference `target-value` must fit in `int`.
 
 ###### Work and memory
 
@@ -6186,22 +6557,60 @@ arranges only enough items to find that rank.
 
 To detect a duplicate in `[4,1,4,2]`, expect `true`.
 
-1.  **Step: Sort**
-    - **Before:** Equal values `4` are separated.
-    - **Decision:** Put all values in increasing order.
-    - **After:** `[1,2,4,4]`.
-    - **Known correct:** Sorting places equal values next to each
+Initial state: `values=[4,1,4,2]`, `scanIndex=unset`,
+`result=pending`.
+
+1.  Sort
+    - Decision: Put all values in increasing order.
+    - After: `values=[1,2,4,4]`, `scanIndex=1`, `result=pending`.
+    - Known correct: Sorting places equal values next to each
       other.
-2.  **Step: Compare neighbors**
-    - **Before:** Pairs `(1,2)` and `(2,4)` differ.
-    - **Decision:** Compare the final neighboring pair `(4,4)`.
-    - **After:** Return `true`.
-    - **Known correct:** Two separate input positions contain the same
+2.  Compare neighbors
+    - Decision: Skip differing pairs `(1,2)` and `(2,4)`; match
+      final pair `(4,4)`.
+    - After: `values=[1,2,4,4]`, `scanIndex=3`, `result=true`.
+    - Known correct: Two separate input positions contain the same
       value.
 
-For selection in `[4,1,3,2]`, partitioning around `3` may produce
-`[1,2 | 3 | 4]`; `3` is already the third-smallest value. Equal keys
-require a defined rank convention and careful partition progress.
+To select the fourth-smallest value from `[7,2,5,1,4,3,6]`, use
+zero-based rank `3`. The trace below uses the last value of each
+active range as its pivot, the value used to split that range.
+
+Initial state: `ordered=[7,2,5,1,4,3,6]`, `rank=3`,
+`range=[0,7)`, `result=pending`.
+
+1.  Partition around pivot `6`
+    - Decision: Move `2,5,1,4,3` before pivot `6`; leave `7`
+      after it. The pivot reaches index `5`.
+    - After: `ordered=[2,5,1,4,3,6,7]`, `rank=3`,
+      `range=[0,5)`,
+      `result=pending`.
+    - Known correct: Pivot index `5` is final; requested rank `3`
+      can occur only to its left. That remaining side is not sorted.
+2.  Partition around pivot `3`
+    - Decision: Keep `2` and `1` before pivot `3`; its index becomes
+      `2` while `5` and `4` remain on the other side.
+    - After: `ordered=[2,1,3,4,5,6,7]`, `rank=3`,
+      `range=[3,5)`,
+      `result=pending`.
+    - Known correct: Pivot index `2` is final; requested rank `3`
+      can occur only to its right.
+3.  Partition around pivot `5`
+    - Decision: Keep `4` before pivot `5`; its index becomes `4`.
+    - After: `ordered=[2,1,3,4,5,6,7]`, `rank=3`,
+      `range=[3,4)`, `result=pending`.
+    - Known correct: Requested rank `3` can occur only to the
+      pivot's left.
+4.  Finish the one-value range
+    - Decision: Only `ordered[3]=4` remains; no partition is needed.
+    - After: `ordered=[2,1,3,4,5,6,7]`, `rank=3`,
+      `range=[3,4)`, `result=4`.
+    - Known correct: `4` is the value a full sort would place at
+      zero-based rank `3`, even though positions `0` and `1` remain
+      unsorted.
+
+Repeated values occupy separate ranks. For `[2,2,3]`, ranks `0` and
+`1` both contain `2`.
 
 ###### Why it works
 
@@ -6220,6 +6629,12 @@ values require the partition's chosen rank rule to make progress.
 
 ###### Go example
 
+For the duplicate trace, `hasDuplicate([]int{4, 1, 4, 2})` returns
+`true`; the trace's sorted `values` are the code's copied `ordered`
+slice. For the selection trace,
+`kthSmallest([]int{7, 2, 5, 1, 4, 3, 6}, 3)` returns `(4, true)`;
+its `ordered` slice and zero-based `rank` use the trace's names.
+
 ```go
 import "sort"
 
@@ -6236,16 +6651,58 @@ func hasDuplicate(values []int) bool {
 	}
 	return false
 }
+
+func kthSmallest(values []int, rank int) (int, bool) {
+	// A rank is a zero-based position in the fully sorted order.
+	if rank < 0 || rank >= len(values) {
+		return 0, false
+	}
+	// Partition a copy so selection does not change the caller's slice.
+	ordered := append([]int(nil), values...)
+	left, right := 0, len(ordered)
+	for left < right {
+		if right-left == 1 {
+			return ordered[left], true
+		}
+		// Use the last active value as the pivot. Values no larger than
+		// it are gathered at the active range's left side.
+		pivotIndex := right - 1
+		pivotValue := ordered[pivotIndex]
+		nextSmallerOrEqual := left
+		for scanIndex := left; scanIndex < pivotIndex; scanIndex++ {
+			if ordered[scanIndex] <= pivotValue {
+				ordered[nextSmallerOrEqual], ordered[scanIndex] =
+					ordered[scanIndex], ordered[nextSmallerOrEqual]
+				nextSmallerOrEqual++
+			}
+		}
+		// Put the pivot between the two partitions. Its index is final,
+		// although values inside each side remain unsorted.
+		ordered[nextSmallerOrEqual], ordered[pivotIndex] =
+			ordered[pivotIndex], ordered[nextSmallerOrEqual]
+		if nextSmallerOrEqual == rank {
+			return ordered[nextSmallerOrEqual], true
+		}
+		if rank < nextSmallerOrEqual {
+			right = nextSmallerOrEqual
+		} else {
+			left = nextSmallerOrEqual + 1
+		}
+	}
+	return 0, false
+}
 ```
 
 ###### Work and memory
 
-Comparison sorting uses `O(n log n)` time. The copied slice above uses
-`O(n)` memory. Quickselect usually performs work proportional to `n`,
-written expected `O(n)`, but repeatedly choosing a pivot near one end
-can cause `O(n^2)` work. Counting over a small range of `k` possible
-keys takes `O(n+k)` time and `O(k)` memory. Returning an ordered copy
-also needs `O(n)` output space.
+Comparison sorting uses `O(n log n)` time. Each function above copies
+`n` values and therefore uses `O(n)` extra memory. Quickselect does
+linear work on average when input order makes its pivots split the
+active range reasonably well. Repeatedly choosing its smallest or
+largest value makes it rescan nearly the whole remaining range and
+takes `O(n^2)` time. Counting over a small range of `k` possible keys
+takes `O(n+k)` time and `O(k)` memory. Returning an ordered copy also
+needs `O(n)` output space.
 
 ###### When to use it
 
@@ -6303,28 +6760,24 @@ possibility.
 
 For `[1,3,3,5]`, find the first value at least `3`; expect index `1`.
 
-1.  **Range: `[0,4)`**
-    - **Before:** Positions `0` through `3` are unchecked; position
-      `4` is the after-the-slice boundary.
-    - **Decision:** Middle position `2` has value `3`, so a first
+Initial state: `left=0`, `right=4`, `result=pending`.
+
+1.  Check range `[0,4)`
+    - Decision: Middle index `2` has value `3`, so a first
       valid position cannot be later than `2`. Set `right=2`.
-    - **After:** `left=0`, `right=2`.
-    - **Known correct:** Positions `0` and `1` remain unchecked;
+    - After: `left=0`, `right=2`, `result=pending`.
+    - Known correct: Positions `0` and `1` remain unchecked;
       position `2` is the earliest known success.
-2.  **Range: `[0,2)`**
-    - **Before:** Positions `0` and `1` are unchecked; position `2`
-      is known to succeed.
-    - **Decision:** Middle position `1` has value `3`, so set
+2.  Check range `[0,2)`
+    - Decision: Middle index `1` has value `3`, so set
       `right=1`.
-    - **After:** `left=0`, `right=1`.
-    - **Known correct:** Position `0` remains unchecked; position `1`
+    - After: `left=0`, `right=1`, `result=pending`.
+    - Known correct: Position `0` remains unchecked; position `1`
       is now the earliest known success.
-3.  **Range: `[0,1)`**
-    - **Before:** Position `0` is unchecked; position `1` is known to
-      succeed.
-    - **Decision:** Its value `1` is too small, so set `left=1`.
-    - **After:** `left=1`, `right=1`; no unchecked position remains.
-    - **Known correct:** Position `0` failed and position `1` is the
+3.  Check range `[0,1)`
+    - Decision: Middle index `0` has value `1`; set `left=1`.
+    - After: `left=1`, `right=1`, `result=1`.
+    - Known correct: Position `0` failed and position `1` is the
       first valid position.
 
 For an empty slice, the same half-open bounds start and finish at `0`,
@@ -6345,7 +6798,8 @@ boundaries meet, so `left` is the first acceptable position.
 
 The complete lower-bound implementation is owned by [E.1 Binary search
 bounds](#e1-binary-search-bounds); its `left`, `right`, and `middle`
-variables match this trace.
+variables match this trace. Calling `LowerBound([]int{1, 3, 3, 5}, 3)`
+returns `1`.
 
 ###### Work and memory
 
@@ -6373,12 +6827,10 @@ test cannot prove that one entire half is impossible.
 > neither boundary repeats the same test forever.
 
 A valid insertion position may equal `len(values)`. Ordinary bounds
-require fully sorted input. Wrapped input such as `[4,5,6,1,2,3]`
-needs a separate proof that identifies the sorted side before
-discarding it. Duplicates can hide which side is sorted; a boundary
-may then shrink by only one position, making the worst case `O(n)`.
-Peak searches also need an explicit rule for equal adjacent values
-because a plateau may not identify one safe half to discard.
+require fully sorted input. Rotated arrays and peak searches need
+different facts that prove which side is safe to discard; do not copy
+this lower-bound update rule into those problems without deriving the
+new boundary proof.
 
 ###### Related material
 
@@ -6416,122 +6868,101 @@ partial-match length to keep after a failure.
 
 ###### Step-by-step examples
 
-The table-building example and the searching example are separate.
-Each one has only one job.
+Example 1 builds the table for pattern `"ababac"`. The expected
+`prefixLengths` is `[0,0,1,2,3,0]`.
 
-**Example 1: build every backup answer.** Use pattern `"ababac"`.
-Its completed `prefixLengths` should be `[0,0,1,2,3,0]`.
+Initial state: `patternIndex=1`, `overlapLength=0`,
+`prefixLengths=[0,0,0,0,0,0]`.
 
-Here is every state while building `prefixLengths`. `i` means
-`patternIndex`, and `L` means `overlapLength`. The test column shows
-the current byte followed by the pattern byte it is compared with.
-The final column is the complete slice after that action.
+1.  Compare `b` with `a`
+    - Decision: They differ with no backup; store `0` and advance.
+    - After: `patternIndex=2`, `overlapLength=0`,
+      `prefixLengths=[0,0,0,0,0,0]`.
+    - Known correct: Positions `0` and `1` have final answers.
+2.  Compare `a` with `a`
+    - Decision: Grow the overlap to `1`, store it, and advance.
+    - After: `patternIndex=3`, `overlapLength=1`,
+      `prefixLengths=[0,0,1,0,0,0]`.
+    - Known correct: Prefix and suffix `"a"` match through index `2`.
+3.  Compare `b` with `b`
+    - Decision: Grow the overlap to `2`, store it, and advance.
+    - After: `patternIndex=4`, `overlapLength=2`,
+      `prefixLengths=[0,0,1,2,0,0]`.
+    - Known correct: Prefix and suffix `"ab"` match through index `3`.
+4.  Compare `a` with `a`
+    - Decision: Grow the overlap to `3`, store it, and advance.
+    - After: `patternIndex=5`, `overlapLength=3`,
+      `prefixLengths=[0,0,1,2,3,0]`.
+    - Known correct: Prefix and suffix `"aba"` match through index
+      `4`.
+5.  Reject the three-byte backup
+    - Decision: `c != b`; set overlap to `prefixLengths[2]=1`.
+    - After: `patternIndex=5`, `overlapLength=1`,
+      `prefixLengths=[0,0,1,2,3,0]`.
+    - Known correct: The same `c` can still extend a smaller backup.
+6.  Reject the one-byte backup
+    - Decision: `c != b`; set overlap to `prefixLengths[0]=0`.
+    - After: `patternIndex=5`, `overlapLength=0`,
+      `prefixLengths=[0,0,1,2,3,0]`.
+    - Known correct: No nonempty backup remains.
+7.  Confirm zero at index `5`
+    - Decision: `c != a`; store `0` and advance.
+    - After: `patternIndex=6`, `overlapLength=0`,
+      `prefixLengths=[0,0,1,2,3,0]`.
+    - Known correct: Every table position has its longest backup.
 
-Go fills the slice with zeros when it is created. A zero to the right
-of `i` is still only the initial value; it has not been confirmed yet.
+Example 2 shows a smaller backup succeeding for pattern `"aabaaab"`.
 
-```text
-step  i  old L  test  action                   new L  prefixLengths
-----  -  -----  ----  -----------------------  -----  -------------
-init  1  0      -     allocate zeros           0      [0,0,0,0,0,0]
-0     1  0      b/a   store 0; i++             0      [0,0,0,0,0,0]
-1     2  0      a/a   grow; store 1            1      [0,0,1,0,0,0]
-2     3  1      b/b   grow; store 2            2      [0,0,1,2,0,0]
-3     4  2      a/a   grow; store 3            3      [0,0,1,2,3,0]
-4     5  3      c/b   prefixLengths[2] -> 1    1      [0,0,1,2,3,0]
-5     5  1      c/b   prefixLengths[0] -> 0    0      [0,0,1,2,3,0]
-6     5  0      c/a   store 0; i++             0      [0,0,1,2,3,0]
-```
+Initial state: `patternIndex=5`, `overlapLength=2`,
+`prefixLengths=[0,1,0,1,2,0,0]`.
 
-The fallback rows use the same count-to-position conversion introduced
-above:
+1.  Fall back once
+    - Decision: `pattern[5]='a'` differs from `pattern[2]='b'`; use
+      `prefixLengths[1]=1`.
+    - After: `patternIndex=5`, `overlapLength=1`,
+      `prefixLengths=[0,1,0,1,2,0,0]`.
+    - Known correct: The same current byte remains unconsumed.
+2.  Grow the smaller backup
+    - Decision: `pattern[5]=='a'` matches `pattern[1]=='a'`; store
+      `2`.
+    - After: `patternIndex=6`, `overlapLength=2`,
+      `prefixLengths=[0,1,0,1,2,2,0]`.
+    - Known correct: The longest prefix-suffix match at index `5`
+      has length `2`.
 
-```text
-current backup count:       3
-end position for count 3:   3 - 1 = 2
-backup answer:              prefixLengths[2] = 1
-next backup count:          1
-```
-
-1. At step `4`, `overlapLength=3`. The builder tests whether the
-   three-byte backup `"aba"` can grow through the current `'c'`:
-
-   ```text
-   current ending plus byte:  a b a | c
-   pattern start plus byte:   a b a | b
-   ```
-
-   It cannot. The backup answer for a matched count of `3` is stored
-   at position `3-1=2`. Read `prefixLengths[2]=1`, set
-   `overlapLength=1`, and keep `patternIndex=5`.
-
-2. At step `5`, retry the same `'c'` with the new backup count `1`:
-
-   ```text
-   current ending plus byte:  a | c
-   pattern start plus byte:   a | b
-   ```
-
-   That also fails. Convert matched count `1` to end position
-   `1-1=0`. Read `prefixLengths[0]=0`, set `overlapLength=0`, and
-   keep `patternIndex=5` again.
-
-3. At step `6`, no backup remains. Compare the same `'c'` with the
-   first pattern byte, `'a'`. They differ, so confirm the answer `0`
-   at position `5` and finally move forward.
-
-The slice does not change during steps `4` and `5`; only
-`overlapLength` changes. The same current byte is retried until a
-backup grows or the backup count reaches zero.
-
-**Example 2: a smaller backup succeeds.** For pattern `"aabaaab"`,
-consider position `5` with `overlapLength=2`:
-
-```text
-current byte:                  pattern[5] = 'a'
-next byte after backup 2:      pattern[2] = 'b'
-first test:                    'a' != 'b'
-backup for matched count 2:    prefixLengths[2-1] = 1
-retry against:                 pattern[1] = 'a'
-second test:                   'a' == 'a'
-stored answer at position 5:   2
-```
-
-The first backup count fails, but its backup count succeeds. The
-builder stores `2` and advances.
-
-**Example 3: use the table while searching.** Search for pattern
+Example 3 uses the table while searching. Search for pattern
 `"ababac"` in text `"abababac"`. The answer should be position `2`.
 
 The pattern's table is `[0,0,1,2,3,0]`.
 
-1. The first five text bytes match `"ababa"`. The next state is
-   `textIndex=5` and `matchedLength=5`.
+Initial state: `textIndex=0`, `matchedLength=0`, `result=pending`.
 
-2. At text position `5`, the text has `'b'`, but pattern position `5`
-   has `'c'`. The bytes differ:
+1.  Match the first five bytes
+    - Decision: Compare equal byte pairs while advancing both
+      positions.
+    - After: `textIndex=5`, `matchedLength=5`, `result=pending`.
+    - Known correct: Those five text bytes equal pattern positions
+      `0` through `4`.
+2.  Keep the longest valid backup
+    - Decision: Text `'b'` differs from pattern `'c'`. Keep the text
+      position, read `prefixLengths[4]=3`, and retain the final
+      `"aba"` of the matched text.
+    - After: `textIndex=5`, `matchedLength=3`, `result=pending`.
+    - Known correct: The current `'b'` remains unconsumed, and the
+      kept `"aba"` equals the first three pattern bytes.
 
-   ```text
-   text:    a b a b a | b a c
-   pattern: a b a b a | c
-   ```
+    ```text
+    text:    a b a b a | b a c
+    pattern:     a b a | b a c
+    ```
 
-3. The matched count is `5`. Convert it to end position `5-1=4`,
-   then read the backup answer `prefixLengths[4]=3`. Set
-   `matchedLength=3`. This keeps the final `"aba"`:
+3.  Finish from the smaller backup
+    - Decision: Match the remaining bytes `"bac"`.
+    - After: `textIndex=8`, `matchedLength=6`, `result=2`.
+    - Known correct: Every pattern byte matches text positions `2`
+      through `7`, so the first complete match starts at position `2`.
 
-   ```text
-   text:    a b a b a | b a c
-   pattern:     a b a | b a c
-   ```
-
-   `textIndex` stays at `5`. The `'b'` has not matched yet.
-
-4. Retry that same `'b'` against pattern position `3`. The remaining
-   bytes `"bac"` now match. The scan ends with `textIndex=8` and
-   `matchedLength=6`, so the start is `8-6=2`.
-
-**Small boundary cases.** Searching text `"x"` for pattern `"a"`
+Small boundary cases: searching text `"x"` for pattern `"a"`
 returns `-1`: no bytes matched, so the search simply advances through
 the text. An empty pattern returns `0`. A pattern longer than the text
 cannot complete and returns `-1`.
@@ -6668,8 +7099,8 @@ matches, reordered characters, or other non-exact relationships.
 
 ###### Common mistakes and edge cases
 
-The slice stores backup lengths. Its indexes are end positions. Keep
-those two roles separate:
+> **Warning:** The slice stores backup lengths, but its indexes are
+> end positions. Keep those two roles separate:
 
 ```text
 matched count:        5
@@ -6677,9 +7108,9 @@ lookup position:      5 - 1 = 4
 stored backup length: prefixLengths[4] = 3
 ```
 
-Do not move past the current pattern or text byte during a fallback.
-That byte failed against one pattern position, but it may match the
-next position after the pattern is shortened.
+> **Warning:** Do not move past the current pattern or text byte
+> during a fallback. That byte failed against one pattern position,
+> but it may match the next position after the pattern is shortened.
 
 Define the empty-pattern result before scanning. This implementation
 returns position `0`.
@@ -6722,51 +7153,42 @@ machine** to enforce a **grammar**, the allowed input shapes. A
 Parse `"  -42x"` with the rule
 `space -> optional sign -> digits -> stop`; expect `-42`.
 
-1.  **Mode: Leading spaces**
-    - **Before:** `currentIndex=0`, `magnitude=0`.
-    - **Decision:** Consume the two allowed leading spaces.
-    - **After:** `currentIndex=2`; next byte is `'-'`.
-    - **Known correct:** The consumed beginning is legal.
-2.  **Mode: Optional sign**
-    - **Before:** No digit has been read.
-    - **Decision:** Record a negative sign and advance once.
-    - **After:** `currentIndex=3`, `negative=true`.
-    - **Known correct:** A second sign is no longer legal.
-3.  **Mode: Digits, first byte**
-    - **Before:** `magnitude=0`; current byte is `'4'`.
-    - **Decision:** Append digit `4` after checking the limit.
-    - **After:** `magnitude=4`, `currentIndex=4`.
-    - **Known correct:** The stored magnitude equals the parsed text
+Initial state: `currentIndex=0`, `mode=spaces`, `negative=false`,
+`magnitude=0`, `result=pending`.
+
+1.  Consume leading spaces
+    - Decision: Skip the two spaces allowed by `mode=spaces`.
+    - After: `currentIndex=2`, `mode=sign`, `negative=false`,
+      `magnitude=0`, `result=pending`.
+    - Known correct: The consumed beginning is legal.
+2.  Consume the optional sign
+    - Decision: Record `'-'` and enter digit mode.
+    - After: `currentIndex=3`, `mode=digits`, `negative=true`,
+      `magnitude=0`, `result=pending`.
+    - Known correct: A second sign is no longer legal.
+3.  Consume digit `4`
+    - Decision: Append digit `4` after checking the limit.
+    - After: `currentIndex=4`, `mode=digits`, `negative=true`,
+      `magnitude=4`, `result=pending`.
+    - Known correct: The stored magnitude equals parsed text
       `"4"`.
-4.  **Mode: Digits, second byte**
-    - **Before:** `magnitude=4`; current byte is `'2'`.
-    - **Decision:** Append digit `2` after checking the limit.
-    - **After:** `magnitude=42`, `currentIndex=5`.
-    - **Known correct:** The stored magnitude equals the parsed text
+4.  Consume digit `2`
+    - Decision: Append digit `2` after checking the limit.
+    - After: `currentIndex=5`, `mode=digits`, `negative=true`,
+      `magnitude=42`, `result=pending`.
+    - Known correct: The stored magnitude equals parsed text
       `"42"`.
-5.  **Mode: Stop**
-    - **Before:** Current byte is `'x'`, which is not a digit.
-    - **Decision:** This grammar accepts the longest numeric prefix,
+5.  Stop at `x`
+    - Decision: This grammar accepts the longest numeric prefix,
       so stop and apply the negative sign.
-    - **After:** Return `-42`.
-    - **Known correct:** Every accepted byte was interpreted once;
+    - After: `currentIndex=5`, `mode=done`, `negative=true`,
+      `magnitude=42`, `result=-42`.
+    - Known correct: Every accepted byte was interpreted once;
       `'x'` was not consumed.
 
 For `"4-2"`, the `-` is not legal after digits. This entry's
 stop-at-first-nondigit grammar returns `4`. A whole-input grammar
 would instead reject it.
-
-For arithmetic expressions, a stack handles nested parentheses, while
-operator precedence can be handled by operator/value stacks or by
-recursive-descent functions: one function handles additions, another
-multiplications, and another individual values or parenthesized
-expressions. This organization is called **recursive descent** because
-the functions follow the grammar's nested levels. For `2+3*4`, the
-value parser reads `3` and `4`, the multiplication level produces
-`12`, and only then does the addition level produce `14`. Decide
-whether **unary** `+` and `-`, which apply to one following value, are
-operators or part of numeric tokenization. Do not rely on splitting by
-spaces when the grammar permits no spaces or arbitrary spacing.
 
 ###### Why it works
 
@@ -6780,12 +7202,18 @@ represented by the accepted prefix.
 
 ###### Go example
 
+Calling `parseSignedPrefix("  -42x")` returns `(-42, true)`. The
+trace's `mode` is represented by the code's ordered phases: the first
+loop consumes spaces, the sign branch runs once, the digit loop
+builds `magnitude`, and returning applies the sign. `currentIndex`,
+`negative`, and `magnitude` keep the trace's names.
+
 ```go
 import "math"
 
 func parseSignedPrefix(input string) (int64, bool) {
 	currentIndex, negative := 0, false
-	// Skip only the leading ASCII spaces allowed by this parser's
+	// Skip only the leading space bytes allowed by this parser's
 	// contract.
 	for currentIndex < len(input) && input[currentIndex] == ' ' {
 		currentIndex++
@@ -6840,7 +7268,7 @@ rejects a magnitude outside the `int64` range before multiplying.
 
 ###### Work and memory
 
-Reading `n` input characters once takes `O(n)` time. A simple number
+Reading `n` input bytes once takes `O(n)` time. A simple number
 parser can use `O(1)` extra memory. Nested expressions may need a
 stack whose size is proportional to the nesting depth, and retaining
 every token can require `O(n)` memory.
@@ -6896,34 +7324,32 @@ memory pointer.
 
 The movement depends on the task. In a sorted pair-sum search, start
 at both ends: move the left position when the sum is too small and the
-right position when it is too large. To merge sorted inputs, compare
-their next unread values and advance the input that supplied the
-smaller one. To compact one slice in place, a read position inspects
-each value while a write position marks the next output slot. For a
-palindrome, move two positions inward while their values match.
+right position when it is too large. Other tasks may coordinate the
+next unread positions of two inputs, a read and write position in one
+slice, or two symmetric positions. Each version needs its own reason
+that moving a position cannot discard required work.
 
 ###### Step-by-step examples
 
-Find a pair totaling `9` in `[1,2,4,7,11]`; expect `[2,7]`.
+Find a pair totaling `9` in `[1,2,4,7,11]`; expect index result
+`(1,3,true)`.
 
-1.  **Ends: `1` and `11`**
-    - **Before:** `left=0`, `right=4`; every pair inside those
-      positions remains possible.
-    - **Decision:** Sum `12` is too large, so move `right` left once.
-    - **After:** `left=0`, `right=3`; end values are `1` and `7`.
-    - **Known correct:** No pair using `11` can total `9`, because `1`
+Initial state: `left=0`, `right=4`, `result=pending`.
+
+1.  Check values `1` and `11`
+    - Decision: Sum `12` is too large; decrement `right`.
+    - After: `left=0`, `right=3`, `result=pending`.
+    - Known correct: No pair using `11` can total `9`, because `1`
       was its smallest available partner.
-2.  **Ends: `1` and `7`**
-    - **Before:** `left=0`, `right=3`; sum is `8`.
-    - **Decision:** The sum is too small, so move `left` right once.
-    - **After:** `left=1`, `right=3`; end values are `2` and `7`.
-    - **Known correct:** No pair using `1` can total `9`, because `7`
+2.  Check values `1` and `7`
+    - Decision: Sum `8` is too small; increment `left`.
+    - After: `left=1`, `right=3`, `result=pending`.
+    - Known correct: No pair using `1` can total `9`, because `7`
       was its largest available partner.
-3.  **Ends: `2` and `7`**
-    - **Before:** `left=1`, `right=3`.
-    - **Decision:** Sum is `9`.
-    - **After:** Return values `[2,7]`.
-    - **Known correct:** The returned values are at distinct positions
+3.  Check values `2` and `7`
+    - Decision: Their sum is `9`, so return them.
+    - After: `left=1`, `right=3`, `result=(1,3,true)`.
+    - Known correct: The returned values are at distinct positions
       and total the target.
 
 An empty or one-item input has no pair and must finish before indexing
@@ -6932,46 +7358,26 @@ both ends.
 ###### Why it works
 
 No pair using a position already passed by `left` or `right` can meet
-the target. Sorted order makes each discard safe.
-
-During a merge, the output contains the smallest values read so far,
-in order. For `[1, 4]` and `[2, 3]`, emit `1`, then `2`, then `3`, and
-finally the remaining `4`. When merging into unused space at the end
-of the first input, work backward from the largest values so a write
-cannot overwrite unread input.
-
-Let `read` inspect every value and `write` mark where the next kept
-value belongs. The part before `write` always contains exactly the
-kept values seen so far, in their required order. Because `write`
-never passes `read`, writing cannot destroy
-unread data. The [non-zero compaction
-trace](#a2-correctness-and-invariants) shows both positions changing
-on actual values.
-
-Every palindrome is centered on either one character or one gap. The
-already-accepted interior is a palindrome before each matching outer
-pair is added. In `abba`, the center gap first accepts `bb`, then
-expands to the matching outer `a` values.
-
-When at most one deletion is allowed, scan inward until the first
-mismatch. Only two possibilities remain: skip the left value or skip
-the right value, then verify the rest of each range with an ordinary
-palindrome scan. This is a bounded branch, not general backtracking,
-so the total work remains `O(n)`. In `abca`, the first mismatch is `b`
-versus `c`; skipping either one leaves a palindrome (`aca` or `aba`).
+the target. If the sum is too small, `right` already supplies the
+largest available partner for `values[left]`, so that left value
+cannot work with any remaining position. The too-large case is
+symmetric: `left` is the smallest available partner for
+`values[right]`. Equality returns a valid pair. Otherwise one boundary
+moves inward, so the finite range eventually becomes empty.
 
 ###### Go example
 
 The complete implementation is owned by [E.9 Sorted two-pointer pair
 search](#e9-sorted-two-pointer-pair-search). Its boundary checks and
-movements match this trace.
+movements match this trace. Calling
+`PairSumSorted([]int{1, 2, 4, 7, 11}, 9)` returns `(1,3,true)`.
 
 ###### Work and memory
 
-Pair search, merging, and in-place compaction take linear time. They
-use `O(1)` extra memory unless a merged output is created. Expanding
-around all palindrome centers takes between `O(n)` and `O(n^2)` time
-and `O(1)` extra memory.
+For `n` sorted values, each boundary moves inward at most `n` times,
+so pair search takes `O(n)` time and `O(1)` extra memory. A two-input
+merge or a read/write compaction can also be linear, but a returned
+merged sequence needs space for its output.
 
 ###### When to use it
 
@@ -6988,11 +7394,10 @@ order must remain intact.
 
 ###### Common mistakes and edge cases
 
-Sorting may destroy required original positions. The inward pair-sum
-form requires sorted values, though negative values are fine. Use the
-provided populated lengths when an array contains spare capacity,
-advance a write position only after retaining a value, and test both
-character and gap centers for palindromes.
+> **Warning:** The inward pair-sum movement requires sorted values.
+> On `[4,1,7,2]`, an end sum gives no safe reason to discard either
+> endpoint. Sorting may also destroy required original positions, so
+> preserve positions separately when the output needs them.
 
 ###### Related material
 
@@ -7036,49 +7441,49 @@ what one state answers, write how it depends on smaller states, set
 the smallest known answers, then evaluate states only after the states
 they need. The dependency rule is the **recurrence**. **Memoization**
 computes and saves states on demand; **tabulation** fills a table in a
-planned order.
-
-Common state shapes include a position or prefix, a remaining amount
-or capacity, a grid cell, a pair of positions in two sequences, an
-interval, or a position plus a small mode such as "holding stock."
-Keep only facts that can change future choices. For a one-use item,
-scan capacities backward so the current item cannot be reused; scan
-forward only when repeated use is allowed.
-
-After the dependencies are clear, memory can sometimes be reduced.
-For example, a grid transition that needs only the cell above and the
-cell to the left can reuse one row-sized slice. Before `dp[col]` is
-replaced it means "above"; after replacement, `dp[col-1]` means
-"left." The scan direction matters because overwriting a value too
-early changes what later states read.
+planned order. In the stair example,
+`ways[stair] -> number of routes that end exactly at stair`.
+For example, `ways[2]=2` records routes `[1,1]` and `[2]`.
 
 ###### Step-by-step examples
 
-Count ways to climb `4` stairs using steps of one or two; expect `5`.
+Count ways to climb `4` stairs using steps of one or two; expect
+`(5,true)`.
 
-1.  **Step: Smallest known answers**
-    - **Before:** No answer has been stored.
-    - **Decision:** Set `ways[0]=1` and `ways[1]=1`.
-    - **After:** Ways are `[1,1]` through stair `1`.
-    - **Known correct:** There is one empty route to stair `0` and one
+A direct recursive search repeats the same smaller question:
+
+```text
+ways(4)
+|-- ways(3)
+|   |-- ways(2)
+|   `-- ways(1)
+`-- ways(2)  <- computed again
+```
+
+The table below stores `ways(2)` once and reuses it from both places.
+
+Initial state: `stair=0`, `ways=[]`, `result=pending`.
+
+1.  Store the base answers
+    - Decision: Set `ways[0]=1` and `ways[1]=1`.
+    - After: `stair=2`, `ways=[1,1]`, `result=pending`.
+    - Known correct: There is one empty route to stair `0` and one
       one-step route to stair `1`.
-2.  **Step: Stair `2`**
-    - **Before:** `ways[0]=1`, `ways[1]=1`.
-    - **Decision:** A final one-step move comes from stair `1`. A
+2.  Compute stair `2`
+    - Decision: A final one-step move comes from stair `1`; a
       final two-step move comes from stair `0`. Add both counts.
-    - **After:** `ways[2]=1+1=2`.
-    - **Known correct:** Routes `[1,1]` and `[2]` are counted once.
-3.  **Step: Stair `3`**
-    - **Before:** `ways[1]=1`, `ways[2]=2`.
-    - **Decision:** Add routes ending with a one-step move and routes
+    - After: `stair=3`, `ways=[1,1,2]`, `result=pending`.
+    - Known correct: Routes `[1,1]` and `[2]` are counted once.
+3.  Compute stair `3`
+    - Decision: Add routes ending with a one-step move and routes
       ending with a two-step move.
-    - **After:** `ways[3]=2+1=3`.
-    - **Known correct:** The two final-move groups do not overlap.
-4.  **Step: Stair `4`**
-    - **Before:** `ways[2]=2`, `ways[3]=3`.
-    - **Decision:** Calculate `ways[4]=3+2`.
-    - **After:** Return `5`.
-    - **Known correct:** Every route reaches stair `4` with exactly
+    - After: `stair=4`, `ways=[1,1,2,3]`, `result=pending`.
+    - Known correct: The two final-move groups do not overlap.
+4.  Compute stair `4`
+    - Decision: Set `ways[4]=ways[3]+ways[2]=5`.
+    - After: `stair=done`, `ways=[1,1,2,3,5]`,
+      `result=(5,true)`.
+    - Known correct: Every route reaches stair `4` with exactly
       one of the two allowed final moves.
 
 For `n=0`, the base value `1` represents the empty way; another
@@ -7096,9 +7501,32 @@ available. The finite loop ends with the exact count for stair `n`.
 
 ###### Go example
 
-The rolling Go implementation is owned by [E.2 Rolling dynamic
-programming](#e2-rolling-dynamic-programming). It retains only the two
-earlier states used by the recurrence.
+Calling `countStairWays(4)` builds the traced table
+`[]int{1, 1, 2, 3, 5}` and returns `(5,true)`.
+
+```go
+func countStairWays(numStairs int) (int, bool) {
+	if numStairs < 0 {
+		return 0, false
+	}
+	// ways[stair] counts routes ending exactly at that stair. The
+	// empty route is the one way to end at stair zero.
+	ways := make([]int, numStairs+1)
+	ways[0] = 1
+	if numStairs >= 1 {
+		ways[1] = 1
+	}
+	// Every later route ends with either a one-step or two-step move,
+	// so the two earlier nonoverlapping groups add to the new count.
+	for stair := 2; stair <= numStairs; stair++ {
+		ways[stair] = ways[stair-1] + ways[stair-2]
+	}
+	return ways[numStairs], true
+}
+```
+
+[E.2 Rolling dynamic programming](#e2-rolling-dynamic-programming)
+keeps the same recurrence but retains only its two earlier states.
 
 ###### Work and memory
 
@@ -7169,29 +7597,39 @@ receive the same index.
 Race times such as `120`, `450`, and `900` may be far apart, but their
 useful order is first, second, third. **Coordinate compression**
 replaces each distinct value with this ordered rank. Equal original
-values receive the same rank.
+values receive the same rank. The lookup contract is
+`original value -> position in the sorted distinct values`. For
+`[-5,20,100]`, `rankByValue[20]=1` means `20` is the second distinct
+value, at zero-based position `1`.
 
 ###### Step-by-step examples
 
 For `[100,-5,100,20]`, expect ranks `[2,0,2,1]`.
 
-1.  **Step: Sort distinct values**
-    - **Before:** Values are in input order and may repeat.
-    - **Decision:** Sort a copy and keep one copy of each value.
-    - **After:** Distinct values are `[-5,20,100]`.
-    - **Known correct:** Every different input value appears once in
+Initial state: `values=[100,-5,100,20]`, `distinct=[]`,
+`rankByValue={}`, `result=[]`.
+
+1.  Sort distinct values
+    - Decision: Sort a copy and keep one copy of each value.
+    - After: `values=[100,-5,100,20]`, `distinct=[-5,20,100]`,
+      `rankByValue={}`, `result=[]`.
+    - Known correct: Every different input value appears once in
       increasing order.
-2.  **Step: Assign ranks**
-    - **Before:** No value-to-rank map exists.
-    - **Decision:** Map `-5 -> 0`, `20 -> 1`, and `100 -> 2`.
-    - **After:** Every distinct value has a compact index.
-    - **Known correct:** Smaller original values have smaller ranks.
-3.  **Step: Translate the original order**
-    - **Before:** Original values are `[100,-5,100,20]`.
-    - **Decision:** Replace each value with its mapped rank.
-    - **After:** Result is `[2,0,2,1]`.
-    - **Known correct:** Equal values share rank `2`, and output
+2.  Assign ranks
+    - Decision: Map `-5 -> 0`, `20 -> 1`, and `100 -> 2`.
+    - After: `values=[100,-5,100,20]`, `distinct=[-5,20,100]`,
+      `rankByValue={-5:0,20:1,100:2}`, `result=[]`.
+    - Known correct: Smaller original values have smaller ranks.
+3.  Translate the original order
+    - Decision: Replace each value with its mapped rank.
+    - After: `values=[100,-5,100,20]`, `distinct=[-5,20,100]`,
+      `rankByValue={-5:0,20:1,100:2}`, `result=[2,0,2,1]`.
+    - Known correct: Equal values share rank `2`, and output
       positions still correspond to the original input positions.
+
+For `[-1000000000,1000000000]`, compression returns `[0,1]`. Direct
+indexing across the raw inclusive range would reserve `2000000001`
+positions to store facts about only two values.
 
 For an empty input, both the distinct list and output are empty. Equal
 values must receive one rank rather than separate positions.
@@ -7289,38 +7727,33 @@ answers.
 
 Sort `[4,1,3,2]`; expect `[1,2,3,4]`.
 
-1.  **Step: Split the full input**
-    - **Before:** One problem contains `[4,1,3,2]`.
-    - **Decision:** Divide it into `[4,1]` and `[3,2]`.
-    - **After:** Two independent two-value problems remain.
-    - **Known correct:** The halves do not overlap. Together, they
+Initial state: `pending=[[4,1,3,2]]`, `solved=[]`,
+`result=pending`.
+
+1.  Split the full input
+    - Decision: Divide it into `[4,1]` and `[3,2]`.
+    - After: `pending=[[4,1],[3,2]]`, `solved=[]`,
+      `result=pending`.
+    - Known correct: The halves do not overlap. Together, they
       contain every original value.
-2.  **Step: Solve the left half**
-    - **Before:** Left half is `[4,1]`.
-    - **Decision:** One-value lists are already sorted; merge `[4]`
+2.  Solve the left half
+    - Decision: Merge sorted one-value lists `[4]`
       and `[1]` by taking the smaller front value first.
-    - **After:** Left result is `[1,4]`.
-    - **Known correct:** Both left-half values appear in order.
-3.  **Step: Solve the right half**
-    - **Before:** Right half is `[3,2]`.
-    - **Decision:** Merge sorted one-value lists `[3]` and `[2]`.
-    - **After:** Right result is `[2,3]`.
-    - **Known correct:** Both right-half values appear in order.
-4.  **Step: Combine the two halves**
-    - **Before:** Sorted halves are `[1,4]` and `[2,3]`.
-    - **Decision:** Repeatedly take the smaller unread front value:
+    - After: `pending=[[3,2]]`, `solved=[[1,4]]`,
+      `result=pending`.
+    - Known correct: Both left-half values appear in order.
+3.  Solve the right half
+    - Decision: Merge sorted one-value lists `[3]` and `[2]`.
+    - After: `pending=[]`, `solved=[[1,4],[2,3]]`,
+      `result=pending`.
+    - Known correct: Both right-half values appear in order.
+4.  Combine the two halves
+    - Decision: Repeatedly take the smaller unread front value:
       `1`, then `2`, then `3`, then `4`.
-    - **After:** Result is `[1,2,3,4]`.
-    - **Known correct:** The result is sorted and contains every input
+    - After: `pending=[]`, `solved=[[1,4],[2,3]]`,
+      `result=[1,2,3,4]`.
+    - Known correct: The result is sorted and contains every input
       value exactly once.
-
-**Focused second example.** Calculate `2^10`; expect `1024`.
-Exponentiation by squaring reuses the same smaller power:
-
-```text
-split:    2^10 -> (2^5)^2 -> (2 * (2^2)^2)^2
-combine:  2^1=2 -> 2^2=4 -> 2^5=32 -> 2^10=1024
-```
 
 ###### Why it works
 
@@ -7340,6 +7773,12 @@ for the same state. Memoizing a divide-and-conquer recursion because
 its parts overlap has effectively turned it into DP.
 
 ###### Go example
+
+Calling `mergeSort([]int{4, 1, 3, 2})` returns
+`[]int{1, 2, 3, 4}`. The trace's `pending` work is represented by
+recursive calls on the two halves, while its `solved` halves are the
+code's returned `left` and `right` slices. Both representations apply
+the same left-half, right-half, then merge phases.
 
 ```go
 func mergeSort(values []int) []int {
@@ -7376,10 +7815,11 @@ input.
 ###### Work and memory
 
 The cost depends on the number and sizes of the smaller parts plus the
-work needed to combine them. Write that relationship before claiming a
-bound: merge sort is `O(n log n)` time with `O(n)` merge storage,
-while exponentiation by squaring is `O(log |n|)` time and can use
-`O(1)` extra memory as a loop.
+work needed to combine them. For `n` values, merge sort has `log n`
+split levels, and merging all ranges on one level handles `n` values.
+It therefore takes `O(n log n)` time. The active child results use
+`O(n)` auxiliary memory, the call stack uses `O(log n)` memory, and
+the returned sorted slice uses `O(n)` output memory.
 
 ###### When to use it
 
@@ -7405,10 +7845,6 @@ An empty or one-value input is the base case. During merge, copy the
 remainder of either half after the other empties. When equal values
 must remain in their original relative order, called stable order,
 declare and preserve a tie rule.
-
-For a negative exponent, compute the positive magnitude and take its
-reciprocal. Negating the most negative signed integer in the same type
-overflows, so obtain its magnitude without evaluating that negation.
 
 ###### Related material
 
@@ -7440,35 +7876,32 @@ ever seen. This is **Kadane's algorithm**.
 
 For `[-2,3,-1,4,-5]`, expect sum `6` from `[3,-1,4]`.
 
-1.  **Value: `-2`**
-    - **Before:** No nonempty section has been processed.
-    - **Decision:** Initialize both tracked sums from the first value.
-    - **After:** `endingHere=-2`, `bestOverall=-2`.
-    - **Known correct:** `[-2]` is the only available section.
-2.  **Value: `3`**
-    - **Before:** Extending gives `-2+3=1`; starting fresh gives `3`.
-    - **Decision:** Start a new section at `3`.
-    - **After:** `endingHere=3`, `bestOverall=3`.
-    - **Known correct:** `[3]` is best at this ending position and
+Initial state: `index=0`, `endingHere=unset`, `bestOverall=unset`.
+
+1.  Process `-2`
+    - Decision: Initialize both sums from the first value.
+    - After: `index=1`, `endingHere=-2`, `bestOverall=-2`.
+    - Known correct: `[-2]` is the only available section.
+2.  Process `3`
+    - Decision: Starting fresh at `3` beats extending to `1`.
+    - After: `index=2`, `endingHere=3`, `bestOverall=3`.
+    - Known correct: `[3]` is best at this ending position and
       among all positions processed so far.
-3.  **Value: `-1`**
-    - **Before:** Extending gives `3-1=2`; starting fresh gives `-1`.
-    - **Decision:** Extend the section.
-    - **After:** `endingHere=2`, `bestOverall=3`.
-    - **Known correct:** `[3,-1]` is best ending here, while `[3]`
+3.  Process `-1`
+    - Decision: Extending gives `2`, which beats starting at `-1`.
+    - After: `index=3`, `endingHere=2`, `bestOverall=3`.
+    - Known correct: `[3,-1]` is best ending here, while `[3]`
       remains best overall.
-4.  **Value: `4`**
-    - **Before:** Extending gives `2+4=6`; starting fresh gives `4`.
-    - **Decision:** Extend the section and update the overall best.
-    - **After:** `endingHere=6`, `bestOverall=6`.
-    - **Known correct:** `[3,-1,4]` is best ending here and best
+4.  Process `4`
+    - Decision: Extending gives `6`; update the overall best.
+    - After: `index=4`, `endingHere=6`, `bestOverall=6`.
+    - Known correct: `[3,-1,4]` is best ending here and best
       overall.
-5.  **Value: `-5`**
-    - **Before:** Extending gives `6-5=1`; starting fresh gives `-5`.
-    - **Decision:** Extend the section, but keep the previous overall
+5.  Process `-5`
+    - Decision: Extending gives `1`; keep the previous overall
       best.
-    - **After:** `endingHere=1`, `bestOverall=6`.
-    - **Known correct:** Every possible ending position has been
+    - After: `index=done`, `endingHere=1`, `bestOverall=6`.
+    - Known correct: Every possible ending position has been
       represented, and the largest sum is `6`.
 
 For `[-4,-2]`, initializing from the first value returns `-2`;
@@ -7522,7 +7955,7 @@ an empty subarray sum.
 
 ###### Work and memory
 
-The scan takes `O(n)` time and `O(1)` extra memory.
+For `n` values, the scan takes `O(n)` time and `O(1)` extra memory.
 
 ###### When to use it
 
@@ -7543,13 +7976,8 @@ previous position.
 
 To return indices, remember the candidate start whenever beginning at
 the current value is better, and save it when `bestOverall` improves.
-For circular input, compare the ordinary maximum with the total sum
-minus the minimum non-wrapping section. For `[5,-3,5]`, that gives
-`7-(-3)=10`, the two end values joined around the circle. On
-all-negative input, the subtraction removes the whole array and
-creates an invalid empty answer, so keep the ordinary non-empty
-result. Reject or separately define empty input, and check addition
-overflow when `endingHere+value` can exceed `int`.
+Reject or separately define empty input, and check addition overflow
+when `endingHere+value` can exceed `int`.
 
 ###### Related material
 
@@ -7581,28 +8009,26 @@ out (LIFO)**.
 Validate the four-character input `([])`; expect `true`. In the stack
 shown below, the rightmost item is the top.
 
-1.  **Read `(`**
-    - **Before:** Stack is empty.
-    - **Decision:** This is an opener, so push it.
-    - **After:** Stack is `['(']`.
-    - **Known correct:** The stack contains the only opener not yet
+Initial state: `index=0`, `stack=[]`, `result=pending`.
+
+1.  Read `(`
+    - Decision: It is an opener, so push it.
+    - After: `index=1`, `stack=['(']`, `result=pending`.
+    - Known correct: The stack contains the only opener not yet
       matched.
-2.  **Read `[`**
-    - **Before:** Stack is `['(']`.
-    - **Decision:** Push the new opener.
-    - **After:** Stack is `['(', '[']`.
-    - **Known correct:** The newest unmatched opener, `[`, is on top.
-3.  **Read `]`**
-    - **Before:** The stack's top is `[`.
-    - **Decision:** `]` matches `[`, so pop the top.
-    - **After:** Stack is `['(']`.
-    - **Known correct:** The inner pair is complete; `(` is still
+2.  Read `[`
+    - Decision: It is an opener, so push it.
+    - After: `index=2`, `stack=['(', '[']`, `result=pending`.
+    - Known correct: The newest unmatched opener, `[`, is on top.
+3.  Read `]`
+    - Decision: It matches top `[`, so pop the top.
+    - After: `index=3`, `stack=['(']`, `result=pending`.
+    - Known correct: The inner pair is complete; `(` is still
       unmatched.
-4.  **Read `)`**
-    - **Before:** The stack's top is `(`.
-    - **Decision:** `)` matches `(`, so pop the top.
-    - **After:** Stack is empty; return `true`.
-    - **Known correct:** Every closer matched the newest unmatched
+4.  Read `)`
+    - Decision: It matches top `(`, so pop the top.
+    - After: `index=4`, `stack=[]`, `result=true`.
+    - Known correct: Every closer matched the newest unmatched
       opener, and no opener remains.
 
 For `([)]`, `)` does not match top `[`, so reject immediately. Empty
@@ -7621,16 +8047,51 @@ remains.
 
 ###### Go example
 
-The complete generic implementation is owned by [E.5 Generic
-stack](#e5-generic-stack). A bracket validator may use a byte slice
-directly and must check length before reading or removing the top.
+Calling `balancedBrackets("([])")` follows the trace and returns
+`true`. The byte slice's final element is the stack top.
+
+```go
+func balancedBrackets(input string) bool {
+	stack := make([]byte, 0, len(input))
+	for index := range input {
+		current := input[index]
+		switch current {
+		case '(', '[', '{':
+			// Openers become the newest unfinished item.
+			stack = append(stack, current)
+		case ')', ']', '}':
+			// A closer requires a pending opener before the stack top can
+			// be inspected.
+			if len(stack) == 0 {
+				return false
+			}
+			top := stack[len(stack)-1]
+			matches := top == '(' && current == ')' ||
+				top == '[' && current == ']' ||
+				top == '{' && current == '}'
+			if !matches {
+				return false
+			}
+			stack = stack[:len(stack)-1]
+		default:
+			// This validator's language contains bracket bytes only.
+			return false
+		}
+	}
+	return len(stack) == 0
+}
+```
+
+[E.5 Generic stack](#e5-generic-stack) provides a reusable container
+for other last-in, first-out tasks.
 
 ###### Work and memory
 
 Push, pop, and top inspection take `O(1)` time, aside from occasional
-slice growth when Go uses a slice as the stack. The stack may retain
-`O(n)` items. Clear a removed slice position when it may hold pointers
-so Go's garbage collector can reclaim objects no longer in use.
+slice growth when Go uses a slice as the stack. For `n` input items,
+the stack may retain `O(n)` items. Clear a removed slice position when
+it may hold pointers so Go's garbage collector can reclaim objects no
+longer in use.
 
 ###### When to use it
 
@@ -7650,12 +8111,6 @@ Removing from the front of a Go slice does not model a stack and may
 retain a large underlying array. Recursive calls already use memory
 like a stack behind the scenes; use your own stack when nesting may be
 unsafe or direct control is needed.
-
-For adjacent-run elimination, store `(value, count)` for each run.
-After a pop, recheck the new top because separated equal runs may now
-touch. If runs of three disappear, `aabbbaa` first loses `bbb`; the
-two `aa` runs then combine into `aaaa`. Failing to recheck would miss
-that new adjacency.
 
 ###### Related material
 
@@ -7695,39 +8150,36 @@ moving both ends forward is the **sliding-window** method.
 Find the shortest positive-value range totaling at least `7` in
 `[2,3,1,2,4,3]`; expect length `2`.
 
-1.  **Grow until the first valid window**
-    - **Before:** The window is empty; `left=0`, `sum=0`.
-    - **Decision:** Add values `2`, `3`, and `1`; their running sums
-      are `2`, `5`, and `6`. Add the next value `2`; sum `8` reaches
-      the target, so record length `4`.
-    - **After:** The window is `[2,3,1,2]`; `sum=8`, `best=4`.
-    - **Known correct:** No window ending before index `3` reaches
+Initial state: `left=0`, `right=-1`, `sum=0`, `best=none`.
+
+1.  Grow through index `3`
+    - Decision: Add `2`, `3`, `1`, then `2`; running sums are `2`,
+      `5`, `6`, and `8`. Record length `4` at the target.
+    - After: `left=0`, `right=3`, `sum=8`, `best=4`.
+    - Known correct: No window ending before index `3` reaches
       `7`, and a valid window ending at index `3` has been found.
-2.  **Shrink the window ending at index `3`**
-    - **Before:** `left=0`, `sum=8`, and `best=4`.
-    - **Decision:** Remove the leftmost `2`. The sum becomes `6`, so
+2.  Shrink at right index `3`
+    - Decision: Remove the leftmost `2`; sum `6` is invalid, so
       stop shrinking.
-    - **After:** The window is `[3,1,2]`; `left=1`, `sum=6`.
-    - **Known correct:** Every valid start for right index `3` was
+    - After: `left=1`, `right=3`, `sum=6`, `best=4`.
+    - Known correct: Every valid start for right index `3` was
       tested; removing another positive value cannot restore `7`.
-3.  **Add index `4` and test its possible starts**
-    - **Before:** The window is `[3,1,2]`; `sum=6`, `best=4`.
-    - **Decision:** Add `4`, giving sum `10`. Record length `4`,
+3.  Add index `4` and shrink
+    - Decision: Add `4`, giving sum `10`. Record length `4`,
       remove `3`, record the shorter length `3` at sum `7`, then
       remove `1`. Sum `6` is invalid, so stop shrinking.
-    - **After:** The window is `[2,4]`; `left=3`, `sum=6`, `best=3`.
-    - **Known correct:** Every valid start for right index `4` was
+    - After: `left=3`, `right=4`, `sum=6`, `best=3`.
+    - Known correct: Every valid start for right index `4` was
       tested, and length `3` is the shortest seen so far.
-4.  **Add index `5` and finish**
-    - **Before:** The window is `[2,4]`; `sum=6`, `best=3`.
-    - **Decision:** Add `3`, giving sum `9`. Record length `3`, remove
+4.  Add index `5` and finish
+    - Decision: Add `3`, giving sum `9`. Record length `3`, remove
       `2`, and record length `2` at sum `7`. Remove `4`; sum `3` is
       invalid, so stop.
-    - **After:** The window is `[3]`; `left=5`, `sum=3`, `best=2`.
-    - **Known correct:** Every ending position has been handled, so
+    - After: `left=5`, `right=5`, `sum=3`, `best=2`.
+    - Known correct: Every ending position has been handled, so
       return `2` for window `[4,3]`.
 
-**Focused failure case.** For values `[1,-1,5]` and target `5`, the
+Focused failure case: for values `[1,-1,5]` and target `5`, the
 expected shortest length is `1`, but this positive-value method would
 record length `3`, remove `1`, see sum `4`, and stop. It would never
 remove `-1`, even though doing so raises the sum to `5`. Negative
@@ -7778,10 +8230,10 @@ func shortestPositiveWindow(values []int, target int) int {
 
 ###### Work and memory
 
-Each end moves forward at most `n` times, so the usual window scan
-takes `O(n)` time. A running sum uses `O(1)` extra memory; character
-or value counts use memory proportional to the number of distinct
-values kept.
+For `n` input values, each end moves forward at most `n` times, so the
+usual window scan takes `O(n)` time. A running sum uses `O(1)` extra
+memory; character or value counts use memory proportional to the
+number of distinct values kept.
 
 ###### When to use it
 
@@ -7829,7 +8281,10 @@ total before its left edge from the total through its right edge.
 A bank statement can show the running balance after every transaction.
 Subtracting two saved balances gives the change between them without
 adding each transaction again. The list of saved running totals is a
-**prefix-sum array**.
+**prefix-sum array**. Its contract is
+`prefix[endExclusive] -> sum of values before endExclusive`. For
+example, `prefix[3]=7` for `[2,4,1,3]` means indexes `0` through `2`
+sum to `7`.
 
 ###### Step-by-step examples
 
@@ -7839,44 +8294,36 @@ Adding each range directly would add the values at indexes `2` and `3`
 twice. The saved prefix totals should answer both without revisiting
 either range.
 
-1.  **Start with no values**
-    - **Before:** No running total exists.
-    - **Decision:** Store zero for the total before index `0`.
-    - **After:** `prefix=[0]`.
-    - **Known correct:** The first zero is the sum of zero values.
-2.  **Read value `2` at index `0`**
-    - **Before:** Latest total is `0`.
-    - **Decision:** Add `2` and store the result.
-    - **After:** `prefix=[0,2]`.
-    - **Known correct:** `prefix[1]` totals the first one value.
-3.  **Read value `4` at index `1`**
-    - **Before:** Latest total is `2`.
-    - **Decision:** Add `4` and store `6`.
-    - **After:** `prefix=[0,2,6]`.
-    - **Known correct:** `prefix[2]` totals the first two values.
-4.  **Read value `1` at index `2`**
-    - **Before:** Latest total is `6`.
-    - **Decision:** Add `1` and store `7`.
-    - **After:** `prefix=[0,2,6,7]`.
-    - **Known correct:** `prefix[3]` totals the first three values.
-5.  **Read value `3` at index `3`**
-    - **Before:** Latest total is `7`.
-    - **Decision:** Add `3` and store `10`.
-    - **After:** `prefix=[0,2,6,7,10]`.
-    - **Known correct:** `prefix[4]` totals all four values.
-6.  **Answer query `1..3`**
-    - **Before:** `prefix[4]=10` totals indexes `0` through `3`.
-    - **Decision:** Subtract `prefix[1]=2`, which is the total before
-      index `1`.
-    - **After:** `10-2=8`.
-    - **Known correct:** Only index `0` was removed, leaving indexes
+Initial state: `valueIndex=0`, `prefix=[0]`, `answers=[]`.
+
+1.  Read value `2`
+    - Decision: Add it to the latest total `0`.
+    - After: `valueIndex=1`, `prefix=[0,2]`, `answers=[]`.
+    - Known correct: `prefix[1]` totals the first value.
+2.  Read value `4`
+    - Decision: Add it to the latest total `2`.
+    - After: `valueIndex=2`, `prefix=[0,2,6]`, `answers=[]`.
+    - Known correct: `prefix[2]` totals the first two values.
+3.  Read value `1`
+    - Decision: Add it to the latest total `6`.
+    - After: `valueIndex=3`, `prefix=[0,2,6,7]`, `answers=[]`.
+    - Known correct: `prefix[3]` totals the first three values.
+4.  Read value `3`
+    - Decision: Add it to the latest total `7`.
+    - After: `valueIndex=done`, `prefix=[0,2,6,7,10]`,
+      `answers=[]`.
+    - Known correct: `prefix[4]` totals all four values.
+5.  Answer query `1..3`
+    - Decision: Subtract `prefix[1]=2` from `prefix[4]=10`.
+    - After: `valueIndex=done`, `prefix=[0,2,6,7,10]`,
+      `answers=[8]`.
+    - Known correct: Only index `0` was removed, leaving indexes
       `1`, `2`, and `3`.
-7.  **Answer overlapping query `2..3`**
-    - **Before:** The same `prefix` array remains available, and
-      `prefix[2]=6` totals indexes `0` and `1`.
-    - **Decision:** Subtract `prefix[2]` from `prefix[4]`.
-    - **After:** `10-6=4`.
-    - **Known correct:** Indexes `2` and `3` were summed from saved
+6.  Answer query `2..3`
+    - Decision: Subtract `prefix[2]=6` from `prefix[4]=10`.
+    - After: `valueIndex=done`, `prefix=[0,2,6,7,10]`,
+      `answers=[8,4]`.
+    - Known correct: Indexes `2` and `3` were summed from saved
       totals; their values were not visited again.
 
 The leading zero represents the total before any values and makes a
@@ -7898,6 +8345,10 @@ from `left` through `right` once.
 
 The caller must provide `0 <= left <= right` and
 `right+1 < len(prefixTotals)`.
+The trace's `prefix` is the code's `prefixTotals`. Calling
+`prefixSums([]int{2, 4, 1, 3})` returns `[0,2,6,7,10]`; passing that
+result to `rangeSum` with `(left,right)=(1,3)` and `(2,3)` returns
+`8` and `4`.
 
 ```go
 func prefixSums(values []int) []int {
@@ -7921,18 +8372,17 @@ func rangeSum(prefixTotals []int, left, right int) int {
 
 ###### Work and memory
 
-Building summaries for `n` values takes `O(n)` time and usually `O(n)`
-memory. Each sum, count, or XOR range query then takes `O(1)` time
-when its answer can be recovered from two stored prefixes.
+Building `n+1` totals for `n` values takes `O(n)` time and `O(n)`
+stored-summary memory. Each compatible sum or count query then takes
+`O(1)` time.
 
 ###### When to use it
 
 Many questions ask for sums or counts over overlapping ranges. The
 simplest solution repeatedly adds values it has already added for an
-earlier question. Prefix frequencies handle range counts, and prefix
-bitwise XOR handles range XOR because equal bits cancel when XORed
-twice. A left-prefix and right-suffix product can also build each
-"product except self" answer without division.
+earlier question. To count values with one property, store `1` when
+an item has that property and `0` otherwise; the same prefix sums then
+answer range-count queries.
 
 ###### When not to use it
 
@@ -7966,11 +8416,11 @@ addition when valid inputs can overflow `int`.
 
 ###### The problem it solves
 
-Given an initial array and many inclusive range additions, return the
-final value at every position after all updates. When intermediate
-arrays are not needed, record only where each addition starts and
-stops, then rebuild the final values once instead of visiting every
-covered position for every update.
+Given an array of initially zero values and many inclusive range
+additions, return the final value at every position. When only that
+final result is needed, record where each addition starts and stops,
+then rebuild all values once instead of visiting every covered
+position for every update.
 
 ###### How it works
 
@@ -7979,7 +8429,10 @@ many updates cover long ranges, however, the same positions change
 again and again. On a staffing calendar, mark `+2` when two workers
 start and `-2` when they finish instead of rewriting every hour they
 cover. A **difference array** stores those start and stop changes; one
-later running total rebuilds every hour's staffing.
+later running total rebuilds every hour's staffing. Its contract is
+`difference[index] -> net change that begins at index`. For example,
+`difference[2]=4` means the running total gains `4` before result
+index `2` is stored.
 
 ###### Step-by-step examples
 
@@ -7987,71 +8440,71 @@ Start with eight zeroes. Apply `+3` to indexes `0..7`, `+2` to indexes
 `1..7`, `-1` to indexes `0..6`, and `+4` to indexes `2..7`, including
 both endpoints. Expect `[2,4,8,8,8,8,8,9]`.
 
-**Baseline: iterate through every covered index.**
+Baseline: iterate through every covered index.
 
-1.  **Apply all four updates directly**
-    - **Before:** `result=[0,0,0,0,0,0,0,0]`.
-    - **Decision:** Visit `8+7+7+6=28` covered positions and add each
+Initial state: `result=[0,0,0,0,0,0,0,0]`, `writes=0`.
+
+1.  Apply all four updates directly
+    - Decision: Visit `8+7+7+6=28` covered positions and add each
       update's delta at every position it covers.
-    - **After:** `result=[2,4,8,8,8,8,8,9]`.
-    - **Known correct:** Direct iteration gives the required result,
+    - After: `result=[2,4,8,8,8,8,8,9]`, `writes=28`.
+    - Known correct: Direct iteration gives the required result,
       but overlapping positions were rewritten up to four times.
 
 The difference-array method performs eight boundary additions and
 eight rebuilding steps instead of 28 range additions on this input.
 
-**Phase 1: record where the update starts and stops.**
+Difference-array method:
 
-2.  **Create the markers**
-    - **Before:** The result length is `8`.
-    - **Decision:** Create nine zero markers so index `8` can mark a
-      change that occurs just after the result ends.
-    - **After:** `difference=[0,0,0,0,0,0,0,0,0]`.
-    - **Known correct:** Every possible start and stop position has a
-      marker slot.
-3.  **Record update `+3` on `0..7`**
-    - **Before:** Every marker is zero.
-    - **Decision:** Add `3` at index `0` and subtract `3` at index
+Initial state: `nextUpdate=+3@0..7`,
+`difference=[0,0,0,0,0,0,0,0,0]`, `result=[]`,
+`runningTotal=0`.
+
+1.  Record `+3` on `0..7`
+    - Decision: Add `3` at index `0` and subtract `3` at index
       `8`.
-    - **After:** `difference=[3,0,0,0,0,0,0,0,-3]`.
-    - **Known correct:** Every result position will receive `+3`.
-4.  **Record update `+2` on `1..7`**
-    - **Before:** `difference=[3,0,0,0,0,0,0,0,-3]`.
-    - **Decision:** Add `2` at index `1` and subtract `2` at index
+    - After: `nextUpdate=+2@1..7`,
+      `difference=[3,0,0,0,0,0,0,0,-3]`, `result=[]`,
+      `runningTotal=0`.
+    - Known correct: Every result position will receive `+3`.
+2.  Record `+2` on `1..7`
+    - Decision: Add `2` at index `1` and subtract `2` at index
       `8`.
-    - **After:** `difference=[3,2,0,0,0,0,0,0,-5]`.
-    - **Known correct:** Index `0` receives only `+3`; later indexes
+    - After: `nextUpdate=-1@0..6`,
+      `difference=[3,2,0,0,0,0,0,0,-5]`, `result=[]`,
+      `runningTotal=0`.
+    - Known correct: Index `0` receives only `+3`; later indexes
       also receive `+2`.
-5.  **Record update `-1` on `0..6`**
-    - **Before:** `difference=[3,2,0,0,0,0,0,0,-5]`.
-    - **Decision:** Add `-1` at index `0` and add `1` at index `7` to
+3.  Record `-1` on `0..6`
+    - Decision: Add `-1` at index `0` and add `1` at index `7` to
       stop that negative delta.
-    - **After:** `difference=[2,2,0,0,0,0,0,1,-5]`.
-    - **Known correct:** The first seven positions receive `-1`, but
+    - After: `nextUpdate=+4@2..7`,
+      `difference=[2,2,0,0,0,0,0,1,-5]`, `result=[]`,
+      `runningTotal=0`.
+    - Known correct: The first seven positions receive `-1`, but
       index `7` does not.
-6.  **Record update `+4` on `2..7`**
-    - **Before:** `difference=[2,2,0,0,0,0,0,1,-5]`.
-    - **Decision:** Add `4` at index `2` and subtract `4` at index
+4.  Record `+4` on `2..7`
+    - Decision: Add `4` at index `2` and subtract `4` at index
       `8`.
-    - **After:** `difference=[2,2,4,0,0,0,0,1,-9]`.
-    - **Known correct:** Indexes `2` through `7` also receive `+4`.
-
-**Phase 2: rebuild the result from left to right.**
-
-7.  **Rebuild indexes `0` through `2`**
-    - **Before:** `runningTotal=0`; the result is empty.
-    - **Decision:** Add markers `2`, `2`, and `4` in order, storing
+    - After: `nextUpdate=none`,
+      `difference=[2,2,4,0,0,0,0,1,-9]`, `result=[]`,
+      `runningTotal=0`.
+    - Known correct: Indexes `2` through `7` also receive `+4`.
+5.  Rebuild indexes `0` through `2`
+    - Decision: Add markers `2`, `2`, and `4` in order, storing
       each new total.
-    - **After:** `result=[2,4,8]`; `runningTotal=8`.
-    - **Known correct:** Index `2` contains `3+2-1+4=8`, so all four
+    - After: `nextUpdate=none`,
+      `difference=[2,2,4,0,0,0,0,1,-9]`, `result=[2,4,8]`,
+      `runningTotal=8`.
+    - Known correct: Index `2` contains `3+2-1+4=8`, so all four
       overlapping updates contribute exactly once.
-8.  **Finish indexes `3` through `7`**
-    - **Before:** `runningTotal=8`; markers at indexes `3` through `6`
-      are zero, and the marker at index `7` is `1`.
-    - **Decision:** Store `8` through index `6`, then add marker `1`
+6.  Finish indexes `3` through `7`
+    - Decision: Store `8` through index `6`, then add marker `1`
       and store `9` at index `7`.
-    - **After:** `result=[2,4,8,8,8,8,8,9]`.
-    - **Known correct:** Every result position contains the sum of all
+    - After: `nextUpdate=none`,
+      `difference=[2,2,4,0,0,0,0,1,-9]`,
+      `result=[2,4,8,8,8,8,8,9]`, `runningTotal=9`.
+    - Known correct: Every result position contains the sum of all
       updates whose ranges include it.
 
 The extra final position allows an update to end at the last result
@@ -8069,6 +8522,10 @@ position once, so both phases finish.
 
 The function requires `length >= 0` and every update to satisfy
 `0 <= left <= right < length`.
+For the trace, call `applyRangeAdds` with `length=8` and updates
+`{0,7,3}`, `{1,7,2}`, `{0,6,-1}`, and `{2,7,4}`. The returned slice
+is `[2,4,8,8,8,8,8,9]`; each triple supplies `left`, `right`, and
+`delta` to one `rangeAdd`.
 
 ```go
 type rangeAdd struct{ left, right, delta int }
@@ -8133,97 +8590,35 @@ deltas must fit the chosen integer type.
 
 <a id="c1317-fenwick-and-segment-trees"></a>
 
-##### C.1.3.17 Update range summaries (Fenwick and segment trees)
+##### C.1.3.17 Update range sums (Fenwick and segment trees)
 
 ###### The problem it solves
 
-Given an array that changes between questions, update a value and
-answer a range question without scanning the whole requested range or
-rebuilding all saved prefix totals. A question may ask for a sum or,
-when the chosen structure supports it, another summary such as a
-minimum or maximum.
+An array changes between questions. Two operations may alternate:
+
+1. set one array value; and
+2. ask for the sum from index `left` through index `right`, including
+   both endpoints.
+
+Scanning that range answers one question but repeats work on later
+questions. A prefix-sum array answers quickly, but changing one value
+makes every later prefix sum stale. Segment trees and Fenwick trees
+save smaller block sums, so one change repairs only a few saved sums.
 
 ###### How it works
 
-Imagine labeled boxes that each hold a trusted total for a group of
-neighboring values. A query combines a small number of boxes. Changing
-one value repairs only the boxes whose groups contain that value.
+Both structures follow one rule:
 
-A **segment tree** makes those groups visible as a hierarchy. The root
-summarizes the whole array, its children summarize two halves, and the
-leaves summarize individual values. A point update changes one leaf
-and then its ancestors. A query combines non-overlapping nodes whose
-ranges exactly cover the requested range. The same layout can store
-any suitable summary, including sums, minimums, or maximums. The
-combine operation must be **associative**, meaning regrouping values
-does not change the result. It also needs an **identity**, a neutral
-value for unused ranges. Sum uses `0`; minimum uses positive infinity.
+> Every saved number is the sum of one named block of array values.
 
-A **Fenwick tree**, also called a **binary indexed tree**, is a
-compact slice designed mainly for prefix sums and related operations.
-Its stored positions start at `1` even when public indexes start at
-`0`. For a positive stored position `i`, `i & -i` isolates its lowest
-binary `1`; that power of two is the number of input values summarized
-at `sums[i]`. The group ends at public index `i-1`. For example,
-`sums[3]` covers one value, public index `2`, while `sums[4]` covers
-four values, public indexes `0..3`.
+A query combines saved blocks, or subtracts two combined prefixes, to
+cover the requested range exactly. An update repairs only blocks
+containing the changed index.
 
-To change a value, first calculate `delta = newValue-oldValue`. Start
-at stored position `index+1`, add `delta`, and repeatedly add
-`i & -i` to the position; these are exactly the stored groups that
-contain the changed public index. For a prefix sum, repeatedly
-subtract `i & -i`; the visited groups do not overlap and exactly cover
-the prefix. Subtracting the prefix before a range from the prefix
-through its end gives the range sum.
+**Segment tree: show every block.**
 
-###### Step-by-step examples
-
-Build a Fenwick tree for `[2,1,5,3]`. Query public indexes `1` through
-`2`, then change index `2` from `5` to `6`. Expect query result `6`
-and final total `12`. The stored slice has an unused position `0`.
-
-1.  **Add public index `0`, value `2`**
-    - **Before:** Stored positions `1` through `4` contain zero.
-    - **Decision:** Start at stored position `1`; add `2` at positions
-      `1`, `2`, and `4` by making the jumps `1 -> 2 -> 4`.
-    - **After:** Stored sums are `[2,2,0,2]` at positions `1..4`.
-    - **Known correct:** Those are exactly the stored groups that
-      contain public index `0`.
-2.  **Add public index `1`, value `1`**
-    - **Before:** Its stored position is `2`.
-    - **Decision:** Add `1` at positions `2` and `4`.
-    - **After:** Stored sums are `[2,3,0,3]`.
-    - **Known correct:** Position `2` totals public indexes `0..1`.
-3.  **Add public index `2`, value `5`**
-    - **Before:** Its stored position is `3`.
-    - **Decision:** Add `5` at positions `3` and `4`.
-    - **After:** Stored sums are `[2,3,5,8]`.
-    - **Known correct:** Position `3` stores index `2` alone, and
-      position `4` totals indexes `0..3` so far.
-4.  **Add public index `3`, value `3`**
-    - **Before:** Its stored position is `4`.
-    - **Decision:** Add `3` at position `4`.
-    - **After:** Stored sums are `[2,3,5,11]`.
-    - **Known correct:** Position `4` now totals all four values.
-5.  **Query indexes `1` through `2`**
-    - **Before:** The total through index `2` uses stored positions
-      `3` and `2`: `5+3=8`.
-    - **Decision:** Subtract the total before index `1`. Stored
-      position `1` holds it: `8-2`.
-    - **After:** The range result is `6`.
-    - **Known correct:** Subtraction removes index `0` and leaves
-      values `1+5`.
-6.  **Change index `2` from `5` to `6`**
-    - **Before:** The change amount is `+1`.
-    - **Decision:** Call the update with index `2` and delta `1`,
-      repairing stored positions `3` and `4`.
-    - **After:** Stored sums are `[2,3,6,12]`; total is `12`.
-    - **Known correct:** Only groups containing index `2` changed.
-
-When there are no values, a query must either report an error or
-return the result promised by the public method for an empty range.
-
-A segment tree stores the same values in a more visible hierarchy:
+A segment tree makes the blocks visible. For `[2,1,5,3]`, its leaves
+hold individual values. Each parent holds the sum of its two children:
 
 ```text
                  [0..3] = 11
@@ -8233,123 +8628,325 @@ A segment tree stores the same values in a more visible hierarchy:
        [0] = 2 [1] = 1  [2] = 5 [3] = 3
 ```
 
-Each node stores one range's sum. Query `1..2` by combining
-`[1] = 1` and `[2] = 5`, giving `6`. Changing index `2` from `5` to
-`6` repairs only ranges containing it:
+To set index `2` to `6`, change its leaf and rebuild the ancestors on
+the path to the root. To sum `0..1`, read the saved block `[0..1]`.
+To sum `1..2`, combine the two leaves `[1]` and `[2]`.
+
+**Fenwick tree: keep only selected sum blocks.**
+
+A Fenwick tree is a compact choice for sums. Public array indexes are
+zero-based. Fenwick positions are one-based, and position `0` is
+unused. Public index `0` maps to Fenwick position `1`, index `1` maps
+to position `2`, and so on. For `[2,1,5,3]`, the complete stored
+meaning is:
 
 ```text
-[2] = 6 -> [2..3] = 9 -> [0..3] = 12
+Fenwick   Binary   Public indexes in block   Saved sum
+position
+1         001      0                          2
+2         010      0..1                       3
+3         011      2                          5
+4         100      0..3                      11
 ```
 
-`[0..1] = 3` stays unchanged.
+For a positive Fenwick position `p`, `p & -p` returns its block size.
+The expression isolates the lowest-value `1` bit. For example, using
+eight displayed bits for position `12`:
+
+```text
+p          00001100
+-p         11110100
+p & -p     00000100 = 4
+```
+
+Go represents a negative integer so that `-p` is formed by flipping
+the bits of `p` and adding one. The addition leaves the lowest-value
+`1` in the same position, while `&` clears the other positions. Thus
+position `3` (`011`) has block size `1`, while position `4` (`100`)
+has block size `4`. Position `p` stores the block ending at public
+index `p-1` with that size.
+
+A prefix sum is the sum from public index `0` up to, but not
+including, an `end` index. Start at Fenwick position `end`. After
+reading one block, subtract its size to move just before that block.
+For example, `prefix(3)` reads positions `3` and `2`. Their blocks
+are public indexes `2` and `0..1`, which together cover `0..2`.
+
+The inclusive sum `left..right` is:
+
+```text
+prefix(right + 1) - prefix(left)
+```
+
+Setting a value first computes the change:
+
+```text
+delta = new value - old value
+```
+
+Starting at Fenwick position `index+1`, add `delta` to that block.
+Then add the block size to reach the next stored block containing the
+same public index. Stop after passing the final Fenwick position.
+
+For this four-value example, every possible update path is:
+
+```text
+public index   start position   repaired Fenwick positions
+0              1                1, 2, 4
+1              2                2, 4
+2              3                3, 4
+3              4                4
+```
+
+Each listed position's named block contains the public index in that
+row. No unlisted stored block contains it.
+
+###### Step-by-step examples
+
+Use `[2,1,5,3]`. First ask for the sum of public indexes `1..2`.
+Then set index `2` from `5` to `6`.
+
+Baseline: scan or rebuild.
+
+Initial state: `values=[2,1,5,3]`, `request=1..2`,
+`answer=pending`.
+
+1.  Answer by scanning
+    - Decision: Read both requested values and add `1+5`.
+    - After: `values=[2,1,5,3]`, `request=1..2`, `answer=6`.
+    - Known correct: Every value in `1..2` was included once, but
+      a long range would require many reads for every question.
+
+Initial state: `values=[2,1,5,3]`, `prefix=[0,2,3,8,11]`,
+`update=set(2,6)`.
+
+1.  Repair saved prefix sums
+    - Decision: Setting index `2` from `5` to `6` changes every
+      prefix sum after that value.
+    - After: `values=[2,1,6,3]`, `prefix=[0,2,3,9,12]`,
+      `update=done`.
+    - Known correct: Prefix sums make the query cheap but can make
+      one update repair many positions.
+
+Segment tree: visible blocks.
+
+Initial state: `blocks={[0..3]:11,[0..1]:3,[2..3]:8,
+[0]:2,[1]:1,[2]:5,[3]:3}`, `total=0`, `update=pending`.
+
+1.  Query indexes `1..2`
+    - Decision: The smallest exact cover is `[1]` and `[2]`; add
+      their saved sums: `1+5`.
+    - After: `blocks` unchanged, `total=6`, `update=pending`.
+    - Known correct: The chosen blocks do not overlap, and their
+      indexes together are exactly `1..2`.
+2.  Set index `2` to `6`
+    - Decision: Set leaf `[2]` to `6`, then recompute only its
+      parent and the root.
+    - After: `blocks={[0..3]:12,[0..1]:3,[2..3]:9,
+      [0]:2,[1]:1,[2]:6,[3]:3}`, `total=6`, `update=done`.
+    - Known correct: Those are exactly the saved blocks containing
+      index `2`.
+
+Fenwick tree: selected blocks.
+
+Build the initial Fenwick state from `values=[2,1,5,3]` by storing
+the sum of each position's block:
+
+```text
+sums[0] = 0                   unused position
+sums[1] = values[0]          = 2
+sums[2] = values[0] + values[1]
+        = 2 + 1              = 3
+sums[3] = values[2]          = 5
+sums[4] = values[0] + values[1] + values[2] + values[3]
+        = 2 + 1 + 5 + 3      = 11
+```
+
+Therefore the initial stored state is `sums=[0,2,3,5,11]`. It is not
+the prefix-sum array: position `3` stores only its one-value block,
+not the sum of public indexes `0..2`.
+
+Initial state: `values=[2,1,5,3]`, `sums=[0,2,3,5,11]`,
+`position=3`, `total=0`, `rangeAnswer=pending`.
+
+1.  Begin `prefix(3)`
+    - Decision: Position `3` has block size `1` and stores public
+      index `2`. Add `5`, then move to `3-1=2`.
+    - After: `values=[2,1,5,3]`, `sums=[0,2,3,5,11]`,
+      `position=2`, `total=5`, `rangeAnswer=pending`.
+    - Known correct: Public index `2` has been counted once.
+2.  Finish `prefix(3)`
+    - Decision: Position `2` has block size `2` and stores public
+      indexes `0..1`. Add `3`, then move to `2-2=0`.
+    - After: `values=[2,1,5,3]`, `sums=[0,2,3,5,11]`,
+      `position=0`, `total=8`, `rangeAnswer=pending`.
+    - Known correct: The disjoint blocks `0..1` and `2` exactly
+      cover the prefix `0..2`.
+3.  Compute the requested range
+    - Decision: Subtract `prefix(1)=2` from `prefix(3)=8`.
+    - After: `values=[2,1,5,3]`, `sums=[0,2,3,5,11]`,
+      `position=0`, `total=8`, `rangeAnswer=6`.
+    - Known correct: Subtraction removes index `0`, leaving only
+      values `1+5`.
+4.  Begin setting index `2` to `6`
+    - Decision: Compute `delta=1`; add it to position `3`,
+      whose block is public index `2`. Move to `3+1=4`.
+    - After: `values=[2,1,6,3]`, `sums=[0,2,3,6,11]`,
+      `position=4`, `total=8`, `rangeAnswer=6`.
+    - Known correct: The saved one-value block now matches the
+      changed array value.
+5.  Finish setting index `2`
+    - Decision: Position `4` has block size `4` and contains
+      index `2`. Add `1`, then move to `4+4=8`, past the tree.
+    - After: `values=[2,1,6,3]`, `sums=[0,2,3,6,12]`,
+      `position=8`, `total=8`, `rangeAnswer=6`.
+    - Known correct: Every stored block containing index `2` was
+      repaired, and every other block stayed unchanged.
 
 ###### Why it works
 
-Every stored summary equals the values in its assigned range. This is
-established by building segment-tree parents from their children. A
-new Fenwick tree represents an all-zero array, and adding each initial
-value preserves the same fact. A later segment-tree update changes one
-leaf and recombines its ancestors. A Fenwick update adds the same
-delta to every stored group containing the changed index. Both updates
-therefore preserve the stored-summary fact.
+The shared invariant is that every saved number equals the sum of its
+named block.
 
-A segment-tree query combines non-overlapping stored ranges whose
-union is the requested range. A Fenwick prefix query adds one ending
-group, then jumps just before that group; the visited groups likewise
-do not overlap and together cover the prefix. Subtracting the prefix
-before `left` removes exactly the values outside an inclusive range.
+In a segment tree, leaves satisfy the invariant because each contains
+one array value. A parent satisfies it after adding its two child
+blocks. An update rebuilds every ancestor of the changed leaf, so the
+invariant remains true. A query combines non-overlapping blocks whose
+union is the requested range, so it includes every requested value
+once and no value outside the range.
 
-Each segment-tree move reaches a range about twice as large or small.
-Each Fenwick jump changes at least one binary place and eventually
-passes the slice boundary or reaches zero. Both loops therefore finish
-after `O(log n)` moves.
+Fenwick position `p` stores the block of `p & -p` values ending at
+public index `p-1`. During a prefix query, subtracting that block size
+moves to the position immediately before the block just counted. The
+visited blocks therefore do not overlap and together cover the whole
+prefix. Subtracting the prefix before `left` from the prefix through
+`right` leaves exactly the inclusive range `left..right`.
+
+During a Fenwick update, starting at `index+1` and adding each block
+size visits exactly the stored blocks containing that public index.
+Adding the same `delta` repairs every affected sum. Query positions
+strictly decrease, and update positions strictly increase, so both
+loops finish.
 
 ###### Go example
 
-This compact implementation requires `length >= 0`. Before calling
-`add`, require `0 <= index < length`; before calling `rangeSum`,
-require `0 <= left <= right < length`. Sums must fit in `int`.
+This implementation stores the original values so `set` can accept a
+replacement value rather than requiring the caller to calculate a
+delta. Public indexes are zero-based. Internal Fenwick positions are
+one-based.
+
+Require `0 <= index < len(values)` for `set`. Require
+`0 <= left <= right < len(values)` for `rangeSum`. Sums must fit in
+`int`. The subtraction `newValue-oldValue` must also fit in `int`.
 
 ```go
-type fenwick struct{ sums []int }
-
-// Internal indices are one-based. For a positive oneBasedIndex,
-// oneBasedIndex & -oneBasedIndex isolates its lowest 1 bit; that
-// power of two is the size of the range stored at that index.
-func newFenwick(length int) *fenwick {
-	return &fenwick{sums: make([]int, length+1)}
+type fenwick struct {
+	values []int
+	sums   []int
 }
-func (tree *fenwick) add(index, delta int) {
-	// Start at the public index's one-based position. Adding the lowest
-	// set bit moves to the next larger stored range that also contains
-	// the updated value.
-	oneBasedIndex := index + 1
-	for oneBasedIndex < len(tree.sums) {
-		tree.sums[oneBasedIndex] += delta
-		oneBasedIndex += oneBasedIndex & -oneBasedIndex
+
+func newFenwick(values []int) *fenwick {
+	tree := &fenwick{
+		values: append([]int(nil), values...),
+		sums:   make([]int, len(values)+1),
+	}
+	for index, value := range values {
+		tree.addDelta(index, value)
+	}
+	return tree
+}
+
+// blockSize returns the number of array values summarized at a
+// positive, one-based Fenwick position.
+func blockSize(oneBasedPosition int) int {
+	// Two's-complement negation and AND isolate the lowest-value 1 bit;
+	// its numeric value is this position's block length.
+	return oneBasedPosition & -oneBasedPosition
+}
+
+func (tree *fenwick) addDelta(index, delta int) {
+	// Convert public index to its one-based Fenwick position. Every
+	// visited block contains that public index.
+	position := index + 1
+	for position < len(tree.sums) {
+		tree.sums[position] += delta
+		// Adding this block's size reaches the next larger stored block
+		// that also contains index.
+		position += blockSize(position)
 	}
 }
+
+func (tree *fenwick) set(index, newValue int) {
+	// Convert replacement into the change shared by every block that
+	// contains index, then keep the original-value copy synchronized.
+	delta := newValue - tree.values[index]
+	tree.values[index] = newValue
+	tree.addDelta(index, delta)
+}
+
+// prefix returns the sum of public indexes in [0,end).
 func (tree *fenwick) prefix(end int) int {
 	total := 0
-	// Subtracting the lowest set bit removes the range just counted. The
-	// visited disjoint ranges exactly cover the public half-open prefix
-	// [0,end).
-	oneBasedIndex := end
-	for oneBasedIndex > 0 {
-		total += tree.sums[oneBasedIndex]
-		oneBasedIndex -= oneBasedIndex & -oneBasedIndex
+	for position := end; position > 0; {
+		// This block ends immediately before the uncounted prefix boundary.
+		total += tree.sums[position]
+		// Subtract its size to move before the block just counted.
+		position -= blockSize(position)
 	}
 	return total
 }
 
-// Two prefix sums isolate the inclusive range [left,right].
+// rangeSum includes both left and right.
 func (tree *fenwick) rangeSum(left, right int) int {
 	return tree.prefix(right+1) - tree.prefix(left)
 }
 ```
 
-The public indices are zero-based; the stored Fenwick positions are
-one-based.
-
 ###### Work and memory
 
-For `n` values, both structures store `O(n)` summaries. Building a
-segment tree from all values takes `O(n)` time. Initializing the shown
-Fenwick slice takes `O(n)` time; inserting all `n` values through
-`add` takes `O(n log n)` time. Each compatible query or later update
-visits `O(log n)` summaries. Both structures use `O(n)` memory.
+Let `n` be the number of array values. A direct range scan takes up to
+`O(n)` time per query. Repairing a prefix-sum array takes up to `O(n)`
+time per update.
+
+A segment tree can be built in `O(n)` time. The shown Fenwick
+constructor adds `n` values in `O(n log n)` time. After construction,
+either structure handles one point update or compatible range query
+in `O(log n)` time and uses `O(n)` memory.
 
 ###### When to use it
 
-Use these structures when updates and queries alternate. A Fenwick
-tree is usually the simpler choice for point changes and prefix or
-range sums. A segment tree is more flexible when the query needs
-another associative summary, such as minimum or maximum. Use a prefix
-array for fixed data and a difference array when all updates precede
-one final rebuild.
+Use one of these structures when point updates and range questions
+alternate often. Choose a Fenwick tree for the smallest implementation
+when the questions are prefix sums or range sums. Choose a segment
+tree when visible ranges help clarity or when nodes must store another
+summary that can be combined from neighboring blocks, such as a
+minimum or maximum.
 
 ###### When not to use it
 
-The data never changes, all updates can be collected before one final
-pass, or the number of operations is small enough that a direct scan
-is clearer and fast enough.
+Use direct scans when there are only a few operations. Use prefix sums
+when values never change. Use a difference array when all range
+updates happen before one final rebuild. These simpler choices have
+less indexing machinery.
 
 ###### Common mistakes and edge cases
 
-> **Warning:** Calling `add(-1, delta)` converts the public index to
-> stored position `0`; because `0 & -0` is zero, the loop never
-> advances. Require `0 <= index < length` before calling the compact
-> method.
+> **Warning:** Fenwick position `0` has block size `0`. Starting an
+> update there would never advance. Convert a valid public index with
+> `index+1`, and reject negative or out-of-range indexes first.
 
-Likewise require `0 <= left <= right < length` for `rangeSum`. Choose
-the operation's correct identity, preserve combination order when
-changing the order changes the result, and account for sum overflow.
+Do not mix the inclusive public range `left..right` with the half-open
+prefix `[0,end)`. An empty tree has no valid nonempty range query.
+Check whether sums can overflow `int` for the problem's limits.
+
+For a segment tree, define what a query returns when a node does not
+overlap the requested range. For sums that neutral value is `0`.
 
 ###### Related material
 
 - [C.1.3.10.1 Coordinate compression](#c13101-coordinate-compression)
   maps large values to tree indices.
-- [C.1.3.15 Prefix sums](#c1315-prefix-sums) is simpler for immutable
+- [C.1.3.15 Prefix sums](#c1315-prefix-sums) is simpler for fixed
   data.
 - [C.1.3.16 Difference arrays](#c1316-difference-arrays) is simpler
   when all updates precede one rebuild.
@@ -8378,38 +8975,41 @@ Choose the most non-overlapping meetings from
 `(1,9),(2,4),(5,7),(8,10)`; expect three meetings. One meeting may
 start exactly when the previous meeting ends.
 
-1.  **Sort by ending time**
-    - **Before:** Meetings are in input order.
-    - **Decision:** Put earlier ending times first.
-    - **After:** Order is `(2,4),(5,7),(1,9),(8,10)`.
-    - **Known correct:** The scan will always see the compatible
+Initial state: `meetings=[(1,9),(2,4),(5,7),(8,10)]`,
+`candidate=unset`, `selected=[]`, `lastEnd=-infinity`.
+
+1.  Sort by ending time
+    - Decision: Put earlier ending times first.
+    - After: `meetings=[(2,4),(5,7),(1,9),(8,10)]`,
+      `candidate=(2,4)`, `selected=[]`, `lastEnd=-infinity`.
+    - Known correct: The scan will always see the compatible
       meeting that leaves the most time first.
-2.  **Inspect `(2,4)`**
-    - **Before:** Nothing is selected; `lastEnd` is `math.MinInt`, a
-      value no valid start can be smaller than.
-    - **Decision:** Its start is allowed, so select it.
-    - **After:** Selected is `[(2,4)]`; `lastEnd=4`.
-    - **Known correct:** Finishing at `4` leaves at least as much room
+2.  Inspect `(2,4)`
+    - Decision: Its start is allowed, so select it.
+    - After: `meetings=[(2,4),(5,7),(1,9),(8,10)]`,
+      `candidate=(5,7)`, `selected=[(2,4)]`, `lastEnd=4`.
+    - Known correct: Finishing at `4` leaves at least as much room
       as any other possible first meeting.
-3.  **Inspect `(5,7)`**
-    - **Before:** `5 >= lastEnd`.
-    - **Decision:** Select the meeting.
-    - **After:** Selected is `[(2,4),(5,7)]`; `lastEnd=7`.
-    - **Known correct:** It does not overlap either selected meeting.
-4.  **Inspect `(1,9)`**
-    - **Before:** `1 < lastEnd`.
-    - **Decision:** Skip it because it overlaps selected time.
-    - **After:** The selected list and `lastEnd=7` do not change.
-    - **Known correct:** A meeting ending at `9` would leave no more
+3.  Inspect `(5,7)`
+    - Decision: Its start `5` is at least `lastEnd=4`; select it.
+    - After: `meetings=[(2,4),(5,7),(1,9),(8,10)]`,
+      `candidate=(1,9)`, `selected=[(2,4),(5,7)]`, `lastEnd=7`.
+    - Known correct: It does not overlap either selected meeting.
+4.  Inspect `(1,9)`
+    - Decision: Its start `1` is before `lastEnd=7`; skip it.
+    - After: `meetings=[(2,4),(5,7),(1,9),(8,10)]`,
+      `candidate=(8,10)`, `selected=[(2,4),(5,7)]`, `lastEnd=7`.
+    - Known correct: A meeting ending at `9` would leave no more
       future room than the selected meeting ending at `7`.
-5.  **Inspect `(8,10)`**
-    - **Before:** `8 >= lastEnd`.
-    - **Decision:** Select it.
-    - **After:** Return `[(2,4),(5,7),(8,10)]`, whose length is `3`.
-    - **Known correct:** The new meeting starts after the previous one
+5.  Inspect `(8,10)`
+    - Decision: Its start `8` is at least `lastEnd=7`; select it.
+    - After: `meetings=[(2,4),(5,7),(1,9),(8,10)]`,
+      `candidate=done`, `selected=[(2,4),(5,7),(8,10)]`,
+      `lastEnd=10`.
+    - Known correct: The new meeting starts after the previous one
       ends.
 
-**Focused failure case.** For coin values `[1,3,4]` and target `6`,
+Focused failure case: for coin values `[1,3,4]` and target `6`,
 "take the largest coin" chooses `4+1+1`, using three coins. The
 expected best result is `3+3`, using two. The apparently largest
 choice blocks the better combination, so that rule is unsafe.
@@ -8428,6 +9028,9 @@ meeting per iteration and therefore finishes.
 
 Each meeting must satisfy `start <= end`. The function sorts the
 supplied slice in place; copy it first when mutation is forbidden.
+For the trace, the input is `[]meeting{{1,9},{2,4},{5,7},{8,10}}`.
+The returned slice is `[]meeting{{2,4},{5,7},{8,10}}`. The trace's
+`lastEnd` is the code's `endOfLastSelectedMeeting`.
 
 ```go
 import (
@@ -8482,8 +9085,9 @@ the alternatives must be explored and cannot be summarized that way.
 ###### Common mistakes and edge cases
 
 There is no universal rule such as "take the smallest" or "take the
-largest." The rule and proof depend on the problem. Verify every extra
-promise too, such as whether a majority is guaranteed to exist.
+largest." The rule and proof depend on the problem. In interval
+scheduling, sorting by start time or by shortest duration does not
+have the same safe-choice proof as sorting by end time.
 
 ###### Related material
 
@@ -8518,45 +9122,42 @@ are **sibling branches**.
 
 Generate all subsets of `[a,b]`; expect `[a,b]`, `[a]`, `[b]`, and
 `[]`, in that order. Here `path` holds included values, and `index`
-names the value whose include/exclude choice comes next.
+names the value whose include/exclude choice comes next. `result`
+holds copies of completed paths.
 
-1.  **Include `a` at index `0`**
-    - **Before:** `index=0`, `path=[]`.
-    - **Decision:** Append `a` and visit index `1`.
-    - **After:** `path=[a]`.
-    - **Known correct:** This branch represents subsets containing
+Initial state: `index=0`, `path=[]`, `result=[]`.
+
+1.  Include `a`
+    - Decision: Append `a` and visit index `1`.
+    - After: `index=1`, `path=[a]`, `result=[]`.
+    - Known correct: This branch represents subsets containing
       `a`.
-2.  **Include `b` at index `1`**
-    - **Before:** `index=1`, `path=[a]`.
-    - **Decision:** Append `b` and visit index `2`.
-    - **After:** The path is complete; save a copy `[a,b]`.
-    - **Known correct:** Both input values were included once.
-3.  **Undo `b`, then exclude it**
-    - **Before:** `path=[a,b]` after the recursive call returns.
-    - **Decision:** Remove the last value, restoring `[a]`, then visit
-      index `2` without appending `b`.
-    - **After:** Save a copy `[a]`.
-    - **Known correct:** Both choices for `b` under the include-`a`
+2.  Include `b`
+    - Decision: Append `b`, visit index `2`, and save a copy.
+    - After: `index=1`, `path=[a,b]`, `result=[[a,b]]`.
+    - Known correct: Both input values were included once.
+3.  Undo and exclude `b`
+    - Decision: Remove `b`, then visit index `2` without it.
+    - After: `index=0`, `path=[a]`, `result=[[a,b],[a]]`.
+    - Known correct: Both choices for `b` under the include-`a`
       branch are complete.
-4.  **Undo `a`, then exclude it**
-    - **Before:** Control has returned to index `0`; `path=[a]`.
-    - **Decision:** Remove `a`, restoring `[]`, then visit index `1`
+4.  Undo and exclude `a`
+    - Decision: Remove `a`, then visit index `1`
       without appending `a`.
-    - **After:** `index=1`, `path=[]`.
-    - **Known correct:** The new branch contains no choice left over
+    - After: `index=1`, `path=[]`, `result=[[a,b],[a]]`.
+    - Known correct: The new branch contains no choice left over
       from the include-`a` branch.
-5.  **Include `b`**
-    - **Before:** `index=1`, `path=[]`.
-    - **Decision:** Append `b`, visit index `2`, and save a copy.
-    - **After:** Saved result is `[b]`.
-    - **Known correct:** This is the branch excluding `a` and
+5.  Include `b`
+    - Decision: Append `b`, visit index `2`, and save a copy.
+    - After: `index=1`, `path=[b]`, `result=[[a,b],[a],[b]]`.
+    - Known correct: This is the branch excluding `a` and
       including `b`.
-6.  **Undo and exclude `b`**
-    - **Before:** `path=[b]` after the call returns.
-    - **Decision:** Remove `b`, visit index `2` without it, and save a
+6.  Undo and exclude `b`
+    - Decision: Remove `b`, visit index `2` without it, and save a
       copy.
-    - **After:** Saved result is `[]`; all four results are complete.
-    - **Known correct:** Every value had exactly one include or
+    - After: `index=done`, `path=[]`,
+      `result=[[a,b],[a],[b],[]]`.
+    - Known correct: Every value had exactly one include or
       exclude decision on each completed path.
 
 Saving `path` without copying would be wrong because later undo steps
@@ -8680,55 +9281,44 @@ explores a graph in that order. Each location is a **vertex**, and
 each direct connection is an **edge**.
 
 For ordinary reachability, one `seen` flag per vertex prevents repeat
-visits. Directed cycle detection needs three states instead: unseen,
-active on the current DFS route, and finished. An edge to an active
-vertex proves a cycle; an edge to a finished vertex does not. In an
-undirected graph, ignore the edge back to the current vertex's parent
-and treat another visited neighbor as a cycle.
+visits. Mark a vertex before following its edges. Otherwise an edge
+back to an earlier vertex can enter it again before it is marked. The
+contract is `seen[vertex] -> whether that vertex has been entered`.
+For example, `seen[B]=true` means DFS must not enter `B` again.
 
 ###### Step-by-step examples
 
 Traverse edges `A-B`, `A-C`, and `B-D` from `A`; one valid DFS order
 is `A,B,D,C`.
 
-1.  **Enter `A`**
-    - **Before:** Every vertex is unseen; order is empty.
-    - **Decision:** Mark `A` and append it to the order.
-    - **After:** Order is `[A]`; the active route ends at `A`.
-    - **Known correct:** A later edge back to `A` cannot schedule it
+Initial state: `seen={}`, `order=[]`, `activeRoute=[]`.
+
+1.  Enter `A`
+    - Decision: Mark `A` and append it to the order.
+    - After: `seen={A}`, `order=[A]`, `activeRoute=[A]`.
+    - Known correct: A later edge back to `A` cannot schedule it
       again.
-2.  **Follow edge `A-B`**
-    - **Before:** `B` is `A`'s first unseen neighbor.
-    - **Decision:** Enter `B`, mark it, and append it.
-    - **After:** Order is `[A,B]`; active route is `A-B`.
-    - **Known correct:** Both entered vertices appear exactly once.
-3.  **Follow edge `B-D`**
-    - **Before:** `D` is unseen.
-    - **Decision:** Enter `D`, mark it, and append it.
-    - **After:** Order is `[A,B,D]`; active route is `A-B-D`.
-    - **Known correct:** Every explored edge from `B` has led to its
+2.  Follow edge `A-B`
+    - Decision: Enter unseen `B`, mark it, and append it.
+    - After: `seen={A,B}`, `order=[A,B]`, `activeRoute=[A,B]`.
+    - Known correct: Both entered vertices appear exactly once.
+3.  Follow edge `B-D`
+    - Decision: Enter unseen `D`, mark it, and append it.
+    - After: `seen={A,B,D}`, `order=[A,B,D]`,
+      `activeRoute=[A,B,D]`.
+    - Known correct: Every explored edge from `B` has led to its
       unseen destination.
-4.  **Return from `D`, then `B`**
-    - **Before:** `D` has no unseen neighbor.
-    - **Decision:** Return to `B`; after `B` also has no unseen
-      neighbor, return to `A`.
-    - **After:** `A` resumes its neighbor loop.
-    - **Known correct:** Every route beginning through `B` is fully
+4.  Return from `D`, then `B`
+    - Decision: Neither has another unseen neighbor, so return to `A`.
+    - After: `seen={A,B,D}`, `order=[A,B,D]`, `activeRoute=[A]`.
+    - Known correct: Every route beginning through `B` is fully
       explored.
-5.  **Follow edge `A-C`**
-    - **Before:** `C` is `A`'s remaining unseen neighbor.
-    - **Decision:** Enter and mark `C`; it has no unseen neighbor.
-    - **After:** Order is `[A,B,D,C]`; return from `A`.
-    - **Known correct:** Every vertex reachable from `A` was entered
+5.  Follow edge `A-C`
+    - Decision: Enter and mark `C`, then return because it has no
+      unseen neighbor.
+    - After: `seen={A,B,C,D}`, `order=[A,B,D,C]`, `activeRoute=[]`.
+    - Known correct: Every vertex reachable from `A` was entered
       once.
-
-In a directed cycle `A->B->C->A`, an edge to an active vertex proves a
-cycle; an edge to a finished vertex does not.
-
-A tree-shaped use is calculating each directory's total size: descend
-through its files and subdirectories first. Once a subdirectory has
-been fully explored, return its total and add it to its parent
-directory's size.
 
 ###### Why it works
 
@@ -8745,6 +9335,9 @@ every call eventually finish.
 Validate `start` and every stored neighbor before calling this
 fragment. Use an explicit stack when a valid path may be too deep for
 recursion.
+For the trace, map `A=0`, `B=1`, `C=2`, and `D=3`, and pass
+`graph=[[1,2],[0,3],[0],[1]]` with `start=0`. The returned integer
+order `[0,1,3,2]` maps back to `[A,B,D,C]`.
 
 ```go
 func depthFirst(graph [][]int, start int) []int {
@@ -8785,7 +9378,8 @@ do not need the first discovered path to use the fewest moves.
 
 ###### When not to use it
 
-You need a route with the fewest equal-cost moves; use BFS instead.
+You need a route with the fewest equal-cost moves; use breadth-first
+search instead.
 Also avoid recursive DFS when a valid path can be too deep for the
 call stack unless the environment guarantees enough stack space.
 
@@ -8793,7 +9387,13 @@ call stack unless the environment guarantees enough stack space.
 
 Nested function calls consume memory. A path with too many steps may
 exceed the program's call limit, so use your own stack collection for
-very deep inputs.
+very deep inputs. Mark each vertex before exploring its neighbors;
+marking after recursion can revisit a cycle forever.
+
+One call visits only the vertices reachable from `start`. To traverse
+a disconnected graph, scan all vertices and start another DFS at each
+still-unseen vertex. Neighbor order can change the traversal order,
+but not which reachable vertices are visited.
 
 ###### Related material
 
@@ -8820,52 +9420,76 @@ records a shortest route.
 
 Ripples reach every point one step from a splash before points two
 steps away. **Breadth-first search (BFS)** explores a graph in the
-same layers, so each layer is one more move from the start.
+same layers, so each layer is one more move from the start. It uses a
+first-in, first-out queue: remove the oldest discovered vertex, add
+each unseen neighbor at the next distance, and mark that neighbor as
+soon as it enters the queue. Here,
+`distanceByVertex[vertex] -> fewest edges from the start`, with `-1`
+meaning undiscovered. For example, `distanceByVertex[E]=2` means the
+shortest route from `A` to `E` uses two edges.
 
 ###### Step-by-step examples
 
-On path `A-B-C-D`, find the distance from `A` to `D`; expect `3`.
+For this undirected graph, find the fewest edges from `A` to every
+vertex:
 
-1.  **Initialize the start**
-    - **Before:** All distances are `-1`, meaning undiscovered.
-    - **Decision:** Set `distance[A]=0` and enqueue `A`.
-    - **After:** Queue is `[A]`.
-    - **Known correct:** The start is zero moves from itself.
-2.  **Remove `A`**
-    - **Before:** `A` is the oldest queued vertex.
-    - **Decision:** Discover `B`, set `distance[B]=1`, and enqueue it.
-    - **After:** Queue is `[B]`.
-    - **Known correct:** Every route from `A` to `B` needs at least
-      one edge.
-3.  **Remove `B`**
-    - **Before:** `B` has distance `1`; `A` is already discovered.
-    - **Decision:** Skip `A`. Discover `C` at distance `2` and enqueue
-      it.
-    - **After:** Queue is `[C]`.
-    - **Known correct:** Every distance-1 vertex was processed before
-      `C` received distance `2`.
-4.  **Remove `C`**
-    - **Before:** `C` has distance `2`.
-    - **Decision:** Skip discovered `B`. Discover `D` at distance `3`
-      and enqueue it.
-    - **After:** Queue is `[D]`; `distance[D]=3`.
-    - **Known correct:** Every route with fewer than three edges has
-      already been considered.
-5.  **Remove `D`**
-    - **Before:** `D` is the only queued vertex.
-    - **Decision:** Its only neighbor is already discovered, so add
+```text
+A --- B
+|     |
+C --- D
+ \   /
+   E
+```
+
+The neighbor order is `A:[B,C]`, `B:[A,D]`, `C:[A,D,E]`,
+`D:[B,C,E]`, and `E:[C,D]`. Expect
+`distanceByVertex={A:0,B:1,C:1,D:2,E:2}`. The queue below lists only
+vertices still waiting to be removed.
+
+Initial state: `queue=[]`,
+`distanceByVertex={A:-1,B:-1,C:-1,D:-1,E:-1}`.
+
+1.  Initialize `A`
+    - Decision: Set its distance to `0` and enqueue it.
+    - After: `queue=[A]`,
+      `distanceByVertex={A:0,B:-1,C:-1,D:-1,E:-1}`.
+    - Known correct: The start is zero moves from itself.
+2.  Remove `A`
+    - Decision: Discover `B` and `C` at distance `1`; enqueue them
+      in that order.
+    - After: `queue=[B,C]`,
+      `distanceByVertex={A:0,B:1,C:1,D:-1,E:-1}`.
+    - Known correct: `B` and `C` form the complete distance-1
+      layer.
+3.  Remove `B`
+    - Decision: Skip discovered `A`; discover `D` at distance `2`
+      and mark it when it enters the queue.
+    - After: `queue=[C,D]`,
+      `distanceByVertex={A:0,B:1,C:1,D:2,E:-1}`.
+    - Known correct: `C` still waits at distance `1`, ahead of `D`
+      at distance `2`.
+4.  Remove `C`
+    - Decision: Skip `A` and the already-enqueued `D`; discover
+      `E` at distance `2` and enqueue it once.
+    - After: `queue=[D,E]`,
+      `distanceByVertex={A:0,B:1,C:1,D:2,E:2}`.
+    - Known correct: Both distance-1 vertices were removed before
+      either distance-2 vertex. Marking `D` on insertion prevented
+      `C` from enqueueing it again.
+5.  Remove `D`
+    - Decision: Skip its discovered neighbors, including `E`.
+      Reaching `E` through `A-B-D-E` would take `3` edges.
+    - After: `queue=[E]`,
+      `distanceByVertex={A:0,B:1,C:1,D:2,E:2}`.
+    - Known correct: The earlier route `A-C-E` keeps the shorter
+      distance `2`.
+6.  Remove `E`
+    - Decision: Both neighbors are already discovered, so add
       nothing.
-    - **After:** The queue is exhausted; return the distance array.
-    - **Known correct:** The fewest-move distance from `A` to `D` is
-      `3`.
-
-With several sources, enqueue all at distance zero before starting.
-With no source, the queue stays empty and no position is reachable.
-
-A grid use is a maze: process the start at distance `0`, its open
-neighbors at distance `1`, and their unseen neighbors at distance `2`.
-The first time the exit is added, you have found a route with the
-fewest moves.
+    - After: `queue=[]`,
+      `distanceByVertex={A:0,B:1,C:1,D:2,E:2}`.
+    - Known correct: The queue is empty, and every reachable
+      vertex has its fewest-edge distance from `A`.
 
 ###### Why it works
 
@@ -8881,6 +9505,10 @@ search terminates.
 
 Validate `start` and every stored neighbor before calling this
 fragment. Returned distance `-1` means unreachable.
+For the trace, map `A=0`, `B=1`, `C=2`, `D=3`, and `E=4`. Pass
+`graph=[[1,2],[0,3],[0,3,4],[1,2,4],[2,3]]` with `start=0`.
+The returned slice `[0,1,1,2,2]` stores the distances shown for
+`A` through `E` in that index order.
 
 ```go
 func breadthFirstDistances(graph [][]int, start int) []int {
@@ -8923,16 +9551,6 @@ queue, distances, and reached state. Here, `V` counts locations and
 You need the fewest moves through a network where every move costs the
 same, the nearest reachable position, or tree nodes grouped by depth.
 
-For distance to the nearest of several sources, enqueue every source
-at distance zero before starting. On `[S,.,.,.,S]`, the two ripples
-give the center distance `2`; running one BFS per source repeats work.
-
-When moves are reversible and one start and target are known, a
-bidirectional BFS can grow from both ends. Its **frontiers**, the
-outermost reached layers, stop when they meet. On `A-B-C-D-E`, the
-two searches meet at `C`; distances `2` and `2` give route length `4`.
-Keep their distance maps separate so the two values combine correctly.
-
 ###### When not to use it
 
 Moves have different costs. The route with the fewest moves may then
@@ -8974,41 +9592,61 @@ unfinished task in that same cycle.
 
 While cooking, chop ingredients before heating them and heat them
 before serving. A **topological order** lists every task after all of
-its prerequisites, repeatedly taking tasks that are ready.
+its prerequisites, repeatedly taking tasks that are ready. The lookup
+`unmetPrerequisites[task] -> unfinished prerequisites for task`
+controls readiness. A stored zero means the task may enter the ready
+queue.
 
 ###### Step-by-step examples
 
-For `Shop -> Cook -> Eat`, expect `[Shop,Cook,Eat]`.
+Use rules `Shop -> Cook`, `Prep -> Cook`, and `Cook -> Eat`. If ready
+tasks enter the queue in the listed task order, expect one valid order
+`[Shop,Prep,Cook,Eat]`.
 
-1.  **Count unfinished prerequisites**
-    - **Before:** No counts or ready queue exist.
-    - **Decision:** Count incoming rules for each task.
-    - **After:** Counts are `Shop=0`, `Cook=1`, and `Eat=1`; ready
-      queue is `[Shop]`.
-    - **Known correct:** `Shop` is the only task ready immediately.
-2.  **Complete `Shop`**
-    - **Before:** `Shop` is the oldest ready task.
-    - **Decision:** Remove it, append it to the output, and reduce
-      `Cook`'s unfinished count from `1` to `0`.
-    - **After:** Output is `[Shop]`; queue is `[Cook]`.
-    - **Known correct:** `Cook` enters the queue only after its sole
-      prerequisite appears in the output.
-3.  **Complete `Cook`**
-    - **Before:** `Cook` is ready; `Eat` has one unfinished
-      prerequisite.
-    - **Decision:** Output `Cook` and reduce `Eat`'s count to zero.
-    - **After:** Output is `[Shop,Cook]`; queue is `[Eat]`.
-    - **Known correct:** Both output tasks follow every prerequisite.
-4.  **Complete `Eat`**
-    - **Before:** `Eat` is the final ready task.
-    - **Decision:** Output it; it unlocks nothing else.
-    - **After:** Output is `[Shop,Cook,Eat]`; all three tasks were
-      processed.
-    - **Known correct:** Every arrow points from an earlier output
+The Go representation uses task order `[Shop,Prep,Cook,Eat]`, so the
+task indexes are `Shop=0`, `Prep=1`, `Cook=2`, and `Eat=3`.
+`graph[prerequisite]` stores the tasks it unlocks, giving
+`graph=[[2],[2],[3],[]]`. The integer output `[0,1,2,3]` maps back to
+the named order above.
+
+Initial state: `unmetPrerequisites=unset`, `queue=[]`, `output=[]`.
+
+1.  Count unfinished prerequisites
+    - Decision: Count incoming rules and enqueue each zero count.
+    - After: `unmetPrerequisites={Shop:0,Prep:0,Cook:2,Eat:1}`,
+      `queue=[Shop,Prep]`, `output=[]`.
+    - Known correct: `Shop` and `Prep` are the only tasks ready
+      immediately.
+2.  Complete `Shop`
+    - Decision: Output it and reduce `Cook`'s unfinished count from
+      `2` to `1`.
+    - After: `unmetPrerequisites={Shop:0,Prep:0,Cook:1,Eat:1}`,
+      `queue=[Prep]`, `output=[Shop]`.
+    - Known correct: `Cook` is not ready while `Prep` remains
+      unfinished.
+3.  Complete `Prep`
+    - Decision: Output it and reduce `Cook`'s count from `1` to `0`.
+    - After: `unmetPrerequisites={Shop:0,Prep:0,Cook:0,Eat:1}`,
+      `queue=[Cook]`, `output=[Shop,Prep]`.
+    - Known correct: `Cook` enters only after both prerequisites
+      appear in the output.
+4.  Complete `Cook`
+    - Decision: Output it and reduce `Eat`'s count to zero.
+    - After: `unmetPrerequisites={Shop:0,Prep:0,Cook:0,Eat:0}`,
+      `queue=[Eat]`, `output=[Shop,Prep,Cook]`.
+    - Known correct: Every output task follows all its prerequisites.
+5.  Complete `Eat`
+    - Decision: Output it; it unlocks nothing else.
+    - After: `unmetPrerequisites={Shop:0,Prep:0,Cook:0,Eat:0}`,
+      `queue=[]`,
+      `output=[Shop,Prep,Cook,Eat]`.
+    - Known correct: Every arrow points from an earlier output
       position to a later one.
 
-Adding `Eat -> Shop` leaves no zero-count task; processing fewer than
-all tasks proves a cycle blocks any valid order.
+Focused failure case: adding `Eat -> Shop` leaves only `Prep` ready.
+After outputting `Prep`, `Cook` still waits for `Shop`, while
+`Shop -> Cook -> Eat -> Shop` forms a cycle. The queue empties with
+only one of four tasks processed, so no complete order exists.
 
 ###### Why it works
 
@@ -9025,24 +9663,27 @@ cycle. A cycle cannot have a valid prerequisite order.
 
 ###### Go example
 
-Every stored destination must be a valid index in `graph`.
+Every stored destination must be a valid index in `graph`. For the
+traced input, `topologicalOrder([][]int{{2}, {2}, {3}, {}})` returns
+`([0,1,2,3], true)`, which maps to
+`([Shop,Prep,Cook,Eat], true)` using the declared task order.
 
 ```go
 func topologicalOrder(graph [][]int) ([]int, bool) {
-	// numUnmetPrerequisitesByVertex counts each vertex's unmet
-	// prerequisites.
-	numUnmetPrerequisitesByVertex := make([]int, len(graph))
+	// unmetPrerequisites stores each vertex's unfinished incoming-edge
+	// count.
+	unmetPrerequisites := make([]int, len(graph))
 	// Count every incoming edge once, including parallel prerequisites
 	// if present.
 	for _, destinations := range graph {
 		for _, destinationVertex := range destinations {
-			numUnmetPrerequisitesByVertex[destinationVertex]++
+			unmetPrerequisites[destinationVertex]++
 		}
 	}
 	// Vertices with no prerequisites can appear first.
 	queue := make([]int, 0, len(graph))
-	for vertex := range numUnmetPrerequisitesByVertex {
-		if numUnmetPrerequisitesByVertex[vertex] == 0 {
+	for vertex := range unmetPrerequisites {
+		if unmetPrerequisites[vertex] == 0 {
 			// This vertex is ready immediately because it has no incoming
 			// edge.
 			queue = append(queue, vertex)
@@ -9058,8 +9699,8 @@ func topologicalOrder(graph [][]int) ([]int, bool) {
 		order = append(order, vertex)
 		for _, destinationVertex := range graph[vertex] {
 			// Emitting vertex satisfies one prerequisite of this destination.
-			numUnmetPrerequisitesByVertex[destinationVertex]--
-			if numUnmetPrerequisitesByVertex[destinationVertex] == 0 {
+			unmetPrerequisites[destinationVertex]--
+			if unmetPrerequisites[destinationVertex] == 0 {
 				// The destination is ready after all its prerequisites reach the
 				// output.
 				queue = append(queue, destinationVertex)
@@ -9107,9 +9748,8 @@ the valid empty order.
 
 ###### Related material
 
-- [C.1.3.21 Breadth-first
-  search](#c1321-breadth-first-search) explains processing one
-  distance layer at a time.
+- [B.3 Queues and deques](#b3-queues-and-deques) explains the ready
+  queue's first-in, first-out behavior.
 - [C.1.3.20 Depth-first search](#c1320-depth-first-search) provides
   the postorder alternative.
 - [B.5 Graphs and grids](#b5-graphs-and-grids) defines directed edges.
@@ -9121,7 +9761,7 @@ the valid empty order.
 ###### The problem it solves
 
 Given a weighted graph, one starting vertex, and edge costs that are
-all zero or greater, return the cheapest known cost from the start to
+all zero or greater, return the cheapest route cost from the start to
 every reachable vertex. The method must decide when a tentative route
 is final so later work cannot reveal a cheaper route to that vertex.
 
@@ -9130,84 +9770,153 @@ is final so later work cannot reveal a cheaper route to that vertex.
 On a map with travel costs, always process the unvisited location with
 the cheapest known route from the starting location. This is
 **Dijkstra's algorithm**. A known cost that may still improve is
-**tentative**; a cost proved minimal is **finalized**.
+**tentative**; a cost proved minimal is **finalized**. The contracts
+are `distanceByVertex[vertex] -> cheapest route found so far` and
+`finalized[vertex] -> whether that stored cost is proved minimal`.
 
 ###### Step-by-step examples
 
-Let `A->B=4`, `A->C=1`, and `C->B=2`; from `A`, expect `B=3`.
+Apply the Go function below to the Network Delay Time problem. Each
+entry `[source,destination,time]` is a directed signal route. For
+`times=[[1,2,4],[1,3,1],[3,2,2],[2,4,1],[3,4,5]]`,
+`numVertices=4`, and `startVertex=1`, the expected answer is `4`.
 
-1.  **Initialize**
-    - **Before:** No route cost is known.
-    - **Decision:** Store `A=0`; store `infinity` for `B` and `C` to
-      mean they have not been reached.
-    - **After:** Costs are `A=0`, `B=infinity`, `C=infinity`.
-    - **Known correct:** The empty route reaches `A` at cost zero.
-2.  **Finalize `A`**
-    - **Before:** `A=0` is the cheapest unfinished cost.
-    - **Decision:** Follow `A->B` to offer cost `4`, then follow
-      `A->C` to offer cost `1`.
-    - **After:** Costs are `A=0`, `B=4`, `C=1`; `A` is final.
-    - **Known correct:** `B=4` and `C=1` are the cheapest routes found
-      so far.
-3.  **Finalize `C`**
-    - **Before:** `C=1` is cheaper than unfinished `B=4`.
-    - **Decision:** Following `C->B` offers `1+2=3`, which replaces
-      `B=4`.
-    - **After:** Costs are `A=0`, `B=3`, `C=1`; `C` is final.
-    - **Known correct:** Every unfinished route must already cost at
-      least `1`, and no non-negative edge can lower it below `1`.
-4.  **Finalize `B`**
-    - **Before:** `B=3` is the only unfinished reachable location.
-    - **Decision:** Mark `B` final. It has no outgoing edge to
-      improve.
-    - **After:** Final cost to `B` is `3`.
-    - **Known correct:** Any later route would start at cost at least
-      `3` and can only add a non-negative amount.
+The input labels vertices from `1` through `4`, while Go slices use
+indexes `0` through `3`. The graph-building loop converts every edge:
+`[1,2,4]` becomes `(0->1,4)`, `[1,3,1]` becomes `(0->2,1)`,
+`[3,2,2]` becomes `(2->1,2)`, `[2,4,1]` becomes `(1->3,1)`,
+and `[3,4,5]` becomes `(2->3,5)`. Each stored pair means
+`{destination,travelTime}`.
 
-A negative edge invalidates that finalization argument even when this
-particular trace happens to work.
+Initial state: `graph=[[],[],[],[]]`,
+`distanceByVertex=unset`, `finalized=unset`,
+`latestArrival=unset`.
+
+1.  Build the adjacency list
+    - Decision: Convert each one-based endpoint to a zero-based index
+      and append its route to the source's list.
+    - After: `graph=[[{1,4},{2,1}],[{3,1}],`
+      `[{1,2},{3,5}],[]]`, `distanceByVertex=unset`,
+      `finalized=unset`, `latestArrival=unset`.
+    - Known correct: Every input route appears once under its source.
+2.  Initialize the route state
+    - Decision: Set every distance to `infinity`, then set start index
+      `0` to `0`; no vertex is finalized yet.
+    - After: `distanceByVertex=[0,infinity,infinity,infinity]`,
+      `finalized=[false,false,false,false]`,
+      `latestArrival=unset`.
+    - Known correct: Vertex `1` receives the signal at time `0`; no
+      route to another vertex has been examined.
+3.  Finalize index `0`, input vertex `1`
+    - Decision: The dense scan selects distance `0`. Its two routes
+      offer arrival times `0+4=4` at index `1` and `0+1=1` at
+      index `2`.
+    - After: `distanceByVertex=[0,4,1,infinity]`,
+      `finalized=[true,false,false,false]`,
+      `latestArrival=unset`.
+    - Known correct: Index `0` has final distance `0`; the other
+      stored values are the cheapest routes found so far.
+4.  Finalize index `2`, input vertex `3`
+    - Decision: Its distance `1` is the smallest unfinished value.
+      Route `2->1` offers `1+2=3`, replacing `4`; route `2->3`
+      offers `1+5=6`.
+    - After: `distanceByVertex=[0,3,1,6]`,
+      `finalized=[true,false,true,false]`,
+      `latestArrival=unset`.
+    - Known correct: Index `2` has final distance `1`; index `1`
+      now records the cheaper route `0->2->1`.
+5.  Finalize index `1`, input vertex `2`
+    - Decision: Its distance `3` is now smallest. Route `1->3`
+      offers `3+1=4`, replacing `6`.
+    - After: `distanceByVertex=[0,3,1,4]`,
+      `finalized=[true,true,true,false]`,
+      `latestArrival=unset`.
+    - Known correct: Index `1` has final distance `3`; index `3`
+      keeps the cheaper complete route found so far.
+6.  Finalize index `3`, input vertex `4`
+    - Decision: Select its distance `4`; it has no outgoing route.
+    - After: `distanceByVertex=[0,3,1,4]`,
+      `finalized=[true,true,true,true]`,
+      `latestArrival=unset`.
+    - Known correct: Every vertex now has its minimum arrival time.
+7.  Produce the problem's answer
+    - Decision: Every distance is finite, and their maximum is `4`.
+    - After: `distanceByVertex=[0,3,1,4]`,
+      `finalized=[true,true,true,true]`, `latestArrival=4`,
+      `result=4`.
+    - Known correct: All vertices have received the signal by time
+      `4`, and vertex `4` cannot receive it earlier.
+
+For the focused failure input `times=[[1,2,1]]`,
+`numVertices=3`, and `startVertex=1`, index `2` remains at
+`infinity`. The final scan returns `-1` because not every vertex can
+receive the signal.
 
 ###### Why it works
 
 Let `d` be the cheapest unfinished route cost. Every route through
 another unfinished vertex already costs at least `d` before taking
 another edge. Because an edge cannot subtract cost, none can produce
-a route below `d`. The dense scan and a priority queue make this same
-cheapest-unfinished choice. Each outer iteration finalizes one vertex
-or stops when none is reachable, so at most `V` iterations run.
+a route below `d`. The dense scan makes this same cheapest-unfinished
+choice. Each outer iteration finalizes one vertex or stops when none
+is reachable, so at most `V` iterations run.
+
+After those iterations, each finite entry is that vertex's earliest
+signal-arrival time. All vertices have received the signal exactly
+when the latest of those arrivals occurs, so their maximum is the
+required answer. An `infinity` entry proves that no route from the
+start reaches that vertex, which requires the problem's `-1` result.
 
 ###### Go example
 
-This fragment requires a valid `start`, valid endpoints, non-negative
-costs, and every reachable route cost to be less than `math.MaxInt`.
+This function solves the problem traced above. It requires a positive
+`numVertices`, a `startVertex` from `1` through `numVertices`, and
+entries containing valid one-based endpoints and non-negative travel
+times. Every relevant route sum must fit in `int`.
 
 ```go
 import "math"
 
-type weightedEdge struct{ to, cost int }
+type networkEdge struct {
+	destination int
+	travelTime  int
+}
 
-func dijkstraDense(graph [][]weightedEdge, start int) []int {
-	// MaxInt is an infinity marker for vertices not yet reached;
-	// finalized marks costs already proved minimal.
+func networkDelayTime(
+	times [][]int,
+	numVertices int,
+	startVertex int,
+) int {
+	// Convert one-based input labels to a zero-based adjacency list.
+	graph := make([][]networkEdge, numVertices)
+	for _, time := range times {
+		source := time[0] - 1
+		destination := time[1] - 1
+		edge := networkEdge{
+			destination: destination,
+			travelTime:  time[2],
+		}
+		graph[source] = append(graph[source], edge)
+	}
+
+	// MaxInt marks vertices that no examined route has reached.
 	const infinity = math.MaxInt
-	distanceByVertex := make([]int, len(graph))
-	finalized := make([]bool, len(graph))
-	// Begin with every vertex unreachable, then give start its
-	// zero-length path.
+	distanceByVertex := make([]int, numVertices)
+	finalized := make([]bool, numVertices)
 	for vertex := range distanceByVertex {
 		distanceByVertex[vertex] = infinity
 	}
-	distanceByVertex[start] = 0
+	startIndex := startVertex - 1
+	distanceByVertex[startIndex] = 0
+
+	// Finalize one cheapest unfinished vertex per iteration.
 	for range graph {
-		// Among unfinished vertices, choose the smallest tentative
-		// distance.
 		selectedVertex := -1
 		for candidateVertex := range graph {
 			if finalized[candidateVertex] {
 				continue
 			}
-			// The -1 sentinel means no unfinished candidate has been
-			// selected. Store the first one before comparing distances.
+			// A negative index means the scan has no candidate yet.
 			if selectedVertex < 0 {
 				selectedVertex = candidateVertex
 				continue
@@ -9221,50 +9930,52 @@ func dijkstraDense(graph [][]weightedEdge, start int) []int {
 			}
 		}
 		if selectedVertex < 0 {
-			// Every vertex has already been finalized.
+			// Every vertex is already final.
 			break
 		}
 		if distanceByVertex[selectedVertex] == infinity {
-			// Unfinished vertices remain, but none is reachable.
+			// No route can reach any unfinished vertex.
 			break
 		}
 		finalized[selectedVertex] = true
 		for _, edge := range graph[selectedVertex] {
-			// Prove the route addition is safe before evaluating it.
-			if distanceByVertex[selectedVertex] > infinity-edge.cost {
+			// Guard the addition before extending the selected route.
+			if distanceByVertex[selectedVertex] >
+				infinity-edge.travelTime {
 				continue
 			}
 			candidateDistance :=
-				distanceByVertex[selectedVertex] + edge.cost
-			if candidateDistance < distanceByVertex[edge.to] {
-				// Keep the cheaper complete route to this destination.
-				distanceByVertex[edge.to] = candidateDistance
+				distanceByVertex[selectedVertex] + edge.travelTime
+			if candidateDistance <
+				distanceByVertex[edge.destination] {
+				// Keep the cheapest route found to this destination.
+				distanceByVertex[edge.destination] = candidateDistance
 			}
 		}
 	}
-	return distanceByVertex
+
+	// The final receiver determines when the whole network is reached.
+	latestArrival := 0
+	for _, arrivalTime := range distanceByVertex {
+		if arrivalTime == infinity {
+			return -1
+		}
+		if arrivalTime > latestArrival {
+			latestArrival = arrivalTime
+		}
+	}
+	return latestArrival
 }
 ```
-
-The dense scan is `O(V^2+E)`. A heap changes selection to the
-`O((V+E) log V)` form analyzed below.
 
 ###### Work and memory
 
 The shown dense version performs up to `V` selections, and each one
 scans `V` locations. Together with examining `E` connections, that is
-`O(V^2 + E)` time. Its distance and finalized slices use `O(V)` extra
-memory beyond the graph.
-
-An adjacency list stores each location's outgoing connections. With
-these lists and a **binary heap**, a priority queue arranged like a
-tree with at most two children per position, the usual implementation
-takes `O((V + E) log V)` time and `O(V + E)` storage including the
-graph. Here, `V` counts locations and `E` counts connections. Some
-priority queues support **decrease-key**,
-which edits the priority of an entry already stored. When that
-operation is unavailable, push a new improved entry and later discard
-any popped entry whose cost no longer equals the stored best cost.
+`O(V^2 + E)` time. Building the adjacency list stores `E` edges, and
+the graph, distance slice, and finalized slice use `O(V + E)` memory.
+Here, `V` counts network vertices and `E` counts directed signal
+routes.
 
 ###### When to use it
 
@@ -9282,8 +9993,10 @@ same cost, breadth-first search is simpler.
 > `A->B=4`, `A->C=7`, and `C->B=-5`, finalizing `B=4` before
 > processing `C` misses the cheaper route of cost `2`.
 
-Validate the start and endpoints, reject negative costs, ignore stale
-heap entries, and guard route-cost addition before evaluating it.
+Validate the start and endpoints, reject negative costs, and guard
+route-cost addition before evaluating it. For Network Delay Time,
+also return the greatest finalized distance rather than one chosen
+destination's distance, and return `-1` if any distance is infinite.
 
 ###### Related material
 
@@ -9291,8 +10004,9 @@ heap entries, and guard route-cost addition before evaluating it.
   simpler for equal costs.
 - [C.1.3.24 Bellman-Ford](#c1324-bellman-ford-shortest-paths) permits
   negative edges.
-- [D.5 Priority queues](#d5-priority-queues) explains Go heap
-  behavior.
+- [LeetCode 743: Network Delay
+  Time](https://leetcode.com/problems/network-delay-time/) is the
+  concrete problem traced above.
 
 <a id="c1324-bellman-ford-shortest-paths"></a>
 
@@ -9311,49 +10025,58 @@ finalized after its first apparently cheapest route.
 Imagine updating a road map whenever one route sign reveals a cheaper
 trip to the next town. Repeat across every road until cheaper news has
 had time to cross the whole map. This is the **Bellman-Ford** method.
+For an edge `from -> to`, add its cost to the known cost of `from`.
+If that route is cheaper than the stored cost of `to`, replace the
+stored cost. This comparison is called **relaxing** the edge. Here,
+`distanceByVertex[vertex] -> cheapest route cost found from start`,
+with `infinity` meaning no route has reached that vertex yet.
 
 ###### Step-by-step examples
 
-Let `A->B=4`, `A->C=7`, and `C->B=-5`; from `A`, expect `B=2`.
-Scan the edges in the order shown.
+Let `C->B=-5`, `A->C=7`, and `A->B=4`; from `A`, expect `B=2`.
+Scan the edges in that order so cheaper news must cross a later pass.
 
-1.  **Initialize**
-    - **Before:** Every cost is unknown.
-    - **Decision:** Set `A=0`; use `infinity` for `B` and `C`.
-    - **After:** Costs are `A=0`, `B=infinity`, `C=infinity`.
-    - **Known correct:** The start reaches itself with no edge.
-2.  **First pass, edge `A->B=4`**
-    - **Before:** `A=0`, `B=infinity`.
-    - **Decision:** Candidate `0+4=4` is cheaper, so store `B=4`.
-    - **After:** `B` has a known one-edge route.
-    - **Known correct:** That route is exactly `A->B`.
-3.  **First pass, edge `A->C=7`**
-    - **Before:** `A=0`, `C=infinity`.
-    - **Decision:** Store candidate `0+7=7` for `C`.
-    - **After:** `C=7`.
-    - **Known correct:** The stored route is exactly `A->C`.
-4.  **First pass, edge `C->B=-5`**
-    - **Before:** `C=7`, `B=4`.
-    - **Decision:** Candidate `7-5=2` is cheaper than `4`, so replace
-      `B`'s cost.
-    - **After:** `B=2`.
-    - **Known correct:** The stored route is `A->C->B` and costs `2`.
-5.  **Second pass**
-    - **Before:** Costs are `A=0`, `B=2`, `C=7`.
-    - **Decision:** Try all three edges again; none produces a smaller
-      cost.
-    - **After:** Stop the main passes early because nothing changed.
-    - **Known correct:** Repeating the same comparisons cannot create
-      a new route cost without an earlier improvement.
-6.  **Cycle-check pass**
-    - **Before:** Every simple route has had enough passes to spread.
-    - **Decision:** Scan every edge one more time.
-    - **After:** No cost falls; return `true` with `B=2`.
-    - **Known correct:** No reachable negative cycle can keep reducing
+Initial state: `pass=1`, `nextEdge=C->B`,
+`distanceByVertex={A:0,B:infinity,C:infinity}`, `changed=false`.
+
+1.  Skip `C->B=-5`
+    - Decision: `C` is still unreachable, so this edge cannot yet
+      offer a route to `B`.
+    - After: `pass=1`, `nextEdge=A->C`,
+      `distanceByVertex={A:0,B:infinity,C:infinity}`,
+      `changed=false`.
+    - Known correct: No route to `C` has reached this earlier edge.
+2.  Relax `A->C=7`
+    - Decision: Candidate `0+7=7` is cheaper, so store `C=7`.
+    - After: `pass=1`, `nextEdge=A->B`,
+      `distanceByVertex={A:0,B:infinity,C:7}`, `changed=true`.
+    - Known correct: The stored route is exactly `A->C`.
+3.  Relax `A->B=4`
+    - Decision: Candidate `0+4=4` is cheaper, so store `B=4`.
+    - After: `pass=2`, `nextEdge=C->B`,
+      `distanceByVertex={A:0,B:4,C:7}`, `changed=false`.
+    - Known correct: The first pass found both one-edge routes, but
+      the earlier `C->B` edge has not reused `C=7` yet.
+4.  Ripple the cheaper route on pass `2`
+    - Decision: `C->B` now offers `7-5=2`, replacing `B=4`.
+      Neither edge from `A` improves afterward.
+    - After: `pass=cycleCheck`, `nextEdge=C->B`,
+      `distanceByVertex={A:0,B:2,C:7}`, `changed=true`.
+    - Known correct: The two-edge route `A->C->B` became available
+      only after its first edge was known from the prior pass.
+5.  Run the cycle check
+    - Decision: Scan every edge once more; no cost improves.
+    - After: `pass=done`, `nextEdge=none`,
+      `distanceByVertex={A:0,B:2,C:7}`, `changed=false`.
+    - Known correct: No reachable negative cycle can keep reducing
       a cost.
 
-For `B->C=1` and `C->B=-2`, an extra pass still lowers a cost and
-proves no finite minimum exists for affected vertices.
+Focused failure case: use edges `A->B=1`, `B->C=1`, and
+`C->B=-2`. After the required two main passes, costs are `A=0`,
+`B=-1`, and `C=1`. On the cycle-check pass, `B->C` offers
+`-1+1=0`, which is below `C=1`. The cost can still fall because the
+cycle `B->C->B` costs `-1` each time around, so no finite minimum
+exists for `B` or `C`; return `false`.
 
 ###### Why it works
 
@@ -9381,6 +10104,10 @@ minimum then exists for that cycle or anything reachable from it.
 This fragment requires `numVertices > 0`, a valid `start`, valid
 endpoints, and every evaluated sum
 `distance[edge.from]+edge.cost` to fit in `int64`.
+For the trace, map `A=0`, `B=1`, and `C=2`, then pass the edges
+`{2,1,-5}`, `{0,2,7}`, and `{0,1,4}` in that order with
+`numVertices=3` and `start=0`. The function returns
+`([0,2,7], true)` for vertices `[A,B,C]`.
 
 ```go
 import "math"
@@ -9508,7 +10235,10 @@ Imagine that every connected group has one shared group leader. To
 check whether two items are connected, find each item's leader and
 compare them. To connect two different groups, make one leader report
 to the other. This structure is a **disjoint-set union (DSU)**. It is
-also called **union-find**, after its two main operations.
+also called **union-find**, after its two main operations. Its lookup
+contracts are `parentByItem[item] -> next item toward the leader` and
+`numItemsByRoot[root] -> number of items in that leader's group`.
+Only self-parenting leaders have a meaningful stored size.
 
 ###### Step-by-step examples
 
@@ -9516,34 +10246,55 @@ Create three items, connect `0-1`, then `1-2`; expect `0` and `2` to
 be connected. In each shown pair, `item:parent` names an item and its
 stored parent.
 
-1.  **Initialize three groups**
-    - **Before:** The parent and size slices have just been allocated.
-    - **Decision:** Make every item its own parent with size `1`.
-    - **After:** Parents are `[0:0,1:1,2:2]`; sizes are `[1,1,1]`.
-    - **Known correct:** No connection exists, so each item is its own
+Initial state: `parentByItem=unset`, `numItemsByRoot=unset`,
+`nextUnion=0-1`.
+
+1.  Initialize three groups
+    - Decision: Make every item its own parent with size `1`.
+    - After: `parentByItem=[0:0,1:1,2:2]`,
+      `numItemsByRoot=[1,1,1]`,
+      `nextUnion=0-1`.
+    - Known correct: No connection exists, so each item is its own
       one-item group.
-2.  **Union `0` and `1`**
-    - **Before:** `find(0)=0`, `find(1)=1`; both groups have size `1`.
-    - **Decision:** Attach root `1` below root `0` and add its size.
-    - **After:** Parents are `[0:0,1:0,2:2]`; root `0` has size `2`.
-    - **Known correct:** Exactly items `0` and `1` share a leader.
-3.  **Find leaders for union `1` and `2`**
-    - **Before:** Item `1` points to `0`; item `2` points to itself.
-    - **Decision:** `find(1)` follows its parent and returns `0`;
+2.  Union `0` and `1`
+    - Decision: Attach root `1` below root `0` and add its size.
+    - After: `parentByItem=[0:0,1:0,2:2]`,
+      `numItemsByRoot=[2,1,1]`,
+      `nextUnion=1-2`.
+    - Known correct: Exactly items `0` and `1` share a leader.
+3.  Find leaders for union `1` and `2`
+    - Decision: `find(1)` follows its parent and returns `0`;
       `find(2)` returns `2`.
-    - **After:** The two group roots are `0` and `2`.
-    - **Known correct:** The roots differ, so the new edge joins two
+    - After: `parentByItem=[0:0,1:0,2:2]`,
+      `numItemsByRoot=[2,1,1]`,
+      `nextUnion=roots(0,2)`.
+    - Known correct: The roots differ, so the new edge joins two
       separate groups.
-4.  **Join the two groups**
-    - **Before:** Root `0` has size `2`; root `2` has size `1`.
-    - **Decision:** Attach smaller root `2` below root `0` and add its
+4.  Join the two groups
+    - Decision: Attach smaller root `2` below root `0` and add its
       size.
-    - **After:** Parents are `[0:0,1:0,2:0]`; root `0` has size `3`.
-    - **Known correct:** `find(0)` and `find(2)` both return `0`, so
+    - After: `parentByItem=[0:0,1:0,2:0]`,
+      `numItemsByRoot=[3,1,1]`,
+      `nextUnion=none`.
+    - Known correct: `find(0)` and `find(2)` both return `0`, so
       all added connections are represented.
 
 Unioning already-connected items changes nothing and can signal that a
 new undirected edge would form a cycle.
+
+Path compression becomes visible with four items. After unions
+`0-1`, `2-3`, and `0-2`, a valid parent state is
+`parentByItem=[0:0,1:0,2:0,3:2]`.
+
+Initial state: `item=3`,
+`parentByItem=[0:0,1:0,2:0,3:2]`, `root=unknown`.
+
+1.  Find and compress item `3`
+    - Decision: Follow `3 -> 2 -> 0`; redirect `3` to root `0`.
+    - After: `item=0`, `parentByItem=[0:0,1:0,2:0,3:0]`,
+      `root=0`.
+    - Known correct: Group membership is unchanged, while the next
+      `find(3)` reaches its leader in one link.
 
 ###### Why it works
 
@@ -9566,6 +10317,9 @@ later searches.
 
 `newDisjointSet` requires `numItems >= 0`. Validate every item against
 the set's length before calling `find` or `union`.
+For the trace, create `set := newDisjointSet(3)`, then call
+`set.union(0, 1)` and `set.union(1, 2)`. Both return `true`, and
+`set.find(0) == set.find(2)` is true.
 
 ```go
 type disjointSet struct {
@@ -9661,15 +10415,14 @@ recorded group size.
 
 <a id="c1326-minimum-spanning-tree"></a>
 
-##### C.1.3.26 Connect at least cost (minimum spanning tree)
+##### C.1.3.26 Connect at lowest cost (minimum spanning tree)
 
 ###### The problem it solves
 
-Given locations and optional two-way connections with costs, choose
-connections that link every location with the smallest possible total
-cost. The chosen connections must not contain a cycle, because an edge
-on that cycle could be removed while the locations remain connected,
-leaving unnecessary cost.
+Given locations and optional two-way connections with costs, choose a
+set of connections that forms a tree across every location. Among all
+such **spanning trees**, return one with the smallest total cost. A
+tree is connected and contains no cycle.
 
 ###### How it works
 
@@ -9681,35 +10434,53 @@ route from one chosen village.
 
 ###### Step-by-step examples
 
-For `A-B=1`, `B-C=2`, and `A-C=5`, expect total cost `3`.
+For `A-B=1`, `B-C=2`, `A-C=3`, `C-D=4`, and `A-D=10`, expect
+total cost `7`.
 
-1.  **Sort the edges**
-    - **Before:** Edges may be in any input order.
-    - **Decision:** Sort from smallest to largest cost.
-    - **After:** Order is `A-B=1`, `B-C=2`, `A-C=5`.
-    - **Known correct:** Every later unexamined edge costs at least as
+Initial state: `edges=[A-D:10,A-C:3,C-D:4,A-B:1,B-C:2]`,
+`next=unsorted`, `groups={{A},{B},{C},{D}}`, `accepted=[]`,
+`total=0`.
+
+1.  Sort the edges
+    - Decision: Sort from smallest to largest cost.
+    - After: `edges=[A-B:1,B-C:2,A-C:3,C-D:4,A-D:10]`,
+      `next=A-B`, `groups={{A},{B},{C},{D}}`, `accepted=[]`,
+      `total=0`.
+    - Known correct: Every later unexamined edge costs at least as
       much as the current edge.
-2.  **Inspect `A-B=1`**
-    - **Before:** Groups are `{A}`, `{B}`, and `{C}`.
-    - **Decision:** Its ends are in different groups, so accept it and
+2.  Inspect `A-B=1`
+    - Decision: Its ends are in different groups, so accept it and
       join their groups.
-    - **After:** Accepted edges are `[A-B]`; groups are `{A,B}` and
-      `{C}`.
-    - **Known correct:** The accepted forest has no loop.
-3.  **Inspect `B-C=2`**
-    - **Before:** `B` and `C` have different group leaders.
-    - **Decision:** Accept the edge and join the groups.
-    - **After:** Accepted edges are `[A-B,B-C]`; total cost is `3`.
-    - **Known correct:** Three vertices are connected by `V-1=2`
-      edges, so the result is a tree.
-4.  **Stop**
-    - **Before:** The algorithm has accepted `V-1` edges.
-    - **Decision:** Break without examining `A-C=5`.
-    - **After:** Return total `3` and success.
-    - **Known correct:** Any additional edge would create a loop and
-      cannot be part of a tree on these vertices.
+    - After: `next=B-C`, `groups={{A,B},{C},{D}}`,
+      `accepted=[A-B]`, `total=1`.
+    - Known correct: The accepted forest has no loop.
+3.  Inspect `B-C=2`
+    - Decision: Its ends are in different groups, so accept it.
+    - After: `next=A-C`, `groups={{A,B,C},{D}}`,
+      `accepted=[A-B,B-C]`, `total=3`.
+    - Known correct: The accepted edges connect three vertices
+      without a cycle; `D` still needs a connection.
+4.  Inspect `A-C=3`
+    - Decision: Both ends already belong to `{A,B,C}`, so reject
+      this cycle-forming edge.
+    - After: `next=C-D`, `groups={{A,B,C},{D}}`,
+      `accepted=[A-B,B-C]`, `total=3`.
+    - Known correct: Rejecting the edge preserves the same connected
+      groups and keeps the accepted forest acyclic.
+5.  Inspect `C-D=4`
+    - Decision: Its ends are in different groups, so accept it.
+    - After: `next=A-D`, `groups={{A,B,C,D}}`,
+      `accepted=[A-B,B-C,C-D]`, `total=7`.
+    - Known correct: Four vertices are connected by `V-1=3` edges,
+      so the result is a tree.
+6.  Stop
+    - Decision: `V-1` edges are accepted; skip `A-D=10`.
+    - After: `next=done`, `groups={{A,B,C,D}}`,
+      `accepted=[A-B,B-C,C-D]`, `total=7`.
+    - Known correct: The accepted edges already form a spanning tree;
+      any additional edge would create a cycle.
 
-**Focused failure case.** With only `A-B=1` and isolated vertex `C`,
+Focused failure case: with only `A-B=1` and isolated vertex `C`,
 the scan accepts one edge, fewer than `V-1=2`. The expected result is
 failure plus the forest edge `A-B`, not a spanning tree.
 
@@ -9736,6 +10507,9 @@ for each separate connected group.
 This fragment uses the disjoint-set code above and requires
 `numVertices >= 0` and valid endpoints. It sorts `edges` in place;
 copy the slice first when its order must survive.
+For the trace, map `A=0`, `B=1`, `C=2`, and `D=3`. Pass
+`numVertices=4` and edges `{0,3,10}`, `{0,2,3}`, `{2,3,4}`,
+`{0,1,1}`, and `{1,2,2}`. `kruskal` returns `(7, true)`.
 
 ```go
 import "sort"
@@ -9772,10 +10546,10 @@ func kruskal(numVertices int, edges []mstEdge) (int, bool) {
 
 ###### Work and memory
 
-Kruskal takes `O(E log E)` time and `O(V + E)` storage including its
-edge list and disjoint-set data. Prim with adjacency lists and a
-binary heap takes `O(E log V)` time and `O(V + E)` storage including
-the graph.
+Kruskal takes `O(E log E)` time to sort and scan `E` edges. The
+disjoint set uses `O(V)` auxiliary memory for `V` vertices. The input
+edge list itself uses `O(E)` memory; sorting it in place avoids an
+additional edge-list copy.
 
 ###### When to use it
 
@@ -9784,16 +10558,16 @@ minimum total edge cost and no cycle.
 
 ###### When not to use it
 
-The goal is the cheapest route from one starting vertex, not the
-cheapest total network, or when the directed edges do not represent an
-undirected connection problem.
+Do not use it when the goal is the cheapest route from one starting
+vertex rather than the cheapest total tree. It also does not apply
+when directed edges cannot be treated as two-way connections.
 
 ###### Common mistakes and edge cases
 
 > **Warning:** Accepting an edge whose endpoints already share a
-> leader creates a cycle. In the triangle `A-B=1`, `B-C=2`, `A-C=5`,
-> the last edge must never be accepted. The shown implementation stops
-> as soon as the first two edges complete the tree.
+> leader creates a cycle. In the example, `A-C=3` must be rejected
+> even though vertex `D` is not connected yet. Only an edge crossing
+> from `{A,B,C}` to `{D}` can help complete the tree.
 
 Validate nonnegative vertex count and every endpoint. Copy the edge
 slice when the caller's order must survive, and use checked or wider
@@ -9804,8 +10578,6 @@ treats an empty graph as successfully spanned with cost zero.
 
 - [C.1.3.25 Disjoint-set union](#c1325-disjoint-set-union) supports
   Kruskal.
-- [C.1.3.27 Heap or priority queue](#c1327-heap-or-priority-queue)
-  supports Prim.
 - [C.1.3.23 Dijkstra shortest paths](#c1323-dijkstra-shortest-paths)
   minimizes routes from one start, not total network cost.
 
@@ -9827,45 +10599,47 @@ the earliest arrival. A **priority queue** follows that rule. A
 **heap** keeps the next patient easy to find without fully sorting the
 whole waiting room after every change.
 
+A min-heap stores a tree in a slice. The root is at index `0`. For an
+item at index `i`, its parent is at `(i-1)/2`; its children are at
+`2*i+1` and `2*i+2` when those indexes exist. Every parent is no
+greater than its children, so the root is always the minimum. Other
+slice positions are not globally sorted.
+
 ###### Step-by-step examples
 
 Insert job priorities `5`, `2`, and `8` into a min-heap, where a
 smaller number means a more urgent job. Expect removals `2,5,8`. The
 slice displays the tree one level at a time, with its root first.
 
-1.  **Insert `5`**
-    - **Before:** Heap is empty.
-    - **Decision:** Append `5`; it has no parent to compare with.
-    - **After:** Heap is `[5]`.
-    - **Known correct:** The only value is the minimum.
-2.  **Insert `2`**
-    - **Before:** Heap is `[5]`.
-    - **Decision:** Append `2`, then swap it with parent `5` because
+Initial state: `heap=[]`, `next=insert(5)`, `removed=[]`.
+
+1.  Insert `5`
+    - Decision: Append `5`; it has no parent to compare with.
+    - After: `heap=[5]`, `next=insert(2)`, `removed=[]`.
+    - Known correct: The only value is the minimum.
+2.  Insert `2`
+    - Decision: Append `2`, then swap it with parent `5` because
       `2` is smaller.
-    - **After:** Heap is `[2,5]`.
-    - **Known correct:** The parent is no greater than its child.
-3.  **Insert `8`**
-    - **Before:** Heap is `[2,5]`.
-    - **Decision:** Append `8`; its parent `2` is already smaller.
-    - **After:** Heap is `[2,5,8]`.
-    - **Known correct:** Root `2` is smaller than both children.
-4.  **Remove `2`**
-    - **Before:** Root is `2`; last value is `8`.
-    - **Decision:** Save `2`, move `8` to the root, then swap it with
+    - After: `heap=[2,5]`, `next=insert(8)`, `removed=[]`.
+    - Known correct: The parent is no greater than its child.
+3.  Insert `8`
+    - Decision: Append `8`; its parent `2` is already smaller.
+    - After: `heap=[2,5,8]`, `next=remove`, `removed=[]`.
+    - Known correct: Root `2` is smaller than both children.
+4.  Remove `2`
+    - Decision: Save `2`, move `8` to the root, then swap it with
       smaller child `5`.
-    - **After:** Return `2`; heap is `[5,8]`.
-    - **Known correct:** The removed value was the minimum, and root
+    - After: `heap=[5,8]`, `next=remove`, `removed=[2]`.
+    - Known correct: The removed value was the minimum, and root
       `5` is the new minimum.
-5.  **Remove `5`**
-    - **Before:** Heap is `[5,8]`.
-    - **Decision:** Save `5` and move the last value `8` to the root.
-    - **After:** Return `5`; heap is `[8]`.
-    - **Known correct:** The only remaining value is the new minimum.
-6.  **Remove `8`**
-    - **Before:** Heap is `[8]`.
-    - **Decision:** Remove the sole value.
-    - **After:** Return `8`; heap is empty; output is `[2,5,8]`.
-    - **Known correct:** Every removal returned the smallest value
+5.  Remove `5`
+    - Decision: Save `5` and move final value `8` to the root.
+    - After: `heap=[8]`, `next=remove`, `removed=[2,5]`.
+    - Known correct: The only remaining value is the new minimum.
+6.  Remove `8`
+    - Decision: Remove the sole value.
+    - After: `heap=[]`, `next=done`, `removed=[2,5,8]`.
+    - Known correct: Every removal returned the smallest value
       stored at that time.
 
 Before reading or removing from an empty heap, decide how the function
@@ -9876,35 +10650,85 @@ will report that no value exists.
 The heap contains exactly the items still under consideration, and
 in a min-heap every parent value is no greater than either child. Any
 path from the root therefore cannot reach a value smaller than the
-root. Push and pop repair this parent-child rule along one
-root-to-leaf path, so the root is again the required next item after
-each update. Each repair crosses at most the heap's height and
-therefore terminates.
+root. Push and pop repair this parent-child rule along a single path
+between a leaf and the root. The root is then the required next item
+again. Each repair crosses at most the heap's height and therefore
+terminates.
 
 ###### Go example
 
-[D.5 Priority queues](#d5-priority-queues) explains Go's
-`heap.Interface` mechanics. For top `k`, keep at most `k` items and
-replace the root
-only when a new value belongs in the retained set.
+These functions return the possibly changed slice, so callers must
+keep that returned value. `popMinHeap` reports `false` for an empty
+heap.
+For the trace, start with `heap := []int{}` and replace it with each
+returned slice after pushes of `5`, `2`, and `8`. Three calls to
+`popMinHeap` then return minimum values `2`, `5`, and `8`; its slice
+result is the trace's updated `heap`.
+
+```go
+func pushMinHeap(values []int, value int) []int {
+	// Append as the next leaf, then move the new value toward the root
+	// while it is smaller than its parent.
+	values = append(values, value)
+	child := len(values) - 1
+	for child > 0 {
+		parent := (child - 1) / 2
+		if values[parent] <= values[child] {
+			break
+		}
+		values[parent], values[child] = values[child], values[parent]
+		child = parent
+	}
+	return values
+}
+
+func popMinHeap(values []int) (int, []int, bool) {
+	if len(values) == 0 {
+		return 0, values, false
+	}
+	// Save the root, move the last leaf into its position, and remove
+	// the now-duplicate final slot.
+	minimum := values[0]
+	lastIndex := len(values) - 1
+	values[0] = values[lastIndex]
+	values = values[:lastIndex]
+
+	// Move the replacement down through its smaller child until the
+	// parent-child rule is restored along the whole repair path.
+	parent := 0
+	for {
+		leftChild := 2*parent + 1
+		if leftChild >= len(values) {
+			break
+		}
+		smallerChild := leftChild
+		rightChild := leftChild + 1
+		if rightChild < len(values) &&
+			values[rightChild] < values[leftChild] {
+			smallerChild = rightChild
+		}
+		if values[parent] <= values[smallerChild] {
+			break
+		}
+		values[parent], values[smallerChild] =
+			values[smallerChild], values[parent]
+		parent = smallerChild
+	}
+	return minimum, values, true
+}
+```
 
 ###### Work and memory
 
-Building a heap from `n` existing items can be done in `O(n)` time and
-uses `O(n)` storage. Adding or removing the top takes `O(log n)`, and
-inspecting the top takes `O(1)`. A heap does not provide constant-time
-search or removal for an arbitrary value unless an additional index
-map is maintained and repaired after every swap.
+A bottom-up build can turn `n` existing items into a heap in `O(n)`
+time. Inserting all `n` items with the shown `pushMinHeap` instead
+takes `O(n log n)` time. One push or pop takes `O(log n)` time;
+reading a nonempty root takes `O(1)`. The stored heap uses `O(n)`
+memory, and one operation uses `O(1)` auxiliary memory apart from any
+slice growth.
 
-For `k` sorted inputs containing `N` total items, put the first item
-from each non-empty input into a min-heap. Whenever one is removed,
-add the next item from that same input. The heap contains at most `k`
-candidates and its top is the smallest unread item overall, giving
-`O(N log k)` time and `O(k)` extra space. For streams `[1, 4]` and
-`[2, 3]`, start with candidates `1` and `2`; removing `1` exposes `4`,
-then removing `2` exposes `3`, so the output becomes `1, 2, 3, 4`. If
-output must be unique, compare against the last emitted value; do not
-drop duplicates before they have advanced their source input.
+A heap does not provide constant-time search or removal for an
+arbitrary value. Only the root has the heap's priority guarantee.
 
 ###### When to use it
 
@@ -9926,8 +10750,7 @@ was designed to expose.
 > before `3`.
 
 Check emptiness before peek or pop. Define tie-breaking when equal
-priorities must be stable, and for a top-`k` heap handle `k=0` before
-reading its root.
+priorities must be stable.
 
 ###### Related material
 
@@ -9954,44 +10777,44 @@ irrelevant.
 
 Keep a pile of earlier days still waiting for a warmer day. When a new
 temperature answers days on top, remove them; unresolved temperatures
-remain ordered. This **monotonic stack** rule also finds the nearest
-larger or smaller value in other sequences.
+remain ordered. For a next-greater query, their values stay
+non-increasing from the stack's bottom to its top. This **monotonic
+stack** rule also finds the nearest larger or smaller value in other
+sequences. The result contract is
+`result[index] -> nearest later greater value`, or `none` while that
+answer is unresolved or absent.
 
 ###### Step-by-step examples
 
 For `[2,1,4]`, find each next greater value; expect `[4,4,none]`.
 
-1.  **Read index `0`, value `2`**
-    - **Before:** Stack is empty; every result is `none`.
-    - **Decision:** No earlier position can be resolved, so push index
+Initial state: `index=0`, `stack=[]`, `result=[none,none,none]`.
+
+1.  Read value `2`
+    - Decision: No earlier position can be resolved, so push index
       `0`.
-    - **After:** Stack indexes are `[0]`; their values are `[2]`.
-    - **Known correct:** Index `0` still awaits a greater later value.
-2.  **Read index `1`, value `1`**
-    - **Before:** Top value is `2`.
-    - **Decision:** `1` is not greater than `2`, so push index `1`.
-    - **After:** Stack indexes are `[0,1]`; values are `[2,1]`.
-    - **Known correct:** Neither stored position has seen a greater
+    - After: `index=1`, `stack=[0]`, `result=[none,none,none]`.
+    - Known correct: Index `0` still awaits a greater later value.
+2.  Read value `1`
+    - Decision: `1` is not greater than `2`, so push index `1`.
+    - After: `index=2`, `stack=[0,1]`, `result=[none,none,none]`.
+    - Known correct: Neither stored position has seen a greater
       later value.
-3.  **Use value `4` to resolve index `1`**
-    - **Before:** At index `2`, value `4` is greater than top value
+3.  Resolve index `1` with `4`
+    - Decision: Pop index `1` and set its result to `4`.
+    - After: `index=2`, `stack=[0]`, `result=[none,4,none]`.
+    - Known correct: `4` is the first greater value after index
       `1`.
-    - **Decision:** Pop index `1` and set its result to `4`.
-    - **After:** Stack indexes are `[0]`; result is `[none,4,none]`.
-    - **Known correct:** `4` is the first greater value after index
-      `1`.
-4.  **Use value `4` to resolve index `0`**
-    - **Before:** New top value is `2`, also smaller than `4`.
-    - **Decision:** Pop index `0` and set its result to `4`.
-    - **After:** Stack is empty; result is `[4,4,none]`.
-    - **Known correct:** Index `1` was not greater than `2`, so `4` is
+4.  Resolve index `0` with `4`
+    - Decision: Pop index `0` and set its result to `4`.
+    - After: `index=2`, `stack=[]`, `result=[4,4,none]`.
+    - Known correct: Index `1` was not greater than `2`, so `4` is
       also the first valid answer for index `0`.
-5.  **Store index `2` and finish**
-    - **Before:** The current index has not been pushed.
-    - **Decision:** Push index `2`; after the input ends, leave its
+5.  Store index `2` and finish
+    - Decision: Push index `2`; after the input ends, leave its
       result as `none`.
-    - **After:** Final result is `[4,4,none]`.
-    - **Known correct:** No later value exists for the last position.
+    - After: `index=done`, `stack=[2]`, `result=[4,4,none]`.
+    - Known correct: No later value exists for the last position.
 
 With equal values, choose `<` or `<=` according to whether "greater"
 is strict; the wrong rule changes duplicate answers.
@@ -10005,6 +10828,11 @@ Each input position is pushed once and popped at most once, so the
 finite scan and every inner removal loop finish.
 
 ###### Go example
+
+The code uses `-1` for the trace's `none`. Therefore
+`nextGreater([]int{2, 1, 4})` returns `[]int{4, 4, -1}`. The trace's
+`index` is the code's `currentIndex`; `stack` and `result` keep the
+same roles.
 
 ```go
 func nextGreater(values []int) []int {
@@ -10085,48 +10913,45 @@ that can never become the extreme must be removed as the window moves.
 Picture candidates waiting to be the highest score in a moving time
 window. Remove candidates whose time expired and those beaten by a
 newer score. A **monotonic deque** keeps the remaining candidates
-ordered, with the current winner at the front.
+in decreasing value order, with the current maximum at the front.
 
 ###### Step-by-step examples
 
-For `[1,3,2,5]` with window size `3`, expect maxima `[3,5]`.
+For `[4,2,1,3]` with window size `3`, expect maxima `[4,3]`.
 
-1.  **Read index `0`, value `1`**
-    - **Before:** Deque is empty.
-    - **Decision:** Append index `0` at the back.
-    - **After:** Deque indexes are `[0]`; values are `[1]`.
-    - **Known correct:** Index `0` is the only maximum candidate.
-2.  **Read index `1`, value `3`**
-    - **Before:** Back value is `1`.
-    - **Decision:** Remove index `0` from the back because newer value
-      `3` is larger, then append index `1`.
-    - **After:** Deque indexes are `[1]`; values are `[3]`.
-    - **Known correct:** While both positions could share a window,
-      older value `1` can never beat `3`.
-3.  **Read index `2`, value `2`**
-    - **Before:** Back value `3` is larger than `2`.
-    - **Decision:** Keep index `1` and append index `2`.
-    - **After:** Deque indexes are `[1,2]`; values are `[3,2]`.
-    - **Known correct:** The first full window is indexes `0..2`, and
-      its maximum is front value `3`; append `3` to the output.
-4.  **Check expiration at index `3`**
-    - **Before:** A width-3 window now covers indexes `1..3`.
-    - **Decision:** Keep front index `1` because it is still inside
-      that window.
-    - **After:** Deque remains `[1,2]`.
-    - **Known correct:** No expired position remains at the front.
-5.  **Prune with new value `5`**
-    - **Before:** Back values are `2`, then `3`.
-    - **Decision:** Remove index `2`, then index `1`, because both
-      values are no larger than newer value `5`.
-    - **After:** Deque is empty.
-    - **Known correct:** Both removed positions expire earlier and can
-      never beat `5` in a later shared window.
-6.  **Append index `3` and report**
-    - **Before:** Deque is empty; current value is `5`.
-    - **Decision:** Append index `3`; read its value from the front.
-    - **After:** Deque indexes are `[3]`; output is `[3,5]`.
-    - **Known correct:** Front value `5` is the maximum of indexes
+Initial state: `index=0`, `deque=[]`, `output=[]`.
+
+1.  Read value `4`
+    - Decision: Append index `0` at the back.
+    - After: `index=1`, `deque=[0]`, `output=[]`.
+    - Known correct: Index `0` is the only maximum candidate.
+2.  Read value `2`
+    - Decision: Keep index `0` because value `4` is larger, then
+      append index `1`.
+    - After: `index=2`, `deque=[0,1]`, `output=[]`.
+    - Known correct: Candidate values decrease from front to back.
+3.  Read value `1`
+    - Decision: Keep both earlier candidates, append index `2`, and
+      report front value `4`.
+    - After: `index=3`, `deque=[0,1,2]`, `output=[4]`.
+    - Known correct: The first full window is indexes `0..2`, and
+      its maximum is front value `4`.
+4.  Check expiration at index `3`
+    - Decision: Remove front index `0` because it is outside the new
+      window `1..3`.
+    - After: `index=3`, `deque=[1,2]`, `output=[4]`.
+    - Known correct: Every remaining candidate belongs to the new
+      window; expired value `4` cannot be reported again.
+5.  Prune with value `3`
+    - Decision: Remove index `2`, then index `1`, because both values
+      are no larger than newer value `3`.
+    - After: `index=3`, `deque=[]`, `output=[4]`.
+    - Known correct: Both removed positions expire earlier and can
+      never beat `3` in a later shared window.
+6.  Append index `3` and report
+    - Decision: Append index `3`; report its front value `3`.
+    - After: `index=done`, `deque=[3]`, `output=[4,3]`.
+    - Known correct: Front value `3` is the maximum of indexes
       `1..3`.
 
 Store positions, not only values, so duplicates and expiration are
@@ -10142,6 +10967,11 @@ remain available longer. Each position enters once and can leave only
 once, so all removal loops and the finite outer scan terminate.
 
 ###### Go example
+
+Calling `windowMaximum([]int{4, 2, 1, 3}, 3)` returns
+`[]int{4, 3}`. The trace calls the second input the window size; the
+code names it `width`. Its `deque` is the same index collection, and
+its `result` is the trace's `output`.
 
 ```go
 func windowMaximum(values []int, width int) []int {
@@ -10223,42 +11053,49 @@ is safe because it expires later.
 
 ###### The problem it solves
 
-Given ranges with explicit endpoint rules, return their merged union,
-the gaps between them, or a largest compatible subset. Ranges that
-overlap may be far apart in the original input, so order them by a
-relevant endpoint before deciding which ranges interact.
+Given ranges with inclusive endpoints, combine every overlap and
+return the smallest list of ranges with the same coverage. Ranges
+that overlap may be far apart in the original input, so sort them by
+start before deciding which ones interact.
 
 ###### How it works
 
 Calendar bookings have a start and end. Sort them by start time, and
 overlaps appear beside each other so they can be joined. Each covered
 start-to-end range is an **interval**. This entry includes both ends,
-so `[1,3]` contains `1`, `2`, and `3`.
+so `[1,3]` includes its endpoints `1` and `3`.
 
 ###### Step-by-step examples
 
-Merge `[5,7]`, `[1,3]`, and `[2,6]`; expect `[1,7]`.
+Merge `[8,10]`, `[1,4]`, `[2,3]`, and `[3,6]`; expect
+`[[1,6],[8,10]]`.
 
-1.  **Sort by start**
-    - **Before:** Input order is `[5,7],[1,3],[2,6]`.
-    - **Decision:** Put the smallest start first.
-    - **After:** Order is `[1,3],[2,6],[5,7]`; current is `[1,3]`.
-    - **Known correct:** A possible overlap with the current interval
+Initial state: `intervals=[[8,10],[1,4],[2,3],[3,6]]`,
+`next=unsorted`, `result=[]`.
+
+1.  Sort by start
+    - Decision: Put the smallest start first; seed the result.
+    - After: `intervals=[[1,4],[2,3],[3,6],[8,10]]`,
+      `next=[2,3]`, `result=[[1,4]]`.
+    - Known correct: A possible overlap with the current interval
       now appears before any later gap.
-2.  **Read `[2,6]`**
-    - **Before:** Current merged interval is `[1,3]`.
-    - **Decision:** Start `2` is no greater than end `3`, so the
-      intervals overlap. Extend the end to `6`.
-    - **After:** Current merged interval is `[1,6]`.
-    - **Known correct:** It covers exactly everything covered by the
-      first two sorted intervals.
-3.  **Read `[5,7]`**
-    - **Before:** Current merged interval is `[1,6]`.
-    - **Decision:** Start `5` is no greater than end `6`. Extend the
-      end to `7`.
-    - **After:** Result is `[1,7]`.
-    - **Known correct:** It covers every point covered by any input
-      interval, with no duplicate output range.
+2.  Read `[2,3]`
+    - Decision: It lies inside `[1,4]`, so keep the existing end.
+    - After: `next=[3,6]`, `result=[[1,4]]`.
+    - Known correct: The contained interval adds no new covered
+      point.
+3.  Read `[3,6]`
+    - Decision: Inclusive start `3` is no greater than end `4`, so
+      extend the current end to `6`.
+    - After: `next=[8,10]`, `result=[[1,6]]`.
+    - Known correct: The result covers exactly the first three
+      sorted intervals as one maximal range.
+4.  Read `[8,10]`
+    - Decision: Start `8` is greater than end `6`, so append a new
+      range.
+    - After: `next=done`, `result=[[1,6],[8,10]]`.
+    - Known correct: The gap `6..8` proves the two covered ranges
+      cannot be merged.
 
 Whether `[1,2]` and `[2,3]` overlap depends on whether endpoints are
 inclusive or half-open; decide before comparing.
@@ -10278,6 +11115,8 @@ union.
 
 This version requires inclusive endpoints and `start <= end` for
 every interval. It sorts the input slice in place.
+For the trace, call `mergeIntervals` with intervals `{8,10}`,
+`{1,4}`, `{2,3}`, and `{3,6}`. It returns `{1,6}` and `{8,10}`.
 
 ```go
 import "sort"
@@ -10316,40 +11155,25 @@ func mergeIntervals(intervals []interval) []interval {
 
 Sorting `n` intervals takes `O(n log n)` time, and the following scan
 takes `O(n)`. Sorting in place uses no separate interval copy, but the
-merged or selected result can contain `O(n)` intervals.
+merged result can contain `O(n)` intervals.
 
 ###### When to use it
 
 The input contains ranges, and the output must combine overlapping
-ranges or report the gaps between covered regions.
+ranges into their union.
 
 ###### When not to use it
 
-The ranges change online and each change must be queried immediately,
-or when the problem is really about individual points rather than
-relationships between ranges.
+Do not use this offline sort-and-scan method when ranges change and
+each change must be queried immediately. It is also unnecessary when
+the problem is about unrelated individual points rather than ranges.
 
 ###### Common mistakes and edge cases
 
 Validate that every start is no greater than its end. The problem must
 define whether `[1, 2]` and `[2, 3]` overlap. If both ending points
-are included, the ranges share `2`. If an end marks the
-first excluded value, the first range stops immediately before `2`, so
-they do not overlap.
-
-Different interval objectives require different rules:
-
-- To select the largest number of non-overlapping intervals, sort by
-  end and greedily accept the next compatible interval. Finishing
-  earliest leaves every later option available.
-- To maximize total interval weight or profit, earliest finish is not
-  enough. Sort by end, binary-search the last compatible interval for
-  each choice, and use DP to compare taking it plus its compatible
-  prefix against skipping it.
-- To count simultaneous intervals or required rooms, sort start/end
-  events or keep current ending times in a min-heap. The endpoint
-  convention decides whether an end at time `t` frees a resource
-  before a start at `t`.
+are included, the ranges share `2`. Under the half-open rule
+`[start,end)`, the first range excludes `2`, so they do not overlap.
 
 ###### Related material
 
@@ -10357,7 +11181,6 @@ Different interval objectives require different rules:
   selection](#c135-sorting-and-selection) explains
   ordering.
 - [C.1.3.31 Sweep line](#c1331-sweep-line) counts simultaneous ranges.
-- [C.1.3.18 Greedy](#c1318-greedy) explains earliest-finish selection.
 
 <a id="c1331-sweep-line"></a>
 
@@ -10365,17 +11188,18 @@ Different interval objectives require different rules:
 
 ###### The problem it solves
 
-Given bookings, jobs, or occupied ranges, return the number active at
-each relevant point or the largest number active at once. Time may be
-continuous or span a huge coordinate range, so inspect only start and
-end events where the active set can change rather than checking every
-possible moment.
+Given bookings, jobs, or occupied ranges, return the largest number
+active at once. Time may be continuous or span a huge coordinate
+range, so inspect only start and end events where the active count can
+change rather than checking every possible moment.
 
 ###### How it works
 
 A room becomes busy only when a booking starts and becomes freer when
 one ends. Sort those **events** and update the busy count only at
 those times. Moving through ordered change points is a **sweep line**.
+The lookup `changeByTime[time] -> net change in active bookings at
+time` combines simultaneous starts and ends before the sweep.
 
 ###### Step-by-step examples
 
@@ -10383,39 +11207,41 @@ One booking uses a room from time `1` until time `4`. Another uses a
 room from time `3` until time `5`. The input is `[1,4)` and `[3,5)`,
 and the expected maximum is `2` busy rooms.
 
-1.  **Step: Record the first booking**
-    - **Before:** No changes are recorded.
-    - **Decision:** The room becomes busy at `1` and free at `4`.
-    - **After:** Changes are `1: +1` and `4: -1`.
-    - **Known correct:** The first booking contributes one busy room
+Initial state: `changes={}`, `nextBooking=[1,4)`, `time=unset`,
+`activeRooms=0`, `maximumRooms=0`.
+
+1.  Record booking `[1,4)`
+    - Decision: Add `+1` at `1` and `-1` at `4`.
+    - After: `changes={1:+1,4:-1}`, `nextBooking=[3,5)`,
+      `time=unset`, `activeRooms=0`, `maximumRooms=0`.
+    - Known correct: The first booking contributes one busy room
       from `1` until, but not including, `4`.
-2.  **Step: Record the second booking**
-    - **Before:** Changes are `1: +1` and `4: -1`.
-    - **Decision:** The second room becomes busy at `3` and free at
-      `5`.
-    - **After:** Changes are `1: +1`, `3: +1`, `4: -1`, `5: -1`.
-    - **Known correct:** Every start and end is now represented.
-3.  **Step: Visit time `1`**
-    - **Before:** `activeRooms=0`, `maximumRooms=0`.
-    - **Decision:** Apply the change `+1`.
-    - **After:** `activeRooms=1`, `maximumRooms=1`.
-    - **Known correct:** One booking is active after time `1`.
-4.  **Step: Visit time `3`**
-    - **Before:** `activeRooms=1`, `maximumRooms=1`.
-    - **Decision:** Apply the change `+1`.
-    - **After:** `activeRooms=2`, `maximumRooms=2`.
-    - **Known correct:** Both bookings are active after time `3`.
-5.  **Step: Visit time `4`**
-    - **Before:** `activeRooms=2`, `maximumRooms=2`.
-    - **Decision:** Apply the change `-1` because the first booking
+2.  Record booking `[3,5)`
+    - Decision: Add `+1` at `3` and `-1` at `5`.
+    - After: `changes={1:+1,3:+1,4:-1,5:-1}`, `nextBooking=none`,
+      `time=1`, `activeRooms=0`, `maximumRooms=0`.
+    - Known correct: Every start and end is now represented.
+3.  Visit time `1`
+    - Decision: Apply change `+1` and update the maximum.
+    - After: `changes={1:+1,3:+1,4:-1,5:-1}`, `nextBooking=none`,
+      `time=3`, `activeRooms=1`, `maximumRooms=1`.
+    - Known correct: One booking is active after time `1`.
+4.  Visit time `3`
+    - Decision: Apply change `+1` and update the maximum.
+    - After: `changes={1:+1,3:+1,4:-1,5:-1}`, `nextBooking=none`,
+      `time=4`, `activeRooms=2`, `maximumRooms=2`.
+    - Known correct: Both bookings are active after time `3`.
+5.  Visit time `4`
+    - Decision: Apply change `-1` because the first booking
       has ended.
-    - **After:** `activeRooms=1`, `maximumRooms=2`.
-    - **Known correct:** Only the second booking remains active.
-6.  **Step: Visit time `5`**
-    - **Before:** `activeRooms=1`, `maximumRooms=2`.
-    - **Decision:** Apply the change `-1`.
-    - **After:** `activeRooms=0`; return `maximumRooms=2`.
-    - **Known correct:** No booking remains, and the largest count
+    - After: `changes={1:+1,3:+1,4:-1,5:-1}`, `nextBooking=none`,
+      `time=5`, `activeRooms=1`, `maximumRooms=2`.
+    - Known correct: Only the second booking remains active.
+6.  Visit time `5`
+    - Decision: Apply change `-1`.
+    - After: `changes={1:+1,3:+1,4:-1,5:-1}`, `nextBooking=none`,
+      `time=done`, `activeRooms=0`, `maximumRooms=2`.
+    - Known correct: No booking remains, and the largest count
       seen was two.
 
 For a boundary example, use bookings `[1,4)` and `[4,5)`. The first
@@ -10438,6 +11264,11 @@ Because `maximumRooms` remembers the largest correct active count seen
 at any time, it is the largest number of simultaneous bookings.
 
 ###### Go example
+
+For the trace, call `maximumSimultaneousBookings` with bookings
+`{start:1,end:4}` and `{start:3,end:5}`. It returns `(2, true)`.
+The trace's `changes` map is the code's `changeByTime`; the remaining
+state names match directly.
 
 ```go
 import "sort"
@@ -10526,51 +11357,42 @@ the rule changes how touching bookings behave.
 
 <a id="c1332-fast-and-slow-pointers"></a>
 
-##### C.1.3.32 Reveal structure (fast and slow pointers)
+##### C.1.3.32 Find a linked-list middle (fast and slow pointers)
 
 ###### The problem it solves
 
-Given a one-way linked sequence, detect whether it cycles, find its
-middle, or locate a node a fixed distance from the end without storing
-every visited node. Move two pointers under a precise speed or spacing
-rule so the relationship between their positions reveals the required
-structure.
+Given a one-way linked list, return its middle node without first
+counting all nodes or storing them elsewhere. For an even number of
+nodes, this entry returns the second of the two middle nodes.
 
 ###### How it works
 
-Put two runners on the same track. Moving one runner one step and the
-other two steps can reveal a loop or the middle. Keeping a fixed gap
-between equal-speed runners finds a node measured from the end. These
-coordinated references are the **fast-and-slow pointer** and
-**fixed-gap pointer** methods.
+Put two runners at the list's first node. Move `slow` one link and
+`fast` two links per iteration. When `fast` reaches the end, `slow`
+has moved half as far and points at the middle. This is the
+**fast-and-slow pointer** method.
 
 ###### Step-by-step examples
 
 For `1->2->3->4->nil`, return the second middle `3`.
 
-1.  **Initialize**
-    - **Before:** No node has been examined.
-    - **Decision:** Point both `slow` and `fast` at node `1`.
-    - **After:** `slow=1`, `fast=1`.
-    - **Known correct:** Both have moved zero links.
-2.  **First loop iteration**
-    - **Before:** `fast=1` and its next node `2` both exist.
-    - **Decision:** Move `slow` one link to `2`; move `fast` two links
+Initial state: `slow=1`, `fast=1`, `result=pending`.
+
+1.  Move both pointers
+    - Decision: Move `slow` one link to `2`; move `fast` two links
       to `3`.
-    - **After:** `slow=2`, `fast=3`.
-    - **Known correct:** `fast` has moved twice as many links.
-3.  **Second loop iteration**
-    - **Before:** `fast=3` and its next node `4` both exist.
-    - **Decision:** Move `slow` one link to `3`; move `fast` through
+    - After: `slow=2`, `fast=3`, `result=pending`.
+    - Known correct: `fast` has moved twice as many links.
+2.  Move both pointers again
+    - Decision: Move `slow` one link to `3`; move `fast` through
       `4` to `nil`.
-    - **After:** `slow=3`, `fast=nil`.
-    - **Known correct:** `slow` has moved two of the four links from
+    - After: `slow=3`, `fast=nil`, `result=pending`.
+    - Known correct: `slow` has moved two of the four links from
       the head position through the end.
-4.  **Stop**
-    - **Before:** `fast` is `nil`, so the loop condition is false.
-    - **Decision:** Return `slow`.
-    - **After:** Returned node contains `3`.
-    - **Known correct:** Starting both pointers at the head selects
+3.  Stop
+    - Decision: `fast` is `nil`, so return `slow`.
+    - After: `slow=3`, `fast=nil`, `result=3`.
+    - Known correct: Starting both pointers at the head selects
       the later of the two middle nodes for an even-length list.
 
 For even lengths, a different loop condition can return the first
@@ -10582,13 +11404,8 @@ empty input returns no node.
 For the middle-node loop, after `t` iterations `slow` has moved `t`
 links and `fast` has moved `2t`. When `fast` reaches the end, `slow`
 has covered half the list; the loop condition chooses the later middle
-for even lengths. For a fixed gap, moving both pointers together
-preserves the established distance, so when the leader reaches the end
-the follower has the requested distance from it. For cycle detection,
-once both pointers are inside a finite cycle, their relative offset
-changes by one position per iteration and must eventually become zero.
-Every form moves toward an end or around a finite cycle, so it
-terminates under its stated stopping rule.
+for even lengths. Each iteration moves `fast` closer to the end by two
+links, so a finite list makes the loop terminate.
 
 ###### Go example
 
@@ -10616,26 +11433,19 @@ empty list.
 
 ###### Work and memory
 
-Each pointer makes at most a linear number of moves, so the method
+For `n` list nodes, each pointer makes at most `n` moves. The method
 takes `O(n)` time and `O(1)` extra memory.
 
 ###### When to use it
 
-A linked list may loop back to an earlier node, you need its middle
-without first counting every node, or one position must remain a fixed
-number of nodes behind another.
-
-The structure need not be stored as nodes. Repeatedly applying a
-deterministic function `next(state)` creates a **functional graph** in
-which every state has one outgoing edge. Fast and slow states can
-therefore detect repetition in digit transforms or other generated
-sequences without storing every seen state.
+You need the middle of a finite linked list without making one pass to
+count nodes and a second pass to reach the middle.
 
 ###### When not to use it
 
-You need to jump directly to any chosen position, remember the full
-history, or return the actual visited path. Two moving positions do
-not retain those details.
+The list may contain a cycle, or you need an arbitrary position rather
+than the middle. On an indexed slice, `len(values)/2` directly selects
+the second middle.
 
 ###### Common mistakes and edge cases
 
@@ -10644,17 +11454,13 @@ not retain those details.
 > `fast.next != nil`.
 
 Empty input returns no node. State whether an even-length list needs
-the first or second middle, and establish a requested fixed gap before
-moving both positions.
+the first or second middle before choosing the loop condition.
 
 ###### Related material
 
-- [B.2 Linked lists](#b2-linked-lists) explains node and cycle
-  behavior.
+- [B.2 Linked lists](#b2-linked-lists) explains linked nodes.
 - [C.1.3.9 Two pointers](#c139-two-pointers) explains the broader
   coordinated-position method.
-- [C.1.3.4 Hash map or set](#c134-hash-map-or-set) retains full
-  visited membership when needed.
 
 <a id="c1333-trie"></a>
 
@@ -10672,44 +11478,43 @@ leading symbols so a query follows only the symbols it contains.
 An autocomplete menu can store `car`, `card`, and `care` along one
 shared `car` path, then branch at the next letter. A **trie** is this
 tree of shared word beginnings. Its root comes before any character,
-and an end marker distinguishes a stored word from a mere prefix.
+and an end marker distinguishes a stored word from a mere prefix. At
+each node, `children[byte] -> next node for that byte`; a missing key
+means no stored word has that extended prefix.
 
 ###### Step-by-step examples
 
 Insert `car` and `cat`; expect prefix `ca` to exist but full word `ca`
 not to exist.
 
-1.  **Insert `car`**
-    - **Before:** The root has no children.
-    - **Decision:** Create and follow children `c`, `a`, and `r` in
+Initial state: `trie=root`, `nextOperation=insert(car)`,
+`answers=[]`.
+
+1.  Insert `car`
+    - Decision: Create and follow children `c`, `a`, and `r` in
       order, then mark the `r` node as a word end.
-    - **After:** The path from the root spells `car`.
-    - **Known correct:** Exact lookup for `car` can follow every byte
+    - After: `trie={ca->{r:word}}`, `nextOperation=insert(cat)`,
+      `answers=[]`.
+    - Known correct: Exact lookup for `car` can follow every byte
       and find its end marker.
-2.  **Insert `cat` by reusing its beginning**
-    - **Before:** The path `root -> c -> a` already exists.
-    - **Decision:** Follow the existing `c` and `a` children. Create
-      child `t` beside `r`, then mark `t` as a word end.
-    - **After:** The stored shape is:
-
-      ```text
-      root -> c -> a -> r (word)
-                    `-> t (word)
-      ```
-
-    - **Known correct:** Both words share `ca`; their final bytes use
+2.  Insert `cat`
+    - Decision: Reuse `c`,`a`; create `t` beside `r` and mark it.
+    - After: `trie={ca->{r:word,t:word}}`,
+      `nextOperation=prefix(ca)`, `answers=[]`.
+    - Known correct: Both words share `ca`; their final bytes use
       separate marked nodes.
-3.  **Query prefix `ca`**
-    - **Before:** Start at the root.
-    - **Decision:** Follow child `c`, then child `a`; do not require a
+
+3.  Query prefix `ca`
+    - Decision: Follow `c`, then `a`; do not require a
       word-end marker for a prefix query.
-    - **After:** Prefix lookup returns `true`.
-    - **Known correct:** At least one stored word begins with `ca`.
-4.  **Query whole word `ca`**
-    - **Before:** The same path reaches the `a` node.
-    - **Decision:** Require that node's word-end marker.
-    - **After:** Whole-word lookup returns `false`.
-    - **Known correct:** `ca` is only a beginning, not an inserted
+    - After: `trie={ca->{r:word,t:word}}`,
+      `nextOperation=word(ca)`, `answers=[true]`.
+    - Known correct: At least one stored word begins with `ca`.
+4.  Query whole word `ca`
+    - Decision: Follow the same path and require a marker on `a`.
+    - After: `trie={ca->{r:word,t:word}}`, `nextOperation=done`,
+      `answers=[true,false]`.
+    - Known correct: `ca` is only a beginning, not an inserted
       complete word.
 
 ###### Why it works
@@ -10724,6 +11529,10 @@ finite text ends or lookup encounters a missing child.
 
 These methods require a non-nil root and one-byte alphabet semantics.
 Use runes when the problem defines positions as Unicode code points.
+For the trace, create `root := &trieNode{}`, insert `"car"` and
+`"cat"`, then call `root.find("ca", false)` for the prefix query and
+`root.find("ca", true)` for the whole-word query. They return `true`
+and `false` in that order.
 
 ```go
 type trieNode struct {
@@ -10769,11 +11578,9 @@ func (root *trieNode) find(text string, wholeWord bool) bool {
 
 ###### Work and memory
 
-Inserting or looking up a word of length `L` takes `O(L)` time. An
-insertion may create `O(L)` nodes; across all words, storage is
-proportional to the number of distinct prefix nodes. Wildcards can
-require exploring many branches and may take exponential time in the
-number of wildcards.
+For a word containing `L` bytes, insertion or lookup takes `O(L)`
+time. One insertion may create `O(L)` nodes. Across all words, memory
+is proportional to the number of distinct stored prefix bytes.
 
 ###### When to use it
 
@@ -10826,26 +11633,30 @@ promise that differs usually decides which method fits.
 
 A road problem asks for cheapest routes from `A`.
 
-1.  **Equal costs**
-    - **Before:** Every edge costs one move.
-    - **Decision:** Choose BFS because first-in, first-out queue
+Initial state: `edgeCosts=allOne`, `method=unknown`.
+
+1.  Select for equal costs
+    - Decision: Choose BFS because first-in, first-out queue
       layers are also cost layers.
-    - **After:** No heap is needed.
-    - **Known correct:** First discovery has the fewest moves and
+    - After: `edgeCosts=allOne`, `method=BFS`.
+    - Known correct: First discovery has the fewest moves and
       therefore the lowest cost.
-2.  **Varying nonnegative costs**
-    - **Before:** Edges cost `1`, `4`, or `9`.
-    - **Decision:** Choose Dijkstra and remove the cheapest known
+
+Initial state: `edgeCosts={1,4,9}`, `method=unknown`.
+
+1.  Select for varying nonnegative costs
+    - Decision: Choose Dijkstra and select the cheapest known
       route next.
-    - **After:** Reject first-in, first-out order.
-    - **Known correct:** Costs never decrease after taking another
-      edge, which lets Dijkstra finalize the cheapest removed route.
-3.  **Negative cost**
-    - **Before:** One edge costs `-3`.
-    - **Decision:** Reject Dijkstra and choose Bellman-Ford.
-    - **After:** Repeatedly check every connection for a cheaper
-      route.
-    - **Known correct:** A later negative edge may improve a route
+    - After: `edgeCosts={1,4,9}`, `method=Dijkstra`.
+    - Known correct: Costs never decrease after taking another
+      edge, which lets Dijkstra finalize the cheapest selected route.
+
+Initial state: `edgeCosts=contains(-3)`, `method=unknown`.
+
+1.  Select for a negative cost
+    - Decision: Reject Dijkstra and choose Bellman-Ford.
+    - After: `edgeCosts=contains(-3)`, `method=BellmanFord`.
+    - Known correct: A later negative edge may improve a route
       that looked finished earlier.
 
 ##### Why it works
@@ -10879,9 +11690,9 @@ requirements; the real method may be outside the apparent pair.
 
 ##### Common mistakes and edge cases
 
-> **Warning:** Dijkstra is not "BFS with a heap" when negative edges
-> exist. The negative edge removes the proof that a popped distance is
-> final.
+> **Warning:** Dijkstra is not "weighted BFS" when negative edges
+> exist. A negative edge removes the proof that the cheapest selected
+> distance is final.
 
 Also ask whether all input exists at the start or arrives over time,
 whether it may change, whether one or every answer is needed, and how
@@ -10915,26 +11726,23 @@ guide](#a1-complexity-and-resource-accounting) names that growth.
 
 ##### Step-by-step examples
 
-For `n=100,000`, compare pairwise search with sorting.
+For at most `n=100,000` integers, decide whether any value appears
+twice. Compare every pair with sorting followed by one adjacent scan.
 
-1.  **Pairwise method**
-    - **Before:** There are `n*(n-1)/2` distinct pairs.
-    - **Decision:** For `100,000` values, that is about five billion
+Initial state: `n=100000`, `candidates={pairwise,sorting}`,
+`selected=none`.
+
+1.  Evaluate pairwise comparison
+    - Decision: It requires about five billion
       checks.
-    - **After:** Reject the method.
-    - **Known correct:** Its required number of checks is incompatible
+    - After: `n=100000`, `candidates={sorting}`, `selected=none`.
+    - Known correct: Its required number of checks is incompatible
       with the input size.
-2.  **Sorting method**
-    - **Before:** Sorting uses about `n log n` comparisons.
-    - **Decision:** `100,000*log2(100,000)` is about `1.7` million,
+2.  Evaluate sorting
+    - Decision: About `1.7` million comparisons fit the limit,
       so retain it for correctness and memory review.
-    - **After:** One plausible method remains.
-    - **Known correct:** The input limit has not ruled it out.
-
-If the output requires all `2^n` subsets, writing that many answers
-already takes work that doubles with every extra input item. No
-generator can make the total runtime grow only in direct proportion
-to `n`.
+    - After: `n=100000`, `candidates={sorting}`, `selected=sorting`.
+    - Known correct: The input limit has not ruled it out.
 
 ##### Why it works
 
@@ -11006,29 +11814,48 @@ still a guess.
 ##### Step-by-step examples
 
 Use binary search to find the first position in `[1,3,3,5]` whose
-value is at least `3`. This is called a **lower-bound search**, and
+value is at least `3`. This is called a lower-bound search, and
 the expected position is `1`.
 
-1.  **Check: Meaning**
-    - **Before:** `left` and `right` have no stated meaning.
-    - **Decision:** The possible answer starts at `left` and stops
-      before `right`. Including the first position and excluding the
-      second is called a half-open range, written `[left,right)`.
-    - **After:** Start with `[0,4)`, which contains all four indexes.
-    - **Known correct:** Position `1` has not been discarded.
-2.  **Check: Progress and coverage**
-    - **Before:** A middle position is tested.
-    - **Decision:** Keep only the half that can contain the first
-      value at least `3`.
-    - **After:** The number of possible positions becomes smaller.
-    - **Known correct:** Every discarded value was proved either too
-      small or too late to be the first valid one.
-3.  **Check: Cost and boundaries**
-    - **Before:** The plan handles the ordinary four-value input.
-    - **Decision:** Also test empty input, repeated values, and an
-      answer just after the final value.
-    - **After:** The half-open rule represents all three cases.
-    - **Known correct:** The method and its boundary behavior agree.
+Initial state: `left=unset`, `right=unset`, `result=pending`,
+`verification=pending`.
+
+1.  Define the saved boundaries
+    - Decision: Treat `0..4` as possible insertion positions.
+      Positions before `left` are proved too small. The first valid
+      position is somewhere from `left` through `right`, including
+      both boundaries.
+    - After: `left=0`, `right=4`, `result=pending`,
+      `verification=pending`.
+    - Known correct: Expected position `1` is still possible, and
+      position `4` can represent "no array value is large enough."
+2.  Test middle index `2`
+    - Decision: The value is large enough, so the first
+      valid position is at or before `2`; set `right=2`.
+    - After: `left=0`, `right=2`, `result=pending`,
+      `verification=pending`.
+    - Known correct: Positions after `2` cannot be the first
+      valid one because position `2` already works.
+3.  Test middle index `1`
+    - Decision: Position `1` works, so set `right=1`.
+    - After: `left=0`, `right=1`, `result=pending`,
+      `verification=pending`.
+    - Known correct: Position `1` remains possible; later
+      positions cannot be first.
+4.  Test middle index `0`
+    - Decision: Value `1` is too small, so set `left=1`.
+    - After: `left=1`, `right=1`, `result=1`,
+      `verification=pending`.
+    - Known correct: Position `0` was proved too small, and the
+      only remaining boundary is the expected answer.
+5.  Check progress, cost, and boundaries
+    - Decision: Verify that the possible boundary range shrinks,
+      then test empty input, duplicates, and a result of
+      `len(values)`.
+    - After: `left=1`, `right=1`, `result=1`,
+      `verification=passed`.
+    - Known correct: The invariant includes every insertion
+      boundary, and every iteration makes the range smaller.
 
 ##### Why it works
 
@@ -11041,12 +11868,13 @@ what a correctness and practicality argument must establish.
 
 Translate each checklist item into a nearby name, condition, or
 explicit check. For the trace, [E.1 Binary search
-bounds](#e1-binary-search-bounds) uses the same `left`, `right`, and
-half-open range rule.
+bounds](#e1-binary-search-bounds) provides a complete lower-bound
+implementation with its boundary meanings stated beside the code.
+Calling `LowerBound([]int{1, 3, 3, 5}, 3)` returns `1`.
 
 ##### Work and memory
 
-Writing the checklist is constant planning work. Its final item
+The checklist is design work rather than runtime work. Its final item
 records the selected method's complete cost, including setup,
 recursion, output, and meaningful Go allocations.
 
@@ -11116,39 +11944,43 @@ JSON, a command line, or a test.
 Decode `raw = {"values":[2,7,11,15],"target":9}`. The expected result
 is `pairInput{Values: []int{2, 7, 11, 15}, Target: 9}`.
 
-1.  **Step: Decode the JSON object**
-    - **Before:** `input` has zero values: `Values=nil`, `Target=0`.
-    - **Decision:** The JSON has the expected field names and value
+Initial state: `stage=decode`, `input={Values:nil,Target:0}`,
+`algorithmResult=unset`, `output=unset`, `err=nil`.
+
+1.  Decode the JSON object
+    - Decision: The JSON has the expected field names and value
       types, so `json.Unmarshal` can assign both fields.
-    - **After:** `input.Values=[2,7,11,15]`, `input.Target=9`, and
-      `err=nil`.
-    - **Known correct:** The adapter now holds the same four values
+    - After: `stage=validate`, `input={Values:[2,7,11,15],Target:9}`,
+      `algorithmResult=unset`, `output=unset`, `err=nil`.
+    - Known correct: The adapter now holds the same four values
       and target represented by `raw`.
-2.  **Step: Validate the typed request**
-    - **Before:** `len(input.Values)=4`.
-    - **Decision:** Four values satisfy this adapter's requirement of
+2.  Validate the typed request
+    - Decision: Four values satisfy this adapter's requirement of
       at least two values.
-    - **After:** The adapter returns `input` unchanged.
-    - **Known correct:** A called pair-search algorithm receives a
+    - After: `stage=algorithm`,
+      `input={Values:[2,7,11,15],Target:9}`,
+      `algorithmResult=[0,1]`, `output=unset`, `err=nil`.
+    - Known correct: The pair-search algorithm receives a
       valid typed request and no JSON concerns.
-3.  **Step: Format a successful answer**
-    - **Before:** The pair-search algorithm returned indexes `0` and
-      `1`.
-    - **Decision:** Encode those two indexes as a JSON array.
-    - **After:** The output bytes contain `[0,1]` and no error.
-    - **Known correct:** The outside caller receives the same two
+3.  Format the successful answer
+    - Decision: Encode the returned indexes as a JSON array.
+    - After: `stage=done`, `input={Values:[2,7,11,15],Target:9}`,
+      `algorithmResult=[0,1]`, `output=[0,1]`, `err=nil`.
+    - Known correct: The outside caller receives the same two
       indexes in its required text format.
 
 For a failure case, use `raw = {"values":[2,7],"target":"nine"}`. The
 expected result is a decoding error and no usable `pairInput`.
 
-1.  **Step: Decode the malformed target**
-    - **Before:** `input` contains only zero values.
-    - **Decision:** A JSON string cannot be assigned to the Go `int`
+Initial state: `stage=decode`, `input={Values:nil,Target:0}`,
+`result=unset`, `err=nil`.
+
+1.  Decode the malformed target
+    - Decision: A JSON string cannot be assigned to the Go `int`
       field `Target`, so `json.Unmarshal` returns an error.
-    - **After:** `parsePairInput` returns a wrapped error instead of
-      continuing to validation or an algorithm call.
-    - **Known correct:** No partly decoded request crosses the
+    - After: `stage=done`, `input=unusable`, `result=unset`,
+      `err=wrappedDecodeError`.
+    - Known correct: No partly decoded request crosses the
       boundary.
 
 #### Why it works
@@ -11161,6 +11993,10 @@ happens only after a typed result exists, so representation failures
 remain separate from algorithm failures.
 
 #### Go example
+
+`adaptPairRequest` performs the trace's decode, algorithm, and format
+stages. Its `findPair` argument is the typed algorithm boundary; the
+hash-map implementation in E.3 satisfies that function shape.
 
 ```go
 package boundary
@@ -11200,6 +12036,28 @@ func formatPairOutput(left, right int) ([]byte, error) {
 	// A fixed-size array guarantees that successful output has exactly
 	// two indices.
 	return json.Marshal([2]int{left, right})
+}
+
+type pairFinder func(values []int, target int) (int, int, bool)
+
+func adaptPairRequest(
+	raw []byte,
+	findPair pairFinder,
+) ([]byte, error) {
+	// Decode and validate before the algorithm can observe the request.
+	input, err := parsePairInput(raw)
+	if err != nil {
+		return nil, err
+	}
+	// The algorithm receives only typed problem values. Report absence
+	// separately instead of formatting invented indexes.
+	left, right, found := findPair(input.Values, input.Target)
+	if !found {
+		return nil, fmt.Errorf("pair input has no matching pair")
+	}
+	// Convert the typed result to the external JSON representation only
+	// after the algorithm succeeds.
+	return formatPairOutput(left, right)
 }
 ```
 
@@ -11277,30 +12135,31 @@ Run rows `{name:"positive even", value:4, want:true}` and
 `{name:"negative odd", value:-3, want:false}`. The expected outcome is
 two passing subtests.
 
-1.  **Row: `positive even`**
-    - **Before:** `test.value=4`, `test.want=true`.
-    - **Decision:** `isEven(4)` returns `true`, which equals
+Initial state: `row=positiveEven`, `passed=[]`, `failed=[]`.
+
+1.  Run `positive even`
+    - Decision: `isEven(4)` returns `true`, which equals
       `test.want`.
-    - **After:** The row records no error.
-    - **Known correct:** The ordinary even case used the shared
+    - After: `row=negativeOdd`, `passed=[positiveEven]`, `failed=[]`.
+    - Known correct: The ordinary even case used the shared
       assertion.
-2.  **Row: `negative odd`**
-    - **Before:** `test.value=-3`, `test.want=false`.
-    - **Decision:** In Go, `-3%2` is `-1`, so the result is `false`
+2.  Run `negative odd`
+    - Decision: In Go, `-3%2` is `-1`, so the result is `false`
       and matches `test.want`.
-    - **After:** The row records no error.
-    - **Known correct:** A negative value used exactly the same call
+    - After: `row=done`, `passed=[positiveEven,negativeOdd]`,
+      `failed=[]`.
+    - Known correct: A negative value used exactly the same call
       and check.
 
 For a boundary row, use `{name:"zero", value:0, want:true}`. The
 expected outcome is a passing subtest because `0%2 == 0`.
 
-1.  **Row: `zero`**
-    - **Before:** `test.value=0`, `test.want=true`.
-    - **Decision:** `isEven(0)` returns `true`.
-    - **After:** The comparison passes without special-case test
-      logic.
-    - **Known correct:** The boundary value is checked by the same
+Initial state: `row=zero`, `passed=[]`, `failed=[]`.
+
+1.  Run `zero`
+    - Decision: `isEven(0)` returns `true`, matching `test.want`.
+    - After: `row=done`, `passed=[zero]`, `failed=[]`.
+    - Known correct: The boundary value is checked by the same
       rules as every other row.
 
 #### Why it works
@@ -11427,40 +12286,40 @@ inside those copied values may still refer to shared nested data.
 Call `sortedCopy(values)` with `values = [3,1,2]`. The expected result
 is `sorted = [1,2,3]` while `values` remains `[3,1,2]`.
 
-1.  **Step: Clone the slice**
-    - **Before:** `values` refers to one backing array containing
-      `[3,1,2]`.
-    - **Decision:** The function promises not to reorder `values`, so
+Initial state: `values=[3,1,2]@inputArray`, `sorted=unset`.
+
+1.  Clone the slice
+    - Decision: The function promises not to reorder `values`, so
       `slices.Clone` creates a separate backing array for `sorted`.
-    - **After:** Both slices contain `[3,1,2]`, but changing one
-      array's elements cannot change the other array's elements.
-    - **Known correct:** The caller's order is isolated before sorting
+    - After: `values=[3,1,2]@inputArray`,
+      `sorted=[3,1,2]@resultArray`.
+    - Known correct: The caller's order is isolated before sorting
       starts.
-2.  **Step: Sort the clone**
-    - **Before:** `sorted=[3,1,2]`, `values=[3,1,2]`.
-    - **Decision:** `sort.Ints` rearranges only `sorted` into
+2.  Sort the clone
+    - Decision: `sort.Ints` rearranges only `sorted` into
       ascending order.
-    - **After:** `sorted=[1,2,3]`, `values=[3,1,2]`.
-    - **Known correct:** The result is ordered and the promised input
+    - After: `values=[3,1,2]@inputArray`,
+      `sorted=[1,2,3]@resultArray`.
+    - Known correct: The result is ordered and the promised input
       state is preserved.
 
 For a deliberately broken version, assign `sorted := values` instead
 of cloning. After `sort.Ints(sorted)`, both variables unexpectedly
 show `[1,2,3]`.
 
-1.  **Step: Copy only the slice descriptor**
-    - **Before:** `values=[3,1,2]`.
-    - **Decision:** Assignment copies the pointer, length, and
+Initial state: `values=[3,1,2]@sharedArray`, `sorted=unset`.
+
+1.  Copy only the slice descriptor
+    - Decision: Assignment copies the pointer, length, and
       capacity, not the backing array.
-    - **After:** `sorted` and `values` view the same elements.
-    - **Known correct:** No independent element storage was created.
-2.  **Step: Sort through the alias**
-    - **Before:** Both slices view `[3,1,2]`.
-    - **Decision:** Sorting writes into the shared backing array.
-    - **After:** Both show `[1,2,3]`; the promise to preserve the
-      input is broken.
-    - **Known correct:** A write through either slice is visible
-      through the other because both still share one backing array.
+    - After: `values=[3,1,2]@sharedArray`,
+      `sorted=[3,1,2]@sharedArray`.
+    - Known correct: No independent element storage was created.
+2.  Sort through the alias
+    - Decision: Sorting writes into the shared backing array.
+    - After: `values=[1,2,3]@sharedArray`,
+      `sorted=[1,2,3]@sharedArray`.
+    - Known correct: The promise to preserve the input is broken.
 
 #### Why it works
 
@@ -11564,7 +12423,10 @@ empty-looking result, but that alone cannot tell you whether the
 mailbox exists and is empty. Go can return both the stored value and a
 presence flag. A collection that records only presence is called a
 **set**; Go commonly represents one with a map whose keys are the set
-members.
+members. The contracts below are `entries[key] -> stored integer` and
+`seen[value] -> whether value has appeared`. For example,
+`entries["ready"]=0` is present data, while a missing `seen["go"]`
+entry means `"go"` has not appeared yet.
 
 #### Step-by-step examples
 
@@ -11572,37 +12434,40 @@ Start with `entries = {"ready": 0}` and query `"ready"` and
 `"missing"`. The expected lookup results are `(0, true)` and
 `(0, false)`.
 
-1.  **Step: Query `"ready"`**
-    - **Before:** `entries={"ready":0}`
-    - **Decision:** The key exists and its stored value is `0`.
-    - **After:** `value=0`, `found=true`; map unchanged
-    - **Known correct:** The zero came from a present entry.
-2.  **Step: Query `"missing"`**
-    - **Before:** `entries={"ready":0}`
-    - **Decision:** The key does not exist, so Go supplies the integer
+Initial state: `entries={"ready":0}`, `nextKey="ready"`,
+`answers=[]`.
+
+1.  Query `"ready"`
+    - Decision: The key exists and its stored value is `0`.
+    - After: `entries={"ready":0}`, `nextKey="missing"`,
+      `answers=[(0,true)]`.
+    - Known correct: The zero came from a present entry.
+2.  Query `"missing"`
+    - Decision: The key does not exist, so Go supplies the integer
       zero value.
-    - **After:** `value=0`, `found=false`; map unchanged
-    - **Known correct:** The same value is now identified as a
+    - After: `entries={"ready":0}`, `nextKey=done`,
+      `answers=[(0,true),(0,false)]`.
+    - Known correct: The same value is now identified as a
       missing-key result.
 
 For a set example, process `values = ["go", "go", "rust"]` and keep
 first appearances. The expected result is `["go", "rust"]`.
 
-1.  **Value: `"go"`**
-    - **Before:** `seen={}`, `result=[]`
-    - **Decision:** `"go"` is absent; add and append it.
-    - **After:** `seen={"go"}`, `result=["go"]`
-    - **Known correct:** The first distinct input appears once.
-2.  **Value: `"go"`**
-    - **Before:** `seen={"go"}`, `result=["go"]`
-    - **Decision:** `"go"` is present; skip the duplicate.
-    - **After:** State unchanged.
-    - **Known correct:** The duplicate creates no second output.
-3.  **Value: `"rust"`**
-    - **Before:** `seen={"go"}`, `result=["go"]`
-    - **Decision:** `"rust"` is absent; add and append it.
-    - **After:** `seen={"go","rust"}`, `result=["go","rust"]`
-    - **Known correct:** Each distinct input now appears once, in
+Initial state: `index=0`, `seen={}`, `result=[]`.
+
+1.  Read `"go"`
+    - Decision: It is absent; add and append it.
+    - After: `index=1`, `seen={"go"}`, `result=["go"]`.
+    - Known correct: The first distinct input appears once.
+2.  Read the second `"go"`
+    - Decision: It is present; skip the duplicate.
+    - After: `index=2`, `seen={"go"}`, `result=["go"]`.
+    - Known correct: The duplicate creates no second output.
+3.  Read `"rust"`
+    - Decision: It is absent; add and append it.
+    - After: `index=done`, `seen={"go","rust"}`,
+      `result=["go","rust"]`.
+    - Known correct: Each distinct input now appears once, in
       first-appearance order.
 
 The result order comes from scanning `values`, not from iterating over
@@ -11658,8 +12523,7 @@ values, `seen` stores `u` keys. The result has length `u`, but
 `make(..., 0, len(values))` reserves room for `n` strings to avoid
 growth allocations, so the function's total additional storage is
 `O(n)`. `struct{}` avoids a per-entry value payload, but map keys and
-bucket storage still use memory. Collecting and sorting `u` keys for
-ordered output adds `O(u log u)` work and `O(u)` key storage.
+bucket storage still use memory.
 
 #### When to use it
 
@@ -11727,53 +12591,31 @@ Push `4`, `1`, and `3` into an empty smallest-first queue, then remove
 one item. The expected removed value is `1` and the remaining heap
 array is `[3,4]`.
 
-1.  **Operation: Push `4`**
-    - **Before:** `h=[]`.
-    - **Decision:** Append `4`; it has no parent to compare with.
-    - **After:** `h=[4]`.
-    - **Known correct:** Index zero contains the only and therefore
+Initial state: `h=[]`, `next=push(4)`, `removed=[]`.
+
+1.  Push `4`
+    - Decision: Append `4`; it has no parent to compare with.
+    - After: `h=[4]`, `next=push(1)`, `removed=[]`.
+    - Known correct: Index zero contains the only and therefore
       smallest item.
-2.  **Operation: Push `1`**
-    - **Before:** `h=[4]`.
-    - **Decision:** Append `1`, then swap it with parent `4` because
+2.  Push `1`
+    - Decision: Append `1`, then swap it with parent `4` because
       `1 < 4`.
-    - **After:** `h=[1,4]`.
-    - **Known correct:** Every child is at least its parent, so `1` is
+    - After: `h=[1,4]`, `next=push(3)`, `removed=[]`.
+    - Known correct: Every child is at least its parent, so `1` is
       at the root.
-3.  **Operation: Push `3`**
-    - **Before:** `h=[1,4]`.
-    - **Decision:** Append `3`. Its parent is `1`, so no swap is
+3.  Push `3`
+    - Decision: Append `3`. Its parent is `1`, so no swap is
       needed.
-    - **After:** `h=[1,4,3]`.
-    - **Known correct:** The root is still the smallest item.
-4.  **Operation: Pop**
-    - **Before:** `h=[1,4,3]`.
-    - **Decision:** The package moves root `1` to the end, repairs the
+    - After: `h=[1,4,3]`, `next=pop`, `removed=[]`.
+    - Known correct: The root is still the smallest item.
+4.  Pop
+    - Decision: The package moves root `1` to the end, repairs the
       remaining heap, and asks the type's `Pop` method to shorten the
       slice.
-    - **After:** Returned value `1`; `h=[3,4]`.
-    - **Known correct:** `1` was no larger than any queued item, and
+    - After: `h=[3,4]`, `next=done`, `removed=[1]`.
+    - Known correct: `1` was no larger than any queued item, and
       `3` is now the smallest remaining item.
-
-Some algorithms push a newer record instead of editing an older queued
-record. For the boundary example, Dijkstra's algorithm first queues
-route `B=4`, later finds `B=3`, and queues that too. The expected
-behavior is to use `B=3` and eventually skip `B=4`.
-
-1.  **Record: `B=3` reaches the root**
-    - **Before:** Stored best distance for `B` is `3`.
-    - **Decision:** The queued distance matches the stored best
-      distance.
-    - **After:** Process `B=3`.
-    - **Known correct:** The record represents the current best known
-      route.
-2.  **Record: `B=4` reaches the root**
-    - **Before:** Stored best distance for `B` remains `3`.
-    - **Decision:** `4 != 3`, so the old record is **stale**, meaning
-      a newer record has replaced it.
-    - **After:** Discard `B=4` without processing its outgoing edges.
-    - **Known correct:** Skipping an outdated record cannot discard
-      the stored shorter route.
 
 #### Why it works
 
@@ -11826,6 +12668,18 @@ func (heapValues *intMinHeap) Pop() any {
 	return value
 }
 
+func pushThenPop(values []int) (int, []int) {
+	// Start empty, push each traced arrival through container/heap, then
+	// remove exactly one minimum as the trace does.
+	heapValues := &intMinHeap{}
+	heap.Init(heapValues)
+	for _, value := range values {
+		heap.Push(heapValues, value)
+	}
+	minimum := heap.Pop(heapValues).(int)
+	return minimum, slices.Clone(*heapValues)
+}
+
 func popAscending(values []int) []int {
 	// Clone protects the caller, and Init rearranges the copy into heap
 	// order.
@@ -11841,6 +12695,10 @@ func popAscending(values []int) []int {
 	return result
 }
 ```
+
+For the trace, `pushThenPop([]int{4, 1, 3})` returns removed value
+`1` and remaining heap slice `[3,4]`. `popAscending` demonstrates the
+separate operation of removing every value in priority order.
 
 The package moves the root to the final slot before it calls the
 type's `Pop` method, so that method removes the last element. The type
@@ -11885,9 +12743,7 @@ array does not retain it; see
 
 - [C.1.3.27 Remove urgent
   items](#c1327-heap-or-priority-queue) explains heap selection,
-  correctness, and algorithmic variants.
-- [C.1.3.23 Dijkstra shortest paths](#c1323-dijkstra-shortest-paths)
-  explains why skipping stale shortest-path entries is safe.
+  correctness, and basic operations.
 - [D.9 Slice storage and retained
   memory](#d9-slice-storage-and-retained-memory) explains clearing
   pointer elements removed from long-lived heaps.
@@ -11906,36 +12762,33 @@ encoding or return indexes in the wrong unit.
 
 #### How it works
 
-Think of visible text as symbols packed into bytes. **UTF-8** says how
-one or more bytes form a Unicode **code point**, called a **rune** in
-Go. One visible symbol, such as an accented letter or emoji, may still
-need several runes. Unicode calls that full displayed group a
-**grapheme cluster**.
+Think of visible text as symbols packed into bytes. **Unicode
+Transformation Format 8 (UTF-8)** says how one or more bytes form a
+Unicode **code point**, called a **rune** in Go. One visible symbol,
+such as an accented letter or emoji, may still need several runes.
+Unicode calls that full displayed group a **grapheme cluster**.
 
 #### Step-by-step examples
 
 Use `text = "A\u00e9"`. The expected byte length is `3`, and the
 expected rune sequence is `['A','\u00e9']`.
 
-1.  **Step: Inspect stored bytes**
-    - **Before:** UTF-8 encodes `A` as byte `0x41` and `\u00e9` as
-      bytes `0xC3 0xA9`.
-    - **Decision:** `len` reports stored bytes, not runes.
-    - **After:** `byteCount=3`.
-    - **Known correct:** All three encoded bytes are counted once.
-2.  **Step: Range over runes**
-    - **Before:** Decoding begins at byte index `0`.
-    - **Decision:** The first byte is the complete rune `A`.
-    - **After:** The first pair is `index=0, value='A'`; decoding
-      continues at byte index `1`.
-    - **Known correct:** The first byte and first rune have both been
+Initial state: `byteIndex=unset`, `byteCount=unset`, `runes=[]`.
+
+1.  Inspect stored bytes
+    - Decision: `len` reports stored bytes, not runes.
+    - After: `byteIndex=0`, `byteCount=3`, `runes=[]`.
+    - Known correct: All three encoded bytes are counted once.
+2.  Decode `A`
+    - Decision: Byte `0x41` is the complete rune `A`.
+    - After: `byteIndex=1`, `byteCount=3`, `runes=['A']`.
+    - Known correct: The first byte and first rune have both been
       processed once.
-3.  **Step: Decode the multibyte rune**
-    - **Before:** Bytes `0xC3 0xA9` begin at index `1`.
-    - **Decision:** UTF-8 combines them into rune `\u00e9`.
-    - **After:** The second pair is `index=1, value='\u00e9'`; the
-      rune sequence has length `2`.
-    - **Known correct:** Byte positions and rune values both refer to
+3.  Decode `\u00e9`
+    - Decision: UTF-8 combines bytes `0xC3 0xA9` into one rune.
+    - After: `byteIndex=done`, `byteCount=3`,
+      `runes=['A','\u00e9']`.
+    - Known correct: Byte positions and rune values both refer to
       the same original string without pretending that every rune is
       one byte.
 
@@ -11943,12 +12796,12 @@ For the boundary case, use `text = "e\u0301"`: `e` followed by a
 combining acute accent. The expected rune count is `2` even though
 many displays show one accented symbol.
 
-1.  **Step: Decode code points**
-    - **Before:** The string contains the code points `U+0065` and
-      `U+0301`.
-    - **Decision:** `[]rune` preserves both code points separately.
-    - **After:** `runes=['e','\u0301']` and `len(runes)=2`.
-    - **Known correct:** Rune processing answers a code-point
+Initial state: `text="e\u0301"`, `runes=[]`.
+
+1.  Decode code points
+    - Decision: `[]rune` preserves `U+0065` and `U+0301` separately.
+    - After: `text="e\u0301"`, `runes=['e','\u0301']`.
+    - Known correct: Rune processing answers a code-point
       question, not a visible-symbol question.
 
 #### Why it works
@@ -11995,10 +12848,11 @@ segmentation has its own library-specific state and costs.
 
 #### When to use it
 
-Use bytes for binary data, ASCII-only contracts, or protocols defined
-in bytes. Use runes when comparisons, positions, or counts are defined
-by Unicode code points. Use visible-symbol segmentation for cursor
-movement or limits that must match what a reader sees.
+Use bytes for binary data, American Standard Code for Information
+Interchange (ASCII) contracts, or protocols defined in bytes. Use
+runes when comparisons, positions, or counts are defined by Unicode
+code points. Use visible-symbol segmentation for cursor movement or
+limits that must match what a reader sees.
 
 #### When not to use it
 
@@ -12052,31 +12906,30 @@ checked implementation works with a group of concrete types.
 Call `first([]int{8,13})` and `first([]string{"go","rust"})`. The
 expected results are `(8,true)` and `("go",true)`.
 
-1.  **Call: integer slice**
-    - **Before:** The argument type is `[]int`.
-    - **Decision:** The compiler infers `T=int`; `len(values)>0`.
-    - **After:** The function returns the typed integer `8` and
-      `true`.
-    - **Known correct:** No string or other type can appear in this
+Initial state: `nextCall=first([]int{8,13})`, `results=[]`.
+
+1.  Call with integers
+    - Decision: The compiler infers `T=int`; the slice is nonempty.
+    - After: `nextCall=first([]string{"go","rust"})`,
+      `results=[(8,true)]`.
+    - Known correct: No string or other type can appear in this
       call's result.
-2.  **Call: string slice**
-    - **Before:** The argument type is `[]string`.
-    - **Decision:** The compiler infers `T=string`; `len(values)>0`.
-    - **After:** The function returns the typed string `"go"` and
-      `true`.
-    - **Known correct:** The same control flow is checked for a
+2.  Call with strings
+    - Decision: The compiler infers `T=string`; the slice is nonempty.
+    - After: `nextCall=done`, `results=[(8,true),("go",true)]`.
+    - Known correct: The same control flow is checked for a
       different value type.
 
 For the boundary case, call `first([]int{})`. The expected result is
 `(0,false)`.
 
-1.  **Call: empty integer slice**
-    - **Before:** `T=int` and `len(values)=0`.
-    - **Decision:** There is no first element, so declare
+Initial state: `T=int`, `values=[]`, `result=pending`.
+
+1.  Call with an empty slice
+    - Decision: There is no first element, so declare
       `var zero T`.
-    - **After:** Go gives `zero` the integer zero value `0` and the
-      function returns `0,false`.
-    - **Known correct:** The boolean distinguishes "no value" from a
+    - After: `T=int`, `values=[]`, `result=(0,false)`.
+    - Known correct: The boolean distinguishes "no value" from a
       stored first value that happens to be zero.
 
 #### Why it works
@@ -12173,42 +13026,41 @@ Traverse a tree with root `8`, left child `4`, and right child `12`.
 Write the stack with its top on the right. The expected preorder
 result is `[8,4,12]`.
 
-1.  **Step: Start**
-    - **Before:** `stack=[]`, `result=[]`.
-    - **Decision:** The root is non-nil, so push `8`.
-    - **After:** `stack=[8]`, `result=[]`.
-    - **Known correct:** Every unvisited reachable node is either the
+Initial state: `stack=[]`, `result=[]`, `next=root(8)`.
+
+1.  Push the root
+    - Decision: The root is non-nil, so push `8`.
+    - After: `stack=[8]`, `result=[]`, `next=pop`.
+    - Known correct: Every unvisited reachable node is either the
       root on the stack or below it.
-2.  **Step: Visit `8`**
-    - **Before:** `stack=[8]`, `result=[]`.
-    - **Decision:** Pop and append `8`; push right `12` before left
+2.  Visit `8`
+    - Decision: Pop and append `8`; push right `12` before left
       `4`.
-    - **After:** `stack=[12,4]`, `result=[8]`.
-    - **Known correct:** `8` is the required first value, and `4` is
+    - After: `stack=[12,4]`, `result=[8]`, `next=pop`.
+    - Known correct: `8` is the required first value, and `4` is
       next.
-3.  **Step: Visit `4`**
-    - **Before:** `stack=[12,4]`, `result=[8]`.
-    - **Decision:** Pop and append leaf `4`; it has no children to
+3.  Visit `4`
+    - Decision: Pop and append leaf `4`; it has no children to
       push.
-    - **After:** `stack=[12]`, `result=[8,4]`.
-    - **Known correct:** The root and complete left subtree are in
+    - After: `stack=[12]`, `result=[8,4]`, `next=pop`.
+    - Known correct: The root and complete left subtree are in
       preorder.
-4.  **Step: Visit `12`**
-    - **Before:** `stack=[12]`, `result=[8,4]`.
-    - **Decision:** Pop and append leaf `12`.
-    - **After:** `stack=[]`, `result=[8,4,12]`.
-    - **Known correct:** No pending node remains, and the full
+4.  Visit `12`
+    - Decision: Pop and append leaf `12`.
+    - After: `stack=[]`, `result=[8,4,12]`, `next=done`.
+    - Known correct: No pending node remains, and the full
       preorder is complete.
 
 For the boundary case, use `root=nil`. The expected result is an empty
 slice.
 
-1.  **Step: Check the root**
-    - **Before:** `root=nil`, `stack=[]`, `result=[]`.
-    - **Decision:** There is no call frame to simulate, so return
+Initial state: `root=nil`, `stack=[]`, `result=[]`.
+
+1.  Check the root
+    - Decision: There is no call frame to simulate, so return
       immediately.
-    - **After:** `result=[]`.
-    - **Known correct:** An empty tree contains no node to visit.
+    - After: `root=nil`, `stack=[]`, `result=[]`.
+    - Known correct: An empty tree contains no node to visit.
 
 #### Why it works
 
@@ -12334,46 +13186,44 @@ Suppose `large` refers to a 1,048,576-byte array and
 longer needed. The expected compact result contains the same 16 bytes
 without retaining the large array through `header`.
 
-1.  **Step: Take a small view**
-    - **Before:** `large` reaches the 1,048,576-byte backing array.
-    - **Decision:** `large[:16]` changes the visible length but shares
+Initial state: `large=1048576Bytes@largeArray`, `header=unset`,
+`compact=unset`.
+
+1.  Take a small view
+    - Decision: `large[:16]` changes the visible length but shares
       the array.
-    - **After:** `header` shows 16 bytes and still points into the
-      large array.
-    - **Known correct:** The byte values are right, but storage is not
+    - After: `large=1048576Bytes@largeArray`,
+      `header=16Bytes@largeArray`, `compact=unset`.
+    - Known correct: The byte values are right, but storage is not
       detached.
-2.  **Step: Copy the surviving bytes**
-    - **Before:** `header` shares the 1,048,576-byte array.
-    - **Decision:** Allocate `len(header)=16` bytes and copy the
+2.  Copy the surviving bytes
+    - Decision: Allocate `len(header)=16` bytes and copy the
       visible data.
-    - **After:** `compact` has the same 16 bytes in an independent
-      array with length and capacity `16`.
-    - **Known correct:** Keeping `compact` no longer requires the old
+    - After: `large=1048576Bytes@largeArray`,
+      `header=16Bytes@largeArray`, `compact=16Bytes@compactArray`.
+    - Known correct: Keeping `compact` no longer requires the old
       large array through this slice.
 
 For a pointer-removal example, let `items=[A,B,C]` and pop `C`. The
 expected visible result is `[A,B]`, and the old final array slot
 should be `nil`.
 
-1.  **Step: Save the removed pointer**
-    - **Before:** `last=2` and the backing-array slot holds `C`.
-    - **Decision:** Save `items[2]` so it can be returned.
-    - **After:** `value=C`; the slice and backing array are otherwise
-      unchanged.
-    - **Known correct:** The value remains available to return after
+Initial state: `items=[A,B,C]`, `last=2`, `value=unset`.
+
+1.  Save the removed pointer
+    - Decision: Save `items[2]` so it can be returned.
+    - After: `items=[A,B,C]`, `last=2`, `value=C`.
+    - Known correct: The value remains available to return after
       its old array slot is cleared.
-2.  **Step: Clear the old slot**
-    - **Before:** The final slot still references `C`.
-    - **Decision:** Assign `nil` to `items[2]`.
-    - **After:** Visible length is still `3`, but the backing array is
-      `[A,B,nil]`; saved `value` still refers to `C`.
-    - **Known correct:** The result is preserved separately, and the
+2.  Clear the old slot
+    - Decision: Assign `nil` to `items[2]`.
+    - After: `items=[A,B,nil]`, `last=2`, `value=C`.
+    - Known correct: The result is preserved separately, and the
       reusable array slot no longer retains `C`.
-3.  **Step: Shorten the visible slice**
-    - **Before:** `items` still has length `3` and final value `nil`.
-    - **Decision:** Reslice to `items[:2]`.
-    - **After:** Visible `items=[A,B]`; the hidden final slot is nil.
-    - **Known correct:** The returned slice contains exactly the
+3.  Shorten the visible slice
+    - Decision: Reslice to `items[:2]`.
+    - After: `items=[A,B]`, `last=2`, `value=C`, `hiddenSlot=nil`.
+    - Known correct: The returned slice contains exactly the
       unremoved pointers in their original order.
 
 #### Why it works
@@ -12492,60 +13342,57 @@ exact range boundaries.
 
 Open a dictionary near the middle, then keep only the half that can
 contain the first matching word. **Binary search** repeats that move.
-The code keeps a half-open range `[left,right)`, including `left` but
-not `right`. A lower bound finds the first value at least as large as
-the target; an upper bound finds the first larger value. Either may be
-`len(values)`.
+The code maintains three regions. Indexes before `left` are proved too
+small. Indexes from `right` onward are proved large enough. The
+half-open range `[left,right)`, which includes `left` but not `right`,
+is still unclassified. A lower bound finds the first value at least as
+large as the target; an upper bound finds the first larger value.
+Either boundary may be `len(values)`.
 
 #### Step-by-step examples
 
 For `values=[1,2,2,2,5]` and `target=2`, `LowerBound` should return
 `1`.
 
-1.  **Step: Inspect index 2**
-    - **Before:** `left=0`, `right=5`, `middle=2`, value `2`.
-    - **Decision:** `2` is not smaller than the target, so index 2
+Initial state: `left=0`, `right=5`, `result=pending`.
+
+1.  Inspect index `2`
+    - Decision: `2` is not smaller than the target, so index `2`
       might be the first match; set `right=2`.
-    - **After:** Positions in `[0,2)` remain unchecked; index `2` is
-      the earliest known success.
-    - **Known correct:** No index after `2` can be the first success.
-2.  **Step: Inspect index 1**
-    - **Before:** `left=0`, `right=2`, `middle=1`, value `2`.
-    - **Decision:** Keep this possible first match by setting
+    - After: `left=0`, `right=2`, `result=pending`.
+    - Known correct: No index after `2` can be the first success.
+2.  Inspect index `1`
+    - Decision: Keep this possible first match by setting
       `right=1`.
-    - **After:** Position `0` remains unchecked; index `1` is the
-      earliest known success.
-    - **Known correct:** The lower bound is either unchecked index `0`
+    - After: `left=0`, `right=1`, `result=pending`.
+    - Known correct: The lower bound is either unchecked index `0`
       or known-success index `1`.
-3.  **Step: Inspect index 0**
-    - **Before:** `left=0`, `right=1`, `middle=0`, value `1`.
-    - **Decision:** `1 < 2`, so index 0 cannot qualify; set `left=1`.
-    - **After:** `left=right=1`; return `1`.
-    - **Known correct:** Index 0 is too small and index 1 is the first
-      value at least 2.
+3.  Inspect index `0`
+    - Decision: `1 < 2`, so index `0` cannot qualify; set `left=1`.
+    - After: `left=1`, `right=1`, `result=1`.
+    - Known correct: Index `0` is too small and index `1` is the first
+      value at least `2`.
 
 For the same input and target, `UpperBound` should return `4`, the
 first index whose value is greater than `2`.
 
-1.  **Step: Inspect index 2**
-    - **Before:** `left=0`, `right=5`, `middle=2`, value `2`.
-    - **Decision:** An upper bound must be strictly greater than `2`,
+Initial state: `left=0`, `right=5`, `result=pending`.
+
+1.  Inspect index `2`
+    - Decision: An upper bound must be strictly greater than `2`,
       so set `left=3`.
-    - **After:** Positions in `[3,5)` remain unchecked.
-    - **Known correct:** Indexes `0` through `2` cannot be the answer;
+    - After: `left=3`, `right=5`, `result=pending`.
+    - Known correct: Indexes `0` through `2` cannot be the answer;
       index `5` remains the allowed after-the-slice boundary.
-2.  **Step: Inspect index 4**
-    - **Before:** `left=3`, `right=5`, `middle=4`, value `5`.
-    - **Decision:** Index 4 qualifies and may be first, so set
+2.  Inspect index `4`
+    - Decision: Index `4` qualifies and may be first, so set
       `right=4`.
-    - **After:** Position `3` remains unchecked; index `4` is the
-      earliest known success.
-    - **Known correct:** No index after `4` can be the first answer.
-3.  **Step: Inspect index 3**
-    - **Before:** `left=3`, `right=4`, `middle=3`, value `2`.
-    - **Decision:** Equality does not qualify, so set `left=4`.
-    - **After:** `left=right=4`; return `4`.
-    - **Known correct:** Index 4 is the first value greater than `2`.
+    - After: `left=3`, `right=4`, `result=pending`.
+    - Known correct: No index after `4` can be the first answer.
+3.  Inspect index `3`
+    - Decision: Equality does not qualify, so set `left=4`.
+    - After: `left=4`, `right=4`, `result=4`.
+    - Known correct: Index `4` is the first value greater than `2`.
 
 For the boundary case `values=[1,2,2,2,5]`, `target=6`, `LowerBound`
 returns `5`. Every inspected value is smaller than 6, so `left`
@@ -12703,29 +13550,30 @@ saved count is a **state** because a later answer still depends on it.
 
 For `steps=4`, the expected answer is `5`.
 
-1.  **Step: Establish totals 0 and 1**
-    - **Before:** No loop iteration has run.
-    - **Decision:** There is one way to make 0 and one way to make 1.
-    - **After:** `twoBack=1`, `oneBack=1`.
-    - **Known correct:** The two base totals have exact counts.
-2.  **Step: Build total 2**
-    - **Before:** `current=2`, counts are `1` and `1`.
-    - **Decision:** Append a two-step move to the total-0 sequences or
+Initial state: `current=0`, `twoBack=unset`, `oneBack=unset`,
+`result=pending`.
+
+1.  Establish totals `0` and `1`
+    - Decision: There is one way to make `0` and one way to make `1`.
+    - After: `current=2`, `twoBack=1`, `oneBack=1`,
+      `result=pending`.
+    - Known correct: The two base totals have exact counts.
+2.  Build total `2`
+    - Decision: Append a two-step move to the total-0 sequences or
       a one-step move to the total-1 sequences.
-    - **After:** `twoBack=1`, `oneBack=2`.
-    - **Known correct:** The two sequences are `[2]` and `[1,1]`.
-3.  **Step: Build total 3**
-    - **Before:** `current=3`, counts for totals 1 and 2 are `1` and
-      `2`.
-    - **Decision:** Add them.
-    - **After:** `twoBack=2`, `oneBack=3`.
-    - **Known correct:** All sequences reaching 3 end in exactly one
+    - After: `current=3`, `twoBack=1`, `oneBack=2`,
+      `result=pending`.
+    - Known correct: The two sequences are `[2]` and `[1,1]`.
+3.  Build total `3`
+    - Decision: Add counts `1` and `2`.
+    - After: `current=4`, `twoBack=2`, `oneBack=3`,
+      `result=pending`.
+    - Known correct: All sequences reaching `3` end in exactly one
       of the two allowed move sizes.
-4.  **Step: Build total 4**
-    - **Before:** `current=4`, counts are `2` and `3`.
-    - **Decision:** Add them and roll forward.
-    - **After:** `twoBack=3`, `oneBack=5`; return `5`.
-    - **Known correct:** All five ordered sequences are counted once.
+4.  Build total `4`
+    - Decision: Add counts `2` and `3`, then roll forward.
+    - After: `current=done`, `twoBack=3`, `oneBack=5`, `result=5`.
+    - Known correct: All five ordered sequences are counted once.
 
 For boundary inputs, `steps=-1` returns `0` and `steps=0` returns `1`
 without entering the loop. The second result counts the one empty
@@ -12833,24 +13681,28 @@ values already in the input, and one position cannot be used twice.
 If two items must fit a `$20` budget, each price tells you the partner
 price still needed. That **complement** is `target-currentPrice`. Ask
 a map whether it appeared earlier, then store the current price and
-its index for later items.
+its index for later items. The contract is
+`indexByValue[value] -> earlier input index containing value`. Thus
+`indexByValue[2]=0` means index `0` is an available earlier partner
+whose value is `2`.
 
 #### Step-by-step examples
 
 For `values=[2,7,11,15]` and `target=9`, the expected result is
 `(0,1,true)`.
 
-1.  **Step: Visit index 0**
-    - **Before:** `indexByValue={}`, `value=2`.
-    - **Decision:** `complement=7` is absent, so no earlier partner
+Initial state: `index=0`, `indexByValue={}`, `result=pending`.
+
+1.  Visit index `0`
+    - Decision: Complement `7` is absent, so no earlier partner
       exists.
-    - **After:** `indexByValue={2:0}`.
-    - **Known correct:** No pair ending at index 0 exists.
-2.  **Step: Visit index 1**
-    - **Before:** `indexByValue={2:0}`, `value=7`.
-    - **Decision:** `complement=2` is present at index 0.
-    - **After:** Return `(0,1,true)` without further mutation.
-    - **Known correct:** The positions are distinct and `2+7=9`.
+    - After: `index=1`, `indexByValue={2:0}`, `result=pending`.
+    - Known correct: No pair ending at index `0` exists.
+2.  Visit index `1`
+    - Decision: Complement `2` is present at index `0`.
+    - After: `index=1`, `indexByValue={2:0}`,
+      `result=(0,1,true)`.
+    - Known correct: The positions are distinct and `2+7=9`.
 
 For the duplicate case `values=[3,3]`, `target=6`, index 0 is stored
 before index 1 looks up its complement. The result is `(0,1,true)`;
@@ -12903,12 +13755,11 @@ used.
 
 #### Work and memory
 
-With ordinary Go map behavior, each lookup and insertion takes
-constant time on average, so the scan takes `O(n)` average time and
-can take `O(n^2)` in an unusually bad case where map operations stop
-behaving like constant-time lookups. The map stores at most `n`
-entries and uses `O(n)` additional memory. A successful early pair can
-reduce actual work but does not change the worst-case bound.
+In the usual hash-map cost model, each lookup and insertion takes
+expected `O(1)` time, so the scan takes expected `O(n)` time. Go's
+language rules do not promise a fixed worst-case time for map
+operations. The map stores at most `n` entries and uses `O(n)`
+additional memory. A successful early pair can reduce actual work.
 
 #### When to use it
 
@@ -12919,9 +13770,7 @@ useful, and `O(n)` extra map memory is acceptable.
 
 Use the sorted two-pointer implementation in
 [E.9](#e9-sorted-two-pointer-pair-search) when the input is already
-sorted or may be reordered and constant extra memory matters. A
-frequency map is needed instead when the task asks for all pairs or
-counts rather than one pair.
+sorted or may be reordered and constant extra memory matters.
 
 #### Common mistakes and edge cases
 
@@ -12966,54 +13815,62 @@ before it is overwritten.
 Build and reverse `values=[10,20,30]`; the expected final slice is
 `[30,20,10]`.
 
-**Phase 1: build the list.**
+Phase 1: build the list.
 
-1.  **Step: Create the temporary start**
-    - **Before:** `dummy.Next=nil`, `tail=dummy`.
-    - **Decision:** Use `dummy` as a construction-only node before the
-      first real value.
-    - **After:** The real list is empty; `tail` names where to append.
-    - **Known correct:** Empty and nonempty input can use the same
-      append operation.
-2.  **Step: Append all three values**
-    - **Before:** `tail=dummy`, `dummy.Next=nil`.
-    - **Decision:** Create node `10` after `tail` and move `tail` to
-      it. Repeat the same append operation for `20`, then `30`.
-    - **After:** `dummy -> 10 -> 20 -> 30 -> nil`; return node 10.
-    - **Known correct:** Returning `dummy.Next` excludes the temporary
-      node and preserves all input values in order.
+Initial state: `nextValue=10`, `list=empty`, `tail=dummy`.
 
-**Phase 2: reverse the links.**
+1.  Append `10`
+    - Decision: Create node `10` after `tail`; move `tail` to it.
+    - After: `nextValue=20`, `list=10 -> nil`, `tail=10`.
+    - Known correct: The built list equals the processed prefix
+      `[10]`.
+2.  Append `20`
+    - Decision: Create node `20` after `tail`; move `tail` to it.
+    - After: `nextValue=30`, `list=10 -> 20 -> nil`, `tail=20`.
+    - Known correct: The built list equals `[10,20]`.
+3.  Append `30` and return the real head
+    - Decision: Append node `30`, then return `dummy.Next`.
+    - After: `nextValue=done`, `list=10 -> 20 -> 30 -> nil`,
+      `tail=30`.
+    - Known correct: The dummy is excluded, and every input value
+      appears once in order.
 
-3.  **Step: Reverse node 10**
-    - **Before:** `previous=nil`, `current=10 -> 20`, `next` not yet
-      saved.
-    - **Decision:** Save node 20, then set `10.Next=nil`.
-    - **After:** `previous=10 -> nil`, `current=20 -> 30`.
-    - **Known correct:** Node 10 forms the complete reversed prefix,
+Phase 2: reverse the links.
+
+Initial state: `previous=nil`, `current=10 -> 20 -> 30 -> nil`.
+
+1.  Reverse node `10`
+    - Decision: Save node `20`, set `10.Next=nil`, and advance.
+    - After: `previous=10 -> nil`, `current=20 -> 30 -> nil`.
+    - Known correct: Node `10` forms the complete reversed prefix,
       and node 20 still reaches every unprocessed node.
-4.  **Step: Reverse node 20**
-    - **Before:** `previous=10`, `current=20`, `next=30` after saving.
-    - **Decision:** Set `20.Next=10` and advance.
-    - **After:** `previous=20 -> 10`, `current=30`.
-    - **Known correct:** The first two original nodes are reversed
+2.  Reverse node `20`
+    - Decision: Save node `30`, set `20.Next=10`, and advance.
+    - After: `previous=20 -> 10 -> nil`, `current=30 -> nil`.
+    - Known correct: The first two original nodes are reversed
       without losing node 30.
-5.  **Step: Reverse node 30**
-    - **Before:** `previous=20 -> 10`, `current=30`.
-    - **Decision:** Save `nil`, point 30 to 20, and advance to `nil`.
-    - **After:** Return `previous=30 -> 20 -> 10` as the new head.
-    - **Known correct:** Every original node appears once in reverse
+3.  Reverse node `30`
+    - Decision: Save `nil`, point `30` to `20`, and advance.
+    - After: `previous=30 -> 20 -> 10 -> nil`, `current=nil`.
+    - Known correct: Every original node appears once in reverse
       order.
 
-**Phase 3: convert the result for inspection.**
+Phase 3: convert the result for inspection.
 
-6.  **Step: Follow the reversed links**
-    - **Before:** Output is empty; the current node is 30.
-    - **Decision:** Append `30`, `20`, and `10` while following each
-      `Next` link. Stop when the next node is `nil`.
-    - **After:** Return `[30,20,10]`.
-    - **Known correct:** Every reversed-list node was visited once and
-      appears in encounter order.
+Initial state: `node=30 -> 20 -> 10 -> nil`, `values=[]`.
+
+1.  Read node `30`
+    - Decision: Append `30`; advance to node `20`.
+    - After: `node=20 -> 10 -> nil`, `values=[30]`.
+    - Known correct: The slice equals the visited list prefix.
+2.  Read node `20`
+    - Decision: Append `20`; advance to node `10`.
+    - After: `node=10 -> nil`, `values=[30,20]`.
+    - Known correct: Both visited nodes appear in encounter order.
+3.  Read node `10` and finish
+    - Decision: Append `10`; advance to `nil` and stop.
+    - After: `node=nil`, `values=[30,20,10]`.
+    - Known correct: Every reversed-list node was visited once.
 
 For an empty `values=[]`, `FromSlice` returns `nil`, `Reverse(nil)`
 returns `nil`, and `ToSlice(nil)` returns an empty slice without
@@ -13143,48 +14000,50 @@ handle an empty stack without a panic.
 #### How it works
 
 Use the end of a slice as the top of a stack of trays. Adding and
-removing at that one end implements **last in, first out**, often
-shortened to LIFO. A generic `Stack[T]` gives the same operations to
-any chosen value type.
+removing at that one end implements **last in, first out (LIFO)**. A
+generic `Stack[T]` gives the same operations to any chosen value type.
 
 #### Step-by-step examples
 
 Starting with the zero value `var stack Stack[string]`, push `"a"`,
 push `"b"`, peek, then pop. The expected peek and pop value is `"b"`.
 
-1.  **Step: Push `"a"`**
-    - **Before:** `items=nil`, length 0.
-    - **Decision:** Append at the slice end.
-    - **After:** `items=["a"]`, length 1.
-    - **Known correct:** `"a"` is the newest and top value.
-2.  **Step: Push `"b"`**
-    - **Before:** `items=["a"]`.
-    - **Decision:** Append without disturbing the earlier item.
-    - **After:** `items=["a","b"]`, length 2.
-    - **Known correct:** `"b"` is now the top.
-3.  **Step: Peek**
-    - **Before:** Last index is 1.
-    - **Decision:** Read that slot without slicing it away.
-    - **After:** Return `"b",true`; `items` remains `["a","b"]`.
-    - **Known correct:** Inspection did not change stack order or
+Initial state: `items=nil`, `next=push("a")`, `observed=[]`,
+`savedValue=unset`.
+
+1.  Push `"a"`
+    - Decision: Append at the slice end.
+    - After: `items=["a"]`, `next=push("b")`, `observed=[]`,
+      `savedValue=unset`.
+    - Known correct: `"a"` is the newest and top value.
+2.  Push `"b"`
+    - Decision: Append without disturbing the earlier item.
+    - After: `items=["a","b"]`, `next=peek`, `observed=[]`,
+      `savedValue=unset`.
+    - Known correct: `"b"` is now the top.
+3.  Peek
+    - Decision: Read the final slot without slicing it away.
+    - After: `items=["a","b"]`, `next=pop`,
+      `observed=[("b",true)]`, `savedValue=unset`.
+    - Known correct: Inspection did not change stack order or
       length.
-4.  **Step: Save the top value**
-    - **Before:** `items=["a","b"]`; last index is 1.
-    - **Decision:** Save `items[1]` in `value`.
-    - **After:** `value="b"`; the slice is unchanged.
-    - **Known correct:** The value to return is preserved before its
+4.  Save the top value
+    - Decision: Save `items[1]` in `savedValue`.
+    - After: `items=["a","b"]`, `next=clear`,
+      `observed=[("b",true)]`, `savedValue="b"`.
+    - Known correct: The value to return is preserved before its
       slot changes.
-5.  **Step: Clear the old slot**
-    - **Before:** Slot 1 still contains `"b"`.
-    - **Decision:** Assign the string zero value `""` to slot 1.
-    - **After:** Backing storage is `["a",""]`; visible length is 2.
-    - **Known correct:** The saved result remains `"b"`, and the old
+5.  Clear the old slot
+    - Decision: Assign the string zero value `""` to slot `1`.
+    - After: `items=["a",""]`, `next=shorten`,
+      `observed=[("b",true)]`, `savedValue="b"`.
+    - Known correct: The saved result remains `"b"`, and the old
       slot no longer retains it.
-6.  **Step: Shorten and return**
-    - **Before:** `items=["a",""]`, `value="b"`.
-    - **Decision:** Reslice before index 1 and return the saved value.
-    - **After:** Return `"b",true`; visible `items=["a"]`.
-    - **Known correct:** The newest value was removed first.
+6.  Shorten and return
+    - Decision: Reslice before index `1` and return the saved value.
+    - After: `items=["a"]`, `next=done`,
+      `observed=[("b",true),("b",true)]`, `savedValue="b"`.
+    - Known correct: The newest value was removed first.
 
 For an empty stack, both `Pop` and `Peek` return `"",false` for
 `Stack[string]`; the boolean distinguishes failure from a successfully
@@ -13271,9 +14130,8 @@ zero-value stack.
 `Peek`, `Pop`, `Len`, and `IsEmpty` take `O(1)` time. `Push` takes
 `O(1)` amortized time. **Amortized** means averaged across a sequence:
 most appends are constant work, while an occasional capacity growth
-copies `O(n)` items. Storing `n` values
-uses `O(n)` memory. The methods use `O(1)` extra memory beyond the
-slice storage.
+copies `O(n)` items. Storing `n` values uses `O(n)` memory. The
+methods use `O(1)` extra memory beyond the slice storage.
 
 #### When to use it
 
@@ -13332,22 +14190,21 @@ operation is safe before executing it.
 
 For `value=120`, the expected result is `(21,true)`.
 
-1.  **Step: Move digit 0**
-    - **Before:** `value=120`, `reversed=0`, `digit=0`.
-    - **Decision:** The guard passes, so append 0.
-    - **After:** `value=12`, `reversed=0`.
-    - **Known correct:** The processed suffix `0` is represented as
+Initial state: `value=120`, `reversed=0`, `result=pending`.
+
+1.  Move digit `0`
+    - Decision: The guard passes, so append `0`.
+    - After: `value=12`, `reversed=0`, `result=pending`.
+    - Known correct: The processed suffix `0` is represented as
       integer 0; its leading zero need not be retained.
-2.  **Step: Move digit 2**
-    - **Before:** `value=12`, `reversed=0`, `digit=2`.
-    - **Decision:** The guarded expression fits.
-    - **After:** `value=1`, `reversed=2`.
-    - **Known correct:** The processed suffix `20` is reversed to `2`.
-3.  **Step: Move digit 1**
-    - **Before:** `value=1`, `reversed=2`, `digit=1`.
-    - **Decision:** Append the final digit.
-    - **After:** `value=0`, `reversed=21`; return `(21,true)`.
-    - **Known correct:** Every input digit has moved to its reversed
+2.  Move digit `2`
+    - Decision: The guarded expression fits, so append `2`.
+    - After: `value=1`, `reversed=2`, `result=pending`.
+    - Known correct: The processed suffix `20` is reversed to `2`.
+3.  Move digit `1`
+    - Decision: Append the final digit.
+    - After: `value=0`, `reversed=21`, `result=(21,true)`.
+    - Known correct: Every input digit has moved to its reversed
       decimal position.
 
 For the overflow case `value=8085774586302733229`, the digits
@@ -13470,23 +14327,25 @@ user-visible symbols.
 
 For `strs=["flower","flow","flight"]`, the expected result is `"fl"`.
 
-1.  **Step: Compare column 0**
-    - **Before:** `column=0`, `expected='f'`.
-    - **Decision:** Rows 1 and 2 both contain `'f'` at byte 0.
-    - **After:** Continue to column 1.
-    - **Known correct:** Every string shares prefix `"f"`.
-2.  **Step: Compare column 1**
-    - **Before:** `column=1`, `expected='l'`.
-    - **Decision:** Both other rows also contain `'l'`.
-    - **After:** Continue to column 2.
-    - **Known correct:** Every string shares prefix `"fl"`.
-3.  **Step: Compare column 2**
-    - **Before:** `column=2`, `expected='o'`; row 1 contains `'o'`,
-      row 2 contains `'i'`.
-    - **Decision:** The mismatch means no common prefix can include
+Initial state: `column=0`, `expected='f'`, `prefix=""`,
+`result=pending`.
+
+1.  Compare column `0`
+    - Decision: Rows `1` and `2` both contain `'f'`.
+    - After: `column=1`, `expected='l'`, `prefix="f"`,
+      `result=pending`.
+    - Known correct: Every string shares prefix `"f"`.
+2.  Compare column `1`
+    - Decision: Rows `1` and `2` both contain `'l'`.
+    - After: `column=2`, `expected='o'`, `prefix="fl"`,
+      `result=pending`.
+    - Known correct: Every string shares prefix `"fl"`.
+3.  Compare column `2`
+    - Decision: Row `2` contains `'i'`, so no prefix can include
       column 2.
-    - **After:** Return `strs[0][:2]`, which is `"fl"`.
-    - **Known correct:** The first two bytes match everywhere and the
+    - After: `column=2`, `expected='o'`, `prefix="fl"`,
+      `result="fl"`.
+    - Known correct: The first two bytes match everywhere and the
       third does not.
 
 For `strs=["","abc"]`, the outer loop has no columns and returns `""`.
@@ -13508,30 +14367,30 @@ which is itself the maximum possible answer length.
 package commonprefixscan
 
 // LongestCommonPrefix returns the longest byte prefix shared by all
-// strings. It returns an empty string when strings is empty.
-func LongestCommonPrefix(strings []string) string {
+// strings. It returns an empty string when strs is empty.
+func LongestCommonPrefix(strs []string) string {
 	// Empty input has no first row to use as the comparison baseline.
-	if len(strings) == 0 {
+	if len(strs) == 0 {
 		return ""
 	}
 
 	// Each byte in the first string is the expected value for one
 	// column.
-	for column := 0; column < len(strings[0]); column++ {
-		expectedByte := strings[0][column]
-		for row := 1; row < len(strings); row++ {
+	for column := 0; column < len(strs[0]); column++ {
+		expectedByte := strs[0][column]
+		for row := 1; row < len(strs); row++ {
 			// Check length before indexing. A missing or unequal byte proves
 			// that the previously verified columns form the longest common
 			// prefix.
-			if column >= len(strings[row]) ||
-				strings[row][column] != expectedByte {
-				return strings[0][:column]
+			if column >= len(strs[row]) ||
+				strs[row][column] != expectedByte {
+				return strs[0][:column]
 			}
 		}
 	}
 	// Every byte of the first string matched, so no longer prefix is
 	// possible.
-	return strings[0]
+	return strs[0]
 }
 ```
 
@@ -13608,23 +14467,25 @@ needed for the next comparison.
 For `values=[3,4,2]`, the expected result is `3` because the signed
 expression is `-3+4+2`.
 
-1.  **Step: Establish the right edge**
-    - **Before:** `last=2`, no total yet.
-    - **Decision:** The last value has no right neighbor, so add it.
-    - **After:** `total=2`, `rightValue=2`.
-    - **Known correct:** Index 2 has its final contribution.
-2.  **Step: Visit index 1**
-    - **Before:** `value=4`, `rightValue=2`, `total=2`.
-    - **Decision:** `4` is not smaller than 2, so add it.
-    - **After:** `total=6`, `rightValue=4`.
-    - **Known correct:** Indices 1 and 2 have their final
+Initial state: `index=2`, `total=0`, `rightValue=none`,
+`result=pending`.
+
+1.  Establish the right edge
+    - Decision: Value `2` has no right neighbor, so add it.
+    - After: `index=1`, `total=2`, `rightValue=2`,
+      `result=pending`.
+    - Known correct: Index `2` has its final contribution.
+2.  Visit index `1`
+    - Decision: `4` is not smaller than `2`, so add it.
+    - After: `index=0`, `total=6`, `rightValue=4`,
+      `result=pending`.
+    - Known correct: Indices `1` and `2` have their final
       contributions, and `rightValue` is the original value at index
       1.
-3.  **Step: Visit index 0**
-    - **Before:** `value=3`, `rightValue=4`, `total=6`.
-    - **Decision:** `3 < 4`, so subtract it.
-    - **After:** `total=3`, `rightValue=3`; return `3`.
-    - **Known correct:** Every index was classified against its
+3.  Visit index `0`
+    - Decision: `3 < 4`, so subtract it.
+    - After: `index=done`, `total=3`, `rightValue=3`, `result=3`.
+    - Known correct: Every index was classified against its
       immediate original right neighbor.
 
 For empty input, the result is zero. For `values=[7]`, initialization
@@ -13750,28 +14611,26 @@ high-price side down. These coordinated integer indexes form the
 For `values=[-3,1,2,5,8]` and `target=7`, the expected result is
 `(2,3,true)`.
 
-1.  **Step: Check indexes 0 and 4**
-    - **Before:** `left=0`, `right=4`, sum `-3+8=5`.
-    - **Decision:** The sum is too small, so increment `left`.
-    - **After:** Possible positions are indexes 1 through 4.
-    - **Known correct:** Index 0 cannot pair with any remaining value
+Initial state: `left=0`, `right=4`, `result=pending`.
+
+1.  Check indexes `0` and `4`
+    - Decision: Sum `5` is too small, so increment `left`.
+    - After: `left=1`, `right=4`, `result=pending`.
+    - Known correct: Index `0` cannot pair with any remaining value
       because 8 was already its largest possible partner.
-2.  **Step: Check indexes 1 and 4**
-    - **Before:** Sum `1+8=9`.
-    - **Decision:** The sum is too large, so decrement `right`.
-    - **After:** Possible positions are indexes 1 through 3.
-    - **Known correct:** Index 4 cannot pair with any remaining value
+2.  Check indexes `1` and `4`
+    - Decision: Sum `9` is too large, so decrement `right`.
+    - After: `left=1`, `right=3`, `result=pending`.
+    - Known correct: Index `4` cannot pair with any remaining value
       because 1 was already its smallest possible partner.
-3.  **Step: Check indexes 1 and 3**
-    - **Before:** Sum `1+5=6`.
-    - **Decision:** The sum is too small; increment `left`.
-    - **After:** `left=2`, `right=3`.
-    - **Known correct:** Index 1 has no valid remaining partner.
-4.  **Step: Check indexes 2 and 3**
-    - **Before:** Sum `2+5=7`.
-    - **Decision:** The sum equals the target.
-    - **After:** Return `(2,3,true)`.
-    - **Known correct:** The positions are distinct and their values
+3.  Check indexes `1` and `3`
+    - Decision: Sum `6` is too small, so increment `left`.
+    - After: `left=2`, `right=3`, `result=pending`.
+    - Known correct: Index `1` has no valid remaining partner.
+4.  Check indexes `2` and `3`
+    - Decision: Sum `7` equals the target.
+    - After: `left=2`, `right=3`, `result=(2,3,true)`.
+    - Known correct: The positions are distinct and their values
       sum to 7.
 
 For `values=[4]`, `target=8`, `left=0` and `right=0`, so the loop
@@ -13863,7 +14722,7 @@ overflow.
 #### Related material
 
 - [C.1.3.9 Move coordinated positions (two pointers)](#two-pointers)
-  explains why each pointer move is safe and shows related forms.
+  explains the same ordered discard proof.
 - [E.3 Hash-map complement lookup](#e3-hash-map-complement-lookup) is
   the unsorted one-pass alternative.
 - [D.3 Sorting without unexpected
@@ -13885,9 +14744,10 @@ the linked starting point first if the new topic is unfamiliar.
   in [graphs and grids](#b5-graphs-and-grids).
 - **All-pairs shortest paths** find the cheapest route between every
   pair of nodes, rather than routes from only one starting node.
-  Compare repeated [Dijkstra
-  searches](#c1323-dijkstra-shortest-paths) with reusing smaller
-  answers through [dynamic programming](#c1310-dynamic-programming).
+  For nonnegative costs, compare repeated [Dijkstra
+  searches](#c1323-dijkstra-shortest-paths) with [dynamic
+  programming](#c1310-dynamic-programming) that gradually allows more
+  intermediate nodes on a route.
 - **Maximum flow** asks how much material can travel from a starting
   point to a destination. Each one-way connection has a **capacity**,
   meaning the largest amount it can carry. Start with the way

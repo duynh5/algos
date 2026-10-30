@@ -330,14 +330,20 @@ func validateNoTables(path string, prose []byte) []string {
 }
 
 func validateTraceItems(path string, prose []byte) []string {
-	requiredLabels := []string{
+	standaloneLabels := []string{
 		"Before",
+		"Decision",
+		"After",
+		"Known correct",
+	}
+	chainedLabels := []string{
 		"Decision",
 		"After",
 		"Known correct",
 	}
 	issues := make([]string, 0)
 	inExamples := false
+	chainedTrace := false
 	itemLine := 0
 	var item strings.Builder
 
@@ -346,10 +352,14 @@ func validateTraceItems(path string, prose []byte) []string {
 			return
 		}
 		itemText := item.String()
+		requiredLabels := standaloneLabels
+		if chainedTrace {
+			requiredLabels = chainedLabels
+		}
 		foundLabels := 0
 		missingLabels := make([]string, 0, len(requiredLabels))
 		for _, label := range requiredLabels {
-			marker := "**" + label + ":**"
+			marker := label + ":"
 			if strings.Contains(itemText, marker) {
 				foundLabels++
 				continue
@@ -358,7 +368,7 @@ func validateTraceItems(path string, prose []byte) []string {
 		}
 		// A numbered explanation without state labels may accompany a
 		// concrete diagram. Once an item adopts the trace vocabulary,
-		// require the complete transition in that same item.
+		// require a complete standalone or chained transition.
 		if foundLabels > 0 && len(missingLabels) > 0 {
 			issues = append(
 				issues,
@@ -383,15 +393,22 @@ func validateTraceItems(path string, prose []byte) []string {
 			switch match[2] {
 			case "Step-by-step examples":
 				inExamples = true
+				chainedTrace = false
 			case "Why it works":
 				if inExamples {
 					flushItem()
 					inExamples = false
+					chainedTrace = false
 				}
 			}
 			continue
 		}
 		if !inExamples {
+			continue
+		}
+		if strings.Contains(line, "Initial state:") {
+			flushItem()
+			chainedTrace = true
 			continue
 		}
 		if traceItemPattern.MatchString(line) {
