@@ -52,15 +52,15 @@ Treat the version currently in the working tree as the source of truth. Keep its
 - Define each necessary technical term in the paragraph where it first appears. Do not explain one unfamiliar term with several other undefined terms.
 - Use concrete verbs such as "visit," "remember," "compare," and "move." Avoid abstract phrases such as "perform traversal" and "leverage state."
 - Explain notation in words before using it repeatedly.
-- Before showing how an algorithm builds or changes state, explain what one representative value, table entry, lookup, pointer, or boundary means.
-- Before explaining updates to indexed or mapped state, state its data contract as `lookup input -> stored fact`. Say what selects an entry, what unit its value measures, and how to read one concrete entry as a sentence.
-- Keep logical quantities, storage locations, and stored values separate. When code converts a count, key, index, offset, or boundary, show the conversion with exact values before giving the general expression.
+- Before showing how a method builds or changes state, explain what one representative part of that state means.
+- Before explaining updates to structured state, state its access contract as `selection input -> stored fact`. Say what selects one part, what unit its value measures, and how to read one concrete part as a sentence.
+- Keep logical quantities, storage selectors, storage locations, and stored values separate. When code converts between them, show the conversion with exact values before giving the general expression.
 - If the implementation hides the natural mental model, explain the conceptual representation first. Then map it to the actual storage representation. Storage details should refine the mental model, not create a different one.
-- When the same data has different roles or locations, label each use by its role and location. Do not let words such as "current," "copy," "position," or "value" quietly refer to different things.
+- When the same data has different roles or locations, label each use by its role and location. Do not let one vague name quietly refer to different things.
 - Give state a plain-language mental model when it makes the idea easier to remember. Follow it with the exact term and rule so the analogy does not replace a correct explanation.
 - Use one main mental model throughout an entry's introduction, procedure, traces, correctness argument, and code. If another model is necessary, explain how it maps to the first one.
 - Show before telling. Demonstrate a non-obvious rule with exact values, positions, or state changes before describing it in abstract terms.
-- Keep standard names such as _binary search_, _dynamic programming_, and _Big-O_ visible. Readers need to recognize these names in problems, documentation, and interviews.
+- Keep each entry's standard technical name visible. Readers need to recognize established terminology in problems, documentation, and interviews.
 - Keep a precise technical term when removing it would reduce accuracy, but pair it with a plain-English explanation.
 - Spell out each abbreviation the first time it appears in a learning context.
 
@@ -73,6 +73,14 @@ Every active concept, data structure, problem-solving method, language technique
    - Do not define the technique by repeating its name.
 2. **How it works**
    - Use plain language and as much detail as the concept needs.
+   - For a method that repeatedly chooses its next work, state one
+     plain-language selection contract: the eligible items, the rule
+     that chooses one item, and how the shown code finds it. Separate
+     the algorithm's choice from its implementation data structure.
+     When different data structures can enact the same choice, make
+     clear which behavior stays fixed and which mechanism changes.
+   - When a nearby method has similar control flow, contrast their
+     selection contracts before explaining secondary details.
    - Do not remove a necessary rule, condition, state meaning, or distinction just to shorten the section.
    - Split long explanations into focused paragraphs when that makes them easier to follow.
    - Begin with a familiar action or practical situation when it makes the idea easier to picture.
@@ -86,7 +94,7 @@ Every active concept, data structure, problem-solving method, language technique
    - Add a boundary, duplicate, failure, or adversarial example when it changes the behavior or reveals a common mistake.
 4. **Why it works**
    - Use plain language and as much detail as the reasoning needs.
-   - Begin with the concrete fact that stays true. Use the word _invariant_ only after that fact is clear.
+   - Begin with the concrete fact or contract that makes the result reliable. Introduce its formal name only after that fact is clear.
    - For an algorithm, explain why the fact is true at the start, remains true after one step, and leads to the answer when the process ends. Also explain why the process ends.
    - For language, browser, data, or systems behavior, explain the relevant contract or lifecycle instead of forcing a loop proof.
    - State every assumption required by the reasoning.
@@ -97,7 +105,7 @@ Every active concept, data structure, problem-solving method, language technique
    - Show the smallest complete code fragment that matches the trace, or link to the reference implementation that owns the full example.
 6. **Work and memory**
    - Explain each cost in words before using standard notation.
-   - Include preprocessing, recursion, output construction, runtime allocations, rendering, network, storage, and server costs when they make a meaningful difference.
+   - Include every meaningful setup, execution, output, allocation, and external-system cost.
 7. **When to use it**
    - List clues a reader can see in the problem, input, or required output.
 8. **When not to use it**
@@ -124,13 +132,13 @@ Give each required heading a separate teaching purpose. Do not repeat the same e
 - Keep trace labels and numbered step titles plain. Do not wrap them in bold emphasis; the raw Markdown must remain easy to scan.
 - Use numbered lists for traces that change state. Use concise bullets for comparisons and mappings that do not change state.
 - Teach the main path with one small, ordinary example. Put unusual branches, boundaries, failures, and adversarial behavior in focused follow-up examples when combining them would hide the main idea. Several examples may share the coverage; one input does not need to exercise every branch.
-- For a table or other derived state, explain how to read one completed representative value before tracing how it was built.
-- Before a trace starts with a derived collection or serialized state, derive every displayed entry from the original input. Do not present a completed array, table, tree, map, or serialized value without showing where its displayed values came from.
-- Use the actual state and collection names in a trace, not vague labels such as "value" or "table." Include everything needed to replay the transition: the complete relevant collection after the step, the lookup key or index, the returned value, any unchanged retry state, and whether each displayed default is only initialized or already confirmed.
+- For derived state, explain how to read one completed representative part before tracing how it was built.
+- Before a trace starts with derived or serialized state, derive every displayed part from the original input. Do not present completed derived state without showing where its displayed values came from.
+- Use the actual state names in a trace, not vague labels. Include everything needed to replay the transition: the complete relevant state after the step, the selection input, the returned result, any unchanged retry state, and whether each displayed default is only initialized or already confirmed.
 - Split a multi-phase method into named phases. When state changes roles between phases, give each role a distinct name. Use the same phase and state names in the prose, traces, and code.
 - Use a compact, aligned text diagram when position, nesting, overlap, ownership, or another spatial relationship is much clearer visually than in prose.
 - Show a stateful process as a sequence of aligned snapshots when possible. Keep the input, current positions, derived state, and output in stable locations. Change only the values or markers that actually change. Keep an important unchanged value visible when the step is meant to highlight it.
-- Put a derived table, index, pointer, or status beside the data it describes. Put the active rule beside the transition it controls so the reader does not have to combine separate diagrams mentally.
+- Put derived state beside the source state it describes. Put the active rule beside the transition it controls so the reader does not have to combine separate diagrams mentally.
 - Show one active rule or branch at a time. Introduce another branch when the example reaches it, after the reader has concrete state to apply it to.
 - When an optimized method removes visible wasted work, first show the baseline method doing that work once. The optimization should solve a problem the reader has already seen.
 - Make the example workload support the stated reason for choosing the concept. If the concept helps with many, repeated, overlapping, interleaved, concurrent, or failure-prone operations, include enough of that condition to make the benefit visible. One operation that a simpler method handles equally well shows mechanics, not why the concept should be chosen.
@@ -141,7 +149,7 @@ Give each required heading a separate teaching purpose. Do not repeat the same e
 - A visualization must show real input values and the state or transition being taught. Decorative diagrams and outcome-only images do not demonstrate the rule.
 - Do not rely on color alone. Also use labels, position, brackets, or symbols so every state remains understandable without color.
 - If a fallback, retry, propagation, or other branch can repeat, include a focused trace in which it repeats. Do not stop after its first pass.
-- Build each focused example around the misunderstanding it should correct, not only the branch it should cover. Name the distinction, such as count versus position, key versus value, or initialized versus confirmed state.
+- Build each focused example around the misunderstanding it should correct, not only the branch it should cover. Name the exact roles or states the learner might confuse.
 - Keep each numbered step focused on one meaningful state change. Show a repeated rule once before compressing identical later transitions.
 - An outcome-only paragraph is not a worked example.
 - Do not use Markdown tables in teaching entries. They are hard to read on narrow screens and do not handle long state descriptions well.
@@ -150,14 +158,14 @@ Give each required heading a separate teaching purpose. Do not repeat the same e
 
 ## 6. Correctness standards
 
-- Describe the fact that stays true before calling it an _invariant_.
+- Describe the fact that stays true before introducing its formal name.
 - For an algorithm, explain:
-  1. why the invariant is true at the start
-  2. why one iteration or recursive step keeps it true
+  1. why the fact is true at the start
+  2. why one step keeps it true
   3. why the process ends
   4. why the final state contains the required answer
 - For a data structure or language technique, explain why its operations or language rules produce the demonstrated result. For browser, framework, data, and operational topics, connect the behavior to the relevant contract or lifecycle. Do not force an algorithm-style proof when a precise behavior explanation is clearer.
-- State every assumption required for correctness, such as sorted input, non-negative weights, valid encoding, acyclic relationships, or safe numeric bounds.
+- State every assumption required for correctness and show where the reasoning depends on it.
 - Replay every changed trace against the changed code. The prose and code must make the same decisions in the same order.
 
 ## 7. Code example standards
@@ -165,24 +173,24 @@ Give each required heading a separate teaching purpose. Do not repeat the same e
 - Put Go code in fenced `go` blocks. Put frontend code in fenced `typescript` or `tsx` blocks.
 - Follow `CODING_RULES.md`, including its standard for comments written for learners.
 - Make each example understandable on its own. The names, control flow, and nearby comments must explain every non-obvious state change. A reader should not need to search earlier prose for a missing step.
-- Do not hide several reasoning steps in one unexplained expression. Explain index offsets, sentinel values, fallback lookups, bit operations, boundary updates, mutations, and compound conditions with named intermediate steps or an immediate invariant-based comment. Keep obvious language idioms concise.
-- When code converts a logical quantity to an index, key, offset, or boundary, use role-based intermediate names if they clarify the conversion. The prose and trace must show the same input, conversion, lookup, and returned value.
+- Do not hide several reasoning steps in one unexplained expression. Use named intermediate steps or an immediate rule-based comment for non-obvious conversions, special values, state changes, and compound decisions. Keep obvious language idioms concise.
+- When code converts a logical quantity into a storage selector or location, use role-based intermediate names if they clarify the conversion. The prose and trace must show the same input, conversion, access, and returned result.
 - Match the code's phase boundaries and role-based state names to the explanation. Do not use one vague state name for different roles just because they share a type or update rule.
 - Make each example complete enough to understand and compile in its stated context.
 - State required input conditions immediately before the code.
-- Explain non-obvious language and runtime behavior where the reader first needs it. Examples include Go aliasing and allocation, JavaScript coercion and task ordering, browser lifecycle behavior, and framework ownership rules.
+- Explain non-obvious language, runtime, platform, and ownership behavior where the reader first needs it.
 - If the reference section already has a complete implementation, keep the full code there and link to it. Do not maintain a second copy.
 - Format and compile or type-check every complete code example changed by an update. Use the repository's configured tools to run its ordinary case and at least one relevant boundary or failure case.
 
 ## 8. Work and memory standards
 
-- Before writing a growth rate such as `O(n)`, define what each input-size symbol measures.
-- Explain what work or stored data creates each cost before writing `O(...)`.
+- Before using asymptotic notation, define what each input-size symbol measures.
+- Explain what work or stored data creates each cost before stating its formal growth rate.
 - List best, usual, and worst cases only when they differ in a meaningful way.
-- Include preprocessing costs such as sorting and building an index.
-- Account for recursion depth, explicit stacks and queues, maps, copied collections, retained backing storage, rendering, network transfer, storage, server load, and every other meaningful cost.
+- Include all preprocessing costs.
+- Account for control-flow state, auxiliary storage, copied or retained data, output construction, runtime resources, and external-system work when they are meaningful.
 - When output size matters, separate extra working memory from the memory required to hold the output.
-- Use separate symbols for important input dimensions when one `n` would hide their effects. Examples include rows, columns, vertices, edges, and output count.
+- Use separate symbols for important input dimensions when one symbol would hide their independent effects.
 
 ## 9. Content ownership and duplication
 
@@ -233,7 +241,7 @@ While editing:
 After editing:
 
 1. Re-read each changed entry as a beginner. Look for undefined terms, vague pronouns, unexplained notation, and circular explanations. Make sure a reader can explain one representative state value before learning how it is built.
-2. For each non-obvious representation, use a short prompt that asks a learner to paraphrase a concrete expression. For example, ask them to identify its lookup input and stored fact. If the answer requires terms the example has not introduced, revise the entry.
+2. For each non-obvious representation, ask a learner to paraphrase one concrete expression and explain the role of each part. If the answer requires terms the example has not introduced, revise the entry.
 3. Make a separate technical pass. Replay every trace, compare it with the code, verify the correctness or lifecycle explanation, and recalculate each relevant cost.
 4. Review the full diff for missing prose, examples, links, code, and sources. Also check for accidental changes outside the requested scope.
 5. Read every fenced code example in each changed guide for local clarity. Formatting, compilation, and tests do not replace this review.
@@ -287,12 +295,12 @@ An update to an active concept study guide is complete only when:
 - every changed teaching entry has all ten required sections in order
 - each new term is explained in plain language before it is used
 - representative state values have a concrete meaning before the trace shows how they are built
-- every indexed or mapped state names its lookup input and stored fact and explains any conversion between a logical quantity and its storage location
+- every structured state names its selection input and stored fact and explains any conversion between a logical quantity and its storage location
 - every non-obvious rule is shown with concrete state before it is summarized; diagrams use actual values when a relationship is much easier to see than describe
 - traces use real identifiers, show all relevant state, and separate default or unconfirmed values from confirmed results
 - chained traces show the initial state once and do not repeat one transition's `After` state as the next transition's `Before` state
 - stateful explanations use stable, aligned snapshots, keep related state together, and show each active rule beside the step it controls
-- every code example makes its non-obvious state changes clear through explicit names, control flow, or invariant-based comments
+- every code example makes its non-obvious state changes clear through explicit names, control flow, or rule-based comments
 - ordinary and relevant boundary behavior appear in replayable traces; focused examples are used when a combined trace would hide the main idea
 - each example workload shows the repeated work, overlap, interleaving, failure, state requirement, or other condition that makes the concept better than its simpler alternative
 - the prose, traces, and code use the same phase boundaries and role-based state names
