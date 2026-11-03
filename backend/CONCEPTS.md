@@ -1665,11 +1665,8 @@ stream when a streaming protocol is the actual requirement.
 
 - [Architecture and service construction](
   #5-architecture-and-service-construction)
-- [Frontend network and security][frontend-network]
 - [Data, transactions, and architecture][data-lesson]
 
-[frontend-network]:
-  ../frontend/CONCEPTS.md#a3-networking-storage-and-browser-security
 [data-lesson]: #8-business-transactions-and-contested-state
 
 ## 7. Relational modeling and PostgreSQL access

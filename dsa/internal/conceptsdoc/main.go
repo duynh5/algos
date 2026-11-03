@@ -54,13 +54,6 @@ var conceptGuideSpecs = []conceptGuideSpec{
 		ownsBaselineLinks: true,
 	},
 	{
-		path: "frontend/CONCEPTS.md",
-		requiredFields: teachingFields(
-			"TypeScript example",
-		),
-		expectedEntries: 13,
-	},
-	{
 		path:            "backend/CONCEPTS.md",
 		requiredFields:  teachingFields("Go example"),
 		expectedEntries: 32,

@@ -2,7 +2,7 @@
 
 ## Purpose and scope
 
-These standards govern `dsa/CONCEPTS.md`, `frontend/CONCEPTS.md`, and `backend/CONCEPTS.md`. Each guide must be consistent, understandable, and complete enough for a reader to apply its concepts correctly.
+These standards govern `dsa/CONCEPTS.md` and `backend/CONCEPTS.md`. Each guide must be consistent, understandable, and complete enough for a reader to apply its concepts correctly.
 
 A lesson succeeds when the reader can explain the problem in everyday language, reproduce an actual example step by step, implement the method, explain why it works, recognize its limits, and handle the cases that commonly break it. Definitions, code, and links alone do not meet this standard.
 
@@ -10,12 +10,12 @@ Comprehensive means covering the concept's contract, mechanism, reasoning, imple
 
 ## 1. Organize for learning and lookup
 
-- Begin each guide with its audience, assumed knowledge, how to study it, and a table of contents. DSA assumes basic Go syntax; frontend assumes basic TypeScript and browser use; backend assumes basic Go and web-service concepts. Teach or link additional prerequisites before relying on them.
+- Begin each guide with its audience, assumed knowledge, how to study it, and a table of contents. DSA assumes basic Go syntax; backend assumes basic Go and web-service concepts. Teach or link additional prerequisites before relying on them.
 - Order lessons from foundations to applications. Teach method selection before catalogs of methods and language behavior before implementations depend on it. Follow domain curriculum indexes where present.
 - Give each concept one primary teaching entry. Other entries explain their application and link back instead of maintaining competing explanations or code copies.
 - Keep standard technical names searchable in headings and contents. Pair a familiar description with the established name when helpful.
 - Distinguish complete lessons from outlines, roadmaps, evidence summaries, and further-study lists. Label planned material honestly; a heading alone is not coverage.
-- Link reusable DSA explanations from web guides instead of copying them. Keep domain-specific behavior in the guide that owns it.
+- Link reusable DSA explanations from other guides instead of copying them. Keep domain-specific behavior in the guide that owns it.
 - Preserve useful explanations, examples, sources, attribution, and incoming links. Before renaming or moving headings, search repository references and preserve old fragments with explicit anchors where needed.
 
 ## 2. Use a consistent lesson sequence
@@ -44,7 +44,7 @@ The main trace and implementation must describe the same problem, input, represe
 
 ### Implementation
 
-Provide readable code implementing the demonstrated contract, or link to the repository implementation that owns it. Use Go for DSA and backend, and TypeScript or TSX for frontend. Identify the execution context, dependencies, assumptions, returned result, and side effects.
+Provide readable Go code implementing the demonstrated contract, or link to the repository implementation that owns it. Identify the execution context, dependencies, assumptions, returned result, and side effects.
 
 A link may avoid duplicate full code, but it cannot replace the local explanation or walkthrough. Follow `CODING_RULES.md` for code, comments, formatting, and validation.
 
@@ -113,7 +113,6 @@ When shrinking, retry, fallback, propagation, or backtracking can repeat, includ
 - Algorithms: follow reads, decisions, updates, and return values in implementation order.
 - Data structures: trace interacting operations that reveal representation, ordering, and boundaries.
 - Language behavior: show actual expressions, values, ownership or aliasing, and observable results.
-- Frontend: show user actions, application state, rendering or effects, asynchronous event order, and visible outcomes. Include stale results, cleanup, or cancellation where relevant.
 - Backend: show requests or events, durable and temporary state, failure points, and externally visible outcomes. Identify scheduling and failure assumptions rather than implying every execution has one order.
 
 Use aligned text snapshots when position, nesting, ownership, or boundaries are clearer visually. Keep related values together and positions stable. Label meaning explicitly rather than relying on color. Avoid Markdown tables in teaching entries so explanations remain readable on narrow screens.

@@ -4,7 +4,7 @@
 
 The `dsa/` domain teaches algorithms and data structures in Go. Keep the educational guide in `dsa/CONCEPTS.md`, the active exercise under `dsa/workbench/`, and standalone practice and completed judge-ready solutions under `dsa/problems/`.
 
-The shared teaching contract in `CONCEPTS_STANDARDS.md` applies to every active concept study guide: `dsa/CONCEPTS.md`, `frontend/CONCEPTS.md`, and `backend/CONCEPTS.md`.
+The shared teaching contract in `CONCEPTS_STANDARDS.md` applies to every active concept study guide: `dsa/CONCEPTS.md` and `backend/CONCEPTS.md`.
 
 ## Code Generation Standard
 
@@ -134,7 +134,7 @@ When the completed problem is in the workbench:
 ## Documentation Map
 
 - [`dsa/CONCEPTS.md`](dsa/CONCEPTS.md) is the learning guide for reusable algorithms, data structures, Go techniques, and problem-solving methods.
-- [`CONCEPTS_STANDARDS.md`](CONCEPTS_STANDARDS.md) defines how to maintain every active DSA, frontend, and backend concept study guide.
+- [`CONCEPTS_STANDARDS.md`](CONCEPTS_STANDARDS.md) defines how to maintain every active DSA and backend concept study guide.
 - [`dsa/workbench/README.md`](dsa/workbench/README.md) explains how to prepare and run the active problem.
 - [`dsa/problems/README.md`](dsa/problems/README.md) documents standalone problem files and provides their index.
 - [`VALIDATION.md`](VALIDATION.md) owns repository prerequisites and validation commands.

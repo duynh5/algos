@@ -10,10 +10,9 @@ import (
 func TestConceptGuideSpecsCoverEveryActiveGuide(t *testing.T) {
 	wantedPaths := []string{
 		"dsa/CONCEPTS.md",
-		"frontend/CONCEPTS.md",
 		"backend/CONCEPTS.md",
 	}
-	wantedEntries := []int{434, 13, 32}
+	wantedEntries := []int{434, 32}
 	if len(conceptGuideSpecs) != len(wantedPaths) {
 		t.Fatalf(
 			"concept guide count = %d; want %d",
@@ -46,14 +45,14 @@ func TestValidateTeachingEntriesUsesGuideExampleHeading(
 	t *testing.T,
 ) {
 	spec := conceptGuideSpec{
-		path: "frontend/CONCEPTS.md",
+		path: "typed-guide.md",
 		requiredFields: teachingFields(
 			"TypeScript example",
 		),
 		expectedEntries: 1,
 	}
 	prose := []byte(strings.Join([]string{
-		"## Frontend lesson",
+		"## Typed lesson",
 		"### The problem it solves",
 		"### How it works",
 		"### Step-by-step examples",
@@ -79,14 +78,14 @@ func TestValidateTeachingEntriesRejectsWrongExampleHeading(
 	t *testing.T,
 ) {
 	spec := conceptGuideSpec{
-		path: "frontend/CONCEPTS.md",
+		path: "typed-guide.md",
 		requiredFields: teachingFields(
 			"TypeScript example",
 		),
 		expectedEntries: 1,
 	}
 	prose := []byte(strings.Join([]string{
-		"## Frontend lesson",
+		"## Typed lesson",
 		"### The problem it solves",
 		"### How it works",
 		"### Step-by-step examples",
@@ -307,36 +306,36 @@ func TestValidateInboundLinksUsesDestinationGuideTargets(
 	t *testing.T,
 ) {
 	repositoryRoot := t.TempDir()
-	frontendDirectory := filepath.Join(
+	sampleDirectory := filepath.Join(
 		repositoryRoot,
-		"frontend",
+		"sample",
 	)
-	if err := os.MkdirAll(frontendDirectory, 0o755); err != nil {
-		t.Fatalf("create frontend directory: %v", err)
+	if err := os.MkdirAll(sampleDirectory, 0o755); err != nil {
+		t.Fatalf("create sample directory: %v", err)
 	}
 
-	// Give the frontend guide a target that is different from every
+	// Give the sample guide a target that is different from every
 	// target in the DSA guide.
-	frontendGuide := []byte(
-		"# Frontend\n\n## Frontend entry\n",
+	sampleGuide := []byte(
+		"# Sample\n\n## Sample entry\n",
 	)
-	frontendGuidePath := filepath.Join(
-		frontendDirectory,
+	sampleGuidePath := filepath.Join(
+		sampleDirectory,
 		"CONCEPTS.md",
 	)
 	if err := os.WriteFile(
-		frontendGuidePath,
-		frontendGuide,
+		sampleGuidePath,
+		sampleGuide,
 		0o600,
 	); err != nil {
-		t.Fatalf("write frontend guide: %v", err)
+		t.Fatalf("write sample guide: %v", err)
 	}
 
 	// The inbound link must resolve against the file named in the
 	// destination rather than against a single global target set.
 	readme := []byte(
-		"[Entry](frontend/" +
-			"CONCEPTS.md" + "#frontend-entry)\n",
+		"[Entry](sample/" +
+			"CONCEPTS.md" + "#sample-entry)\n",
 	)
 	if err := os.WriteFile(
 		filepath.Join(repositoryRoot, "README.md"),
@@ -356,7 +355,7 @@ func TestValidateInboundLinksUsesDestinationGuideTargets(
 
 	// A fragment absent from the destination guide must still fail.
 	invalidReadme := []byte(
-		"[Entry](frontend/" +
+		"[Entry](sample/" +
 			"CONCEPTS.md" + "#missing-entry)\n",
 	)
 	if err := os.WriteFile(

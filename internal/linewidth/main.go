@@ -34,9 +34,8 @@ const (
 )
 
 var conceptGuidePaths = map[string]struct{}{
-	"backend/CONCEPTS.md":  {},
-	"dsa/CONCEPTS.md":      {},
-	"frontend/CONCEPTS.md": {},
+	"backend/CONCEPTS.md": {},
+	"dsa/CONCEPTS.md":     {},
 }
 
 var codeExtensions = map[string]struct{}{

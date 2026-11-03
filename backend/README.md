@@ -4,10 +4,8 @@ This extension teaches backend engineering with Go through one
 evolving Order API. Active lessons follow the shared
 [concept study standards](../CONCEPTS_STANDARDS.md).
 
-Frontend candidates should first follow the
-[frontend curriculum](../frontend/README.md). Use this extension to
-develop full-stack range, understand the systems behind browser
-applications, or prepare for backend-heavy roles.
+Use this extension to develop full-stack range, understand the systems
+behind browser applications, or prepare for backend-heavy roles.
 
 Reading alone is not completion. Each chapter asks for implementation,
 failure testing, explanation, and production evidence.
