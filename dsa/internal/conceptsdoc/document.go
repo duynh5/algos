@@ -210,107 +210,6 @@ func githubSlug(heading string) string {
 	return strings.Trim(slug.String(), "-")
 }
 
-func validateTeachingEntries(
-	spec conceptGuideSpec,
-	prose []byte,
-) ([]string, int) {
-	fieldIndex := make(map[string]int, len(spec.requiredFields))
-	for index, field := range spec.requiredFields {
-		fieldIndex[field] = index
-	}
-
-	issues := make([]string, 0)
-	expected := 0
-	entryCount := 0
-	entryLevel := 0
-	scanner := bufio.NewScanner(bytes.NewReader(prose))
-	lineNumber := 0
-	for scanner.Scan() {
-		lineNumber++
-		match := headingPattern.FindStringSubmatch(scanner.Text())
-		if match == nil {
-			continue
-		}
-		if match[2] == "The idea in simple terms" {
-			issues = append(
-				issues,
-				fmt.Sprintf(
-					"%s:%d: deprecated teaching field %q; merge it "+
-						"into %q",
-					spec.path,
-					lineNumber,
-					match[2],
-					"How it works",
-				),
-			)
-			continue
-		}
-		index, isField := fieldIndex[match[2]]
-		if !isField {
-			continue
-		}
-		if index != expected {
-			issues = append(
-				issues,
-				fmt.Sprintf(
-					"%s:%d: teaching field %q appears where %q is "+
-						"required",
-					spec.path,
-					lineNumber,
-					match[2],
-					spec.requiredFields[expected],
-				),
-			)
-			expected = (index + 1) % len(spec.requiredFields)
-			continue
-		}
-		level := len(match[1])
-		if expected == 0 {
-			entryLevel = level
-		} else if level != entryLevel {
-			issues = append(
-				issues,
-				fmt.Sprintf(
-					"%s:%d: teaching field %q uses level %d; "+
-						"entry started at level %d",
-					spec.path,
-					lineNumber,
-					match[2],
-					level,
-					entryLevel,
-				),
-			)
-		}
-		expected++
-		if expected == len(spec.requiredFields) {
-			entryCount++
-			expected = 0
-		}
-	}
-	if expected != 0 {
-		issues = append(
-			issues,
-			fmt.Sprintf(
-				"%s: final teaching entry stops before %q",
-				spec.path,
-				spec.requiredFields[expected],
-			),
-		)
-	}
-	if entryCount != spec.expectedEntries {
-		issues = append(
-			issues,
-			fmt.Sprintf(
-				"%s: teaching entries: got %d, want %d",
-				spec.path,
-				entryCount,
-				spec.expectedEntries,
-			),
-		)
-	}
-	return issues, entryCount
-}
-
 func validateNoTables(path string, prose []byte) []string {
 	lines := strings.Split(string(prose), "\n")
 	for index := 1; index < len(lines); index++ {
@@ -391,10 +290,10 @@ func validateTraceItems(path string, prose []byte) []string {
 		line := scanner.Text()
 		if match := headingPattern.FindStringSubmatch(line); match != nil {
 			switch match[2] {
-			case "Step-by-step examples":
+			case "Step-by-step examples", "Worked walkthrough":
 				inExamples = true
 				chainedTrace = false
-			case "Why it works":
+			case "Why it works", "Implementation":
 				if inExamples {
 					flushItem()
 					inExamples = false

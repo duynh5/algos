@@ -50,7 +50,7 @@ var conceptGuideSpecs = []conceptGuideSpec{
 	{
 		path:              "dsa/CONCEPTS.md",
 		requiredFields:    teachingFields("Go example"),
-		expectedEntries:   93,
+		expectedEntries:   434,
 		ownsBaselineLinks: true,
 	},
 	{

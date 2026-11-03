@@ -1,314 +1,186 @@
-# Standards for Maintaining Concept Study Guides
+# Concept Study Guide Standards
 
-Follow these standards whenever you change an active concept study guide:
+## Purpose and scope
 
-- `dsa/CONCEPTS.md`
-- `frontend/CONCEPTS.md`
-- `backend/CONCEPTS.md`
+These standards govern `dsa/CONCEPTS.md`, `frontend/CONCEPTS.md`, and `backend/CONCEPTS.md`. Each guide must be consistent, understandable, and complete enough for a reader to apply its concepts correctly.
 
-Treat the version currently in the working tree as the source of truth. Keep its useful explanations, examples, code, sources, links, and legacy anchors unless you have verified that something needs to change.
+A lesson succeeds when the reader can explain the problem in everyday language, reproduce an actual example step by step, implement the method, explain why it works, recognize its limits, and handle the cases that commonly break it. Definitions, code, and links alone do not meet this standard.
 
-## Line length
+Comprehensive means covering the concept's contract, mechanism, reasoning, implementation, costs, alternatives, and relevant boundaries. It does not mean mentioning every related topic or making every lesson equally long. Give difficult ideas the space they need; remove repetition rather than necessary reasoning.
 
-- Limit every line in an active concept guide to 70 Unicode characters.
-- This limit applies to everything in the guide, including prose, headings, lists, links, comments, diagrams, and code examples.
-- Format long URLs, paths, identifiers, and serialized values so that no line exceeds 70 characters.
-- After changing a concept guide, run `go run ./internal/linewidth`.
+## 1. Organize for learning and lookup
 
-## 1. Purpose and audience
+- Begin each guide with its audience, assumed knowledge, how to study it, and a table of contents. DSA assumes basic Go syntax; frontend assumes basic TypeScript and browser use; backend assumes basic Go and web-service concepts. Teach or link additional prerequisites before relying on them.
+- Order lessons from foundations to applications. Teach method selection before catalogs of methods and language behavior before implementations depend on it. Follow domain curriculum indexes where present.
+- Give each concept one primary teaching entry. Other entries explain their application and link back instead of maintaining competing explanations or code copies.
+- Keep standard technical names searchable in headings and contents. Pair a familiar description with the established name when helpful.
+- Distinguish complete lessons from outlines, roadmaps, evidence summaries, and further-study lists. Label planned material honestly; a heading alone is not coverage.
+- Link reusable DSA explanations from web guides instead of copying them. Keep domain-specific behavior in the guide that owns it.
+- Preserve useful explanations, examples, sources, attribution, and incoming links. Before renaming or moving headings, search repository references and preserve old fragments with explicit anchors where needed.
 
-- Write each guide consistently for its intended readers.
+## 2. Use a consistent lesson sequence
 
-  Assume the following background in each guide:
+Use these eight section headings, in order, for new or fully revised teaching entries. Place them one level below the concept heading. Add focused subheadings when needed without exceeding Markdown's six heading levels. Section length follows the concept's difficulty, not a fixed word count.
 
-  - DSA readers know basic Go syntax.
-  - Frontend readers work with TypeScript and browser concepts.
-  - Backend readers work with Go and web-service concepts.
+### Problem and contract
 
-- Teach ways of thinking that readers can reuse instead of collecting solutions to individual problems.
-- Keep every entry technically accurate, but do not assume that readers already know its formal terms.
-- Add a topic only when it meets a clear learning need, not simply to make the guide cover more material.
+Explain what the reader needs to accomplish before naming the mechanism. State the input, expected output or observable behavior, and preconditions. Specify ordering, duplicate handling, mutation, ownership, valid ranges, failure behavior, and timing guarantees whenever they affect correctness.
 
-## 2. Guide organization
+Identify prerequisites and give a concrete reason to learn the concept. Establish a simple baseline when it helps reveal the repeated work, ambiguity, or failure being addressed.
 
-- Keep each domain's `CONCEPTS.md` as the main guide for that domain unless another change explicitly creates a different structure.
-- Keep the DSA guide in this learning order:
-  1. how to use the guide and current evidence about technical interviews
-  2. foundations
-  3. ways to store and organize information
-  4. ways to solve problems
-  5. Go-specific techniques
-  6. Go reference implementations
-  7. further study
-- Keep the table of contents in sync with section names, order, and heading anchors.
-- Place the DSA method-selection guidance before the pattern cards so readers learn how to choose among them first.
-- Place DSA Go techniques before the reference implementations so readers learn the relevant language behavior before the code relies on it.
-- Keep the frontend and backend sections in the order defined by their curriculum indexes.
-- Treat evidence sections, competency maps, navigation groups, source references, and further-study lists as supporting material rather than teaching entries. They must follow the teaching-entry contract only when they become standalone active teaching entries.
+### Mental model
 
-## 3. Plain language and terminology
+Explain the idea in plain English. Identify the information remembered, what each part means, how the next action is chosen, and what ends the process. Introduce technical names alongside those meanings.
 
-- Explain the main idea in everyday language before giving its standard technical name.
-- Define each necessary technical term in the paragraph where it first appears. Do not explain one unfamiliar term with several other undefined terms.
-- Use concrete verbs such as "visit," "remember," "compare," and "move." Avoid abstract phrases such as "perform traversal" and "leverage state."
-- Explain notation in words before using it repeatedly.
-- Before showing how a method builds or changes state, explain what one representative part of that state means.
-- Before explaining updates to structured state, state its access contract as `selection input -> stored fact`. Say what selects one part, what unit its value measures, and how to read one concrete part as a sentence.
-- Keep logical quantities, storage selectors, storage locations, and stored values separate. When code converts between them, show the conversion with exact values before giving the general expression.
-- If the implementation hides the natural mental model, explain the conceptual representation first. Then map it to the actual storage representation. Storage details should refine the mental model, not create a different one.
-- When the same data has different roles or locations, label each use by its role and location. Do not let one vague name quietly refer to different things.
-- Give state a plain-language mental model when it makes the idea easier to remember. Follow it with the exact term and rule so the analogy does not replace a correct explanation.
-- Use one main mental model throughout an entry's introduction, procedure, traces, correctness argument, and code. If another model is necessary, explain how it maps to the first one.
-- Show before telling. Demonstrate a non-obvious rule with exact values, positions, or state changes before describing it in abstract terms.
-- Keep each entry's standard technical name visible. Readers need to recognize established terminology in problems, documentation, and interviews.
-- Keep a precise technical term when removing it would reduce accuracy, but pair it with a plain-English explanation.
-- Spell out each abbreviation the first time it appears in a learning context.
+Define state before updating it. For a map, array, table, queue, or other structured representation, explain what selects an element and what fact its value stores. Read one concrete lookup as a sentence. Distinguish values from indices, indices from counts, and tentative results from confirmed ones.
 
-## 4. Required teaching-entry contract
+For example, explain that a table entry stores the number of ways to reach a particular total before showing its update formula. If logical positions and storage positions differ, show one exact conversion before giving the general rule.
 
-Every active concept, data structure, problem-solving method, language technique, and reference implementation must use the following headings in this order. A section may be short, but none may be omitted.
+### Worked walkthrough
 
-1. **The problem it solves**
-   - State the problem, the shape of the input, and the expected result.
-   - Do not define the technique by repeating its name.
-2. **How it works**
-   - Use plain language and as much detail as the concept needs.
-   - For a method that repeatedly chooses its next work, state one
-     plain-language selection contract: the eligible items, the rule
-     that chooses one item, and how the shown code finds it. Separate
-     the algorithm's choice from its implementation data structure.
-     When different data structures can enact the same choice, make
-     clear which behavior stays fixed and which mechanism changes.
-   - When a nearby method has similar control flow, contrast their
-     selection contracts before explaining secondary details.
-   - Do not remove a necessary rule, condition, state meaning, or distinction just to shorten the section.
-   - Split long explanations into focused paragraphs when that makes them easier to follow.
-   - Begin with a familiar action or practical situation when it makes the idea easier to picture.
-   - Give the formal name only after the action is clear.
-   - Explain the real workflow when an analogy would add complexity.
-   - Remove filler, long introductions, and repeated points. Every sentence must add a rule, reason, condition, distinction, or useful mental model.
-   - Put the full procedure in the worked trace unless the reader must understand a rule first.
-3. **Step-by-step examples**
-   - Show the complete method with at least one small, ordinary example.
-   - Make the reason for choosing the concept visible in the example's workload, not only in the surrounding explanation.
-   - Add a boundary, duplicate, failure, or adversarial example when it changes the behavior or reveals a common mistake.
-4. **Why it works**
-   - Use plain language and as much detail as the reasoning needs.
-   - Begin with the concrete fact or contract that makes the result reliable. Introduce its formal name only after that fact is clear.
-   - For an algorithm, explain why the fact is true at the start, remains true after one step, and leads to the answer when the process ends. Also explain why the process ends.
-   - For language, browser, data, or systems behavior, explain the relevant contract or lifecycle instead of forcing a loop proof.
-   - State every assumption required by the reasoning.
-   - Remove filler and do not replay transitions already clear in the trace. Every sentence must add a reason, condition, or link between the state and the result.
-5. **Language-specific example**
-   - Use the exact heading `Go example` in the DSA and backend guides.
-   - Use the exact heading `TypeScript example` in the frontend guide. Use TSX when browser or framework behavior requires it.
-   - Show the smallest complete code fragment that matches the trace, or link to the reference implementation that owns the full example.
-6. **Work and memory**
-   - Explain each cost in words before using standard notation.
-   - Include every meaningful setup, execution, output, allocation, and external-system cost.
-7. **When to use it**
-   - List clues a reader can see in the problem, input, or required output.
-8. **When not to use it**
-   - Explain which assumption fails or which cost is too high.
-   - Name the closest alternative when it helps the reader choose.
-9. **Common mistakes and edge cases**
-   - Tie each warning to a specific failing input, invalid state change, or relevant language, browser, network, or runtime behavior.
-10. **Related material**
-    - Link to prerequisites, contrasting methods, the primary implementation, and representative repository problems. Do not repeat their content.
+Demonstrate the complete process on actual values using the trace requirements below. Include an ordinary example and focused examples for relevant boundaries and failure behavior.
 
-Use each required label as a Markdown heading exactly one level below the entry heading. For example, an `###` entry uses `#### The problem it solves`. A `#####` pattern card uses `###### The problem it solves`.
+The main trace and implementation must describe the same problem, input, representation, decisions, and result. A simplified trace of a different algorithm is insufficient.
 
-Give each required heading a separate teaching purpose. Do not repeat the same explanation under several headings. Let `How it works` build the mental model, the trace teach the procedure, and the correctness section justify it. Refer to the main explanation instead of restating it in every section.
+### Implementation
 
-## 5. Example and trace standards
+Provide readable code implementing the demonstrated contract, or link to the repository implementation that owns it. Use Go for DSA and backend, and TypeScript or TSX for frontend. Identify the execution context, dependencies, assumptions, returned result, and side effects.
 
-- Give the exact input and expected output for every worked example.
-- For an algorithm entry, make the ordinary worked trace and the language-specific example one continuous demonstration. Name a concrete problem, apply the code to the trace's exact input, and follow the code's actual representation, conversions, state changes, branches, and returned result. Do not trace a simplified mock example while the code solves a different problem or contract.
-- Write each trace so a reader can reproduce it from the prose alone. For one continuous process, show `Initial state:` once. Then give every meaningful transition:
-  - `Decision:` the action and why it is valid
-  - `After:` the state produced by the action
-  - `Known correct:` the part of the result already established
-- The `After` state of one transition is the next transition's input. Do not repeat it as `Before`. Use `Before:` only for a standalone transition that does not continue from the preceding state.
-- Keep trace labels and numbered step titles plain. Do not wrap them in bold emphasis; the raw Markdown must remain easy to scan.
-- Use numbered lists for traces that change state. Use concise bullets for comparisons and mappings that do not change state.
-- Teach the main path with one small, ordinary example. Put unusual branches, boundaries, failures, and adversarial behavior in focused follow-up examples when combining them would hide the main idea. Several examples may share the coverage; one input does not need to exercise every branch.
-- For derived state, explain how to read one completed representative part before tracing how it was built.
-- Before a trace starts with derived or serialized state, derive every displayed part from the original input. Do not present completed derived state without showing where its displayed values came from.
-- Use the actual state names in a trace, not vague labels. Include everything needed to replay the transition: the complete relevant state after the step, the selection input, the returned result, any unchanged retry state, and whether each displayed default is only initialized or already confirmed.
-- Split a multi-phase method into named phases. When state changes roles between phases, give each role a distinct name. Use the same phase and state names in the prose, traces, and code.
-- Use a compact, aligned text diagram when position, nesting, overlap, ownership, or another spatial relationship is much clearer visually than in prose.
-- Show a stateful process as a sequence of aligned snapshots when possible. Keep the input, current positions, derived state, and output in stable locations. Change only the values or markers that actually change. Keep an important unchanged value visible when the step is meant to highlight it.
-- Put derived state beside the source state it describes. Put the active rule beside the transition it controls so the reader does not have to combine separate diagrams mentally.
-- Show one active rule or branch at a time. Introduce another branch when the example reaches it, after the reader has concrete state to apply it to.
-- When an optimized method removes visible wasted work, first show the baseline method doing that work once. The optimization should solve a problem the reader has already seen.
-- Make the example workload support the stated reason for choosing the concept. If the concept helps with many, repeated, overlapping, interleaved, concurrent, or failure-prone operations, include enough of that condition to make the benefit visible. One operation that a simpler method handles equally well shows mechanics, not why the concept should be chosen.
-- After the examples, the reader should be able to explain why the simpler alternative repeats work, loses required state, breaks a stated rule, or fails on the demonstrated input. If the ordinary trace does not show that difference, add a focused comparison or a second example. Do not rely only on an abstract complexity claim.
-- Let the concrete example or diagram carry the explanation. Use prose to point out what matters instead of repeating the same relationship in abstract terms.
-- Make the worked trace the main demonstration. Keep the prose before it focused, but include every fact needed to understand the trace.
-- Do not narrate every movement already visible in a snapshot. Use prose to explain why the transition happens, which rule applies, or what the visual cannot show by itself.
-- A visualization must show real input values and the state or transition being taught. Decorative diagrams and outcome-only images do not demonstrate the rule.
-- Do not rely on color alone. Also use labels, position, brackets, or symbols so every state remains understandable without color.
-- If a fallback, retry, propagation, or other branch can repeat, include a focused trace in which it repeats. Do not stop after its first pass.
-- Build each focused example around the misunderstanding it should correct, not only the branch it should cover. Name the exact roles or states the learner might confuse.
-- Keep each numbered step focused on one meaningful state change. Show a repeated rule once before compressing identical later transitions.
-- An outcome-only paragraph is not a worked example.
-- Do not use Markdown tables in teaching entries. They are hard to read on narrow screens and do not handle long state descriptions well.
-- Start each warning with `> **Warning:**`, then describe the concrete failure and its correction.
-- Use the same names in examples, traces, code, and analysis.
+A link may avoid duplicate full code, but it cannot replace the local explanation or walkthrough. Follow `CODING_RULES.md` for code, comments, formatting, and validation.
 
-## 6. Correctness standards
+### Why it works
 
-- Describe the fact that stays true before introducing its formal name.
-- For an algorithm, explain:
-  1. why the fact is true at the start
-  2. why one step keeps it true
-  3. why the process ends
-  4. why the final state contains the required answer
-- For a data structure or language technique, explain why its operations or language rules produce the demonstrated result. For browser, framework, data, and operational topics, connect the behavior to the relevant contract or lifecycle. Do not force an algorithm-style proof when a precise behavior explanation is clearer.
-- State every assumption required for correctness and show where the reasoning depends on it.
-- Replay every changed trace against the changed code. The prose and code must make the same decisions in the same order.
+Explain the fact that makes each decision safe. For algorithms, show why it holds initially, survives every kind of update, and implies the required result at termination. Explain why the process terminates and where each precondition matters.
 
-## 7. Code example standards
+For language, browser, framework, or service behavior, explain the applicable contract, lifecycle, or guarantee. State what it guarantees and what it leaves unspecified. Use the reasoning appropriate to the subject rather than forcing every lesson into a loop proof.
 
-- Put Go code in fenced `go` blocks. Put frontend code in fenced `typescript` or `tsx` blocks.
-- Follow `CODING_RULES.md`, including its standard for comments written for learners.
-- Make each example understandable on its own. The names, control flow, and nearby comments must explain every non-obvious state change. A reader should not need to search earlier prose for a missing step.
-- Do not hide several reasoning steps in one unexplained expression. Use named intermediate steps or an immediate rule-based comment for non-obvious conversions, special values, state changes, and compound decisions. Keep obvious language idioms concise.
-- When code converts a logical quantity into a storage selector or location, use role-based intermediate names if they clarify the conversion. The prose and trace must show the same input, conversion, access, and returned result.
-- Match the code's phase boundaries and role-based state names to the explanation. Do not use one vague state name for different roles just because they share a type or update rule.
-- Make each example complete enough to understand and compile in its stated context.
-- State required input conditions immediately before the code.
-- Explain non-obvious language, runtime, platform, and ownership behavior where the reader first needs it.
-- If the reference section already has a complete implementation, keep the full code there and link to it. Do not maintain a second copy.
-- Format and compile or type-check every complete code example changed by an update. Use the repository's configured tools to run its ordinary case and at least one relevant boundary or failure case.
+### Costs and tradeoffs
 
-## 8. Work and memory standards
+Explain the work performed and information stored before giving complexity notation. Define each size symbol and separate independent input dimensions. Include meaningful preprocessing, allocation, copying, recursion, output construction, retained storage, and external work. Separate auxiliary memory from output storage.
 
-- Before using asymptotic notation, define what each input-size symbol measures.
-- Explain what work or stored data creates each cost before stating its formal growth rate.
-- List best, usual, and worst cases only when they differ in a meaningful way.
-- Include all preprocessing costs.
-- Account for control-flow state, auxiliary storage, copied or retained data, output construction, runtime resources, and external-system work when they are meaningful.
-- When output size matters, separate extra working memory from the memory required to hold the output.
-- Use separate symbols for important input dimensions when one symbol would hide their independent effects.
+Distinguish best, average, amortized, and worst-case costs when meaningful, including assumptions behind average or expected costs. For systems topics, explain relevant latency, network requests, contention, capacity, resource lifetime, and operational costs rather than forcing everything into Big O notation.
 
-## 9. Content ownership and duplication
+### Edge cases and mistakes
 
-- Give each idea one primary teaching entry.
-- Use selection guides and competency maps to help readers choose an entry. Do not repeat the entry's full explanation in them.
-- Put a data structure's basic representation and operations in its own entry. Pattern and application entries should explain how they use those operations.
-- Put language, runtime, browser, and standard-library behavior in the relevant language-technique entry. Other entries should link to it when they depend on that behavior.
-- Keep reusable algorithms and DSA-specific Go techniques in the DSA guide. Web entries should link to them instead of copying them.
-- Keep a reference implementation's full code, contract, input requirements, variable-level trace, implementation costs, and concrete test cases together in its primary entry.
-- Describe relationships between entries in one or two sentences, then link to the primary entry instead of copying its explanation.
-- Before moving material, make sure its new primary entry is complete. Only then remove it from the old location.
+For each relevant case, give a concrete input or event sequence, expected behavior, what a mistaken implementation does, and the rule that prevents the failure. Link to its focused trace or test when already shown.
 
-## 10. Navigation and compatibility
+Avoid generic warnings such as "watch out for boundaries." Identify the boundary, the branch it changes, and the exact mistake it exposes.
 
-- Keep standard algorithm, data-structure, browser, framework, and system names searchable in headings and the table of contents, even when a plain-English phrase comes first.
-- Preserve every explicit legacy anchor and every heading anchor used elsewhere in the repository.
-- Before renaming or moving a heading, search the entire repository for links to it. If old links must keep working, add an explicit HTML anchor for the old fragment.
-- Add or update links in both directions only when they make navigation meaningfully better.
-- After an edit, verify every table-of-contents link, local path, in-guide anchor, and repository link into the guide.
-- Keep links to representative problems, projects, labs, and sources with the concept they demonstrate.
-- Do not remove a useful source, attribution, example, or link without a specific, documented reason.
+### When to choose it
 
-## 11. Evidence and source maintenance
+Give recognizable clues favoring this concept, conditions ruling it out, and the closest useful alternatives. Explain the decisive difference through a workload or counterexample rather than declaring a method simply faster or better.
 
-- Keep time-sensitive claims about interviews, browsers, frameworks, services, and tools separate from explanations of lasting concepts.
-- Check a time-sensitive claim against its linked sources before changing it.
-- Use official preparation material for claims about a company's stated process whenever possible. Label candidate reports as anecdotal evidence.
-- Do not use company tags or remembered question lists as proof of what a company currently asks.
-- When replacing or removing a baseline external source for the DSA guide, update the checker under `dsa/internal/conceptsdoc/` in the same change. Explain why the new source supports the claim.
+Finish with relevant links to prerequisites, contrasting concepts, the primary implementation, repository problems or labs, and authoritative sources. Links support a self-contained explanation; they do not substitute for teaching it.
 
-## 12. Update workflow
+## 3. Explain in plain English
 
-Before editing:
+- Start with concrete actions: compare values, move a boundary, remember a result, wait for a response. Introduce formal names after their meaning is clear.
+- Define unfamiliar terms, abbreviations, symbols, units, and interval conventions at first use. Do not explain one unfamiliar term with several undefined terms.
+- Explain why an action happens. "Move the left boundary because every earlier value is too small" teaches more than "update left."
+- Use one consistent mental model. If an analogy helps, explain its correspondence and limits. Prefer the real workflow when an analogy adds complexity.
+- Keep names consistent across prose, diagrams, traces, code, correctness reasoning, and cost analysis. Give different roles different names even when their values match.
+- Demonstrate non-obvious expressions with exact values before generalizing. Expose index conversions, sentinels, fallback rules, and compound decisions.
+- Use short, connected paragraphs. Give each section a separate teaching purpose. Avoid repeating the trace in the mental model or narrating every value already visible in a diagram.
+- Distinguish guarantees, assumptions, heuristics, observations, and behavior that depends on a version or environment.
+- Never shorten a lesson by removing a prerequisite, state meaning, decision rule, or failure case needed to reproduce it.
 
-1. Read this standards file, the relevant curriculum index, the entire entry being changed, and the primary entries it links to. If the change involves code or code examples, also read `CODING_RULES.md`.
-2. Check `git status` and the relevant diff. Preserve unrelated and user-authored changes. Never overwrite working-tree changes by restoring the guide from `HEAD`.
-3. Find the subject's primary entry. Search for every related heading, anchor, link, code name, example, and problem reference that the change could affect.
+## 4. Make walkthroughs replayable
 
-While editing:
+### Choose inputs that reveal the mechanism
 
-1. Make the smallest complete change that keeps the entry accurate.
-2. When learner feedback reveals a failed explanation, find the earliest prerequisite the learner misunderstood and rebuild from there. Replace the failed mental model and remove outdated prose. Do not pile on more terminology, exceptions, and extra examples.
-3. Complete all ten required sections when adding or substantially reorganizing an entry. Do not leave the conversion unfinished.
-4. Change other sections only when consistency, ownership, or navigation requires it.
-5. As soon as a heading is renamed, preserve its old link target with an explicit HTML anchor.
-6. Update `dsa/internal/conceptsdoc/` when an intentional structural change affects the number of teaching entries or the required source set.
+Use small, explicit inputs with exact expected results. An ordinary example must show meaningful decisions, state changes, and the stopping condition. If the benefit depends on repeated queries, overlapping work, interleaving, or failures, include that condition.
 
-After editing:
+Show the relevant wasted work or failure of a simpler approach before explaining an optimization. A complexity formula alone does not demonstrate why the concept helps.
 
-1. Re-read each changed entry as a beginner. Look for undefined terms, vague pronouns, unexplained notation, and circular explanations. Make sure a reader can explain one representative state value before learning how it is built.
-2. For each non-obvious representation, ask a learner to paraphrase one concrete expression and explain the role of each part. If the answer requires terms the example has not introduced, revise the entry.
-3. Make a separate technical pass. Replay every trace, compare it with the code, verify the correctness or lifecycle explanation, and recalculate each relevant cost.
-4. Review the full diff for missing prose, examples, links, code, and sources. Also check for accidental changes outside the requested scope.
-5. Read every fenced code example in each changed guide for local clarity. Formatting, compilation, and tests do not replace this review.
-6. Make sure the ordinary example teaches the main path without relying on an edge-case trace. Use focused examples for added coverage instead of one input with too many branches. Compare the workload with `The problem it solves` and `When to use it`. The input must actually show the condition that justifies choosing the concept.
-7. Make a density pass. Remove filler, narration of an adjacent visual, and content repeated from another required section. Keep every rule, reason, distinction, boundary, and check the reader needs, even when the explanation must remain long.
-8. Run the validation commands below. Fix every failure before calling the update complete.
+Keep the main example readable. Use separate examples for unusual branches and boundaries when combining them would obscure the idea. Across the examples, cover every materially different decision rule. Compress identical repeated steps only after demonstrating the rule.
 
-## 13. Validation
+### Show each meaningful transition
 
-After every update to an active concept study guide, run these commands from the repository root:
+Begin a continuous trace with the original input, expected result, and `Initial state:`. Derive any displayed preprocessing or initialized state from the input. Use numbered steps containing:
 
-```bash
-~/.codex/scripts/check-non-ascii.py \
-  CONCEPTS_STANDARDS.md \
-  dsa/CONCEPTS.md \
-  frontend/CONCEPTS.md \
-  backend/CONCEPTS.md
-git diff --check HEAD -- \
-  CONCEPTS_STANDARDS.md \
-  dsa/CONCEPTS.md \
-  frontend/CONCEPTS.md \
-  backend/CONCEPTS.md
-go run ./dsa/internal/conceptsdoc
-go run ./internal/codeexamples
-go run ./internal/linewidth
-go vet ./dsa/internal/conceptsdoc
-go test ./dsa/internal/conceptsdoc
-go test ./...
-```
+- `Decision:` the values inspected, condition evaluated, action chosen, and reason it is valid.
+- `After:` the resulting relevant state, including changed boundaries, stored values, pending work, or output.
+- `Known correct:` what has been established and what remains unresolved.
 
-Also format, compile or type-check, and run each changed complete code example in its stated environment or a temporary package. Remove all temporary files and other validation artifacts after the checks.
+Each step starts from the preceding step's `After` state. Do not repeat it as `Before:`. Reserve `Before:` for independent transitions that also include their own decision, resulting state, and established fact. Show the final stopping check and returned value or observable outcome.
 
-The concepts-document checker enforces the guide-specific structure. The repository line-width checker enforces the line limits defined here and in `CODING_RULES.md`. The concepts checker must continue to verify:
+Include enough information to replay the process without running code: indices and values, active ranges, branch conditions, queue order, recursion arguments, restored state, or event order as appropriate. Distinguish initialized placeholders from computed answers. Name phases in multiphase methods and show their handoff.
 
-- a valid heading hierarchy with no duplicate targets
-- balanced fenced blocks
-- every teaching entry and its ten sections in the required order
-- the ban on Markdown tables in teaching content
-- complete initial-state chains or complete standalone transitions in every numbered item that uses the trace vocabulary
-- local paths and fragments
-- repository links into the guide
-- the maintained set of external sources
+When shrinking, retry, fallback, propagation, or backtracking can repeat, include a case where it repeats. Show what changes, what remains valid, and what bounds the repetition.
 
-These automated checks verify structure, links, formatting, and executable consistency. They cannot prove that a learner will form the intended mental model. The beginner and technical reading passes are still required.
+### Adapt traces to the subject
 
-## 14. Definition of done
+- Algorithms: follow reads, decisions, updates, and return values in implementation order.
+- Data structures: trace interacting operations that reveal representation, ordering, and boundaries.
+- Language behavior: show actual expressions, values, ownership or aliasing, and observable results.
+- Frontend: show user actions, application state, rendering or effects, asynchronous event order, and visible outcomes. Include stale results, cleanup, or cancellation where relevant.
+- Backend: show requests or events, durable and temporary state, failure points, and externally visible outcomes. Identify scheduling and failure assumptions rather than implying every execution has one order.
 
-An update to an active concept study guide is complete only when:
+Use aligned text snapshots when position, nesting, ownership, or boundaries are clearer visually. Keep related values together and positions stable. Label meaning explicitly rather than relying on color. Avoid Markdown tables in teaching entries so explanations remain readable on narrow screens.
 
-- every line in the changed guide is no more than 70 characters
-- every changed teaching entry has all ten required sections in order
-- each new term is explained in plain language before it is used
-- representative state values have a concrete meaning before the trace shows how they are built
-- every structured state names its selection input and stored fact and explains any conversion between a logical quantity and its storage location
-- every non-obvious rule is shown with concrete state before it is summarized; diagrams use actual values when a relationship is much easier to see than describe
-- traces use real identifiers, show all relevant state, and separate default or unconfirmed values from confirmed results
-- chained traces show the initial state once and do not repeat one transition's `After` state as the next transition's `Before` state
-- stateful explanations use stable, aligned snapshots, keep related state together, and show each active rule beside the step it controls
-- every code example makes its non-obvious state changes clear through explicit names, control flow, or rule-based comments
-- ordinary and relevant boundary behavior appear in replayable traces; focused examples are used when a combined trace would hide the main idea
-- each example workload shows the repeated work, overlap, interleaving, failure, state requirement, or other condition that makes the concept better than its simpler alternative
-- the prose, traces, and code use the same phase boundaries and role-based state names
-- one main mental model stays consistent throughout the entry, with an explicit mapping wherever the implementation uses a different representation
-- each required section has a separate teaching purpose, and the prose does not repeat information already clear from a nearby visual or the primary entry
-- the correctness or lifecycle explanation, code, and cost analysis agree
-- content ownership is clear, and links replace duplicated teaching prose
-- existing navigation still works
-- no useful concept, example, attribution, source, or link was removed without a stated reason
-- changed code examples compile or type-check and pass the cases used to exercise them
-- every applicable validation command passes
+An outcome-only paragraph, a decorative diagram, or a list of expected outputs is not a walkthrough.
+
+## 5. Cover edge cases deliberately
+
+Identify applicable categories for each entry. Explain why an apparently relevant case is outside the contract instead of silently ignoring it. Coverage follows behavior, not a fixed example quota.
+
+- Input size: empty when valid, smallest valid input, one item, and large or maximum supported input.
+- Values: duplicates, all equal, zero, negatives, missing targets, extreme values, overflow, and precision limits.
+- Position and shape: first and last positions, exact boundaries, sorted or reversed order, skewed structures, disconnected components, cycles, and uneven dimensions.
+- Transitions: no update, repeated update, ties, exhausted work, early exit, and conditions changing from valid to invalid or back again.
+- Representation: nil versus empty, byte versus character, shared storage, mutation, ownership, invalid indices, and sentinel collisions.
+- External behavior: malformed input, unavailable dependencies, partial success, duplicate delivery, reordered completion, timeout, cancellation, cleanup, and recovery.
+
+Cover valid boundaries separately from invalid inputs. State whether invalid input is rejected, excluded by a precondition, or handled explicitly. Do not invent behavior the problem or platform does not promise.
+
+Give a fully worked focused trace when a case introduces new reasoning. A compact input, expected result, and explanation is sufficient when only the data changes. For large constraint cases, use deterministic generated tests and analytical reasoning rather than printing thousands of transitions.
+
+Include at least one counterexample to a plausible wrong approach. Identify its first incorrect decision and connect the correction to the contract or correctness rule. Preserve useful failures as regression cases when the repository has an executable home for them.
+
+## 6. Keep code and sources trustworthy
+
+- Make code complete in its stated context. Identify deliberate fragments and their missing context. Never present pseudocode as compiling code.
+- Use language-tagged fences. Expose meaningful state changes through clear names, control flow, and nearby comments explaining the reasoning. Do not hide the lesson inside helpers or unrelated setup.
+- Keep ordering, mutation, errors, and tie-breaking consistent with the contract and trace. State the acceptance rule when multiple results are valid.
+- Keep full reference implementations in one primary location with their contract, trace, costs, and cases. Link applications to that location.
+- Format and compile or type-check changed complete examples. Run ordinary cases and relevant boundaries or failures in the stated environment. Formatting alone does not establish correctness.
+- Prefer authoritative documentation and original sources. Separate version-dependent and time-sensitive evidence from durable explanations. Verify changing claims before updating them and record the relevant version or verification date.
+- Label interview reports as anecdotal. Remembered questions and platform tags do not establish a company's current process.
+- Preserve attribution. Verify replacement baseline sources and update the checker contract in the same change.
+
+## 7. Formatting and adoption
+
+Every line in an active concept guide must be at most 70 Unicode characters, including headings, prose, links, diagrams, and code. Wrap text and use supported link layouts without breaking targets or shortening meaningful names. This root standards document follows the repository's unwrapped-prose convention.
+
+Maintain balanced fences, a valid heading hierarchy, working paths and fragments, and a synchronized table of contents. Keep trace labels plain and use emphasis only for meaningful distinctions.
+
+These standards replace the former ten-section teaching contract. Existing entries may retain their old headings until deliberately migrated; they are not automatically compliant with the new teaching requirements. Apply the substantive explanation, walkthrough, and edge-case requirements to every changed explanation, even when retaining legacy headings for a focused edit.
+
+The current `dsa/internal/conceptsdoc/` checker enforces the legacy headings. When adopting the eight-section sequence in a guide, update the checker and its tests in the same change to recognize both layouts during migration and validate each complete entry's order. Retain link, fence, trace, source, and hierarchy checks. Update expected entry counts only for intentional additions, removals, or splits. Remove legacy-layout support after all active guides migrate. Do not disable checks to make a conversion pass.
+
+Rewriting these standards alone does not authorize rewriting all guides or their validator. Keep migrations scoped, preserve useful content and anchors, and report which material was actually reviewed.
+
+## 8. Review and definition of done
+
+Before editing a guide, read its current working-tree entry, linked prerequisites, relevant curriculum, these standards, and `CODING_RULES.md` when code is involved. Inspect the diff, identify the primary owner, and trace references before moving or renaming material. Preserve user changes.
+
+After editing, perform two separate reading passes:
+
+1. Beginner pass: can the reader explain the problem, interpret each state value, and replay every decision without guessing? Repair the earliest missing explanation. Check that the example demonstrates the reason for choosing the concept.
+2. Technical pass: replay traces against code, check boundaries and termination, verify guarantees, recalculate costs, and check alternatives and counterexamples. Exercise the main path and a relevant failure, cancellation, or exit path where applicable.
+
+Review the diff for lost content, unintended changes, duplication, broken navigation, and stale sources. A section being present does not establish that it teaches its subject.
+
+Use the commands and prerequisites in [VALIDATION.md](VALIDATION.md). For guide changes, run the concept-document, embedded-code, and line-width checkers, followed by repository tests. Execute changed complete examples as described above. For a standards-only edit, check Markdown formatting, whitespace, and consistency with the existing checker; do not claim unchanged guides meet new requirements.
+
+An entry is ready only when:
+
+- Its contract and prerequisites are explicit, and unfamiliar language is explained locally or through a clear prerequisite link.
+- Its mental model defines the remembered state and rule for choosing the next action.
+- Its ordinary walkthrough reaches the actual result through reproducible decisions and state changes matching the implementation.
+- Its focused examples cover materially different branches, relevant boundaries, and a plausible incorrect approach.
+- Its reasoning establishes correctness under stated assumptions, including termination or lifecycle behavior.
+- Its cost analysis accounts for meaningful work and storage, and its selection guidance explains useful alternatives.
+- Its implementation is readable and verified, navigation works, and applicable checks pass.
+
+Report exact validation failures and unresolved limitations. Automated checks provide structural and executable evidence; the two reading passes establish whether the lesson actually teaches the concept.
